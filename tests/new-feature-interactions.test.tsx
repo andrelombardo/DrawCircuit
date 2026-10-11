@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { chooseSelectionCommand, chooseSelectionColor } from './helpers/selectionMenu';
 import { chooseDrawingTool } from './helpers/drawingMenu';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
@@ -99,7 +100,7 @@ describe('new feature UI integrates with the existing editor', () => {
     });
     render(<App />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Salva come blocco' }));
+    chooseSelectionCommand('Salva come blocco');
     fireEvent.change(screen.getByLabelText('Nome blocco'), { target: { value: 'R-C personale' } });
     fireEvent.click(screen.getByRole('button', { name: 'Salva blocco' }));
     expect(usePersonalBlocks.getState().blocks).toHaveLength(1);
@@ -144,9 +145,9 @@ describe('new feature UI integrates with the existing editor', () => {
       target: { value: 'i_{AB}' },
     });
     fireEvent.blur(screen.getByLabelText('Etichetta annotazione'));
-    fireEvent.click(screen.getByRole('button', { name: 'Inverti freccia' }));
+    chooseSelectionCommand('Inverti freccia');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Simbolo: Verde' }));
+    chooseSelectionColor('Simbolo', 'Verde');
     expect(doc().objects.at(-1)).toMatchObject({
       reversed: true,
       color: '#269978',
@@ -200,7 +201,7 @@ describe('new feature UI integrates with the existing editor', () => {
       client(0, 0),
     );
     expect(doc().objects.at(-1)).toMatchObject({ mode: 'polarity', componentId: c.id });
-    fireEvent.click(screen.getByRole('button', { name: 'Inverti freccia' }));
+    chooseSelectionCommand('Inverti freccia');
     expect(doc().objects.at(-1)).toMatchObject({ reversed: true });
   });
   it('replaces with a compatible picker and supports atomic undo and redo', () => {
@@ -208,7 +209,7 @@ describe('new feature UI integrates with the existing editor', () => {
     useEditorStore.setState({ document: { ...emptyDocument(), objects: [c] }, selection: [c.id] });
     render(<App />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Sostituisci…' }));
+    chooseSelectionCommand('Sostituisci…');
     expect(screen.queryByRole('button', { name: 'Transistor NPN' })).toBeNull();
     fireEvent.change(screen.getByLabelText('Cerca sostituzione'), {
       target: { value: 'Condensatore' },

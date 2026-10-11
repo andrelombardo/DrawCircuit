@@ -3,15 +3,7 @@ import { BraceView } from '../../circuit/annotations/BraceView';
 import { ElectricalView } from '../../circuit/annotations/ElectricalView';
 import { usePersonalBlocks } from '../../personalBlocks/library';
 import { useRef } from 'react';
-import {
-  PanelRightOpen,
-  CircleAlert,
-  Grid2X2,
-  HelpCircle,
-  Maximize,
-  Minus,
-  Plus,
-} from 'lucide-react';
+import { CircleAlert, Grid2X2, HelpCircle, Maximize, Minus, Plus } from 'lucide-react';
 import { useEditorStore } from '../../store/editorStore';
 import { catalog } from '../../model/catalog';
 import { componentTypes, GRID } from '../../model/types';
@@ -25,7 +17,7 @@ import { InlineTextEditor } from './InlineTextEditor';
 import { inlineTextTarget } from '../../utils/labels';
 import { useKeyboardNudge } from './useKeyboardNudge';
 import { DrawingToolbar } from '../toolbar/Toolbar';
-import { SidebarIcon } from '../toolbar/SidebarIcon';
+import { SidebarToggle } from '../toolbar/SidebarToggle';
 import { useCanvasInteractions } from './useCanvasInteractions';
 import { PropertiesInspector } from '../properties/PropertiesInspector';
 import { useInspectorPreferences } from '../properties/useInspectorPreferences';
@@ -142,17 +134,7 @@ export function Canvas({
       <main className="editor" aria-label="Editor circuito">
         <DrawingToolbar onExport={onExport} sidebarVisible={sidebarVisible} />
         {!sidebarVisible && (
-          <button
-            className="icon-button sidebar-toggle sidebar-reopen floating-surface"
-            aria-label="Mostra componenti"
-            title="Mostra componenti (T)"
-            data-tooltip="Mostra componenti (T)"
-            aria-expanded={false}
-            aria-controls="component-library"
-            onClick={onToggleSidebar}
-          >
-            <SidebarIcon />
-          </button>
+          <SidebarToggle side="left" visible={false} onToggle={onToggleSidebar} />
         )}
         {storageError && (
           <div className="persistence-error floating-surface" role="alert">
@@ -161,16 +143,7 @@ export function Canvas({
           </div>
         )}
         {!inspector.preferences.visible && (
-          <button
-            className="icon-button inspector-reopen floating-surface"
-            aria-label="Mostra proprietà"
-            title="Mostra proprietà"
-            aria-expanded={false}
-            aria-controls="properties-inspector"
-            onClick={inspector.toggle}
-          >
-            <PanelRightOpen size={18} />
-          </button>
+          <SidebarToggle side="right" visible={false} onToggle={inspector.toggle} />
         )}
         {tool === 'wire' && (
           <div className="arrow-tool-options" role="group" aria-label="Routing fili">

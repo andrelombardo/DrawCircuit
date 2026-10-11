@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { chooseSelectionColor } from './helpers/selectionMenu';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { Canvas } from '../src/components/editor/Canvas';
@@ -94,11 +95,13 @@ describe('native custom color workflow', () => {
     choose('simbolo', '#ff9500');
     expect(component()).toMatchObject({ color: '#ff9500', label: { color: COLORS.blue } });
     expect(useEditorStore.getState().past).toHaveLength(1);
-    expect(input('simbolo').parentElement?.getAttribute('data-selected')).toBe('true');
+    expect(screen.getByRole('button', { name: 'Colore simbolo' }).textContent).toContain('FF9500');
     choose('etichetta', '#af52de');
     expect(component()).toMatchObject({ color: '#ff9500', label: { color: '#af52de' } });
     expect(useEditorStore.getState().past).toHaveLength(2);
-    expect(input('etichetta').parentElement?.getAttribute('data-selected')).toBe('true');
+    expect(screen.getByRole('button', { name: 'Colore etichetta' }).textContent).toContain(
+      'AF52DE',
+    );
     openStyle();
     openStyle();
     expect((input('simbolo') as HTMLInputElement).value).toBe('#ff9500');
@@ -109,12 +112,16 @@ describe('native custom color workflow', () => {
     select();
     openStyle();
     expect((input('etichetta') as HTMLInputElement).value).toBe('#af52de');
-    fireEvent.click(screen.getByRole('button', { name: 'Simbolo: Blu' }));
+    chooseSelectionColor('Simbolo', 'Blu');
     expect(component()).toMatchObject({ color: COLORS.blue, label: { color: '#af52de' } });
-    expect(input('simbolo').parentElement?.getAttribute('data-selected')).toBe('false');
-    fireEvent.click(screen.getByRole('button', { name: 'Etichetta: Rosso' }));
+    expect(screen.getByRole('button', { name: 'Colore simbolo' }).textContent).toContain(
+      COLORS.blue.slice(1).toUpperCase(),
+    );
+    chooseSelectionColor('Etichetta', 'Rosso');
     expect(component().label.color).toBe(COLORS.red);
-    expect(input('etichetta').parentElement?.getAttribute('data-selected')).toBe('false');
+    expect(screen.getByRole('button', { name: 'Colore etichetta' }).textContent).toContain(
+      COLORS.red.slice(1).toUpperCase(),
+    );
   });
   it('survives undo/redo, JSON, local persistence, duplicate, clipboard, personal blocks and all exports', async () => {
     render(<Canvas />);
@@ -164,8 +171,9 @@ describe('native custom color workflow', () => {
       expect(component().label.fontSize).toBe(Number(option.value));
     }
 
-    expect(screen.getByText('Sostituisci…')).toBeDefined();
-    expect(screen.getByText('Salva come blocco')).toBeDefined();
+    fireEvent.click(screen.getByRole('button', { name: 'Comandi selezione' }));
+    expect(screen.getByRole('menuitem', { name: 'Sostituisci…' })).toBeDefined();
+    expect(screen.getByRole('menuitem', { name: 'Salva come blocco' })).toBeDefined();
     expect(screen.queryByText('Ruota label')).toBeNull();
   });
 });

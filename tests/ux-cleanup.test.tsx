@@ -306,7 +306,9 @@ describe('annotation and placement cleanup', () => {
       });
       render(<App />);
       const centre = midpoint(brace.start, brace.end);
-      expect(screen.getByRole('button', { name: 'Ruota 90° (R)' })).toBeTruthy();
+      fireEvent.click(screen.getByRole('button', { name: 'Comandi selezione' }));
+      expect(screen.getByRole('menuitem', { name: 'Ruota 90° (R)' })).toBeTruthy();
+      fireEvent.keyDown(window, { key: 'Escape' });
       for (let i = 1; i <= 4; i++) {
         key('r');
         const rotated = state().document.objects[0] as BraceAnnotation;

@@ -1,4 +1,4 @@
-export function SidebarIcon() {
+export function SidebarIcon({ side = 'left' }: { side?: 'left' | 'right' }) {
   return (
     <svg
       width="20"
@@ -12,8 +12,10 @@ export function SidebarIcon() {
       aria-hidden="true"
       focusable="false"
     >
-      <rect x="1.5" y="2" width="21" height="16" rx="3" />
-      <path d="M8.5 2v16M4.5 5.5h1.5M4.5 8.5h1.5M4.5 11.5h1.5" />
+      <g transform={side === 'right' ? 'translate(24 0) scale(-1 1)' : undefined}>
+        <rect x="1.5" y="2" width="21" height="16" rx="3" />
+        <path d="M8.5 2v16M4.5 5.5h1.5M4.5 8.5h1.5M4.5 11.5h1.5" />
+      </g>
     </svg>
   );
 }

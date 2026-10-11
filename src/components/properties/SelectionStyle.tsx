@@ -1,20 +1,26 @@
-import { ChevronDown, Type, Minus } from 'lucide-react';
 import { useCallback, useEffect, useRef } from 'react';
-import type { FormEvent } from 'react';
+import type { FormEvent, ReactNode } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import { commonValue } from './commonValue';
 import { COLORS } from '../../model/types';
 import type { CircuitObject } from '../../model/types';
+import { ActionMenu } from '../toolbar/ActionMenu';
+import { PropertyField, PropertySelect } from './PropertyControls';
 
 const colorNames = { ink: 'Nero', blue: 'Blu', red: 'Rosso', green: 'Verde', purple: 'Viola' };
+const labeled = (o: CircuitObject) => 'label' in o;
+const stroked = (o: CircuitObject) => 'width' in o || 'strokeWidth' in o;
+
 function ColorControl({
   label,
   value,
   onChange,
+  children,
 }: {
   label: string;
   value: string | undefined;
   onChange: (color: string) => void;
+  children: ReactNode;
 }) {
   const lastColor = useRef(value);
   const ownsGesture = useRef(false);
@@ -34,8 +40,7 @@ function ColorControl({
   useEffect(() => {
     lastColor.current = value;
   }, [value]);
-  // React suppresses change if the last input already contained the final color.
-  // Listen to native confirmation so all previews remain a single transaction.
+  // Native confirmation can follow an identical React input value.
   useEffect(() => {
     const input = picker.current;
     const confirm = () => {
@@ -54,60 +59,73 @@ function ColorControl({
     lastColor.current = color;
     onChange(color);
   };
+  const begin = () => {
+    if (!ownsGesture.current) {
+      useEditorStore.getState().beginGesture();
+      ownsGesture.current = true;
+    }
+  };
   return (
-    <div className="style-row">
-      <span>
-        {label}
-        {value === undefined && <small className="mixed-value">Misto</small>}
-      </span>
-      <div className="style-colors" role="group" aria-label={`Colore ${label.toLowerCase()}`}>
-        {Object.entries(COLORS).map(([name, color]) => (
-          <button
-            key={name}
-            type="button"
-            className="color-choice"
-            aria-label={`${label}: ${colorNames[name as keyof typeof colorNames]}`}
-            title={`${label}: ${colorNames[name as keyof typeof colorNames]}`}
-            aria-pressed={value?.toLowerCase() === color}
-            onClick={() => onChange(color)}
-          >
-            <span style={{ background: color }} />
-          </button>
-        ))}
-        <label
-          className="color-choice custom-color-choice"
-          title="Colore personalizzato"
-          data-selected={!Object.values(COLORS).some((color) => color === value?.toLowerCase())}
-        >
-          <span className="rgb-swatch" aria-hidden="true" />
-          <input
-            ref={picker}
-            type="color"
-            value={value ?? COLORS.ink}
-            aria-label={`Colore ${label.toLowerCase()} personalizzato`}
-            title="Colore personalizzato"
-            onPointerDown={() => {
-              if (!ownsGesture.current) {
-                useEditorStore.getState().beginGesture();
-                ownsGesture.current = true;
-              }
-            }}
-            onInput={chooseCustom}
-            onChange={chooseCustom}
-            onBlur={finish}
-            onKeyDown={(e) => {
-              if (e.key === 'Escape' && ownsGesture.current) {
-                e.stopPropagation();
-                ownsGesture.current = false;
-                useEditorStore.getState().cancelGesture();
-              }
-            }}
-          />
-        </label>
+    <div className="inspector-paint-row">
+      <span className="inspector-paint-label">{label}</span>
+      <div className="inspector-color">
+        <ActionMenu
+          label={'Colore ' + label.toLowerCase()}
+          className="inspector-color-trigger"
+          icon={
+            <>
+              <span
+                className={'inspector-swatch' + (value === undefined ? ' mixed-swatch' : '')}
+                style={{ backgroundColor: value }}
+              />
+              <span className="inspector-hex">
+                {value === undefined ? 'Misto' : value.replace('#', '').toUpperCase()}
+              </span>
+            </>
+          }
+          items={[
+            ...Object.entries(COLORS).map(([name, color]) => ({
+              id: name,
+              label: label + ': ' + colorNames[name as keyof typeof colorNames],
+              icon: <span className="inspector-swatch" style={{ backgroundColor: color }} />,
+              onSelect: () => onChange(color),
+            })),
+            {
+              id: 'custom',
+              label: 'Colore personalizzato…',
+              separatorBefore: true,
+              onSelect: () => {
+                begin();
+                picker.current?.click();
+              },
+            },
+          ]}
+        />
+        <input
+          ref={picker}
+          className="inspector-native-color"
+          type="color"
+          tabIndex={-1}
+          value={value ?? COLORS.ink}
+          aria-label={'Colore ' + label.toLowerCase() + ' personalizzato'}
+          onPointerDown={begin}
+          onInput={chooseCustom}
+          onChange={chooseCustom}
+          onBlur={finish}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape' && ownsGesture.current) {
+              e.stopPropagation();
+              ownsGesture.current = false;
+              useEditorStore.getState().cancelGesture();
+            }
+          }}
+        />
       </div>
+      {children}
     </div>
   );
 }
+
 export function OpacityControl({
   objects,
   label,
@@ -119,288 +137,207 @@ export function OpacityControl({
   labelOpacity?: boolean;
   fillOpacity?: boolean;
 }) {
-  const ids = new Set(objects.map((o) => o.id));
-  const values = objects.flatMap((o) =>
-    fillOpacity
-      ? o.kind === 'rectangle' && o.fill !== 'none'
-        ? [o.fillOpacity ?? 1]
-        : []
-      : labelOpacity
-        ? 'label' in o
-          ? [o.label.opacity ?? 1]
-          : []
-        : [o.opacity ?? 1],
-  );
-  const value = Math.round((values[0] ?? 1) * 100);
-  const mixed = values.some((v) => v !== values[0]);
-  const ownsGesture = useRef(false);
-  const begin = () => {
-    if (!ownsGesture.current) {
-      useEditorStore.getState().beginGesture();
-      ownsGesture.current = true;
-    }
-  };
-  const finish = () => {
-    if (ownsGesture.current) {
-      ownsGesture.current = false;
-      useEditorStore.getState().endGesture();
-    }
-  };
-  useEffect(
-    () => () => {
-      if (ownsGesture.current) useEditorStore.getState().endGesture();
-    },
-    [],
+  const value = commonValue(
+    objects.map((o) =>
+      fillOpacity && o.kind === 'rectangle'
+        ? (o.fillOpacity ?? 1)
+        : labelOpacity && 'label' in o
+          ? (o.label.opacity ?? 1)
+          : (o.opacity ?? 1),
+    ),
   );
   return (
-    <label className="style-row opacity-row">
-      <span>
-        {label}
-        {value === undefined && <small className="mixed-value">Misto</small>}
-      </span>
-      <input
-        type="range"
-        min="0"
-        max="100"
-        step="1"
-        value={mixed ? 50 : value}
-        aria-label={label}
-        aria-valuetext={mixed ? 'Valori misti' : `${value}%`}
-        onPointerDown={(e) => {
-          begin();
-          e.currentTarget.setPointerCapture?.(e.pointerId);
-        }}
-        onPointerUp={finish}
-        onPointerCancel={() => {
-          ownsGesture.current = false;
-          useEditorStore.getState().cancelGesture();
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Escape') {
-            e.preventDefault();
-            e.stopPropagation();
-            ownsGesture.current = false;
-            useEditorStore.getState().cancelGesture();
-          } else if (
-            [
-              'ArrowLeft',
-              'ArrowRight',
-              'ArrowUp',
-              'ArrowDown',
-              'Home',
-              'End',
-              'PageUp',
-              'PageDown',
-            ].includes(e.key)
-          )
-            begin();
-        }}
-        onKeyUp={finish}
-        onBlur={finish}
-        onChange={(e) => {
-          const opacity = Number(e.target.value) / 100;
-          const state = useEditorStore.getState();
-          const next = {
-            ...state.document,
-            objects: state.document.objects.map((o) =>
-              !ids.has(o.id)
-                ? o
-                : fillOpacity
-                  ? o.kind === 'rectangle' && o.fill !== 'none'
-                    ? { ...o, fillOpacity: opacity }
-                    : o
-                  : labelOpacity
-                    ? 'label' in o
-                      ? { ...o, label: { ...o.label, opacity } }
-                      : o
-                    : { ...o, opacity },
-            ),
-          };
-          if (ownsGesture.current) state.preview(next);
-          else state.commit(next);
-        }}
-      />
-      <output>{mixed ? '—' : `${value}%`}</output>
-    </label>
+    <PropertyField
+      label={label}
+      caption=""
+      numeric
+      unit="%"
+      min={0}
+      max={100}
+      value={value === undefined ? undefined : Math.round(value * 100)}
+      onCommit={(raw) => {
+        const opacity = Number(raw) / 100;
+        useEditorStore
+          .getState()
+          .updateSelection((o) =>
+            fillOpacity && o.kind === 'rectangle'
+              ? { ...o, fillOpacity: opacity }
+              : labelOpacity && 'label' in o
+                ? { ...o, label: { ...o.label, opacity } }
+                : { ...o, opacity },
+          );
+      }}
+    />
   );
 }
+
 export function SelectionStyle({
+  objects,
+  apply,
+  labelOnly = false,
+}: {
+  objects: CircuitObject[];
+  apply: (fn: (o: CircuitObject) => CircuitObject) => void;
+  labelOnly?: boolean;
+}) {
+  const o = objects.length === 1 ? objects[0] : null;
+  const hasLabel = objects.every(labeled);
+  const hasStroke = !labelOnly && objects.every(stroked);
+  const width = commonValue(
+    objects.map((o) => ('strokeWidth' in o ? o.strokeWidth : 'width' in o ? o.width : 0)),
+  );
+  const rectangles = objects.every((o) => o.kind === 'rectangle');
+  const fillObjects = objects.filter((o) => o.kind === 'rectangle' && o.fill !== 'none');
+  const symbolCaption =
+    o?.kind === 'text'
+      ? 'Testo'
+      : o?.kind === 'wire'
+        ? 'Filo'
+        : o?.kind === 'rectangle' || o?.kind === 'line'
+          ? 'Contorno'
+          : 'Simbolo';
+  return (
+    <div className="inspector-style" role="group" aria-label="Stile selezione">
+      {!labelOnly && (
+        <ColorControl
+          label={symbolCaption}
+          value={commonValue(objects.map((o) => o.color))}
+          onChange={(color) => apply((o) => ({ ...o, color }))}
+        >
+          <OpacityControl
+            objects={objects}
+            label={o?.kind === 'text' ? 'Opacità testo' : 'Opacità simbolo'}
+          />
+        </ColorControl>
+      )}
+      {hasLabel && (
+        <ColorControl
+          label="Etichetta"
+          value={commonValue(objects.map((o) => ('label' in o ? o.label.color : '')))}
+          onChange={(color) =>
+            apply((o) => ('label' in o ? { ...o, label: { ...o.label, color } } : o))
+          }
+        >
+          <OpacityControl objects={objects} label="Opacità etichetta" labelOpacity />
+        </ColorControl>
+      )}
+      {hasStroke && (
+        <PropertySelect
+          label="Spessore linea"
+          caption="Spessore"
+          value={width}
+          onChange={(v) =>
+            apply((o) =>
+              'strokeWidth' in o
+                ? { ...o, strokeWidth: Number(v) }
+                : 'width' in o
+                  ? { ...o, width: Number(v) }
+                  : o,
+            )
+          }
+        >
+          {[...new Set([1, 1.5, 1.8, 2, 3, 4, ...(width === undefined ? [] : [width])])]
+            .sort((a, b) => a - b)
+            .map((w) => (
+              <option key={w} value={w}>
+                {w} px
+              </option>
+            ))}
+        </PropertySelect>
+      )}
+      {rectangles && (
+        <PropertySelect
+          label="Riempimento"
+          value={commonValue(
+            objects.map((o) => (o.kind === 'rectangle' && o.fill !== 'none' ? 'color' : 'none')),
+          )}
+          onChange={(v) =>
+            apply((o) =>
+              o.kind === 'rectangle'
+                ? { ...o, fill: v === 'none' ? 'none' : o.fill === 'none' ? COLORS.blue : o.fill }
+                : o,
+            )
+          }
+        >
+          <option value="none">Nessuno</option>
+          <option value="color">Colore</option>
+        </PropertySelect>
+      )}
+      {rectangles && fillObjects.length === objects.length && (
+        <ColorControl
+          label="Riempimento"
+          value={commonValue(fillObjects.map((o) => (o.kind === 'rectangle' ? o.fill : '')))}
+          onChange={(fill) => apply((o) => (o.kind === 'rectangle' ? { ...o, fill } : o))}
+        >
+          <OpacityControl objects={fillObjects} label="Opacità riempimento" fillOpacity />
+        </ColorControl>
+      )}
+    </div>
+  );
+}
+
+export function SelectionTypography({
   objects,
   apply,
 }: {
   objects: CircuitObject[];
   apply: (fn: (o: CircuitObject) => CircuitObject) => void;
 }) {
-  const o = objects.length === 1 ? objects[0] : null;
-  const labeled = (o: CircuitObject) =>
-    o.kind === 'component' ||
-    o.kind === 'junction' ||
-    o.kind === 'electrical' ||
-    o.kind === 'brace';
-  const hasLabel = objects.some(labeled);
-  const hasText = hasLabel || objects.some((o) => o.kind === 'text');
-  const hasStroke = objects.some(
-    (o) =>
-      o.kind === 'component' ||
-      o.kind === 'wire' ||
-      o.kind === 'arrow' ||
-      o.kind === 'loop-arrow' ||
-      o.kind === 'rectangle' ||
-      o.kind === 'line' ||
-      o.kind === 'electrical' ||
-      o.kind === 'brace',
-  );
   const size = commonValue(
-    objects.flatMap((o) =>
-      o.kind === 'text' ? [o.fontSize] : 'label' in o ? [o.label.fontSize] : [],
-    ),
+    objects.map((o) => (o.kind === 'text' ? o.fontSize : 'label' in o ? o.label.fontSize : 0)),
   );
-  const width = commonValue(
-    objects.flatMap((o) =>
-      o.kind === 'loop-arrow' || o.kind === 'rectangle'
-        ? [o.strokeWidth]
-        : 'width' in o
-          ? [o.width]
-          : [],
-    ),
-  );
-  const fillObjects = objects.filter((o) => o.kind === 'rectangle' && o.fill !== 'none');
   return (
-    <div className="inspector-style" role="group" aria-label="Stile selezione">
-      <ColorControl
-        label={o?.kind === 'text' ? 'Testo' : o?.kind === 'wire' ? 'Filo' : 'Simbolo'}
-        value={commonValue(objects.map((o) => o.color))}
-        onChange={(color) => apply((o) => ({ ...o, color }))}
-      />
-      <OpacityControl
-        objects={objects}
-        label={o?.kind === 'text' ? 'Opacità testo' : 'Opacità simbolo'}
-      />
-      {!!fillObjects.length && (
-        <>
-          <ColorControl
-            label="Riempimento"
-            value={commonValue(
-              fillObjects.map((o) => (o.kind === 'rectangle' ? o.fill : COLORS.ink)),
-            )}
-            onChange={(fill) =>
-              apply((o) => (o.kind === 'rectangle' && o.fill !== 'none' ? { ...o, fill } : o))
-            }
-          />
-          <OpacityControl objects={fillObjects} label="Opacità riempimento" fillOpacity />
-        </>
-      )}
-      {hasLabel && (
-        <ColorControl
-          label="Etichetta"
-          value={commonValue(objects.flatMap((o) => ('label' in o ? [o.label.color] : [])))}
-          onChange={(color) =>
-            apply((o) => ('label' in o ? { ...o, label: { ...o.label, color } } : o))
+    <>
+      <PropertySelect
+        label="Dimensione testo"
+        caption="Dimensione"
+        value={size}
+        onChange={(v) =>
+          apply((o) =>
+            o.kind === 'text'
+              ? { ...o, fontSize: Number(v) }
+              : 'label' in o
+                ? { ...o, label: { ...o.label, fontSize: Number(v) } }
+                : o,
+          )
+        }
+      >
+        {[
+          ...new Set([
+            16,
+            18,
+            20,
+            22,
+            23,
+            24,
+            27,
+            28,
+            32,
+            40,
+            ...(size === undefined ? [] : [size]),
+          ]),
+        ]
+          .sort((a, b) => a - b)
+          .map((s) => (
+            <option key={s} value={s}>
+              {s} px
+            </option>
+          ))}
+      </PropertySelect>
+      {objects.every((o) => o.kind === 'text') && (
+        <PropertySelect
+          label="Allineamento testo"
+          caption="Allineamento"
+          value={commonValue(objects.map((o) => (o.kind === 'text' ? o.align : 'start')))}
+          onChange={(v) =>
+            apply((o) => (o.kind === 'text' ? { ...o, align: v as 'start' | 'middle' | 'end' } : o))
           }
-        />
+        >
+          <option value="start">Sinistra</option>
+          <option value="middle">Centro</option>
+          <option value="end">Destra</option>
+        </PropertySelect>
       )}
-      {hasLabel && <OpacityControl objects={objects} label="Opacità etichetta" labelOpacity />}
-      {hasStroke && (
-        <label className="style-row" title="Spessore linea">
-          <span>
-            <Minus size={15} />
-            Spessore
-          </span>
-          <span className="style-value">
-            <span className="style-select">
-              <select
-                aria-label="Spessore linea"
-                title="Spessore linea"
-                value={width ?? ''}
-                onChange={(e) =>
-                  apply((o) =>
-                    o.kind === 'loop-arrow' || o.kind === 'rectangle'
-                      ? { ...o, strokeWidth: Number(e.target.value) }
-                      : o.kind === 'component' ||
-                          o.kind === 'wire' ||
-                          o.kind === 'line' ||
-                          o.kind === 'arrow' ||
-                          o.kind === 'electrical' ||
-                          o.kind === 'brace'
-                        ? { ...o, width: Number(e.target.value) }
-                        : o,
-                  )
-                }
-              >
-                {width === undefined && (
-                  <option value="" disabled>
-                    Valori misti
-                  </option>
-                )}
-                {[...new Set([1, 1.5, 1.8, 2, 3, 4, ...(width === undefined ? [] : [width])])]
-                  .sort((a, b) => a - b)
-                  .map((w) => (
-                    <option key={w} value={w}>
-                      {w}
-                    </option>
-                  ))}
-              </select>
-              <ChevronDown size={12} aria-hidden="true" />
-            </span>
-            <span className="style-unit">px</span>
-          </span>
-        </label>
-      )}
-      {hasText && (
-        <label className="style-row" title="Dimensione testo">
-          <span>
-            <Type size={15} />
-            Testo
-          </span>
-          <span className="style-value">
-            <span className="style-select">
-              <select
-                aria-label="Dimensione testo"
-                title="Dimensione testo"
-                value={size ?? ''}
-                onChange={(e) =>
-                  apply((o) =>
-                    o.kind === 'text'
-                      ? { ...o, fontSize: Number(e.target.value) }
-                      : 'label' in o
-                        ? { ...o, label: { ...o.label, fontSize: Number(e.target.value) } }
-                        : o,
-                  )
-                }
-              >
-                {size === undefined && (
-                  <option value="" disabled>
-                    Valori misti
-                  </option>
-                )}
-                {[
-                  ...new Set([
-                    16,
-                    18,
-                    20,
-                    22,
-                    23,
-                    24,
-                    27,
-                    28,
-                    32,
-                    40,
-                    ...(size === undefined ? [] : [size]),
-                  ]),
-                ]
-                  .sort((a, b) => a - b)
-                  .map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-              </select>
-              <ChevronDown size={12} aria-hidden="true" />
-            </span>
-            <span className="style-unit">px</span>
-          </span>
-        </label>
-      )}
-    </div>
+    </>
   );
 }

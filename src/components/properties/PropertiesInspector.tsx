@@ -1,8 +1,7 @@
-import { PanelRightClose } from 'lucide-react';
 import { useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { PropertiesContent } from './PropertiesContent';
-import { IconButton } from '../toolbar/IconButton';
+import { SidebarToggle } from '../toolbar/SidebarToggle';
 import {
   clampInspectorWidth,
   INSPECTOR_DEFAULT_WIDTH,
@@ -29,9 +28,7 @@ export function PropertiesInspector({
     >
       <div className="inspector-header">
         <h2>Proprietà</h2>
-        <IconButton label="Nascondi proprietà" onClick={toggle}>
-          <PanelRightClose size={17} />
-        </IconButton>
+        <SidebarToggle side="right" visible onToggle={toggle} />
       </div>
       <div className="inspector-scroll">
         <PropertiesContent />

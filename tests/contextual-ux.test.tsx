@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { chooseSelectionCommand } from './helpers/selectionMenu';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { Canvas } from '../src/components/editor/Canvas';
@@ -142,7 +143,7 @@ describe('selection PNG shortcut', () => {
       useEditorStore.setState({ document: doc, selection });
       render(<Canvas />);
 
-      fireEvent.click(screen.getByRole('button', { name: 'Copia come immagine' }));
+      chooseSelectionCommand('Copia come immagine');
       await waitFor(() => expect(useEditorStore.getState().notice).toBe('PNG copiato'));
       expect(copyPNG).toHaveBeenCalledExactlyOnceWith(getExportSelection(doc, selection));
       expect(screen.queryByRole('dialog')).toBeNull();
@@ -188,7 +189,7 @@ describe('direct contextual annotations and canvas focus', () => {
       const doc: CircuitDocument = { version: 1, title: 'Direct current', objects: [wire] };
       useEditorStore.setState({ document: doc, selection: [wire.id] });
       render(<Canvas />);
-      fireEvent.click(screen.getByRole('button', { name: 'Corrente sul filo' }));
+      chooseSelectionCommand('Corrente sul filo');
 
       const state = useEditorStore.getState();
       expect(state.tool).toBe('select');
@@ -215,7 +216,7 @@ describe('direct contextual annotations and canvas focus', () => {
       const doc: CircuitDocument = { version: 1, title: 'Direct polarity', objects: [component] };
       useEditorStore.setState({ document: doc, selection: [component.id] });
       render(<Canvas />);
-      fireEvent.click(screen.getByRole('button', { name: 'Polarità + / -' }));
+      chooseSelectionCommand('Polarità + / -');
       const state = useEditorStore.getState();
       expect(state.tool).toBe('select');
       expect(state.document.objects[1]).toMatchObject({

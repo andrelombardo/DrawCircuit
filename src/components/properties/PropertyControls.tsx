@@ -6,6 +6,7 @@ function DraftInput({
   numeric,
   min,
   max,
+  unit,
   onCommit,
 }: {
   value: string | number | undefined;
@@ -13,6 +14,7 @@ function DraftInput({
   numeric?: boolean;
   min?: number;
   max?: number;
+  unit?: string;
   onCommit: (value: string) => void;
 }) {
   const [draft, setDraft] = useState(value === undefined ? '' : String(value));
@@ -45,7 +47,10 @@ function DraftInput({
       max={max}
       value={draft}
       aria-label={label}
-      placeholder={value === undefined ? 'Valori misti' : label}
+      aria-valuetext={
+        numeric ? (value === undefined ? 'Valori misti' : `${value}${unit ?? ''}`) : undefined
+      }
+      placeholder={value === undefined ? (numeric ? '—' : 'Valori misti') : label}
       onFocus={() => {
         cancelled.current = false;
       }}
@@ -66,11 +71,18 @@ function DraftInput({
     />
   );
 }
-export function PropertyField(props: Parameters<typeof DraftInput>[0] & { caption?: string }) {
+export function PropertyField(props: Parameters<typeof DraftInput>[0] & { caption?: ReactNode }) {
   return (
-    <label className="inspector-field">
-      <span>{props.caption ?? props.label}</span>
-      <DraftInput key={`${props.label}:${props.value}`} {...props} />
+    <label className={`inspector-field${props.numeric ? ' inspector-number' : ''}`}>
+      <span className="inspector-field-caption">{props.caption ?? props.label}</span>
+      <span className="inspector-input">
+        <DraftInput key={`${props.label}:${props.value}`} {...props} />
+        {props.unit && (
+          <span className="inspector-unit" aria-hidden="true">
+            {props.unit}
+          </span>
+        )}
+      </span>
     </label>
   );
 }
@@ -82,14 +94,14 @@ export function PropertySelect({
   onChange,
 }: {
   label: string;
-  caption?: string;
+  caption?: ReactNode;
   value: string | number | undefined;
   children: ReactNode;
   onChange: (value: string) => void;
 }) {
   return (
     <label className="inspector-field">
-      <span>{caption ?? label}</span>
+      <span className="inspector-field-caption">{caption ?? label}</span>
       <select aria-label={label} value={value ?? ''} onChange={(e) => onChange(e.target.value)}>
         {value === undefined && (
           <option value="" disabled>

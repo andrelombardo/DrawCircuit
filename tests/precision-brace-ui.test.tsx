@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { chooseSelectionCommand, chooseSelectionColor } from './helpers/selectionMenu';
 import { chooseDrawingTool } from './helpers/drawingMenu';
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
@@ -123,7 +124,7 @@ describe('precision/annotation/export UI workflows', () => {
     expect(canvas().querySelectorAll('[data-handle]')).toHaveLength(0);
     fireEvent.pointerDown(hit(), client(100, 0));
     fireEvent.pointerUp(canvas(), client(100, 0));
-    fireEvent.click(screen.getByRole('button', { name: 'Inverti lato' }));
+    chooseSelectionCommand('Inverti lato');
     expect(brace().side).toBe(-1);
     drag([240, 0], [320, 0], canvas().querySelector('[data-handle="end"]')!);
     expect(brace().end.x).toBe(320);
@@ -139,7 +140,7 @@ describe('precision/annotation/export UI workflows', () => {
     expect(brace()).toEqual(final);
     act(() => state().select([o.id]));
 
-    fireEvent.click(screen.getByRole('button', { name: 'Simbolo: Viola' }));
+    chooseSelectionColor('Simbolo', 'Viola');
     fireEvent.change(screen.getByLabelText('Spessore linea'), { target: { value: '4' } });
     fireEvent.change(screen.getByLabelText('Dimensione testo'), { target: { value: '32' } });
     expect(brace()).toMatchObject({ color: '#8855c2', width: 4, label: { fontSize: 32 } });

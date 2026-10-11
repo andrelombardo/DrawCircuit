@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { chooseSelectionCommand, chooseSelectionColor } from './helpers/selectionMenu';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { DistanceGuideLayer } from '../src/components/editor/DistanceGuideLayer';
@@ -232,21 +233,19 @@ describe('Golden spacing and group workflow in the canvas', () => {
   });
 });
 describe('adaptive accessible toolbar', () => {
-  it('shows labeled frequent properties and keeps only secondary controls in More', () => {
+  it('shows properties directly and preserves commands in an accessible overflow menu', () => {
     render(<Canvas />);
     select('R3', 200);
 
     expect(screen.getByLabelText('Dimensione testo')).toBeDefined();
     expect(screen.getByLabelText('Spessore linea')).toBeDefined();
-    for (const name of ['Duplica (⌘/Ctrl D)', 'Ruota 45° (R)']) {
-      const button = screen.getByRole('button', { name });
-      expect(button.title).toBe(name);
-      expect(button.getAttribute('data-tooltip')).toBe(name);
-    }
-
+    fireEvent.click(screen.getByRole('button', { name: 'Comandi selezione' }));
+    for (const name of ['Duplica (⌘/Ctrl D)', 'Ruota 45° (R)'])
+      expect(screen.getByRole('menuitem', { name })).toBeDefined();
     expect(screen.queryByLabelText('Ruota solo label')).toBeNull();
     expect(screen.getByText('Salva come blocco')).toBeDefined();
     expect(screen.queryByLabelText('Ruota selezione')).toBeNull();
+    fireEvent.keyDown(window, { key: 'Escape' });
     fireEvent.keyDown(canvas(), { key: 'Escape' });
     expect(useEditorStore.getState().selection).toEqual([]);
   });
@@ -293,7 +292,9 @@ describe('adaptive accessible toolbar', () => {
       useEditorStore.setState({ document: documentWith([o]), selection: ['a'] });
       render(<Canvas />);
       expect(canvas().querySelectorAll('[data-handle]').length).toBe(loop ? 3 : 4);
-      expect(screen.getByLabelText('Inverti freccia')).toBeDefined();
+      fireEvent.click(screen.getByRole('button', { name: 'Comandi selezione' }));
+      expect(screen.getByRole('menuitem', { name: 'Inverti freccia' })).toBeDefined();
+      fireEvent.keyDown(window, { key: 'Escape' });
       expect(screen.queryByLabelText('Dimensione testo')).toBeNull();
       expect(screen.getByRole('region', { name: 'Proprietà' })).toBeDefined();
     });
@@ -364,16 +365,19 @@ describe('selection export scope in the existing dialog', () => {
 });
 
 describe('compact Style and replacement controls', () => {
-  it('keeps frequent actions direct and edits symbol/label separately inside Style', () => {
+  it('keeps commands in overflow and edits symbol/label separately as properties', () => {
     render(<Canvas />);
     select('R3', 200);
     const inspector = screen.getByRole('region', { name: 'Proprietà' });
-    expect(within(inspector).getByRole('button', { name: 'Polarità + / -' })).toBeDefined();
-    expect(within(inspector).getByRole('button', { name: 'Duplica (⌘/Ctrl D)' })).toBeDefined();
+    expect(within(inspector).queryByRole('button', { name: 'Duplica (⌘/Ctrl D)' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Comandi selezione' }));
+    expect(screen.getByRole('menuitem', { name: 'Polarità + / -' })).toBeDefined();
+    expect(screen.getByRole('menuitem', { name: 'Duplica (⌘/Ctrl D)' })).toBeDefined();
+    fireEvent.keyDown(window, { key: 'Escape' });
     expect(document.querySelector('.context-toolbar')).toBeNull();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Simbolo: Rosso' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Etichetta: Verde' }));
+    chooseSelectionColor('Simbolo', 'Rosso');
+    chooseSelectionColor('Etichetta', 'Verde');
     fireEvent.change(screen.getByLabelText('Spessore linea'), { target: { value: '3' } });
     fireEvent.change(screen.getByLabelText('Dimensione testo'), { target: { value: '28' } });
     expect(useEditorStore.getState().document.objects[1]).toMatchObject({
@@ -382,14 +386,15 @@ describe('compact Style and replacement controls', () => {
       label: { color: '#269978', fontSize: 28 },
     });
 
-    expect(screen.getByRole('button', { name: 'Salva come blocco' })).toBeDefined();
-    expect(screen.getByRole('button', { name: 'Elimina (Delete)' })).toBeDefined();
+    fireEvent.click(screen.getByRole('button', { name: 'Comandi selezione' }));
+    expect(screen.getByRole('menuitem', { name: 'Salva come blocco' })).toBeDefined();
+    expect(screen.getByRole('menuitem', { name: 'Elimina (Delete)' })).toBeDefined();
   });
   it('shows live compatible previews in Replace and filters through shared palette search', () => {
     render(<Canvas />);
     select('R3', 200);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Sostituisci…' }));
+    chooseSelectionCommand('Sostituisci…');
     const dialog = screen.getByRole('dialog', { name: 'Sostituisci componente' });
     expect(dialog.querySelectorAll('.replace-option svg').length).toBeGreaterThan(5);
     expect(within(dialog).queryByRole('button', { name: 'Amplificatore operazionale' })).toBeNull();

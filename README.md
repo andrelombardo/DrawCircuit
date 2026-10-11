@@ -38,7 +38,7 @@ DrawCircuit turns circuit sketches into editable vector diagrams. Place componen
 - **Current arrows** — Integrate a labeled arrow into a branch so it follows the wire as the circuit changes.
 - **Voltage and polarity** — Mark a two-terminal component with +/− signs or draw a voltage arrow between chosen points.
 - **Loops, arrows, and text** — Add editable elliptical loop arrows, straight or Bézier arrows, and mathematical notes. Mirror arrows horizontally or vertically and drag their rotation handle for arbitrary angles; hold Shift to snap to 15°.
-- **Visual styling** — Adjust colors, symbol and label opacity, line thickness, label size, and alignment from the right Properties inspector. Mixed selections display mixed values.
+- **Visual styling** — A compact right Properties inspector groups position, appearance, typography, and geometry. Paired coordinate fields and color/opacity rows keep the panel easy to scan; mixed selections show common properties and mixed values. Contextual commands stay in the selection’s overflow menu.
 - **Styled wires and graphics** — Use solid, dashed, or dotted wires; split a wire to style its continuation independently. Draw decorative lines and resizable rectangles with independent fill and outline opacity, without creating electrical connections.
 
 ### Export & Offline
@@ -121,3 +121,4 @@ Run `npm run test`. The suite covers component terminals and rotations, wire rou
 
 - [User manual and technical details](docs/manuale.md) — Usage, shortcuts, architecture, and export conventions.
 - [Personal blocks, annotations, SVG, and offline support](docs/nuove-feature.md) — Detailed behavior of the newer editing and PWA features.
+- [Properties inspector design and verification](docs/inspector-design/report.md) — Layout choices, preserved commands, regression checks, and browser screenshots.

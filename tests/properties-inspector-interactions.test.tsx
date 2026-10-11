@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { chooseSelectionCommand, chooseSelectionColor } from './helpers/selectionMenu';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../src/App';
 import { useEditorStore, saveDocumentNow, STORAGE_KEY } from '../src/store/editorStore';
@@ -158,31 +159,26 @@ describe('persistent inspector and property transactions', () => {
       'Valori misti',
     );
     expect(screen.getAllByText('Misto')).toHaveLength(1);
-    expect(screen.getByRole('button', { name: 'Simbolo: Nero' }).getAttribute('aria-pressed')).toBe(
-      'false',
-    );
-    expect(
-      screen.getByRole('button', { name: 'Simbolo: Rosso' }).getAttribute('aria-pressed'),
-    ).toBe('false');
-    fireEvent.click(screen.getByRole('button', { name: 'Simbolo: Verde' }));
+    expect(screen.getByRole('button', { name: 'Colore simbolo' }).textContent).toContain('Misto');
+    expect(screen.queryByRole('menu')).toBeNull();
+    chooseSelectionColor('Simbolo', 'Verde');
     expect(current().objects.every((o) => o.color === '#269978')).toBe(true);
     expect(state().past).toHaveLength(1);
     act(() => state().undo());
     expect(current().objects[1].color).toBe('#df4949');
   });
-  it('previews opacity for a whole selection and cancels/commits as a single gesture', () => {
+  it('edits a percentage locally, cancels with Escape and commits the selection once', () => {
     renderSelection(parallelSources().objects.filter((o) => o.kind === 'component'));
-    const slider = screen.getByLabelText('Opacità simbolo');
-    fireEvent.pointerDown(slider);
-    fireEvent.change(slider, { target: { value: '60' } });
-    fireEvent.change(slider, { target: { value: '30' } });
-    expect(current().objects.every((o) => o.opacity === 0.3)).toBe(true);
-    expect(state().past).toHaveLength(0);
-    fireEvent.keyDown(slider, { key: 'Escape' });
+    const input = screen.getByLabelText('Opacità simbolo');
+    input.focus();
+    fireEvent.change(input, { target: { value: '60' } });
+    fireEvent.change(input, { target: { value: '30' } });
     expect(current().objects.every((o) => o.opacity === undefined)).toBe(true);
-    fireEvent.pointerDown(slider);
-    fireEvent.change(slider, { target: { value: '75' } });
-    fireEvent.pointerUp(slider);
+    expect(state().past).toHaveLength(0);
+    fireEvent.keyDown(input, { key: 'Escape' });
+    expect(current().objects.every((o) => o.opacity === undefined)).toBe(true);
+    edit('Opacità simbolo', '75');
+    expect(current().objects.every((o) => o.opacity === 0.75)).toBe(true);
     expect(state().past).toHaveLength(1);
     act(() => state().undo());
     expect(current().objects.every((o) => o.opacity === undefined)).toBe(true);
@@ -302,6 +298,132 @@ describe('persistent inspector and property transactions', () => {
     expect(canvas().querySelectorAll('[stroke-dasharray="0 6"]')).toHaveLength(2);
   });
 });
+describe('contextual properties and selection commands', () => {
+  it('orders properties by purpose and keeps generic commands behind the overflow', () => {
+    renderSelection([createComponent('currentSource', { x: 0, y: 0 })]);
+    const inspector = screen.getByRole('region', { name: 'Proprietà' });
+    expect(
+      within(inspector)
+        .getAllByRole('heading', { level: 3 })
+        .map((h) => h.textContent),
+    ).toEqual(['Generale', 'Posizione', 'Aspetto', 'Testo']);
+    expect(within(inspector).queryByRole('slider')).toBeNull();
+    expect(within(inspector).queryByText('Azioni')).toBeNull();
+    expect(
+      within(inspector).queryByRole('button', { name: /Duplica|Elimina|Sostituisci/ }),
+    ).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Comandi selezione' }));
+    expect(screen.getByRole('menuitem', { name: 'Sostituisci…' })).toBeDefined();
+    expect(screen.getByRole('menuitem', { name: 'Taglia (⌘/Ctrl X)' })).toBeDefined();
+  });
+  it('shows only common properties for a component and a wire while preserving contextual commands', () => {
+    const c = createComponent('currentSource', { x: 0, y: 0 });
+    const w = createWire(
+      { kind: 'free', point: { x: 0, y: 80 } },
+      { kind: 'free', point: { x: 100, y: 80 } },
+    );
+    renderSelection([c, w]);
+    expect(screen.getByText('2 elementi selezionati')).toBeDefined();
+    expect(screen.getByText('Proprietà comuni')).toBeDefined();
+    expect(screen.getByLabelText('Opacità simbolo')).toBeDefined();
+    expect(screen.getByLabelText('Spessore linea')).toBeDefined();
+    for (const label of [
+      'Opacità etichetta',
+      'Etichetta comune',
+      'Dimensione testo',
+      'Routing filo',
+      'Rotazione',
+      'Stile linea',
+    ])
+      expect(screen.queryByLabelText(label)).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Comandi selezione' }));
+    expect(screen.getByRole('menuitem', { name: 'Sostituisci…' })).toBeDefined();
+    expect(screen.queryByRole('menuitem', { name: 'Dividi filo…' })).toBeNull();
+  });
+  it('changes label opacity independently, rejects invalid percentages and records one confirmation', () => {
+    const c = createComponent('currentSource', { x: 0, y: 0 });
+    renderSelection([c]);
+    const input = screen.getByLabelText('Opacità etichetta');
+    input.focus();
+    fireEvent.change(input, { target: { value: '42' } });
+    expect(current().objects[0]).toEqual(c);
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(current().objects[0]).toMatchObject({ label: { opacity: 0.42 } });
+    expect(current().objects[0].opacity).toBeUndefined();
+    expect(state().past).toHaveLength(1);
+    edit('Opacità etichetta', '101');
+    edit('Opacità etichetta', '-1');
+    expect(state().past).toHaveLength(1);
+    expect((screen.getByLabelText('Opacità etichetta') as HTMLInputElement).value).toBe('42');
+    act(() => state().undo());
+    expect(current().objects[0]).toEqual(c);
+  });
+  it('limits a selected label to its properties and leaves the symbol untouched', () => {
+    const c = createComponent('currentSource', { x: 0, y: 0 });
+    renderSelection([c]);
+    act(() => state().setActiveLabel(c.id));
+    expect(screen.getByText('Etichetta selezionata')).toBeDefined();
+    expect(screen.queryByLabelText('Opacità simbolo')).toBeNull();
+    expect(screen.queryByLabelText('Spessore linea')).toBeNull();
+    expect(screen.queryByRole('region', { name: 'Geometria' })).toBeNull();
+    edit('Opacità etichetta', '25');
+    expect(current().objects[0]).toMatchObject({ color: c.color, label: { opacity: 0.25 } });
+    chooseSelectionCommand('Elimina etichetta (Delete)');
+    expect(current().objects).toHaveLength(1);
+    expect(current().objects[0]).toMatchObject({ label: { text: '' } });
+    act(() => state().undo());
+    expect(current().objects[0]).toMatchObject({ label: { text: c.label.text, opacity: 0.25 } });
+  });
+  it('closes the overflow with Escape, restores focus and executes duplicate by keyboard once', () => {
+    const c = createComponent('currentSource', { x: 0, y: 0 });
+    renderSelection([c]);
+    const trigger = screen.getByRole('button', { name: 'Comandi selezione' });
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(
+      screen.getByRole('menuitem', { name: 'Duplica (⌘/Ctrl D)' }),
+    );
+    fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
+    expect(screen.queryByRole('menu')).toBeNull();
+    expect(document.activeElement).toBe(trigger);
+    expect(state().selection).toEqual([c.id]);
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' });
+    fireEvent.keyDown(document.activeElement!, { key: 'Enter' });
+    expect(current().objects).toHaveLength(2);
+    expect(state().past).toHaveLength(1);
+    act(() => state().undo());
+    expect(current().objects).toEqual([c]);
+  });
+  it('keeps rectangle outline and fill opacity independent with one input for each', () => {
+    const r = { ...createRectangle({ x: 0, y: 0 }, { x: 100, y: 80 }), fill: '#2463cb' };
+    renderSelection([r]);
+    expect(screen.getAllByLabelText('Opacità simbolo')).toHaveLength(1);
+    expect(screen.getAllByLabelText('Opacità riempimento')).toHaveLength(1);
+    edit('Opacità riempimento', '35');
+    expect(current().objects[0]).toMatchObject({ fillOpacity: 0.35 });
+    expect(current().objects[0].opacity).toBeUndefined();
+    fireEvent.change(screen.getByLabelText('Riempimento'), { target: { value: 'none' } });
+    expect(screen.queryByLabelText('Opacità riempimento')).toBeNull();
+    expect(screen.getByLabelText('Opacità simbolo')).toBeDefined();
+    act(() => state().undo());
+    act(() => state().select([r.id]));
+    expect(screen.getByLabelText('Opacità riempimento')).toBeDefined();
+  });
+  it('edits shared content and typography across multiple text annotations', () => {
+    const a = createTextAnnotation({ x: 0, y: 0 });
+    const b = { ...createTextAnnotation({ x: 100, y: 0 }), text: 'Secondo', align: 'end' as const };
+    renderSelection([a, b]);
+    expect((screen.getByLabelText('Contenuto comune') as HTMLInputElement).value).toBe('');
+    expect((screen.getByLabelText('Allineamento testo') as HTMLSelectElement).value).toBe('');
+    edit('Contenuto comune', 'V_{ab}');
+    fireEvent.change(screen.getByLabelText('Allineamento testo'), { target: { value: 'middle' } });
+    expect(
+      current().objects.every(
+        (o) => o.kind === 'text' && o.text === 'V_{ab}' && o.align === 'middle',
+      ),
+    ).toBe(true);
+    expect(state().past).toHaveLength(2);
+  });
+});
 describe('graphic drawing and gestures', () => {
   it('creates a rectangle in reverse direction, previews it, resizes atomically and persists all styles', () => {
     useEditorStore.setState({ document: { version: 1, title: 'Test', objects: [] } });
@@ -332,7 +454,7 @@ describe('graphic drawing and gestures', () => {
     edit('Larghezza', '200');
     fireEvent.change(screen.getByLabelText('Stile linea'), { target: { value: 'dashed' } });
     fireEvent.change(screen.getByLabelText('Riempimento'), { target: { value: 'color' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Riempimento: Verde' }));
+    chooseSelectionColor('Riempimento', 'Verde');
     expect(current().objects[0]).toMatchObject({
       width: 200,
       fill: '#269978',
@@ -396,7 +518,7 @@ describe('graphic drawing and gestures', () => {
       { kind: 'free', point: { x: 300, y: 0 } },
     );
     renderSelection([w]);
-    fireEvent.click(screen.getByRole('button', { name: 'Dividi filo…' }));
+    chooseSelectionCommand('Dividi filo…');
     fireEvent.pointerDown(canvas(), client({ x: 180, y: 0 }));
     fireEvent.pointerUp(canvas(), client({ x: 180, y: 0 }));
     expect(current().objects.filter((o) => o.kind === 'wire')).toHaveLength(2);

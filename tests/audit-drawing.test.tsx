@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { chooseSelectionCommand, chooseSelectionColor } from './helpers/selectionMenu';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import App from '../src/App';
@@ -225,7 +226,7 @@ describe('audit: actual rendered drawing workflows (jsdom, not manual browser)',
     expect(current().objects.filter((o) => o.kind === 'wire')).toHaveLength(12);
     drawArrow('l', [-200, 40], [-40, 180]);
     drawArrow('l', [40, 40], [200, 180]);
-    fireEvent.click(screen.getByRole('button', { name: 'Inverti freccia' }));
+    chooseSelectionCommand('Inverti freccia');
     expect(
       current()
         .objects.filter((o) => o.kind === 'loop-arrow')
@@ -248,7 +249,7 @@ describe('audit: actual rendered drawing workflows (jsdom, not manual browser)',
     select(rs[0]);
     expect(screen.queryByRole('combobox', { name: 'Font' })).toBeNull();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Etichetta: Viola' }));
+    chooseSelectionColor('Etichetta', 'Viola');
 
     key('d', { metaKey: true });
     expect(current().objects.filter((o) => o.kind === 'component')).toHaveLength(7);
@@ -524,7 +525,7 @@ describe('audit: snapping, cancellation, topology and history edges', () => {
     drawArrow('l', [240, 0], [400, 120]);
     save();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Simbolo: Verde' }));
+    chooseSelectionColor('Simbolo', 'Verde');
 
     save();
     key('d', { ctrlKey: true });

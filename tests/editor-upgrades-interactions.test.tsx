@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { chooseSelectionCommand } from './helpers/selectionMenu';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { Canvas } from '../src/components/editor/Canvas';
@@ -172,7 +173,7 @@ describe('complete canvas gestures', () => {
     );
     expect(state().selection).toHaveLength(6);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Sostituisci…' }));
+    chooseSelectionCommand('Sostituisci…');
     fireEvent.change(screen.getByLabelText('Cerca sostituzione'), {
       target: { value: 'condensatore' },
     });
@@ -196,25 +197,26 @@ describe('complete canvas gestures', () => {
     fireEvent.pointerUp(canvas(), client(150, 100));
     expect(state().selection).toHaveLength(2);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Sostituisci…' }));
+    chooseSelectionCommand('Sostituisci…');
     expect(screen.getByText(/Nessuna destinazione comune/)).toBeTruthy();
     expect(state().past).toHaveLength(0);
   });
-  it('previews multiple opacity values but commits one undo; label alpha stays independent', () => {
+  it('edits opacity percentages locally and commits one undo; label alpha stays independent', () => {
     const c = { ...createComponent('resistor', { x: 0, y: 0 }), id: 'a' },
       j = { ...createJunction({ x: 100, y: 0 }, 'B'), id: 'b' };
     load([c, j], ['a', 'b']);
     const original = state().document;
 
     const opacity = screen.getByLabelText('Opacità simbolo');
-    fireEvent.pointerDown(opacity, { pointerId: 1 });
+    opacity.focus();
     for (const value of ['80', '50', '0']) fireEvent.change(opacity, { target: { value } });
     expect(state().past).toHaveLength(0);
-    expect(state().document.objects.every((o) => o.opacity === 0)).toBe(true);
+    expect(state().document).toEqual(original);
     expect(
       state().document.objects.every((o) => 'label' in o && o.label.opacity === undefined),
     ).toBe(true);
-    fireEvent.pointerUp(opacity, { pointerId: 1 });
+    fireEvent.blur(opacity);
+    expect(state().document.objects.every((o) => o.opacity === 0)).toBe(true);
     expect(state().past).toHaveLength(1);
     act(() => state().undo());
     expect(state().document).toEqual(original);

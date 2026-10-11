@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { chooseSelectionCommand } from './helpers/selectionMenu';
 import { chooseDrawingTool } from './helpers/drawingMenu';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -321,7 +322,7 @@ describe('complete editor workflows', () => {
       type: 'arc',
     });
     expect(canvas().querySelector('[data-handle="start"]')).not.toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Inverti freccia' }));
+    chooseSelectionCommand('Inverti freccia');
     expect(useEditorStore.getState().document.objects.at(-1)).toMatchObject({ reversed: true });
   });
   it('copies and pastes whole circuits with remapped terminal IDs', async () => {
@@ -571,7 +572,7 @@ describe('fast drawing interactions', () => {
       fireEvent.pointerMove(canvas(), client(x2, 180));
       fireEvent.pointerUp(canvas(), client(x2, 180));
     }
-    fireEvent.click(screen.getByRole('button', { name: 'Inverti freccia' }));
+    chooseSelectionCommand('Inverti freccia');
     const ad = components[3],
       origin = client(-240, 120);
     fireEvent.pointerDown(
@@ -768,7 +769,7 @@ describe('fast drawing interactions', () => {
     fireEvent.pointerUp(canvas(), client(-110, 220));
     const ellipse = useEditorStore.getState().document.objects.at(-1)!;
     expect(ellipse.kind === 'loop-arrow' && ellipse.arrowPosition).toBeCloseTo(0.5);
-    fireEvent.click(screen.getByRole('button', { name: 'Inverti freccia' }));
+    chooseSelectionCommand('Inverti freccia');
     expect(useEditorStore.getState().document.objects.at(-1)).toMatchObject({
       direction: 'counterclockwise',
     });
