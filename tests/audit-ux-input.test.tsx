@@ -178,7 +178,8 @@ describe('audit UX/input evidence', () => {
     expect(useEditorStore.getState().document.objects.at(-1)).toMatchObject({ rotation: 45 });
     chooseDrawingTool('Nodo');
     click(-100, -100);
-    expect(useEditorStore.getState().tool).toBe('select');
+    expect(useEditorStore.getState().tool).toBe('junction');
+    key('Escape');
     for (const [x, y] of [
       [100, -100],
       [100, 100],
@@ -187,6 +188,7 @@ describe('audit UX/input evidence', () => {
       chooseDrawingTool('Nodo');
       click(x, y);
     }
+    key('v');
     const name = screen.getByLabelText('Nome nodo');
     fireEvent.change(name, { target: { value: 'D' } });
     fireEvent.blur(name);

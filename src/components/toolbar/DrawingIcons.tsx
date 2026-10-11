@@ -70,11 +70,3 @@ export function CurrentInlineIcon(props: IconProps) {
     </DrawingIcon>
   );
 }
-
-export function CurrentExternalIcon(props: IconProps) {
-  return (
-    <DrawingIcon {...props}>
-      <path d="M2 17h20M6 7h12M14 3l4 4-4 4" />
-    </DrawingIcon>
-  );
-}

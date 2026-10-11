@@ -26,7 +26,7 @@ export function ElectricalView({
     <g
       data-object={o.id}
       data-electrical={o.mode}
-      data-current-placement={o.mode === 'current' ? (o.currentPlacement ?? 'external') : undefined}
+      data-current-placement={o.mode === 'current' ? 'inline' : undefined}
       data-current-fallback={g.fallback || undefined}
       className={`circuit-object${selected ? ' selected-symbol' : ''}`}
     >
@@ -49,6 +49,7 @@ export function ElectricalView({
               fontFamily={CIRCUIT_FONT}
               fontSize={22}
               fill={o.color}
+              opacity={o.opacity}
             >
               {(i === 0) !== o.reversed ? '+' : '−'}
             </text>
@@ -58,6 +59,7 @@ export function ElectricalView({
         <g
           fill="none"
           stroke={o.color}
+          opacity={o.opacity}
           strokeWidth={g.strokeWidth}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -72,6 +74,7 @@ export function ElectricalView({
           x={g.labelPoint.x}
           y={g.labelPoint.y}
           color={o.label.color}
+          opacity={o.label.opacity}
           fontSize={g.labelFontSize}
           rotation={o.label.rotation}
           labelId={o.id}

@@ -32,13 +32,13 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
           <p>
             <b>02 · Collega</b>Premi W, clicca un terminale, un nodo o un filo: sul filo nasce un
             nodo reale. I clic sul foglio aggiungono svolte; doppio clic o Enter termina su un punto
-            libero.
+            libero. Scegli Ortogonale, 45° o Libero; Shift + W cambia routing.
           </p>
           <p>
             <b>03 · Annota</b>Premi N per un nodo, A per una freccia, L per una maglia. Usa Testo
             nella toolbar per scrivere sul foglio. Trascina per disegnare una freccia o una maglia.
-            Doppio clic modifica testi ed etichette. Tieni Shift premuto mentre inserisci nodi per
-            ripetere l’inserimento.
+            Doppio clic modifica direttamente testi ed etichette; Enter o clic esterno conferma, Esc
+            annulla. Nodo resta attivo fino a Esc, V o cambio strumento.
           </p>
         </div>
         <div className="shortcut-grid">
@@ -48,7 +48,10 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
             ['↑ ↓ ← →', 'Sposta di precisione (1 unità)'],
             ['Shift + ↑↓←→', 'Spostamento maggiore (10 unità)'],
             ['Shift + clic', 'Selezione multipla'],
-            ['Shift + clic con Nodo', 'Inserisci più nodi'],
+            ['N · clic ripetuti', 'Inserisci più nodi · Esc termina'],
+            ['Shift + W', 'Cambia routing del filo'],
+            ['Alt/Option + clic label', 'Scegli tra label sovrapposte'],
+            ['Shift + handle rotazione', 'Aggancia la freccia a multipli di 15°'],
             ['Trascina sul foglio', 'Selezione a rettangolo'],
             ['R', 'Ruota componente di 45° · graffa/staffa di 90°'],
             ['Enter', 'Modifica nome o etichetta'],
@@ -82,11 +85,17 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
           <code>r_&#123;AB&#125;</code> per un pedice.
         </p>
         <p className="help-note">
+          Stile regola colore e opacità, separatamente per simbolo e label, anche sui gruppi.
+          Seleziona più componenti e usa ••• → Sostituisci per cambiarli insieme. La toolbar
+          specchia frecce e maglie nei due assi; il piccolo handle che appare vicino a una freccia
+          selezionata permette di ruotarla liberamente. Ogni gesto ha un solo undo.
+        </p>
+        <p className="help-note">
           L’anteprima Smart Placement indica aggancio e collegamento; Alt/Option li ignora.
           “Inserisci in filo” è nel feedback in basso. La matita “Disegno e annotazioni” raccoglie
-          fili, nodi, frecce, maglie e annotazioni elettriche. “Corrente sul filo” apre Integrata ed
-          Esterna; dalla toolbar di un filo selezionato la corrente si applica subito. “Polarità + /
-          −” si applica direttamente anche dalla toolbar dei componenti compatibili. “Graffa /
+          fili, nodi, frecce, maglie e annotazioni elettriche. “Corrente sul filo” crea direttamente
+          una freccia integrata; dalla toolbar di un filo selezionato si applica subito. “Polarità +
+          / −” si applica direttamente anche dalla toolbar dei componenti compatibili. “Graffa /
           Staffa” apre Graffa e Staffa: trascina per raggruppare, poi aggiungi l’etichetta; R ruota
           di 90° e “Inverti lato” cambia lato. Trascina il grip per spostare la toolbar: la
           posizione viene ricordata. Export offre TikZ, Obsidian, File .tex, SVG e le azioni dirette

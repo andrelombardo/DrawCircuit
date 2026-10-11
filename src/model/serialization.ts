@@ -13,6 +13,7 @@ const str = (v: unknown) => typeof v === 'string' && v.length <= 10000;
 const num = (v: unknown) => typeof v === 'number' && Number.isFinite(v) && Math.abs(v) <= 1e7;
 const color = (v: unknown) => typeof v === 'string' && /^#[a-fA-F0-9]{6}$/.test(v);
 const rotation = isRotation;
+const opacity = (v: unknown) => v === undefined || (num(v) && Number(v) >= 0 && Number(v) <= 1);
 const point = (v: unknown) => {
   const p = record(v);
   return num(p.x) && num(p.y);
@@ -24,6 +25,7 @@ function label(v: unknown): boolean {
     str(l.text) &&
     point(l.offset) &&
     color(l.color) &&
+    opacity(l.opacity) &&
     positive(l.fontSize, 200) &&
     rotation(l.rotation) &&
     (l.fontFamily === undefined || str(l.fontFamily))
@@ -63,6 +65,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
     const o = record(entry);
     if (!str(o.id) || !o.id || ids.has(String(o.id))) fail();
     ids.add(String(o.id));
+    if (!opacity(o.opacity)) fail();
     if (o.kind === 'component') {
       const definition = componentRegistry[o.type as (typeof componentTypes)[number]];
       if (definition && (o.label === undefined || typeof o.label === 'string')) {
@@ -109,6 +112,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
       if (!num(o.x) || !num(o.y) || !label(o.label) || !color(o.color)) fail();
     } else if (o.kind === 'wire') {
       if (
+        (o.routing !== undefined && !['orthogonal', '45', 'free'].includes(String(o.routing))) ||
         !endpoint(o.startEndpoint) ||
         !endpoint(o.endEndpoint) ||
         !Array.isArray(o.vertices) ||
@@ -172,6 +176,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
       )
         fail();
     } else if (o.kind === 'loop-arrow') {
+      if (o.rotation !== undefined && !num(o.rotation)) fail();
       if (
         !num(o.x) ||
         !num(o.y) ||
@@ -186,6 +191,11 @@ export function deserializeDocument(raw: string): CircuitDocument {
       )
         fail();
     } else if (o.kind === 'arrow') {
+      if (
+        (o.arcRotation !== undefined && !num(o.arcRotation)) ||
+        (o.arcMirrored !== undefined && typeof o.arcMirrored !== 'boolean')
+      )
+        fail();
       if (
         !['straight', 'curve', 'arc'].includes(String(o.type)) ||
         !point(o.start) ||
@@ -206,6 +216,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
       delete l.fontFamily;
       delete o.value;
     }
+    if (o.kind === 'electrical' && o.mode === 'current') o.currentPlacement = 'inline';
     if (o.kind === 'text') delete o.fontFamily;
   }
   const doc = root as unknown as CircuitDocument;

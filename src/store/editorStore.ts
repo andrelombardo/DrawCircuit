@@ -1,11 +1,15 @@
 import { usePersonalBlocks, instantiatePersonalBlock } from '../personalBlocks/library';
-import { replaceComponent as replaceComponentInDocument } from '../model/replacement';
+import {
+  replaceComponent as replaceComponentInDocument,
+  replaceComponents as replaceComponentsInDocument,
+} from '../model/replacement';
 import type { ComponentType } from '../model/types';
 import { create } from 'zustand';
 import { reconcileCurrentSegments } from '../annotations/electrical';
 import { demoDocument } from '../model/demo';
 import { deserializeDocument, serializeDocument } from '../model/serialization';
 import { cloneObjects, extractSelection, removeObjects, rotateObjects } from '../utils/operations';
+import { mirrorArrows } from '../utils/arrows';
 import { hasAssociatedLabel, replaceInlineText } from '../utils/labels';
 import { instantiatePreset } from '../presets/instantiate';
 import { presetRegistry } from '../presets/registry';
@@ -17,6 +21,7 @@ import type {
   Point,
   Rotation,
   Tool,
+  WireRouting,
 } from '../model/types';
 export const STORAGE_KEY = 'drawcircuit.document.v1';
 const documentStorage = localPersistence(
@@ -33,13 +38,14 @@ interface EditorState {
   tool: Tool;
   pendingPresetId: string | null;
   replaceComponent: (id: string, type: ComponentType) => void;
+  replaceComponents: (ids: string[], type: ComponentType) => void;
   selectPreset: (id: string) => void;
   insertPreset: (point: Point) => void;
   placementRotation: Rotation;
   rotatePlacement: () => void;
   arrowType: ArrowAnnotation['type'];
-  currentPlacement: 'external' | 'inline';
-  setCurrentPlacement: (placement: 'external' | 'inline') => void;
+  wireRouting: WireRouting;
+  setWireRouting: (routing: WireRouting) => void;
   grid: boolean;
   past: CircuitDocument[];
   future: CircuitDocument[];
@@ -62,6 +68,7 @@ interface EditorState {
   redo: () => void;
   remove: (includeLabelOwner?: boolean) => void;
   duplicate: () => void;
+  mirror: (axis: 'horizontal' | 'vertical') => void;
   rotate: () => void;
   replace: (doc: CircuitDocument) => void;
   notify: (message: string) => void;
@@ -94,6 +101,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
   replaceComponent: (id, type) =>
     get().commit(replaceComponentInDocument(get().document, id, type)),
+  replaceComponents: (ids, type) =>
+    get().commit(replaceComponentsInDocument(get().document, ids, type)),
   placementRotation: 0,
   rotatePlacement: () =>
     set((s) => ({
@@ -101,8 +110,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         360) as Rotation,
     })),
   arrowType: 'straight',
-  currentPlacement: 'external',
-  setCurrentPlacement: (currentPlacement) => set({ currentPlacement }),
+  wireRouting: 'orthogonal',
+  setWireRouting: (wireRouting) => set({ wireRouting }),
   grid: true,
   past: [],
   future: [],
@@ -208,6 +217,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const s = get();
     if (s.selection.length)
       s.add(cloneObjects(extractSelection(s.document, s.selection), { x: 40, y: 40 }, s.document));
+  },
+  mirror: (axis) => {
+    const s = get();
+    s.commit(mirrorArrows(s.document, s.selection, axis));
   },
   rotate: () => {
     const s = get();

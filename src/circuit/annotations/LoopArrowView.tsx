@@ -41,6 +41,7 @@ export const LoopArrowView = memo(function LoopArrowView({
       />
       <path
         d={loopPath(o)}
+        opacity={o.opacity}
         stroke={o.color}
         strokeWidth={o.strokeWidth}
         fill="none"

@@ -1,7 +1,8 @@
+import { drawingWireGaps } from '../../utils/wireRendering';
 import { BraceView } from '../../circuit/annotations/BraceView';
 import { WireBridges } from '../../circuit/wires/WireBridges';
 import { ElectricalView } from '../../circuit/annotations/ElectricalView';
-import { currentWireGaps, wireDrawingPaths } from '../../annotations/electrical';
+import { wireDrawingPaths } from '../../annotations/electrical';
 import { memo, useMemo } from 'react';
 import type { CircuitDocument } from '../../model/types';
 import { wirePoints } from '../../utils/geometry';
@@ -11,6 +12,7 @@ import { JunctionView } from '../../circuit/junctions/JunctionView';
 import { ArrowView } from '../../circuit/annotations/ArrowView';
 import { LoopArrowView } from '../../circuit/annotations/LoopArrowView';
 import { MathText } from '../../circuit/annotations/MathText';
+import { inlineTextTarget } from '../../utils/labels';
 import { SelectionLayer } from './SelectionLayer';
 export const CircuitLayer = memo(function CircuitLayer({
   doc,
@@ -21,6 +23,7 @@ export const CircuitLayer = memo(function CircuitLayer({
   activeLabel = null,
   editingTextId,
   editingLabelId,
+  hoveredArrow,
 }: {
   doc: CircuitDocument;
   selection: string[];
@@ -30,10 +33,11 @@ export const CircuitLayer = memo(function CircuitLayer({
   activeLabel?: string | null;
   editingTextId?: string;
   editingLabelId?: string;
+  hoveredArrow?: string | null;
 }) {
   const selected = useMemo(() => new Set(selection), [selection]);
   const nearby = useMemo(() => new Set(nearbyComponents), [nearbyComponents]);
-  const currentGaps = useMemo(() => currentWireGaps(doc), [doc]);
+  const currentGaps = useMemo(() => drawingWireGaps(doc), [doc]);
   const wires = useMemo(
     () =>
       doc.objects.flatMap((o) =>
@@ -77,24 +81,6 @@ export const CircuitLayer = memo(function CircuitLayer({
           ) : null,
         )}
       </g>
-      <g data-layer="labels">
-        {doc.objects.map((o) =>
-          (o.kind === 'component' || o.kind === 'junction') && o.id !== editingLabelId ? (
-            <g key={o.id} data-object={o.id}>
-              <MathText
-                text={o.label.text}
-                x={o.x + o.label.offset.x}
-                y={o.y + o.label.offset.y}
-                color={o.label.color}
-                fontSize={o.label.fontSize}
-                rotation={o.label.rotation}
-                labelId={o.id}
-                selected={selected.has(o.id) && activeLabel === o.id}
-              />
-            </g>
-          ) : null,
-        )}
-      </g>
       <g data-layer="annotations">
         {doc.objects.map((o) =>
           o.kind === 'brace' ? (
@@ -103,7 +89,7 @@ export const CircuitLayer = memo(function CircuitLayer({
               object={o}
               zoom={zoom}
               labelSelected={selected.has(o.id) && activeLabel === o.id}
-              hideLabel={o.id === editingLabelId}
+              hideLabel
             />
           ) : o.kind === 'electrical' ? (
             <ElectricalView
@@ -112,7 +98,7 @@ export const CircuitLayer = memo(function CircuitLayer({
               doc={doc}
               selected={selected.has(o.id) && activeLabel !== o.id}
               labelSelected={selected.has(o.id) && activeLabel === o.id}
-              hideLabel={o.id === editingLabelId}
+              hideLabel
               zoom={zoom}
             />
           ) : o.kind === 'arrow' ? (
@@ -130,6 +116,7 @@ export const CircuitLayer = memo(function CircuitLayer({
                 x={o.x}
                 y={o.y}
                 color={o.color}
+                opacity={o.opacity}
                 fontSize={o.fontSize}
                 align={o.align}
                 rotation={o.rotation}
@@ -138,8 +125,30 @@ export const CircuitLayer = memo(function CircuitLayer({
           ) : null,
         )}
       </g>
+      <g data-layer="labels">
+        {doc.objects.map((o) => {
+          if (!('label' in o) || o.id === editingLabelId) return null;
+          const target = inlineTextTarget(o, doc)!;
+          return (
+            <g key={o.id} data-object={o.id}>
+              <MathText
+                text={target.text}
+                x={target.point.x}
+                y={target.point.y}
+                color={target.color}
+                opacity={target.opacity}
+                fontSize={target.fontSize}
+                rotation={target.rotation}
+                labelId={o.id}
+                selected={selected.has(o.id) && activeLabel === o.id}
+              />
+            </g>
+          );
+        })}
+      </g>
       <SelectionLayer
         doc={doc}
+        hoveredArrow={hoveredArrow}
         selection={selection.filter((id) => id !== activeLabel)}
         zoom={zoom}
       />

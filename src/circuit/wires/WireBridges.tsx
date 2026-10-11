@@ -1,3 +1,4 @@
+import { translucentCrossing } from '../../utils/wireRendering';
 import { memo } from 'react';
 import type { CircuitDocument } from '../../model/types';
 import { bridgePaths, wireCrossings } from '../../utils/crossings';
@@ -15,15 +16,20 @@ export const WireBridges = memo(function WireBridges({ doc }: { doc: CircuitDocu
             data-over-wire={p.overWire.id}
             data-under-wire={p.underWire.id}
           >
-            <path d={p.gap} fill="none" stroke="white" strokeWidth={w} />
+            {!translucentCrossing(c) && (
+              <>
+                <path d={p.gap} fill="none" stroke="white" strokeWidth={w} />
+                <path
+                  d={p.under}
+                  fill="none"
+                  stroke={p.underWire.color}
+                  strokeWidth={p.underWire.width}
+                />
+                <path d={p.arc} fill="none" stroke="white" strokeWidth={w} strokeLinecap="round" />
+              </>
+            )}
             <path
-              d={p.under}
-              fill="none"
-              stroke={p.underWire.color}
-              strokeWidth={p.underWire.width}
-            />
-            <path d={p.arc} fill="none" stroke="white" strokeWidth={w} strokeLinecap="round" />
-            <path
+              opacity={p.overWire.opacity}
               d={p.arc}
               fill="none"
               stroke={p.overWire.color}

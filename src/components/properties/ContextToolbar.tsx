@@ -1,13 +1,14 @@
 import { createPersonalBlock, usePersonalBlocks } from '../../personalBlocks/library';
 import { BlockNameDialog } from '../toolbar/BlockNameDialog';
 import { ReplaceDialog } from './ReplaceDialog';
-import { compatibleReplacements } from '../../model/replacement';
 import {
   AlignCenter,
   AlignLeft,
   AlignRight,
   Copy,
   FlipHorizontal,
+  FlipVertical,
+  ArrowLeftRight,
   RotateCw,
   Trash2,
   MoreHorizontal,
@@ -18,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useLayoutEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
+import { rotationHandle } from '../../utils/arrows';
 import { reverseLoop } from '../../utils/loops';
 import { SelectionStyle } from './SelectionStyle';
 import type { CircuitObject, Viewport } from '../../model/types';
@@ -31,8 +33,7 @@ import { getExportSelection } from '../../tikz/selection';
 import { createPolarity } from '../../annotations/electrical';
 import { supportsPolarity } from '../../model/capabilities';
 import { currentOnSelectedWire } from './annotationActions';
-import { ActionMenu } from '../toolbar/ActionMenu';
-import { CurrentInlineIcon, CurrentExternalIcon, PolarityIcon } from '../toolbar/DrawingIcons';
+import { CurrentInlineIcon, PolarityIcon } from '../toolbar/DrawingIcons';
 function PropertyText({
   value,
   label,
@@ -91,6 +92,7 @@ export function ContextToolbar({
     more = useRef<HTMLDetailsElement>(null),
     style = useRef<HTMLDetailsElement>(null);
   const objects = doc.objects.filter((o) => selection.includes(o.id));
+  const components = objects.filter((o) => o.kind === 'component');
   const o = objects.length === 1 ? objects[0] : null,
     actions = toolbarActions(o);
   const [dismissed, setDismissed] = useState(o?.kind === 'text'),
@@ -197,6 +199,19 @@ export function ContextToolbar({
           height: r.height,
           weight: selected ? 20 : 1,
         }));
+      // Reserve the rotation handle's hit area even before hover reveals it.
+      // Otherwise the contextual bar can cover the only way to rotate a curve.
+      for (const object of objects) {
+        if (object.kind !== 'arrow' && object.kind !== 'loop-arrow') continue;
+        const handle = rotationHandle(object, v.zoom);
+        obstacles.push({
+          x: handle.x * v.zoom + v.x - 14,
+          y: handle.y * v.zoom + v.y - 14,
+          width: 28,
+          height: 28,
+          weight: 100,
+        });
+      }
       const overlap = (y: number) =>
         obstacles.reduce(
           (cost, r) =>
@@ -308,28 +323,16 @@ export function ContextToolbar({
       </details>
       <div className="toolbar-divider" />
       {o?.kind === 'wire' && (
-        <ActionMenu
-          key={o.id}
+        <IconButton
           label="Corrente sul filo"
-          icon={<CurrentInlineIcon size={18} />}
-          onOpenChange={(open) => {
-            if (open) {
-              if (more.current) more.current.open = false;
-              if (style.current) style.current.open = false;
-            }
+          onClick={() => {
+            const state = useEditorStore.getState();
+            const wire = state.document.objects.find((object) => object.id === o.id);
+            if (wire?.kind === 'wire') state.add([currentOnSelectedWire(wire, state.document)]);
           }}
-          items={(['inline', 'external'] as const).map((placement) => ({
-            id: placement,
-            label: placement === 'inline' ? 'Integrata' : 'Esterna',
-            icon: placement === 'inline' ? <CurrentInlineIcon /> : <CurrentExternalIcon />,
-            onSelect: () => {
-              const state = useEditorStore.getState();
-              const wire = state.document.objects.find((object) => object.id === o.id);
-              if (wire?.kind === 'wire')
-                state.add([currentOnSelectedWire(wire, state.document, placement)]);
-            },
-          }))}
-        />
+        >
+          <CurrentInlineIcon size={18} />
+        </IconButton>
       )}
       {o && supportsPolarity(o) && (
         <IconButton
@@ -370,8 +373,24 @@ export function ContextToolbar({
             )
           }
         >
-          <FlipHorizontal size={17} />
+          <ArrowLeftRight size={17} />
         </IconButton>
+      )}
+      {objects.some((o) => o.kind === 'arrow' || o.kind === 'loop-arrow') && (
+        <>
+          <IconButton
+            label="Specchia orizzontalmente"
+            onClick={() => useEditorStore.getState().mirror('horizontal')}
+          >
+            <FlipHorizontal size={17} />
+          </IconButton>
+          <IconButton
+            label="Specchia verticalmente"
+            onClick={() => useEditorStore.getState().mirror('vertical')}
+          >
+            <FlipVertical size={17} />
+          </IconButton>
+        </>
       )}
       {actions.primary.includes('rotate') && (
         <IconButton
@@ -392,8 +411,8 @@ export function ContextToolbar({
           }
         />
       )}
-      {replaceDialog && o?.kind === 'component' && (
-        <ReplaceDialog component={o} onClose={() => setReplaceDialog(false)} />
+      {replaceDialog && components.length > 0 && (
+        <ReplaceDialog components={components} onClose={() => setReplaceDialog(false)} />
       )}
       {!!actions.secondary.length && (
         <details
@@ -415,7 +434,7 @@ export function ContextToolbar({
             <MoreHorizontal size={18} />
           </summary>
           <div className="context-popover">
-            {o?.kind === 'component' && compatibleReplacements(o).length > 0 && (
+            {components.length > 0 && (
               <button
                 className="secondary-property"
                 onClick={() => {
@@ -447,24 +466,6 @@ export function ContextToolbar({
             </button>
             {o?.kind === 'electrical' && (
               <>
-                {o.mode === 'current' && (
-                  <label className="property-control">
-                    <span>Posizione</span>
-                    <select
-                      aria-label="Posizione corrente"
-                      value={o.currentPlacement ?? 'external'}
-                      onChange={(event) => {
-                        const currentPlacement = event.target.value as 'external' | 'inline';
-                        update(o.id, (object) =>
-                          object.kind === 'electrical' ? { ...object, currentPlacement } : object,
-                        );
-                      }}
-                    >
-                      <option value="external">Esterna</option>
-                      <option value="inline">Integrata</option>
-                    </select>
-                  </label>
-                )}
                 <label className="property-control">
                   Offset X
                   <input

@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useLayoutEffect, useRef, useState } from 'react';
 import { CIRCUIT_FONT } from '../../model/fonts';
 import type { Rotation } from '../../model/types';
 import { renderLatex } from '../../math/latex';
@@ -23,6 +23,7 @@ export const MathText = memo(function MathText({
   x = 0,
   y = 0,
   color,
+  opacity,
   fontSize = 22,
   align = 'middle',
   rotation = 0,
@@ -33,6 +34,7 @@ export const MathText = memo(function MathText({
   x?: number;
   y?: number;
   color: string;
+  opacity?: number;
   fontSize?: number;
   align?: 'start' | 'middle' | 'end';
   rotation?: Rotation;
@@ -42,7 +44,7 @@ export const MathText = memo(function MathText({
   const result = renderLatex(text);
   const content = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 1, height: 1 });
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = content.current;
     if (!el) return;
     let active = true;
@@ -54,13 +56,12 @@ export const MathText = memo(function MathText({
         previous.width === width && previous.height === height ? previous : { width, height },
       );
     };
-    const frame = requestAnimationFrame(measure);
+    measure();
     const observer = new ResizeObserver(measure);
     observer.observe(el);
     void document.fonts?.ready.then(measure);
     return () => {
       active = false;
-      cancelAnimationFrame(frame);
       observer.disconnect();
     };
   }, [text, fontSize, result.kind]);
@@ -68,6 +69,7 @@ export const MathText = memo(function MathText({
     return (
       <g
         transform={`translate(${x} ${y}) rotate(${rotation})`}
+        opacity={opacity}
         data-label={labelId}
         data-source={text}
         aria-label={text}
@@ -96,7 +98,9 @@ export const MathText = memo(function MathText({
       x={x}
       y={y}
       fill={color}
+      opacity={opacity}
       fontSize={fontSize}
+      pointerEvents="bounding-box"
       textAnchor={align}
       dominantBaseline="middle"
       className={`handwriting${selected ? ' selected-label' : ''}`}

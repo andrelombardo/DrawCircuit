@@ -24,12 +24,12 @@ Riprodotto prima del fix il circuito a tre resistori, fili orizzontali/verticali
 Nel browser, la lunghezza visibile misurata del segmento della freccia è:
 
 | Zoom | Integrata (px) | Esterna (px) |
-| --- | ---: | ---: |
-| 15% | 5,4 | 9 |
-| 50% | 18 | 30 |
-| 100% | 36 | 60 |
-| 200% | 72 | 120 |
-| 400% | 144 | 240 |
+| ---- | -------------: | -----------: |
+| 15%  |            5,4 |            9 |
+| 50%  |             18 |           30 |
+| 100% |             36 |           60 |
+| 200% |             72 |          120 |
+| 400% |            144 |          240 |
 
 I dati completi sono in `evidence/browser-geometry.json`. Le catture `golden-15/100/400.jpg` confrontano entrambe le modalità sul disegno A–B. Al 400% il viewport mostra un dettaglio del circuito, come ci si aspetta da un ingrandimento reale.
 

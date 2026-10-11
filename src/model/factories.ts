@@ -1,6 +1,6 @@
 import { makeId } from './catalog';
 import { COLORS } from './types';
-import type { Endpoint, Junction, Point, TextAnnotation, Wire } from './types';
+import type { Endpoint, Junction, Point, TextAnnotation, Wire, WireRouting } from './types';
 
 export function createJunction(point: Point, text: string): Junction {
   return {
@@ -12,13 +12,19 @@ export function createJunction(point: Point, text: string): Junction {
   };
 }
 
-export function createWire(start: Endpoint, end: Endpoint, vertices: Point[] = []): Wire {
+export function createWire(
+  start: Endpoint,
+  end: Endpoint,
+  vertices: Point[] = [],
+  routing: WireRouting = 'orthogonal',
+): Wire {
   return {
     kind: 'wire',
     id: makeId(),
     startEndpoint: start,
     endEndpoint: end,
     vertices,
+    routing,
     color: COLORS.ink,
     width: 2,
   };

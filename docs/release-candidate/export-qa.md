@@ -4,14 +4,14 @@ Data: 3 ottobre 2026. Le prove combinano uso reale dell’export nell’app, ren
 
 ## Formati e prove effettive
 
-| Formato | Verifica | Risultato |
-| --- | --- | --- |
-| Copy TikZ, profilo nativo | Codice esportato dalla UI; render golden nel plugin e compilazione standalone | PASS compilazione; geometria e font CircuitikZ differenti dal canvas |
-| Download `.tex` | Compilazione integrata Codex: tre documenti interi, otto selezioni e golden UX finale | 12 PASS; visuale PDF NOT TESTED |
-| Copy for Obsidian, scala canvas | Due golden osservati nell’app desktop; catalogo e selezioni compilati dal bundle esatto installato | PASS |
-| Copy/download SVG | Apertura in Chromium e resvg, documenti interi e selezioni | PASS nei viewer verificati |
-| CircuitikZ nativo: catalogo 72 × 4 | Bundle Inline TikZ 0.2.1 installato | FAIL: `Could not find font cmmib5` |
-| Stesso catalogo `.tex` | Compiler integrato Codex | PASS; il successo non risolve il FAIL del plugin |
+| Formato                            | Verifica                                                                                           | Risultato                                                            |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Copy TikZ, profilo nativo          | Codice esportato dalla UI; render golden nel plugin e compilazione standalone                      | PASS compilazione; geometria e font CircuitikZ differenti dal canvas |
+| Download `.tex`                    | Compilazione integrata Codex: tre documenti interi, otto selezioni e golden UX finale              | 12 PASS; visuale PDF NOT TESTED                                      |
+| Copy for Obsidian, scala canvas    | Due golden osservati nell’app desktop; catalogo e selezioni compilati dal bundle esatto installato | PASS                                                                 |
+| Copy/download SVG                  | Apertura in Chromium e resvg, documenti interi e selezioni                                         | PASS nei viewer verificati                                           |
+| CircuitikZ nativo: catalogo 72 × 4 | Bundle Inline TikZ 0.2.1 installato                                                                | FAIL: `Could not find font cmmib5`                                   |
+| Stesso catalogo `.tex`             | Compiler integrato Codex                                                                           | PASS; il successo non risolve il FAIL del plugin                     |
 
 Il compiler nativo restituisce diagnostiche senza esportare un PDF ispezionabile: [11 compilazioni iniziali](evidence/exp-native-compile-diagnostics.json) e [golden UX finale](evidence/ux-final-native-compile.json). Non è stato presentato un SVG come prova visuale PDF. Il [log del catalogo nativo](evidence/exp-catalog-compilation.log) e il [risultato FAIL](evidence/exp-catalog-native.svg.result.json) sono conservati. Il catalogo canvas è [PASS dal bundle installato](evidence/exp-catalog-obsidian.svg.result.json): 288 componenti, 72 tipi e quattro rotazioni. Non è stato rieseguito né ricontato durante la chiusura del rapporto.
 
@@ -25,16 +25,16 @@ Il golden di fedeltà ha 37 oggetti: 12 componenti, **otto resistori**, condensa
 
 [Metriche complete](evidence/exp-visual-metrics.json). I box del DOM originale e degli SVG sono riportati nelle coordinate editor con viewBox, scala uniforme e primo endpoint del filo noto; un’unità canvas corrisponde a 0,75 pt TeX. Le righe segnate model/export confrontano i valori vettoriali, non una misura indipendente del raster.
 
-| Metrica, unità editor | Editor | Obsidian normalizzato | Differenza |
-| --- | ---: | ---: | ---: |
-| Larghezza corpo resistore | 40 | 39,99991 | −0,00022% |
-| Altezza corpo resistore | 18 | 17,99725 | −0,01530% |
-| Diametro sorgente | 40 | 39,99980 | −0,00049% |
-| Spessore filo / frecce | 2 | 2 | 0% |
-| Raggio junction | 4,5 | 4,5 | 0% |
-| Lunghezza terminale resistore | 20 | 20 | 0% |
-| Distanza / altezza piastre C | 12 / 34 | 12 / 34 | 0% |
-| Distanza fra centri resistori | 240 | 240 | 0% |
+| Metrica, unità editor         |  Editor | Obsidian normalizzato | Differenza |
+| ----------------------------- | ------: | --------------------: | ---------: |
+| Larghezza corpo resistore     |      40 |              39,99991 |  −0,00022% |
+| Altezza corpo resistore       |      18 |              17,99725 |  −0,01530% |
+| Diametro sorgente             |      40 |              39,99980 |  −0,00049% |
+| Spessore filo / frecce        |       2 |                     2 |         0% |
+| Raggio junction               |     4,5 |                   4,5 |         0% |
+| Lunghezza terminale resistore |      20 |                    20 |         0% |
+| Distanza / altezza piastre C  | 12 / 34 |               12 / 34 |         0% |
+| Distanza fra centri resistori |     240 |                   240 |         0% |
 
 Tutti i **41 glyph** trovano corrispondenza: errore massimo posizione/box **0,00301 unità**, errore massimo larghezza/altezza **0,000108 unità**, famiglie font corrispondenti. Sono confrontati pedici, baseline, offset, normali label Comic Sans, colori e contenuti matematici. Gli SVG non hanno `foreignObject`. L’export SVG ha viewBox `−512 −312 1008,6406 684`; il plugin ricava il proprio bounding box dai path e aggiunge padding. Il suo rettangolo esterno non deve essere interpretato come un cambio di scala degli oggetti.
 
@@ -52,13 +52,13 @@ Questo documento è **diverso dal golden di fedeltà precedente**: [JSON definit
 
 Sono stati confrontati posizione relativa e geometria, crossing con ponte, junction A realmente collegata, entrambe le copie RLC, font e offset delle label, colori blu/rosso, frecce e loop. Il risultato coincide alla scala uniforme di visualizzazione; le label sovrapposte già presenti nell’editor rimangono nello stesso punto nell’export. La barra laterale è stata nascosta e lo screenshot ritagliato al circuito. Nessuna nota personale è stata modificata.
 
-| Output finale UX | Evidenza | Stato |
-| --- | --- | --- |
-| Obsidian intero | [Markdown](evidence/ux-final-full-obsidian.md), [render bundle esatto](evidence/ux-final-full-obsidian.svg), [risultato pipeline](evidence/ux-final-full-obsidian.svg.result.json), screenshot diretto sopra | PASS pipeline e desktop |
-| Obsidian selezione | [Markdown](evidence/ux-final-selection-obsidian.md), [render bundle esatto](evidence/ux-final-selection-obsidian.svg), [risultato](evidence/ux-final-selection-obsidian.svg.result.json) | PASS pipeline installata; desktop selezione NOT TESTED |
-| TikZ intero / selezione | [Intero](evidence/ux-final-full.tikz), [selezione](evidence/ux-final-selection.tikz) | PASS produzione UI |
-| Standalone intero | [`.tex`](evidence/ux-final-full.tex), diagnostica sopra | PASS compilazione; PDF visual NOT TESTED |
-| SVG intero / selezione | [Intero](evidence/ux-final-full.svg), [selezione](evidence/ux-final-selection.svg) | PASS export; i due selected + filo interno producono tre oggetti |
+| Output finale UX        | Evidenza                                                                                                                                                                                                     | Stato                                                            |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| Obsidian intero         | [Markdown](evidence/ux-final-full-obsidian.md), [render bundle esatto](evidence/ux-final-full-obsidian.svg), [risultato pipeline](evidence/ux-final-full-obsidian.svg.result.json), screenshot diretto sopra | PASS pipeline e desktop                                          |
+| Obsidian selezione      | [Markdown](evidence/ux-final-selection-obsidian.md), [render bundle esatto](evidence/ux-final-selection-obsidian.svg), [risultato](evidence/ux-final-selection-obsidian.svg.result.json)                     | PASS pipeline installata; desktop selezione NOT TESTED           |
+| TikZ intero / selezione | [Intero](evidence/ux-final-full.tikz), [selezione](evidence/ux-final-selection.tikz)                                                                                                                         | PASS produzione UI                                               |
+| Standalone intero       | [`.tex`](evidence/ux-final-full.tex), diagnostica sopra                                                                                                                                                      | PASS compilazione; PDF visual NOT TESTED                         |
+| SVG intero / selezione  | [Intero](evidence/ux-final-full.svg), [selezione](evidence/ux-final-selection.svg)                                                                                                                           | PASS export; i due selected + filo interno producono tre oggetti |
 
 Il bundle esatto installato è identificato con hash `bf777b889838870f902fed6989d7afbc5daeab799698582e299ff1cdea036e1a`. La compilazione in processo isolato usa quel codice, ma non viene chiamata “test diretto desktop”: solo lo screenshot e la lettura UI del circuito intero sostengono quella dichiarazione.
 

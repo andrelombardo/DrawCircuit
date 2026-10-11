@@ -30,7 +30,6 @@ beforeEach(() => {
     past: [],
     future: [],
     gestureStart: null,
-    currentPlacement: 'external',
   });
 });
 afterEach(() => {
@@ -83,41 +82,31 @@ describe('compact pencil drawing menu', () => {
     expect(item('Maglia').querySelector('path')?.getAttribute('d')).toContain('H8');
   });
 
-  it.each(['Integrata', 'Esterna'])(
-    'activates %s directly, closes both menu levels and accents the pencil',
-    (label) => {
-      renderToolbar();
-      fireEvent.click(pencil());
-      fireEvent.click(item('Corrente sul filo'));
-      const integrated = item('Integrata').querySelector('path')?.getAttribute('d');
-      const external = item('Esterna').querySelector('path')?.getAttribute('d');
-      expect(integrated).not.toEqual(external);
-      fireEvent.click(item(label));
-      expect(useEditorStore.getState()).toMatchObject({
-        tool: 'current',
-        currentPlacement: label === 'Integrata' ? 'inline' : 'external',
-      });
-      expect(screen.queryByRole('menu')).toBeNull();
-      expect(pencil().getAttribute('aria-pressed')).toBe('true');
-    },
-  );
+  it('activates integrated current in one click and accents the active tool', () => {
+    renderToolbar();
+    fireEvent.click(pencil());
+    fireEvent.click(item('Corrente sul filo'));
+    expect(useEditorStore.getState().tool).toBe('current');
+    expect(screen.queryByRole('menu')).toBeNull();
+    expect(pencil().getAttribute('aria-pressed')).toBe('true');
+  });
 
   it('navigates keyboard levels, wraps items, returns with Left/Escape and restores trigger focus', () => {
     useEditorStore.setState({ selection: ['selected-wire'] });
     renderToolbar();
-    fireEvent.keyDown(pencil(), { key: 'ArrowUp' });
-    expect(document.activeElement).toBe(item('Corrente sul filo'));
+    fireEvent.keyDown(pencil(), { key: 'ArrowDown' });
+    for (let i = 0; i < 4; i++) fireEvent.keyDown(document.activeElement!, { key: 'ArrowDown' });
     fireEvent.keyDown(document.activeElement!, { key: 'ArrowRight' });
-    expect(document.activeElement).toBe(item('Integrata'));
+    expect(document.activeElement).toBe(item('Graffa'));
     fireEvent.keyDown(document.activeElement!, { key: 'ArrowUp' });
-    expect(document.activeElement).toBe(item('Esterna'));
+    expect(document.activeElement).toBe(item('Staffa'));
     fireEvent.keyDown(document.activeElement!, { key: 'ArrowLeft' });
-    expect(screen.queryByRole('menuitem', { name: 'Integrata' })).toBeNull();
-    expect(document.activeElement).toBe(item('Corrente sul filo'));
+    expect(screen.queryByRole('menuitem', { name: 'Graffa' })).toBeNull();
+    expect(document.activeElement).toBe(item('Graffa / Staffa'));
     fireEvent.keyDown(document.activeElement!, { key: 'ArrowRight' });
     fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
-    expect(screen.queryByRole('menuitem', { name: 'Integrata' })).toBeNull();
-    expect(document.activeElement).toBe(item('Corrente sul filo'));
+    expect(screen.queryByRole('menuitem', { name: 'Graffa' })).toBeNull();
+    expect(document.activeElement).toBe(item('Graffa / Staffa'));
     fireEvent.keyDown(document.activeElement!, { key: 'Home' });
     expect(document.activeElement).toBe(item('Filo'));
     fireEvent.keyDown(document.activeElement!, { key: 'n' });
@@ -140,20 +129,20 @@ describe('compact pencil drawing menu', () => {
     expect(pencil().getAttribute('aria-pressed')).toBe('false');
   });
 
-  it('keeps the current submenu open while the pointer traverses its gap and closes on outside click', () => {
+  it('keeps the brace submenu open while the pointer traverses its gap and closes on outside click', () => {
     vi.useFakeTimers();
     renderToolbar();
     fireEvent.click(pencil());
-    fireEvent.pointerEnter(item('Corrente sul filo'));
+    fireEvent.pointerEnter(item('Graffa / Staffa'));
     act(() => vi.advanceTimersByTime(110));
-    const child = screen.getByRole('menu', { name: 'Corrente sul filo' });
+    const child = screen.getByRole('menu', { name: 'Graffa / Staffa' });
     fireEvent.pointerLeave(screen.getByRole('menu', { name: 'Disegno e annotazioni' }));
     act(() => vi.advanceTimersByTime(200));
     fireEvent.pointerEnter(child);
     act(() => vi.advanceTimersByTime(1000));
-    expect(item('Integrata')).toBeTruthy();
-    fireEvent.pointerDown(item('Esterna'));
-    expect(item('Integrata')).toBeTruthy();
+    expect(item('Graffa')).toBeTruthy();
+    fireEvent.pointerDown(item('Staffa'));
+    expect(item('Graffa')).toBeTruthy();
     fireEvent.pointerDown(document.body);
     expect(screen.queryByRole('menu')).toBeNull();
   });

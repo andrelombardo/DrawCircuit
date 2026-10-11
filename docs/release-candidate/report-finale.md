@@ -21,12 +21,12 @@ Report di area:
 
 Il limite disponibile era quattro agenti simultanei, incluso il coordinatore. Sono state mantenute tre verifiche indipendenti in parallelo; dopo le interruzioni gli incarichi sono stati ripresi da nuovi agenti, riutilizzando e controllando le evidenze salvate. Sono stati usati nove incarichi di subagent in tre passaggi, sempre con un massimo di quattro agenti simultanei.
 
-| Agente | Area e prove | Risultati/problemi |
-|---|---|---|
-| `editor_qa` / `editor_final_pass` / `editor_release_finish` | First use, placement, pointer, guide, selezione, sidebar, keyboard; browser reale; 60 azioni e 53 entry di storia; golden finale | Frizioni di input; incoerenza filo/nodo scoperta nell'ultimo golden |
-| `library_topology_qa` / `library_final_pass` / `bridge_release_review` | Tutti i 72 tipi e 23 preset nel browser; terminali, rotazioni, replace, blocchi, topology e prove distruttive | Percorso di fili staccati; persistence blocchi; retest indipendente topologia |
-| `export_fidelity_qa` / `export_final_pass` / `export_release_finish` | LaTeX, font, quattro modalità export, selection, compilazione, Obsidian desktop, render e misure | Colore LaTeX perso; limiti del profilo CircuitikZ nativo nel plugin |
-| Coordinatore | Baseline, code review, triage, data loss, PWA, fault injection, 820 oggetti, viewport, build, pubblicazione e live smoke | Protezione storage, flush alla chiusura, Escape titolo, promesse PWA, parallelismo test |
+| Agente                                                                 | Area e prove                                                                                                                     | Risultati/problemi                                                                      |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `editor_qa` / `editor_final_pass` / `editor_release_finish`            | First use, placement, pointer, guide, selezione, sidebar, keyboard; browser reale; 60 azioni e 53 entry di storia; golden finale | Frizioni di input; incoerenza filo/nodo scoperta nell'ultimo golden                     |
+| `library_topology_qa` / `library_final_pass` / `bridge_release_review` | Tutti i 72 tipi e 23 preset nel browser; terminali, rotazioni, replace, blocchi, topology e prove distruttive                    | Percorso di fili staccati; persistence blocchi; retest indipendente topologia           |
+| `export_fidelity_qa` / `export_final_pass` / `export_release_finish`   | LaTeX, font, quattro modalità export, selection, compilazione, Obsidian desktop, render e misure                                 | Colore LaTeX perso; limiti del profilo CircuitikZ nativo nel plugin                     |
+| Coordinatore                                                           | Baseline, code review, triage, data loss, PWA, fault injection, 820 oggetti, viewport, build, pubblicazione e live smoke         | Protezione storage, flush alla chiusura, Escape titolo, promesse PWA, parallelismo test |
 
 Gli agenti funzionali hanno creato, trascinato, modificato, esportato e ricaricato circuiti dalla UI. Non si è trattato di sola lettura TypeScript.
 
@@ -46,17 +46,17 @@ Conteggio consolidato per root cause: **9 trovati, 9 corretti; P0: 2, P1: 1, P2:
 
 Sono elencati i problemi effettivamente verificati: non sono stati inventati dieci bug per raggiungere un numero.
 
-| ID / severity | Sintomo e root cause | Correzione e regressione |
-|---|---|---|
-| RC-01 / P0 | Storage documento o blocchi corrotto: loader silenzioso apre fallback; autosave sostituisce l'originale | Errore visibile; copia raw univoca prima della scrittura; se il backup fallisce l'originale resta intatto. `release-candidate-persistence` e `release-candidate-block-persistence` |
-| RC-02 / P0 | Chiusura prima del debounce con errore quota: il flush finale ignorava l'errore | `beforeunload` richiede avviso nativo solo su errore; stato committed durante gesture. `release-candidate-exit` |
-| RC-03 / P2 | Delete terminale o export selezione di un filo fanno cambiare l'autorouting perché si perde la direzione del terminale | Congelamento del percorso visibile prima del detach. `release-candidate-topology`; retest UI e SVG |
-| RC-04 / P2 | `\color{red}{R_2}` rosso nell'editor ma blu nell'export; la conversione KaTeX perdeva il colore delle singole parti | Colore esplicito su glyph, regole e path; contenuti normali ereditano lo stile label. `release-export-regression`; browser e Obsidian diretto |
-| RC-05 / P2 | Escape nasconde il draft del titolo ma lascia focus; digitazione successiva viene salvata al blur | Cancellazione esplicita e blur; refocus riparte dal titolo committed. `release-candidate-title`; retest browser |
-| RC-06 / P3 | Import JSON sintatticamente invalido mostra eccezione inglese di `JSON.parse` | Messaggi comprensibili per documento e libreria; import rimane atomico. Test serialization e block persistence |
-| RC-07 / P2 | Promesse rifiutate di update/installazione PWA senza catch | Avviso e retry; callback dopo unmount ignorate. `pwa-update` |
-| RC-08 / P3 | Due workflow DOM superano 5 s con tutti i worker, pur passando invariati con due | Configurazione default a due worker, coerente con CI. Nessuna asserzione o timeout locale indeboliti |
-| RC-09 / P1 | Filo libero attraversa un nodo esistente: dot senza bridge, ma nessun endpoint collegato; Nodo non ripara perché ritorna subito | Bridge basato sugli endpoint realmente condivisi; Nodo riusa il nodo esistente per split. Cinque test modello e un test UI; ponte orientato sul filo estraneo al nodo, con clearance del punto condivisa fra editor e tre export. Retest reale: 16→17 wire, quattro endpoint collegati, move/Undo/Redo PASS |
+| ID / severity | Sintomo e root cause                                                                                                            | Correzione e regressione                                                                                                                                                                                                                                                                                    |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| RC-01 / P0    | Storage documento o blocchi corrotto: loader silenzioso apre fallback; autosave sostituisce l'originale                         | Errore visibile; copia raw univoca prima della scrittura; se il backup fallisce l'originale resta intatto. `release-candidate-persistence` e `release-candidate-block-persistence`                                                                                                                          |
+| RC-02 / P0    | Chiusura prima del debounce con errore quota: il flush finale ignorava l'errore                                                 | `beforeunload` richiede avviso nativo solo su errore; stato committed durante gesture. `release-candidate-exit`                                                                                                                                                                                             |
+| RC-03 / P2    | Delete terminale o export selezione di un filo fanno cambiare l'autorouting perché si perde la direzione del terminale          | Congelamento del percorso visibile prima del detach. `release-candidate-topology`; retest UI e SVG                                                                                                                                                                                                          |
+| RC-04 / P2    | `\color{red}{R_2}` rosso nell'editor ma blu nell'export; la conversione KaTeX perdeva il colore delle singole parti             | Colore esplicito su glyph, regole e path; contenuti normali ereditano lo stile label. `release-export-regression`; browser e Obsidian diretto                                                                                                                                                               |
+| RC-05 / P2    | Escape nasconde il draft del titolo ma lascia focus; digitazione successiva viene salvata al blur                               | Cancellazione esplicita e blur; refocus riparte dal titolo committed. `release-candidate-title`; retest browser                                                                                                                                                                                             |
+| RC-06 / P3    | Import JSON sintatticamente invalido mostra eccezione inglese di `JSON.parse`                                                   | Messaggi comprensibili per documento e libreria; import rimane atomico. Test serialization e block persistence                                                                                                                                                                                              |
+| RC-07 / P2    | Promesse rifiutate di update/installazione PWA senza catch                                                                      | Avviso e retry; callback dopo unmount ignorate. `pwa-update`                                                                                                                                                                                                                                                |
+| RC-08 / P3    | Due workflow DOM superano 5 s con tutti i worker, pur passando invariati con due                                                | Configurazione default a due worker, coerente con CI. Nessuna asserzione o timeout locale indeboliti                                                                                                                                                                                                        |
+| RC-09 / P1    | Filo libero attraversa un nodo esistente: dot senza bridge, ma nessun endpoint collegato; Nodo non ripara perché ritorna subito | Bridge basato sugli endpoint realmente condivisi; Nodo riusa il nodo esistente per split. Cinque test modello e un test UI; ponte orientato sul filo estraneo al nodo, con clearance del punto condivisa fra editor e tre export. Retest reale: 16→17 wire, quattro endpoint collegati, move/Undo/Redo PASS |
 
 Per i problemi di data loss, [persistence-pwa-performance.md](persistence-pwa-performance.md) include passi, expected/actual, root cause, fix ed evidenza. Gli altri report conservano le riproduzioni e i retest delle rispettive aree. I fault injection sono dichiarati come tali: non è stato corrotto lo storage personale dell'utente.
 
@@ -124,15 +124,15 @@ Warning npm di dipendenze transitive deprecate e allow-scripts: non bloccanti; i
 
 ## 15. Build e pubblicazione
 
-| Gate | Risultato |
-|---|---|
-| Node | 26.5.0 da `.nvmrc` |
-| `npm ci` | PASS, zero vulnerabilità |
-| lint | PASS, fonte finale con RC-09 |
-| tests | **33 file / 956 PASS**, 32,65 s, timeout locali invariati |
-| build | PASS, zero errori TypeScript; asset `index-QAjNzizE.js` |
-| GitHub Actions | **PASS build e deploy**, [run 37145440142](https://github.com/andrelombardo/drawcircuit/actions/runs/37145440142), SHA `a81c4f3c1f8b2ad177291b00990807abbc1476e6` |
-| GitHub Pages + browser pubblico | **PASS** asset finale caricato, reload/persistence, drag/rotate/Undo/Redo, selection, import invalido, RC-09 e console; download capture BLOCKED |
+| Gate                            | Risultato                                                                                                                                                         |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node                            | 26.5.0 da `.nvmrc`                                                                                                                                                |
+| `npm ci`                        | PASS, zero vulnerabilità                                                                                                                                          |
+| lint                            | PASS, fonte finale con RC-09                                                                                                                                      |
+| tests                           | **33 file / 956 PASS**, 32,65 s, timeout locali invariati                                                                                                         |
+| build                           | PASS, zero errori TypeScript; asset `index-QAjNzizE.js`                                                                                                           |
+| GitHub Actions                  | **PASS build e deploy**, [run 37145440142](https://github.com/andrelombardo/drawcircuit/actions/runs/37145440142), SHA `a81c4f3c1f8b2ad177291b00990807abbc1476e6` |
+| GitHub Pages + browser pubblico | **PASS** asset finale caricato, reload/persistence, drag/rotate/Undo/Redo, selection, import invalido, RC-09 e console; download capture BLOCKED                  |
 
 Il commit delle correzioni è `a81c4f3c1f8b2ad177291b00990807abbc1476e6`; gli hash delle fonti e dei gate finali sono nel [manifest](evidence/release-source-manifest.json). Un successivo commit contiene solo il report e le evidenze live, senza variazioni del codice distribuito.
 
@@ -142,38 +142,38 @@ Baseline pubblica: [Actions 37073478258](https://github.com/andrelombardo/drawci
 
 `PASS` indica il metodo dichiarato e i casi registrati; `NOT TESTED` non viene convertito in successo. Le matrici estese per tutti i 72 tipi e 23 preset sono nei report di area.
 
-| Feature/area | Unit/integration | Browser/manuale | Export/render | Stato |
-|---|---|---|---|---|
-| 72 componenti, palette, categorie e terminali | PASS | PASS, tutti i tipi | PASS, cataloghi e file | PASS |
-| 23 preset, search, ghost, move/rotate, save/load | PASS | PASS, tutti i preset | PASS | PASS |
-| Smart Placement, anchor, inline insertion | PASS | PASS | PASS | PASS |
-| Select, box, multiselect, group move/rotate | PASS | PASS | Selection PASS | PASS |
-| Wire endpoint, waypoint, split, Quick Junction | PASS | PASS incluso retest RC-09 | PASS incluso bridge RC-09 | PASS |
-| Crossing senza/con nodo, bridge | PASS incluso RC-09 | RC-09 corretto e retestato | RC-09 PASS modello/UI/export | PASS |
-| Replace e mapping classi compatibili | PASS | PASS casi UI | PASS | PASS |
-| Current, polarity, voltage, arrow, loop | PASS | PASS | PASS | PASS |
-| Label edit/move, 19 LaTeX, invalid source | PASS | PASS | PASS, colore corretto | PASS |
-| Guide, equal spacing, override e transient state | PASS | Orizzontale/Alt PASS; verticale e hysteresis manuali NOT TESTED | Assenza negli export PASS | Copertura parziale dichiarata |
-| Pan, zoom editor, fit, grid, sidebar | PASS | PASS | Non applicabile | PASS |
-| Shortcut e blocco durante text/dialog | PASS | 35 casi: 34 PASS, Space+drag BLOCKED; input/dialog protetti | Non applicabile | PASS nei casi registrati |
-| Cmd/Ctrl C/V oggetti e paste ripetuto | PASS modello/integrazione | BLOCKED clipboard browser | Non applicabile | BLOCKED manuale |
-| Duplicate oggetti e gruppi | PASS | PASS | PASS | PASS |
-| Copy TikZ/Obsidian/SVG; download .tex/SVG | PASS | Copy live PASS; download locale PASS, ultimo capture pubblico BLOCKED | Generazione live identica al golden PASS | Limite capture dichiarato |
-| JSON, legacy, import malformed/atomic | PASS | PASS import/reload; raw JSON download live BLOCKED | Roundtrip locale PASS; tre export dopo reload pubblico identici | PASS nei metodi dichiarati |
-| Storage corrupted/quota/access denied | PASS fault injection | Quota OS NOT TESTED | Backup raw PASS | PASS automatizzato |
-| History 50+ operazioni | PASS | PASS, 53 Undo/Redo | JSON esatti | PASS |
-| Blocchi personali lifecycle e ID remap | PASS | PASS lifecycle e ID | PASS | Vedi report libreria |
-| TikZ nativo, compilation golden/catalogo | PASS | UI export PASS | Codex compiler PASS | PASS |
-| TikZ nativo catalogo in Inline TikZ | Validità Codex PASS | Plugin installato | Font cmmib5 FAIL | FAIL nel plugin |
-| Obsidian canvas, golden diretto e catalogo | PASS | Desktop diretto PASS | Pipeline catalogo PASS | PASS |
-| SVG full/selection e validità | PASS | UI PASS | Render PASS | PASS |
-| PWA offline localhost, update e preservation | PASS | PASS server spento | Export offline PASS | PASS |
-| PWA pubblica offline/install OS | Test logici PASS | NOT TESTED rete/OS | Non applicabile | NOT TESTED |
-| Public assets/manifest/scope/MIME | Audit HTTP | Final PASS, asset QAjNzizE osservato | 87 risorse finali HTTP 200, MIME corretti | PASS |
-| 820 oggetti, crossings, export | PASS | PASS | PASS | PASS |
-| 1920/1440/1280/1024 viewport | PASS layout tests | PASS misure/screenshot | Dialog fit PASS | PASS |
-| Zoom browser 80/125/150% | Non applicabile | NOT TESTED capability | Non applicabile | NOT TESTED |
-| Chromium / altri browser | Non applicabile | Chromium PASS; altri NOT TESTED | Viewer disponibile PASS | Copertura parziale |
+| Feature/area                                     | Unit/integration          | Browser/manuale                                                       | Export/render                                                   | Stato                         |
+| ------------------------------------------------ | ------------------------- | --------------------------------------------------------------------- | --------------------------------------------------------------- | ----------------------------- |
+| 72 componenti, palette, categorie e terminali    | PASS                      | PASS, tutti i tipi                                                    | PASS, cataloghi e file                                          | PASS                          |
+| 23 preset, search, ghost, move/rotate, save/load | PASS                      | PASS, tutti i preset                                                  | PASS                                                            | PASS                          |
+| Smart Placement, anchor, inline insertion        | PASS                      | PASS                                                                  | PASS                                                            | PASS                          |
+| Select, box, multiselect, group move/rotate      | PASS                      | PASS                                                                  | Selection PASS                                                  | PASS                          |
+| Wire endpoint, waypoint, split, Quick Junction   | PASS                      | PASS incluso retest RC-09                                             | PASS incluso bridge RC-09                                       | PASS                          |
+| Crossing senza/con nodo, bridge                  | PASS incluso RC-09        | RC-09 corretto e retestato                                            | RC-09 PASS modello/UI/export                                    | PASS                          |
+| Replace e mapping classi compatibili             | PASS                      | PASS casi UI                                                          | PASS                                                            | PASS                          |
+| Current, polarity, voltage, arrow, loop          | PASS                      | PASS                                                                  | PASS                                                            | PASS                          |
+| Label edit/move, 19 LaTeX, invalid source        | PASS                      | PASS                                                                  | PASS, colore corretto                                           | PASS                          |
+| Guide, equal spacing, override e transient state | PASS                      | Orizzontale/Alt PASS; verticale e hysteresis manuali NOT TESTED       | Assenza negli export PASS                                       | Copertura parziale dichiarata |
+| Pan, zoom editor, fit, grid, sidebar             | PASS                      | PASS                                                                  | Non applicabile                                                 | PASS                          |
+| Shortcut e blocco durante text/dialog            | PASS                      | 35 casi: 34 PASS, Space+drag BLOCKED; input/dialog protetti           | Non applicabile                                                 | PASS nei casi registrati      |
+| Cmd/Ctrl C/V oggetti e paste ripetuto            | PASS modello/integrazione | BLOCKED clipboard browser                                             | Non applicabile                                                 | BLOCKED manuale               |
+| Duplicate oggetti e gruppi                       | PASS                      | PASS                                                                  | PASS                                                            | PASS                          |
+| Copy TikZ/Obsidian/SVG; download .tex/SVG        | PASS                      | Copy live PASS; download locale PASS, ultimo capture pubblico BLOCKED | Generazione live identica al golden PASS                        | Limite capture dichiarato     |
+| JSON, legacy, import malformed/atomic            | PASS                      | PASS import/reload; raw JSON download live BLOCKED                    | Roundtrip locale PASS; tre export dopo reload pubblico identici | PASS nei metodi dichiarati    |
+| Storage corrupted/quota/access denied            | PASS fault injection      | Quota OS NOT TESTED                                                   | Backup raw PASS                                                 | PASS automatizzato            |
+| History 50+ operazioni                           | PASS                      | PASS, 53 Undo/Redo                                                    | JSON esatti                                                     | PASS                          |
+| Blocchi personali lifecycle e ID remap           | PASS                      | PASS lifecycle e ID                                                   | PASS                                                            | Vedi report libreria          |
+| TikZ nativo, compilation golden/catalogo         | PASS                      | UI export PASS                                                        | Codex compiler PASS                                             | PASS                          |
+| TikZ nativo catalogo in Inline TikZ              | Validità Codex PASS       | Plugin installato                                                     | Font cmmib5 FAIL                                                | FAIL nel plugin               |
+| Obsidian canvas, golden diretto e catalogo       | PASS                      | Desktop diretto PASS                                                  | Pipeline catalogo PASS                                          | PASS                          |
+| SVG full/selection e validità                    | PASS                      | UI PASS                                                               | Render PASS                                                     | PASS                          |
+| PWA offline localhost, update e preservation     | PASS                      | PASS server spento                                                    | Export offline PASS                                             | PASS                          |
+| PWA pubblica offline/install OS                  | Test logici PASS          | NOT TESTED rete/OS                                                    | Non applicabile                                                 | NOT TESTED                    |
+| Public assets/manifest/scope/MIME                | Audit HTTP                | Final PASS, asset QAjNzizE osservato                                  | 87 risorse finali HTTP 200, MIME corretti                       | PASS                          |
+| 820 oggetti, crossings, export                   | PASS                      | PASS                                                                  | PASS                                                            | PASS                          |
+| 1920/1440/1280/1024 viewport                     | PASS layout tests         | PASS misure/screenshot                                                | Dialog fit PASS                                                 | PASS                          |
+| Zoom browser 80/125/150%                         | Non applicabile           | NOT TESTED capability                                                 | Non applicabile                                                 | NOT TESTED                    |
+| Chromium / altri browser                         | Non applicabile           | Chromium PASS; altri NOT TESTED                                       | Viewer disponibile PASS                                         | Copertura parziale            |
 
 ## 17. Non testato / bloccato
 

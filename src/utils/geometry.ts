@@ -10,13 +10,13 @@ import type {
   CircuitObject,
   Endpoint,
   Point,
-  Rotation,
   Wire,
 } from '../model/types';
 export const snap = (n: number) => Math.round(n / GRID) * GRID;
 export const snapPoint = (p: Point): Point => ({ x: snap(p.x), y: snap(p.y) });
 export const distance = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
-export function rotatePoint(p: Point, rotation: Rotation): Point {
+export function rotatePoint(p: Point, rotation: number): Point {
+  rotation = ((rotation % 360) + 360) % 360;
   switch (rotation) {
     case 90:
       return { x: -p.y, y: p.x };
@@ -29,6 +29,13 @@ export function rotatePoint(p: Point, rotation: Rotation): Point {
     default: {
       // Preserve exact cardinal coordinates and use the real transform for the
       // intermediate steps. Equal diagonal sine/cosine avoids axis jitter.
+      if (rotation % 45 !== 0) {
+        const angle = (rotation * Math.PI) / 180;
+        return {
+          x: p.x * Math.cos(angle) - p.y * Math.sin(angle),
+          y: p.x * Math.sin(angle) + p.y * Math.cos(angle),
+        };
+      }
       const diagonal = Math.SQRT1_2;
       const cos = rotation === 45 || rotation === 315 ? diagonal : -diagonal;
       const sin = rotation === 45 || rotation === 135 ? diagonal : -diagonal;
@@ -262,6 +269,22 @@ export function safeWirePoints(wire: Wire, doc: CircuitDocument): Point[] {
 function routeWire(wire: Wire, doc: CircuitDocument, protectTerminals: boolean): Point[] {
   const startPoint = resolveEndpoint(wire.startEndpoint, doc),
     endPoint = resolveEndpoint(wire.endEndpoint, doc);
+  if (wire.routing === 'free') return [startPoint, ...wire.vertices, endPoint];
+  if (wire.routing === '45') {
+    const anchors = [startPoint, ...wire.vertices, endPoint];
+    const result: Point[] = [startPoint];
+    for (let i = 1; i < anchors.length; i++) {
+      const a = anchors[i - 1],
+        b = anchors[i],
+        dx = b.x - a.x,
+        dy = b.y - a.y;
+      const diagonal = Math.min(Math.abs(dx), Math.abs(dy));
+      if (diagonal > 0.001 && Math.abs(Math.abs(dx) - Math.abs(dy)) > 0.001)
+        result.push({ x: a.x + Math.sign(dx) * diagonal, y: a.y + Math.sign(dy) * diagonal });
+      if (distance(result.at(-1)!, b) > 0.001) result.push(b);
+    }
+    return result;
+  }
   // Smart Placement uses a semantic zero-length wire at coincident terminals.
   // Diagonal lead-outs must not turn that connection into a visible loop.
   if (!wire.vertices.length && distance(startPoint, endPoint) < 0.001) return [startPoint];
@@ -423,17 +446,41 @@ export function arrowPath(a: ArrowAnnotation): string {
   if (a.type === 'straight') return pointsPath([a.start, a.end]);
   if (a.type === 'curve')
     return `M ${a.start.x} ${a.start.y} C ${a.controlPoints[0].x} ${a.controlPoints[0].y} ${a.controlPoints[1].x} ${a.controlPoints[1].y} ${a.end.x} ${a.end.y}`;
-  const cx = (a.start.x + a.end.x) / 2,
-    cy = (a.start.y + a.end.y) / 2,
-    r = Math.max(20, distance(a.start, a.end) / 2);
-  // A 310-degree loop with a clear gap and an arrowhead; the diameter handles size the circle.
-  const s = { x: cx + r * Math.cos(-Math.PI / 3), y: cy + r * Math.sin(-Math.PI / 3) };
-  const e = {
-    x: cx + r * Math.cos(-Math.PI / 3 + (310 * Math.PI) / 180),
-    y: cy + r * Math.sin(-Math.PI / 3 + (310 * Math.PI) / 180),
-  };
-  return `M ${s.x} ${s.y} A ${r} ${r} 0 1 1 ${e.x} ${e.y}`;
+  const g = arcGeometry(a);
+  return `M ${g.start.x} ${g.start.y} A ${g.radius} ${g.radius} 0 1 ${g.sign > 0 ? 1 : 0} ${g.end.x} ${g.end.y}`;
 }
+export function arcGeometry(a: ArrowAnnotation) {
+  const center = midpoint(a.start, a.end),
+    radius = Math.max(20, distance(a.start, a.end) / 2);
+  const transform = (p: Point) =>
+    rotatePoint({ x: a.arcMirrored ? -p.x : p.x, y: p.y }, a.arcRotation ?? 0);
+  const point = (degrees: number) =>
+    add(
+      center,
+      transform({
+        x: radius * Math.cos((degrees * Math.PI) / 180),
+        y: radius * Math.sin((degrees * Math.PI) / 180),
+      }),
+    );
+  const sign = a.arcMirrored ? -1 : 1;
+  const start = point(-60),
+    end = point(250);
+  const angle = ((a.reversed ? -60 : 250) * Math.PI) / 180;
+  const tangent = transform({
+    x: -Math.sin(angle) * (a.reversed ? -1 : 1),
+    y: Math.cos(angle) * (a.reversed ? -1 : 1),
+  });
+  return {
+    center,
+    radius,
+    start,
+    end,
+    sign,
+    tangent,
+    startAngle: (Math.atan2(start.y - center.y, start.x - center.x) * 180) / Math.PI,
+  };
+}
+
 export function objectBounds(
   o: CircuitObject,
   doc: CircuitDocument,
@@ -446,7 +493,7 @@ export function objectBounds(
       { x: p.x + o.width / 2, y: p.y + o.width / 2 },
     ]);
   } else if (o.kind === 'electrical') {
-    const drawing = o.currentPlacement === 'inline' ? electricalDrawingGeometry(o, doc) : null;
+    const drawing = o.mode === 'current' ? electricalDrawingGeometry(o, doc) : null;
     const g = drawing ?? electricalGeometry(o, doc);
     const w = Math.max(24, o.label.text.length * o.label.fontSize * 0.6);
     points = [
@@ -457,8 +504,12 @@ export function objectBounds(
     ];
     if (drawing) points.push(...drawing.head);
   } else if (o.kind === 'wire') points = wirePoints(o, doc);
-  else if (o.kind === 'loop-arrow') return { x: o.x, y: o.y, width: o.width, height: o.height };
-  else if (o.kind === 'arrow') {
+  else if (o.kind === 'loop-arrow') {
+    const angle = ((o.rotation ?? 0) * Math.PI) / 180;
+    const width = Math.hypot(o.width * Math.cos(angle), o.height * Math.sin(angle));
+    const height = Math.hypot(o.width * Math.sin(angle), o.height * Math.cos(angle));
+    return { x: o.x + (o.width - width) / 2, y: o.y + (o.height - height) / 2, width, height };
+  } else if (o.kind === 'arrow') {
     if (o.type === 'arc') {
       const r = Math.max(20, distance(o.start, o.end) / 2),
         c = midpoint(o.start, o.end);

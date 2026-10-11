@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { createCurrent, electricalGeometry } from '../src/annotations/electrical';
+import {
+  createCurrent,
+  currentWireAnchor,
+  electricalGeometry,
+} from '../src/annotations/electrical';
 import { emptyDocument } from '../src/model/demo';
 import { createWire } from '../src/model/factories';
 import { deserializeDocument, serializeDocument } from '../src/model/serialization';
@@ -29,7 +33,7 @@ describe('current annotations survive existing wire splitting workflows', () => 
       annotation.label.offset = { x: 13, y: -7 };
       annotation.offset = { x: 20, y: 40 };
       const original = { ...doc, objects: [wire, annotation] };
-      const geometry = electricalGeometry(annotation, original);
+      const anchor = currentWireAnchor(annotation, original);
       const candidate = findInlineCandidate(original, 'resistor', cut, 0, 1)!;
       expect(candidate).not.toBeNull();
       const { doc: inserted } = smartPlacement(original, 'resistor', {
@@ -47,7 +51,15 @@ describe('current annotations survive existing wire splitting workflows', () => 
         label: annotation.label,
         offset: annotation.offset,
       });
-      expect(electricalGeometry(after, inserted)).toEqual(geometry);
+      const actual = electricalGeometry(after, inserted);
+      // Integrated currents are clamped within the shortened host segment.
+      expect(actual.inline).toBe(true);
+      expect(currentWireAnchor(after, inserted)).toEqual(anchor);
+      // Visual clamping must not change the semantic attachment or its drag offset.
+      expect(actual.arrowEnd).toEqual({
+        x: end.x ? (end.x > 0 ? 320 : -280) : 0,
+        y: end.y ? (end.y > 0 ? 340 : -270) : 0,
+      });
       expect(deserializeDocument(serializeDocument(inserted))).toEqual(inserted);
       useEditorStore.setState({ document: original, past: [], future: [], gestureStart: null });
       useEditorStore.getState().commit(inserted);

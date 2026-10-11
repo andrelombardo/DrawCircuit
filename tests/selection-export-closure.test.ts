@@ -9,7 +9,7 @@ import {
   createCurrent,
   createElectrical,
   createPolarity,
-  electricalGeometry,
+  electricalDrawingGeometry,
 } from '../src/annotations/electrical';
 import { wirePoints } from '../src/utils/geometry';
 import { instantiatePreset } from '../src/presets/instantiate';
@@ -169,8 +169,8 @@ describe('selection export closure A–H', () => {
     const o = subset.objects[0];
     expect(o).toMatchObject({ wireId: undefined, componentId: undefined, offset: { x: 0, y: 0 } });
     if (o.kind !== 'electrical') throw new Error('Missing current');
-    const a = electricalGeometry(f.current, f.source),
-      b = electricalGeometry(o, subset);
+    const a = electricalDrawingGeometry(f.current, f.source),
+      b = electricalDrawingGeometry(o, subset);
     expect(b.end.x - b.start.x).toBeCloseTo(a.end.x - a.start.x);
     expect(b.end.y - b.start.y).toBeCloseTo(a.end.y - a.start.y);
   });

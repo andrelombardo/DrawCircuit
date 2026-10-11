@@ -2,22 +2,22 @@ import { createPortal } from 'react-dom';
 import { useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import type { CircuitComponent } from '../../model/types';
-import { compatibleReplacements } from '../../model/replacement';
+import { commonReplacements } from '../../model/replacement';
 import { categories, componentRegistry, matchesComponent } from '../../model/catalog';
 import { ComponentPreview } from '../palette/ComponentPreview';
 import { useEditorStore } from '../../store/editorStore';
 import { useDialogFocus } from '../toolbar/useDialogFocus';
 export function ReplaceDialog({
-  component,
+  components,
   onClose,
 }: {
-  component: CircuitComponent;
+  components: CircuitComponent[];
   onClose: () => void;
 }) {
   const [search, setSearch] = useState('');
   const ref = useRef<HTMLDivElement>(null);
   useDialogFocus(ref, onClose);
-  const items = compatibleReplacements(component).filter((type) =>
+  const items = commonReplacements(components).filter((type) =>
     matchesComponent(componentRegistry[type], search),
   );
   return createPortal(
@@ -42,7 +42,7 @@ export function ReplaceDialog({
         >
           <X size={20} />
         </button>
-        <h2>Sostituisci con</h2>
+        <h2>Sostituisci {components.length > 1 ? `${components.length} componenti` : 'con'}</h2>
         <div className="replace-search-field">
           <Search size={15} />
           <input
@@ -68,7 +68,10 @@ export function ReplaceDialog({
                     key={c.type}
                     className="replace-option"
                     onClick={() => {
-                      useEditorStore.getState().replaceComponent(component.id, c.type);
+                      useEditorStore.getState().replaceComponents(
+                        components.map((c) => c.id),
+                        c.type,
+                      );
                       onClose();
                     }}
                   >
@@ -80,7 +83,13 @@ export function ReplaceDialog({
             );
           })}
         </div>
-        {!items.length && <p>Nessun componente compatibile trovato.</p>}
+        {!items.length && (
+          <p>
+            {search
+              ? 'Nessun risultato per questa ricerca.'
+              : 'Nessuna destinazione comune: i terminali dei componenti selezionati hanno geometrie o funzioni incompatibili.'}
+          </p>
+        )}
       </div>
     </div>,
     document.body,

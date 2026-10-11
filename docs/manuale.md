@@ -30,12 +30,12 @@ npm run format:check
 
 - Scegli un componente nella palette, poi clicca sul foglio; puoi anche trascinarlo. Ogni clic continua a inserirlo. **R** ruota l’anteprima, **Esc** termina.
 - **W**: clic su un terminale, nodo o filo, poi su un altro terminale, nodo o filo. I clic su punti liberi aggiungono svolte; doppio clic oppure Enter termina il filo su un punto libero.
-- **N**: inserisci un nodo sul foglio o su un filo; **Shift + clic** continua a inserire nodi. Sul filo viene creato un vero collegamento e il filo viene diviso.
+- **N**: inserisci un nodo sul foglio o su un filo; ogni clic ne inserisce un altro senza modificatori, fino a **Esc**, **V** o al cambio strumento. Ogni inserimento ha un proprio undo; cliccare un nodo esistente non lo duplica. Sul filo viene creato un vero collegamento e il filo viene diviso.
 - **T**: mostra/nascondi Componenti. **Testo** si seleziona dalla toolbar. **A**: freccia dritta o Bézier. **L**: trascina un’area per una maglia ellittica; gli angoli ne cambiano larghezza e altezza, il punto sulla punta la sposta continuamente. La toolbar inverte il verso mantenendo il percorso.
 - **V** o Esc: selezione. Shift + clic seleziona più oggetti; trascinare sullo sfondo crea una selezione rettangolare.
 - Trascina un oggetto per spostarlo, oppure la sua label per riposizionarla. I fili seguono i terminali e i nodi. Trascinare un filo collegato modifica il suo percorso; doppio clic sul filo aggiunge una svolta modificabile. Gli handle alle estremità consentono di ricollegare il filo.
-- Doppio clic su una label o un testo per modificarlo. Conferma con Enter o ✓. Esc annulla. Una piccola preview mostra la formula durante l’editing. La toolbar contestuale permette di cambiare label, colore, spessore, dimensione e allineamento. Per i blocchi, il menu **••• → Testo interno** modifica il testo nel simbolo.
-- **R** ruota di 90°. **Delete/Backspace** elimina. **Cmd/Ctrl D** duplica. **Cmd/Ctrl C/V** copia/incolla. **Cmd/Ctrl A** seleziona tutto.
+- Doppio clic su una label o un testo per modificarlo. Conferma con Enter o un clic esterno; Esc annulla. Il cursore appare direttamente sul testo, senza riquadri, usando lo stesso rendering SVG/KaTeX del circuito anche con zoom, colore e rotazione personalizzati. La toolbar contestuale permette di cambiare label, colore, spessore, dimensione e allineamento. Per i blocchi, il menu **••• → Testo interno** modifica il testo nel simbolo.
+- **R** ruota i componenti di 45° e gli altri oggetti di 90°. **Delete/Backspace** elimina. **Cmd/Ctrl D** duplica. **Cmd/Ctrl C/V** copia/incolla. **Cmd/Ctrl A** seleziona tutto.
 - **Cmd/Ctrl Z** annulla; **Cmd/Ctrl Shift Z** oppure **Ctrl Y** ripete. Uno spostamento completo occupa una sola voce di cronologia.
 - **Space + trascina** o **H** sposta la vista. Rotellina/trackpad e i pulsanti +/− controllano lo zoom. **1** adatta alla vista. **G** nasconde la griglia.
 - Il workspace parte dal bordo superiore, senza header, branding o gestione File. Il circuito viene salvato automaticamente in localStorage dopo 400 ms di inattività e prima di chiusura/reload. La cronologia conserva le ultime 100 operazioni durante la sessione.
@@ -45,13 +45,24 @@ La sidebar si nasconde e riapre dal bordo, si ridimensiona tra 200 e 480 px e si
 
 L'esempio iniziale è la rete con nodi A/B/C/D, sei resistenze, label con pedici e annotazioni di maglia richiesta. Una copia riapribile è in `examples/rete-quattro-nodi.json`.
 
+## Interazioni del disegno
+
+- **Fili diagonali:** con W scegli **Ortogonale**, **45°** o **Libero** nel controllo sul canvas; **Shift + W** passa alla modalità successiva anche durante il disegno. Ogni filo conserva la modalità scelta. Il routing libero collega direttamente i punti, quello a 45° usa diagonali e un eventuale tratto orizzontale/verticale. Trascina il tratto selezionato per modificarlo: i terminali rimangono collegati. Inserisci N su una diagonale per dividerla con un nodo reale. Gli incroci restano scollegati senza junction.
+- **Corrente sul filo:** il comando applica direttamente una corrente integrata. La freccia segue il ramo e si accorcia sui segmenti brevi; la toolbar ne inverte il verso. Le vecchie correnti esterne vengono lette come integrate, conservando testo, direzione e riferimenti.
+- **Sostituzione multipla:** seleziona componenti con Shift + clic o con un rettangolo, poi **••• → Sostituisci**. Il dialogo propone soltanto simboli compatibili con tutti i componenti selezionati e spiega quando non ci sono destinazioni comuni. Fili e nodi eventualmente selezionati rimangono intatti; un solo undo ripristina l’intero gruppo.
+- **Label dei nodi:** la posizione iniziale evita per quanto possibile simboli, testi e fili vicini. Le label già spostate restano dove sono. Clicca e trascina il testo per muoverlo indipendentemente dal nodo; i tasti freccia lo spostano di una unità, Shift + freccia di dieci. **Alt/Option + clic** passa tra label sovrapposte nello stesso punto.
+- **Opacità:** apri **Stile** e regola lo slider da 0% a 100%. Simbolo e label hanno controlli indipendenti; il testo autonomo ha un solo controllo. Funziona anche sulla selezione multipla, con preview immediata e un solo undo per gesto. Colore HEX e opacità sono salvati separatamente e vengono esportati in SVG, PNG, TikZ/CircuitikZ e Obsidian.
+- **Frecce e maglie:** **Specchia orizzontalmente/verticalmente** riflette forma e punti di controllo; **Inverti freccia** cambia invece il verso della punta. I comandi di mirroring agiscono anche su più frecce selezionate. Avvicina il mouse a una freccia selezionata e trascina il piccolo handle esterno per ruotarla; **Shift** aggancia l’orientamento a multipli di 15°, **Esc** annulla. La rotazione conserva curva, punta e dimensioni dell’ellisse, viene salvata e rimane negli export.
+
+Il JSON resta alla versione 1: i nuovi campi opzionali hanno default compatibili (opacità 1, routing ortogonale, rotazione delle maglie 0). La scelta iniziale delle label è euristica; in disegni molto affollati può essere necessario trascinarle. L’editor inline modifica il sorgente LaTeX: la formula resta renderizzata, ma il cursore dentro comandi e formule composte segue un’approssimazione delle posizioni del sorgente, non un editor matematico strutturato.
+
 ## Architettura e file principali
 
 | Area        | File                                                           | Responsabilità                                                                                            |
 | ----------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | Modello     | `src/model/types.ts`, `catalog.ts`, `serialization.ts`         | Unione discriminata degli oggetti, 72 tipi di componente, terminali locali, JSON versionato e validazione |
 | Stato       | `src/store/editorStore.ts`                                     | Documento immutabile, selezione, strumenti, transazioni drag, undo/redo, salvataggio locale               |
-| Geometria   | `src/utils/geometry.ts`, `operations.ts`                       | Trasformazioni, rotazioni, routing ortogonale, snapping, bounds, duplicazione e cancellazione             |
+| Geometria   | `src/utils/geometry.ts`, `operations.ts`                       | Trasformazioni, rotazioni, routing ortogonale/45°/libero, snapping, bounds, duplicazione e cancellazione  |
 | Editor      | `src/components/editor/Canvas.tsx`, `useCanvasInteractions.ts` | SVG, viewport, pointer events, scorciatoie, drag, nodi su fili, handle e anteprime                        |
 | Rendering   | `src/circuit/`, `CircuitLayer.tsx`                             | Simboli SVG riutilizzabili, fili, nodi, testo con pedici e frecce; componenti React memoizzati            |
 | Interfaccia | `src/components/toolbar/`, `palette/`, `properties/`           | Palette ricercabile, toolbar, proprietà contestuali, export e guida                                       |
@@ -82,6 +93,8 @@ Il documento di verifica con **72 simboli × 4 rotazioni = 288 componenti** comp
 
 ## Verifiche
 
+La verifica dell’11 ottobre 2026 passa **1.704 test**, lint, formattazione e build. Le nove funzioni aggiornate, le prove nel browser e gli export compilati sono documentati nel [report editor](editor-upgrades/report.md). I conteggi riportati negli audit seguenti si riferiscono alle rispettive versioni storiche.
+
 **401 test automatici** verificano geometria e terminali dei 72 componenti, Smart Placement, fili, junction, frecce/maglie, storia, JSON, migrazione di valore e font legacy, rendering KaTeX, export e sidebar. Il [report label e sidebar](../docs/labels-sidebar/report.md) documenta il Golden Workflow nel browser reale, le tre viewport richieste e le compilazioni LaTeX.
 
 L’audit del 1–2 ottobre 2026 ha usato quattro agenti indipendenti e il browser reale tramite il tunnel HTTPS fornito dall’utente. Il golden workflow, download JSON/TEX, riapertura, reload, stress di 400 oggetti e viewport laptop sono verificati. Sono stati corretti 12 problemi riprodotti. Le compilazioni usano Tectonic/XeTeX; pdfLaTeX, FPS/heap e il percorso keyboard clipboard nel browser controllato rimangono limiti espliciti. Il [report finale](../docs/audit/report-finale.md) contiene risultati, evidenze e TOP 5 problemi.
@@ -96,7 +109,7 @@ Il fixture di carico viene scritto in `/private/tmp/drawcircuit-stress.json` ed 
 
 ## Limiti intenzionali
 
-- Il routing è ortogonale e prevedibile; non cerca di evitare automaticamente ostacoli o incroci. Gli incroci sono scollegati finché non inserisci una junction.
+- Il routing può essere ortogonale, a 45° o libero; non cerca di evitare automaticamente ostacoli o incroci. Gli incroci sono scollegati finché non inserisci una junction.
 - Le nuove maglie sono ellissi di 324° con apertura di 36°; quelle circolari della prima versione rimangono compatibili. L’export usa archi ellittici vettoriali secondo la [documentazione TikZ](https://tikz.dev/tikz-paths#sec-14.7).
 - Il testo matematico usa KaTeX: pedici, apici, frazioni, radici e i comandi supportati dall’engine. Il source rimane nel JSON; il LaTeX non valido appare letterale e resta modificabile. `\ohm` è l’unico alias dell’editor e diventa `\Omega` durante rendering ed export. Il testo normale usa `"Comic Sans MS", "Comic Sans", cursive`, anche i caratteri delle formule e della preview usano Comic Sans; la UI mantiene Inter.
 - I simboli nativi CircuitikZ possono differire leggermente nelle proporzioni rispetto agli SVG; terminali, orientamento, colori e posizioni delle annotazioni rimangono coerenti.
@@ -111,7 +124,7 @@ Il fixture di carico viene scritto in `/private/tmp/drawcircuit-stress.json` ed 
 - Snap: terminale vicino, nodo/terminale, filo, griglia; soglie in pixel dello schermo. Hit area di fili, terminali e handle indipendenti dallo zoom.
 - **Cmd/Ctrl D** genera nuovi ID e numeri di label automatiche, mantenendo le label personalizzate. Le connessioni esterne alla selezione vengono scollegate dalle copie.
 - Toolbar contestuale con controlli frequenti e menu **•••** per dimensione, allineamento e proprietà rare.
-- Livelli SVG e TikZ: fili, componenti, nodi, label, annotazioni; selezione e handle sono sempre sopra e non entrano nell’export.
+- Livelli del canvas: fili, componenti, nodi, annotazioni, label associate; selezione e handle sono sempre sopra e non entrano nell’export.
 - Il JSON v1 rimane compatibile con i documenti precedenti; aggiunge l’oggetto `loop-arrow` con bounding box, verso, posizione della punta, colore e spessore.
 
 ### Terzo passaggio: libreria e font
@@ -151,7 +164,7 @@ Il registro dichiarativo in `src/presets/registry.ts` genera normali componenti,
 
 La selezione singola evidenzia il simbolo senza cornice; quella multipla conserva un bounds comune. Corpo e label usano grab/grabbing, con drag indipendente delle label. Durante lo spostamento compaiono quote locali e allineamenti: la spaziatura uniforme scatta entro 7 pixel dello schermo; Alt/Option ignora le assistenze. Le quote spariscono a fine gesto e non entrano nel documento, negli export o nella cronologia.
 
-Nel dialogo Export scegli **Tutto il circuito** oppure **Solo selezione** per TikZ, Obsidian e standalone. La selezione include automaticamente i fili interni; esclude i collegamenti verso oggetti esterni se non selezionati esplicitamente. La toolbar mostra proprietà comprensibili per il tipo di oggetto, con tooltip; More conserva soltanto controlli secondari e non compare su wire, Loop Arrow o gruppi.
+Nel dialogo Export scegli **Tutto il circuito** oppure **Solo selezione** per TikZ, Obsidian e standalone. La selezione include automaticamente i fili interni; esclude i collegamenti verso oggetti esterni se non selezionati esplicitamente. La toolbar mostra proprietà comprensibili per il tipo di oggetto, con tooltip; More conserva i controlli secondari e offre Sostituisci anche nei gruppi che contengono componenti.
 
 **788 test passano**, inclusi 48 nuovi test. Il [report UX completo](../docs/ux-refinement/report.md) contiene audit delle azioni, regole geometriche, Golden Workflow nel browser, screenshot ed evidenze di export.
 

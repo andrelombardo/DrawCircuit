@@ -85,10 +85,7 @@ function click(x: number, y: number) {
 const key = (key: string, options = {}) => fireEvent.keyDown(canvas(), { key, ...options });
 const doc = () => useEditorStore.getState().document;
 function chooseElectrical(name: string) {
-  chooseDrawingTool(
-    name === 'Corrente su un filo' ? 'Corrente sul filo' : name.replace('−', '-'),
-    name === 'Corrente su un filo' ? 'Esterna' : undefined,
-  );
+  chooseDrawingTool(name === 'Corrente su un filo' ? 'Corrente sul filo' : name.replace('−', '-'));
 }
 const line = (x1: number, y1: number, x2: number, y2: number) =>
   createWire({ kind: 'free', point: { x: x1, y: y1 } }, { kind: 'free', point: { x: x2, y: y2 } });

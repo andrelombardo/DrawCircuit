@@ -20,6 +20,7 @@ import {
 } from '../src/personalBlocks/library';
 import {
   createCurrent,
+  electricalDrawingGeometry,
   createElectrical,
   createPolarity,
   electricalGeometry,
@@ -192,9 +193,10 @@ describe('personal blocks', () => {
     });
     expect(result[2]).toMatchObject({
       kind: 'loop-arrow',
-      width: 60,
-      height: 100,
-      arrowPosition: 0.45,
+      width: 100,
+      height: 60,
+      rotation: 90,
+      arrowPosition: 0.2,
     });
   });
   it('persists separately, renames/deletes and imports a library with fresh block IDs', () => {
@@ -320,7 +322,7 @@ describe('dedicated electrical annotations', () => {
     expect(x1 === x2 ? g.start.x === g.end.x : g.start.y === g.end.y).toBe(true);
     expect(o.label.text).toBe('i_1');
     expect(o.wireId).toBe(w.id);
-    expect(electricalGeometry({ ...o, reversed: true }, doc).arrowEnd).toEqual(g.start);
+    expect(electricalGeometry({ ...o, reversed: true }, doc).arrowEnd).toEqual(g.arrowEnd);
     const moved = { ...doc, objects: [moveObject(w, { x: 40, y: 60 }, new Set())] };
     expect(electricalGeometry(o, moved).start).toEqual({ x: g.start.x + 40, y: g.start.y + 60 });
   });
@@ -338,7 +340,10 @@ describe('dedicated electrical annotations', () => {
     expect(electricalGeometry(a, split).start).toEqual(g.start);
     const detached = removeObjects(doc, [w.id]).objects[0] as ElectricalAnnotation;
     expect(detached.wireId).toBeUndefined();
-    expect(electricalGeometry(detached, documentFor([detached]))).toEqual(g);
+    expect(electricalDrawingGeometry(detached, documentFor([detached]))).toMatchObject({
+      ...electricalDrawingGeometry(o, doc),
+      wireGap: null,
+    });
   });
   it('polarity maps only two terminals, follows rotation and reverses signs', () => {
     const c = createComponent('resistor', { x: 100, y: 200 }, 1),

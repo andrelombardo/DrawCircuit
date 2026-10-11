@@ -21,80 +21,80 @@ Per ogni riga il ciclo UI comprende ricerca e inserimento dalla palette, selezio
 
 La matrice automatica aggiunge tutte le sostituzioni consentite a tutte e quattro le rotazioni, con ID, label, posizione e percorsi dei fili conservati, serializzazione valida e documento di partenza immutato. I tipi senza sostituzioni compatibili restano verificati come tali; non vengono inventate conversioni incompatibili.
 
-| # | Tipo | Componente | Categoria | Pin | UI reale | Rotazioni | Export 3 | Automatico |
-|---:|---|---|---|---:|---|---|---|---|
-| 1 | `resistor` | Resistenza | Passivi | 2 | PASS | 4/4 | PASS | PASS |
-| 2 | `americanResistor` | Resistenza statunitense | Passivi | 2 | PASS | 4/4 | PASS | PASS |
-| 3 | `capacitor` | Condensatore | Passivi | 2 | PASS | 4/4 | PASS | PASS |
-| 4 | `polarizedCapacitor` | Condensatore polarizzato | Passivi | 2 | PASS | 4/4 | PASS | PASS |
-| 5 | `inductor` | Induttore | Passivi | 2 | PASS | 4/4 | PASS | PASS |
-| 6 | `variableResistor` | Resistenza variabile | Passivi | 2 | PASS | 4/4 | PASS | PASS |
-| 7 | `potentiometer` | Potenziometro | Passivi | 3 | PASS | 4/4 | PASS | PASS |
-| 8 | `voltageSource` | Generatore di tensione DC | Generatori | 2 | PASS | 4/4 | PASS | PASS |
-| 9 | `currentSource` | Generatore di corrente DC | Generatori | 2 | PASS | 4/4 | PASS | PASS |
-| 10 | `battery` | Batteria multicella | Generatori | 2 | PASS | 4/4 | PASS | PASS |
-| 11 | `dependentVoltage` | Tensione dipendente | Generatori | 2 | PASS | 4/4 | PASS | PASS |
-| 12 | `dependentCurrent` | Corrente dipendente | Generatori | 2 | PASS | 4/4 | PASS | PASS |
-| 13 | `diode` | Diodo | Diodi | 2 | PASS | 4/4 | PASS | PASS |
-| 14 | `led` | LED | Diodi | 2 | PASS | 4/4 | PASS | PASS |
-| 15 | `zener` | Diodo Zener | Diodi | 2 | PASS | 4/4 | PASS | PASS |
-| 16 | `openSwitch` | Interruttore aperto | Interruttori | 2 | PASS | 4/4 | PASS | PASS |
-| 17 | `closedSwitch` | Interruttore chiuso | Interruttori | 2 | PASS | 4/4 | PASS | PASS |
-| 18 | `ground` | Massa / terra | Riferimenti | 1 | PASS | 4/4 | PASS | PASS |
-| 19 | `ammeter` | Amperometro | Misura | 2 | PASS | 4/4 | PASS | PASS |
-| 20 | `voltmeter` | Voltmetro | Misura | 2 | PASS | 4/4 | PASS | PASS |
-| 21 | `transformer` | Trasformatore | Trasformatori | 4 | PASS | 4/4 | PASS | PASS |
-| 22 | `blackBox` | Blocco rettangolare | Blocchi | 2 | PASS | 4/4 | PASS | PASS |
-| 23 | `thermistor` | Termistore | Passivi | 2 | PASS | 4/4 | PASS | PASS |
-| 24 | `photoresistor` | Fotoresistenza / LDR | Passivi | 2 | PASS | 4/4 | PASS | PASS |
-| 25 | `variableCapacitor` | Condensatore variabile | Passivi | 2 | PASS | 4/4 | PASS | PASS |
-| 26 | `variableInductor` | Induttore variabile | Passivi | 2 | PASS | 4/4 | PASS | PASS |
-| 27 | `acVoltageSource` | Generatore di tensione AC | Generatori | 2 | PASS | 4/4 | PASS | PASS |
-| 28 | `acCurrentSource` | Generatore di corrente AC | Generatori | 2 | PASS | 4/4 | PASS | PASS |
-| 29 | `genericVoltageSource` | Tensione generica | Generatori | 2 | PASS | 4/4 | PASS | PASS |
-| 30 | `genericCurrentSource` | Corrente generica | Generatori | 2 | PASS | 4/4 | PASS | PASS |
-| 31 | `singleCellBattery` | Batteria a cella singola | Generatori | 2 | PASS | 4/4 | PASS | PASS |
-| 32 | `photodiode` | Fotodiodo | Diodi | 2 | PASS | 4/4 | PASS | PASS |
-| 33 | `schottky` | Diodo Schottky | Diodi | 2 | PASS | 4/4 | PASS | PASS |
-| 34 | `varactor` | Diodo varicap | Diodi | 2 | PASS | 4/4 | PASS | PASS |
-| 35 | `npn` | Transistor NPN | Transistor | 3 | PASS | 4/4 | PASS | PASS |
-| 36 | `pnp` | Transistor PNP | Transistor | 3 | PASS | 4/4 | PASS | PASS |
-| 37 | `nmos` | MOSFET NMOS | Transistor | 3 | PASS | 4/4 | PASS | PASS |
-| 38 | `pmos` | MOSFET PMOS | Transistor | 3 | PASS | 4/4 | PASS | PASS |
-| 39 | `njfet` | JFET canale N | Transistor | 3 | PASS | 4/4 | PASS | PASS |
-| 40 | `pjfet` | JFET canale P | Transistor | 3 | PASS | 4/4 | PASS | PASS |
-| 41 | `spdt` | Commutatore SPDT | Interruttori | 3 | PASS | 4/4 | PASS | PASS |
-| 42 | `pushButtonNO` | Pulsante normalmente aperto | Interruttori | 2 | PASS | 4/4 | PASS | PASS |
-| 43 | `pushButtonNC` | Pulsante normalmente chiuso | Interruttori | 2 | PASS | 4/4 | PASS | PASS |
-| 44 | `dpst` | Interruttore DPST | Interruttori | 4 | PASS | 4/4 | PASS | PASS |
-| 45 | `dpdt` | Commutatore DPDT | Interruttori | 6 | PASS | 4/4 | PASS | PASS |
-| 46 | `ohmmeter` | Ohmmetro | Misura | 2 | PASS | 4/4 | PASS | PASS |
-| 47 | `galvanometer` | Galvanometro | Misura | 2 | PASS | 4/4 | PASS | PASS |
-| 48 | `signalGround` | Massa segnale | Riferimenti | 1 | PASS | 4/4 | PASS | PASS |
-| 49 | `chassisGround` | Massa telaio | Riferimenti | 1 | PASS | 4/4 | PASS | PASS |
-| 50 | `centerTapTransformer` | Trasformatore a presa centrale | Trasformatori | 5 | PASS | 4/4 | PASS | PASS |
-| 51 | `coupledInductors` | Induttori accoppiati | Trasformatori | 4 | PASS | 4/4 | PASS | PASS |
-| 52 | `opAmp` | Amplificatore operazionale | Analogici | 3 | PASS | 4/4 | PASS | PASS |
-| 53 | `comparator` | Comparatore | Analogici | 3 | PASS | 4/4 | PASS | PASS |
-| 54 | `andGate` | Porta AND | Digitali | 3 | PASS | 4/4 | PASS | PASS |
-| 55 | `orGate` | Porta OR | Digitali | 3 | PASS | 4/4 | PASS | PASS |
-| 56 | `notGate` | Porta NOT | Digitali | 2 | PASS | 4/4 | PASS | PASS |
-| 57 | `nandGate` | Porta NAND | Digitali | 3 | PASS | 4/4 | PASS | PASS |
-| 58 | `norGate` | Porta NOR | Digitali | 3 | PASS | 4/4 | PASS | PASS |
-| 59 | `xorGate` | Porta XOR | Digitali | 3 | PASS | 4/4 | PASS | PASS |
-| 60 | `xnorGate` | Porta XNOR | Digitali | 3 | PASS | 4/4 | PASS | PASS |
-| 61 | `buffer` | Buffer | Digitali | 2 | PASS | 4/4 | PASS | PASS |
-| 62 | `terminal` | Terminale | Utilità | 1 | PASS | 4/4 | PASS | PASS |
-| 63 | `testPoint` | Punto di test | Utilità | 1 | PASS | 4/4 | PASS | PASS |
-| 64 | `connector2` | Connettore 2 pin | Utilità | 2 | PASS | 4/4 | PASS | PASS |
-| 65 | `connector3` | Connettore 3 pin | Utilità | 3 | PASS | 4/4 | PASS | PASS |
-| 66 | `port` | Porta generica | Utilità | 1 | PASS | 4/4 | PASS | PASS |
-| 67 | `fuse` | Fusibile | Utilità | 2 | PASS | 4/4 | PASS | PASS |
-| 68 | `lamp` | Lampadina | Utilità | 2 | PASS | 4/4 | PASS | PASS |
-| 69 | `motor` | Motore | Utilità | 2 | PASS | 4/4 | PASS | PASS |
-| 70 | `speaker` | Altoparlante | Utilità | 2 | PASS | 4/4 | PASS | PASS |
-| 71 | `buzzer` | Buzzer | Utilità | 2 | PASS | 4/4 | PASS | PASS |
-| 72 | `circleBlock` | Blocco circolare | Blocchi | 2 | PASS | 4/4 | PASS | PASS |
+|   # | Tipo                   | Componente                     | Categoria     | Pin | UI reale | Rotazioni | Export 3 | Automatico |
+| --: | ---------------------- | ------------------------------ | ------------- | --: | -------- | --------- | -------- | ---------- |
+|   1 | `resistor`             | Resistenza                     | Passivi       |   2 | PASS     | 4/4       | PASS     | PASS       |
+|   2 | `americanResistor`     | Resistenza statunitense        | Passivi       |   2 | PASS     | 4/4       | PASS     | PASS       |
+|   3 | `capacitor`            | Condensatore                   | Passivi       |   2 | PASS     | 4/4       | PASS     | PASS       |
+|   4 | `polarizedCapacitor`   | Condensatore polarizzato       | Passivi       |   2 | PASS     | 4/4       | PASS     | PASS       |
+|   5 | `inductor`             | Induttore                      | Passivi       |   2 | PASS     | 4/4       | PASS     | PASS       |
+|   6 | `variableResistor`     | Resistenza variabile           | Passivi       |   2 | PASS     | 4/4       | PASS     | PASS       |
+|   7 | `potentiometer`        | Potenziometro                  | Passivi       |   3 | PASS     | 4/4       | PASS     | PASS       |
+|   8 | `voltageSource`        | Generatore di tensione DC      | Generatori    |   2 | PASS     | 4/4       | PASS     | PASS       |
+|   9 | `currentSource`        | Generatore di corrente DC      | Generatori    |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  10 | `battery`              | Batteria multicella            | Generatori    |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  11 | `dependentVoltage`     | Tensione dipendente            | Generatori    |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  12 | `dependentCurrent`     | Corrente dipendente            | Generatori    |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  13 | `diode`                | Diodo                          | Diodi         |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  14 | `led`                  | LED                            | Diodi         |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  15 | `zener`                | Diodo Zener                    | Diodi         |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  16 | `openSwitch`           | Interruttore aperto            | Interruttori  |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  17 | `closedSwitch`         | Interruttore chiuso            | Interruttori  |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  18 | `ground`               | Massa / terra                  | Riferimenti   |   1 | PASS     | 4/4       | PASS     | PASS       |
+|  19 | `ammeter`              | Amperometro                    | Misura        |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  20 | `voltmeter`            | Voltmetro                      | Misura        |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  21 | `transformer`          | Trasformatore                  | Trasformatori |   4 | PASS     | 4/4       | PASS     | PASS       |
+|  22 | `blackBox`             | Blocco rettangolare            | Blocchi       |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  23 | `thermistor`           | Termistore                     | Passivi       |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  24 | `photoresistor`        | Fotoresistenza / LDR           | Passivi       |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  25 | `variableCapacitor`    | Condensatore variabile         | Passivi       |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  26 | `variableInductor`     | Induttore variabile            | Passivi       |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  27 | `acVoltageSource`      | Generatore di tensione AC      | Generatori    |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  28 | `acCurrentSource`      | Generatore di corrente AC      | Generatori    |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  29 | `genericVoltageSource` | Tensione generica              | Generatori    |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  30 | `genericCurrentSource` | Corrente generica              | Generatori    |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  31 | `singleCellBattery`    | Batteria a cella singola       | Generatori    |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  32 | `photodiode`           | Fotodiodo                      | Diodi         |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  33 | `schottky`             | Diodo Schottky                 | Diodi         |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  34 | `varactor`             | Diodo varicap                  | Diodi         |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  35 | `npn`                  | Transistor NPN                 | Transistor    |   3 | PASS     | 4/4       | PASS     | PASS       |
+|  36 | `pnp`                  | Transistor PNP                 | Transistor    |   3 | PASS     | 4/4       | PASS     | PASS       |
+|  37 | `nmos`                 | MOSFET NMOS                    | Transistor    |   3 | PASS     | 4/4       | PASS     | PASS       |
+|  38 | `pmos`                 | MOSFET PMOS                    | Transistor    |   3 | PASS     | 4/4       | PASS     | PASS       |
+|  39 | `njfet`                | JFET canale N                  | Transistor    |   3 | PASS     | 4/4       | PASS     | PASS       |
+|  40 | `pjfet`                | JFET canale P                  | Transistor    |   3 | PASS     | 4/4       | PASS     | PASS       |
+|  41 | `spdt`                 | Commutatore SPDT               | Interruttori  |   3 | PASS     | 4/4       | PASS     | PASS       |
+|  42 | `pushButtonNO`         | Pulsante normalmente aperto    | Interruttori  |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  43 | `pushButtonNC`         | Pulsante normalmente chiuso    | Interruttori  |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  44 | `dpst`                 | Interruttore DPST              | Interruttori  |   4 | PASS     | 4/4       | PASS     | PASS       |
+|  45 | `dpdt`                 | Commutatore DPDT               | Interruttori  |   6 | PASS     | 4/4       | PASS     | PASS       |
+|  46 | `ohmmeter`             | Ohmmetro                       | Misura        |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  47 | `galvanometer`         | Galvanometro                   | Misura        |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  48 | `signalGround`         | Massa segnale                  | Riferimenti   |   1 | PASS     | 4/4       | PASS     | PASS       |
+|  49 | `chassisGround`        | Massa telaio                   | Riferimenti   |   1 | PASS     | 4/4       | PASS     | PASS       |
+|  50 | `centerTapTransformer` | Trasformatore a presa centrale | Trasformatori |   5 | PASS     | 4/4       | PASS     | PASS       |
+|  51 | `coupledInductors`     | Induttori accoppiati           | Trasformatori |   4 | PASS     | 4/4       | PASS     | PASS       |
+|  52 | `opAmp`                | Amplificatore operazionale     | Analogici     |   3 | PASS     | 4/4       | PASS     | PASS       |
+|  53 | `comparator`           | Comparatore                    | Analogici     |   3 | PASS     | 4/4       | PASS     | PASS       |
+|  54 | `andGate`              | Porta AND                      | Digitali      |   3 | PASS     | 4/4       | PASS     | PASS       |
+|  55 | `orGate`               | Porta OR                       | Digitali      |   3 | PASS     | 4/4       | PASS     | PASS       |
+|  56 | `notGate`              | Porta NOT                      | Digitali      |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  57 | `nandGate`             | Porta NAND                     | Digitali      |   3 | PASS     | 4/4       | PASS     | PASS       |
+|  58 | `norGate`              | Porta NOR                      | Digitali      |   3 | PASS     | 4/4       | PASS     | PASS       |
+|  59 | `xorGate`              | Porta XOR                      | Digitali      |   3 | PASS     | 4/4       | PASS     | PASS       |
+|  60 | `xnorGate`             | Porta XNOR                     | Digitali      |   3 | PASS     | 4/4       | PASS     | PASS       |
+|  61 | `buffer`               | Buffer                         | Digitali      |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  62 | `terminal`             | Terminale                      | Utilità       |   1 | PASS     | 4/4       | PASS     | PASS       |
+|  63 | `testPoint`            | Punto di test                  | Utilità       |   1 | PASS     | 4/4       | PASS     | PASS       |
+|  64 | `connector2`           | Connettore 2 pin               | Utilità       |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  65 | `connector3`           | Connettore 3 pin               | Utilità       |   3 | PASS     | 4/4       | PASS     | PASS       |
+|  66 | `port`                 | Porta generica                 | Utilità       |   1 | PASS     | 4/4       | PASS     | PASS       |
+|  67 | `fuse`                 | Fusibile                       | Utilità       |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  68 | `lamp`                 | Lampadina                      | Utilità       |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  69 | `motor`                | Motore                         | Utilità       |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  70 | `speaker`              | Altoparlante                   | Utilità       |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  71 | `buzzer`               | Buzzer                         | Utilità       |   2 | PASS     | 4/4       | PASS     | PASS       |
+|  72 | `circleBlock`          | Blocco circolare               | Blocchi       |   2 | PASS     | 4/4       | PASS     | PASS       |
 
 ## Matrice completa dei 23 preset
 
@@ -102,31 +102,31 @@ Ogni preset è stato cercato, mostrato come ghost, inserito, mosso come selezion
 
 Gli assert automatici coprono registro, allocazione label, inserimento/rotazione, collegamenti, proprietà del grafo e integrazione UI. La semantica della stella e del triangolo è stata ricontrollata sui JSON scaricati dal browser, quindi senza affidarsi al solo nome o aspetto del preset.
 
-| # | ID | Preset | UI reale e 4 rotazioni | Export 3 | JSON reload/reimport | Scollega/ricollega | Automatico |
-|---:|---|---|---|---|---|---|---|
-| 1 | `resistors-series-2` | 2 resistenze in serie | PASS | PASS | PASS | PASS | PASS |
-| 2 | `resistors-series-3` | 3 resistenze in serie | PASS | PASS | PASS | PASS | PASS |
-| 3 | `resistors-parallel-2` | 2 resistenze in parallelo | PASS | PASS | PASS | PASS | PASS |
-| 4 | `resistors-parallel-3` | 3 resistenze in parallelo | PASS | PASS | PASS | PASS | PASS |
-| 5 | `resistor-star` | Stella di resistenze / Y | PASS | PASS | PASS | PASS | PASS |
-| 6 | `resistor-delta` | Triangolo di resistenze / Delta | PASS | PASS | PASS | PASS | PASS |
-| 7 | `voltage-divider` | Partitore di tensione | PASS | PASS | PASS | PASS | PASS |
-| 8 | `current-divider` | Partitore di corrente | PASS | PASS | PASS | PASS | PASS |
-| 9 | `wheatstone-bridge` | Ponte di Wheatstone | PASS | PASS | PASS | PASS | PASS |
-| 10 | `real-voltage-source` | Generatore reale di tensione | PASS | PASS | PASS | PASS | PASS |
-| 11 | `real-current-source` | Generatore reale di corrente | PASS | PASS | PASS | PASS | PASS |
-| 12 | `thevenin` | Equivalente di Thévenin | PASS | PASS | PASS | PASS | PASS |
-| 13 | `norton` | Equivalente di Norton | PASS | PASS | PASS | PASS | PASS |
-| 14 | `rc-series` | RC serie | PASS | PASS | PASS | PASS | PASS |
-| 15 | `rl-series` | RL serie | PASS | PASS | PASS | PASS | PASS |
-| 16 | `rlc-series` | RLC serie | PASS | PASS | PASS | PASS | PASS |
-| 17 | `rc-parallel` | RC parallelo | PASS | PASS | PASS | PASS | PASS |
-| 18 | `rl-parallel` | RL parallelo | PASS | PASS | PASS | PASS | PASS |
-| 19 | `rlc-parallel` | RLC parallelo | PASS | PASS | PASS | PASS | PASS |
-| 20 | `source-resistor` | Generatore di tensione e resistenza | PASS | PASS | PASS | PASS | PASS |
-| 21 | `two-meshes` | Rete a due maglie | PASS | PASS | PASS | PASS | PASS |
-| 22 | `three-branches` | Rete a tre rami | PASS | PASS | PASS | PASS | PASS |
-| 23 | `source-series-load` | Generatore, resistenza serie e carico | PASS | PASS | PASS | PASS | PASS |
+|   # | ID                     | Preset                                | UI reale e 4 rotazioni | Export 3 | JSON reload/reimport | Scollega/ricollega | Automatico |
+| --: | ---------------------- | ------------------------------------- | ---------------------- | -------- | -------------------- | ------------------ | ---------- |
+|   1 | `resistors-series-2`   | 2 resistenze in serie                 | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|   2 | `resistors-series-3`   | 3 resistenze in serie                 | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|   3 | `resistors-parallel-2` | 2 resistenze in parallelo             | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|   4 | `resistors-parallel-3` | 3 resistenze in parallelo             | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|   5 | `resistor-star`        | Stella di resistenze / Y              | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|   6 | `resistor-delta`       | Triangolo di resistenze / Delta       | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|   7 | `voltage-divider`      | Partitore di tensione                 | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|   8 | `current-divider`      | Partitore di corrente                 | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|   9 | `wheatstone-bridge`    | Ponte di Wheatstone                   | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|  10 | `real-voltage-source`  | Generatore reale di tensione          | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|  11 | `real-current-source`  | Generatore reale di corrente          | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|  12 | `thevenin`             | Equivalente di Thévenin               | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|  13 | `norton`               | Equivalente di Norton                 | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|  14 | `rc-series`            | RC serie                              | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|  15 | `rl-series`            | RL serie                              | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|  16 | `rlc-series`           | RLC serie                             | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|  17 | `rc-parallel`          | RC parallelo                          | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|  18 | `rl-parallel`          | RL parallelo                          | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|  19 | `rlc-parallel`         | RLC parallelo                         | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|  20 | `source-resistor`      | Generatore di tensione e resistenza   | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|  21 | `two-meshes`           | Rete a due maglie                     | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|  22 | `three-branches`       | Rete a tre rami                       | PASS                   | PASS     | PASS                 | PASS               | PASS       |
+|  23 | `source-series-load`   | Generatore, resistenza serie e carico | PASS                   | PASS     | PASS                 | PASS               | PASS       |
 
 ### Semantica stella e triangolo
 
@@ -150,15 +150,15 @@ La validazione finale verifica ID univoci, riferimenti di tutti i fili, riferime
 
 ## Circuiti golden e operazioni distruttive
 
-| Caso | UI reale | Verifica concreta | Evidenza |
-|---|---|---|---|
-| RLC serie: R→C→L | PASS | stesso ID e label, tutti i percorsi SVG dei fili identici; Annulla ripristina R, Ripeti ripristina C | [risultati](evidence/lib-replacement-ui-results.json), [JSON finale](evidence/lib-rlc-capacitor-to-inductor-ui.json), [schermata](evidence/lib-rlc-replacement-final.png) |
-| NPN→PNP con tre pin collegati | PASS | stesso ID, percorsi dei sei fili complessivi identici | [JSON](evidence/lib-npn-to-pnp-ui.json) |
-| Operazionale→comparatore | PASS | stesso ID, fili ai tre pin invariati | [JSON](evidence/lib-opamp-to-comparator-ui.json) |
-| Incrocio senza giunzione | PASS | endpoint liberi distinti e ponte negli export TikZ/SVG | [TikZ](evidence/lib-crossing-without-junction.tikz), [SVG](evidence/lib-crossing-without-junction.svg), [schermata](evidence/lib-crossing-without-junction.png) |
-| Incrocio con giunzione | PASS | nodo unico e quattro endpoint riferiti a quel nodo, split dei due fili | [JSON](evidence/lib-crossing-with-junction.json), [SVG](evidence/lib-crossing-with-junction.svg), [schermata](evidence/lib-crossing-with-junction.png) |
-| Cancellazione giunzione con quattro rami | PASS | tutti gli endpoint diventano liberi, nessun riferimento pendente; Annulla/Ripeti ripristinano gli oggetti esatti | [delete](evidence/lib-junction-deleted.json), [undo](evidence/lib-junction-delete-undo.json), [redo](evidence/lib-junction-delete-redo.json) |
-| Cancellazione terminale e filo esportato senza terminale | PASS dopo fix RC-03 | percorso `M 0 -40 L 0 100 L 160 100` identico prima/dopo | [retest](evidence/lib-delete-terminal-retest.json), [prima](evidence/lib-delete-terminal-before.png), [dopo](evidence/lib-delete-terminal-fixed.png) |
+| Caso                                                     | UI reale            | Verifica concreta                                                                                                | Evidenza                                                                                                                                                                  |
+| -------------------------------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| RLC serie: R→C→L                                         | PASS                | stesso ID e label, tutti i percorsi SVG dei fili identici; Annulla ripristina R, Ripeti ripristina C             | [risultati](evidence/lib-replacement-ui-results.json), [JSON finale](evidence/lib-rlc-capacitor-to-inductor-ui.json), [schermata](evidence/lib-rlc-replacement-final.png) |
+| NPN→PNP con tre pin collegati                            | PASS                | stesso ID, percorsi dei sei fili complessivi identici                                                            | [JSON](evidence/lib-npn-to-pnp-ui.json)                                                                                                                                   |
+| Operazionale→comparatore                                 | PASS                | stesso ID, fili ai tre pin invariati                                                                             | [JSON](evidence/lib-opamp-to-comparator-ui.json)                                                                                                                          |
+| Incrocio senza giunzione                                 | PASS                | endpoint liberi distinti e ponte negli export TikZ/SVG                                                           | [TikZ](evidence/lib-crossing-without-junction.tikz), [SVG](evidence/lib-crossing-without-junction.svg), [schermata](evidence/lib-crossing-without-junction.png)           |
+| Incrocio con giunzione                                   | PASS                | nodo unico e quattro endpoint riferiti a quel nodo, split dei due fili                                           | [JSON](evidence/lib-crossing-with-junction.json), [SVG](evidence/lib-crossing-with-junction.svg), [schermata](evidence/lib-crossing-with-junction.png)                    |
+| Cancellazione giunzione con quattro rami                 | PASS                | tutti gli endpoint diventano liberi, nessun riferimento pendente; Annulla/Ripeti ripristinano gli oggetti esatti | [delete](evidence/lib-junction-deleted.json), [undo](evidence/lib-junction-delete-undo.json), [redo](evidence/lib-junction-delete-redo.json)                              |
+| Cancellazione terminale e filo esportato senza terminale | PASS dopo fix RC-03 | percorso `M 0 -40 L 0 100 L 160 100` identico prima/dopo                                                         | [retest](evidence/lib-delete-terminal-retest.json), [prima](evidence/lib-delete-terminal-before.png), [dopo](evidence/lib-delete-terminal-fixed.png)                      |
 
 La sostituzione conserva la label semantica: dopo R→C→L la prima induttanza continua a chiamarsi `R_1`, come richiesto dalla proprietà di preservazione; non è una rietichettatura automatica.
 

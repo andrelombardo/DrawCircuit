@@ -203,13 +203,14 @@ describe('parametric loop and export', () => {
   it('rotates bounding box and head without losing ellipse proportions', () => {
     const doc = { ...emptyDocument(), objects: [loop] };
     expect(rotateObjects(doc, [loop.id]).objects[0]).toMatchObject({
-      width: 120,
-      height: 240,
-      arrowPosition: 0.5,
+      width: 240,
+      height: 120,
+      rotation: 90,
+      arrowPosition: 0.25,
     });
     let result: CircuitDocument = doc;
     for (let i = 0; i < 4; i++) result = rotateObjects(result, [loop.id]);
-    expect(result).toEqual(doc);
+    expect(result).toEqual({ ...doc, objects: [{ ...loop, rotation: 0 }] });
   });
   it('exports bodies, junctions, labels and annotations in explicit order without UI', () => {
     const c = createComponent('resistor', { x: 0, y: 0 });

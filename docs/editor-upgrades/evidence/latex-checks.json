@@ -1,0 +1,13 @@
+{
+  "compiler": "Codex desktop LaTeX compiler",
+  "checks": [
+    {
+      "file": "browser-native.tex",
+      "kind": "success"
+    },
+    {
+      "file": "browser-obsidian.tex",
+      "kind": "success"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import { ChevronDown, Type, Minus } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import type { FormEvent } from 'react';
+import { useEditorStore } from '../../store/editorStore';
 import { COLORS } from '../../model/types';
 import type { CircuitObject } from '../../model/types';
 
@@ -62,6 +63,105 @@ function ColorControl({
     </div>
   );
 }
+function OpacityControl({
+  objects,
+  label,
+  labelOpacity = false,
+}: {
+  objects: CircuitObject[];
+  label: string;
+  labelOpacity?: boolean;
+}) {
+  const ids = new Set(objects.map((o) => o.id));
+  const values = objects.flatMap((o) =>
+    labelOpacity ? ('label' in o ? [o.label.opacity ?? 1] : []) : [o.opacity ?? 1],
+  );
+  const value = Math.round((values[0] ?? 1) * 100);
+  const mixed = values.some((v) => v !== values[0]);
+  const ownsGesture = useRef(false);
+  const begin = () => {
+    if (!ownsGesture.current) {
+      useEditorStore.getState().beginGesture();
+      ownsGesture.current = true;
+    }
+  };
+  const finish = () => {
+    if (ownsGesture.current) {
+      ownsGesture.current = false;
+      useEditorStore.getState().endGesture();
+    }
+  };
+  useEffect(
+    () => () => {
+      if (ownsGesture.current) useEditorStore.getState().endGesture();
+    },
+    [],
+  );
+  return (
+    <label className="style-row opacity-row">
+      <span>{label}</span>
+      <input
+        type="range"
+        min="0"
+        max="100"
+        step="1"
+        value={value}
+        aria-label={label}
+        aria-valuetext={mixed ? 'Valori misti' : `${value}%`}
+        onPointerDown={(e) => {
+          begin();
+          e.currentTarget.setPointerCapture?.(e.pointerId);
+        }}
+        onPointerUp={finish}
+        onPointerCancel={() => {
+          ownsGesture.current = false;
+          useEditorStore.getState().cancelGesture();
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            e.stopPropagation();
+            ownsGesture.current = false;
+            useEditorStore.getState().cancelGesture();
+          } else if (
+            [
+              'ArrowLeft',
+              'ArrowRight',
+              'ArrowUp',
+              'ArrowDown',
+              'Home',
+              'End',
+              'PageUp',
+              'PageDown',
+            ].includes(e.key)
+          )
+            begin();
+        }}
+        onKeyUp={finish}
+        onBlur={finish}
+        onChange={(e) => {
+          const opacity = Number(e.target.value) / 100;
+          const state = useEditorStore.getState();
+          const next = {
+            ...state.document,
+            objects: state.document.objects.map((o) =>
+              !ids.has(o.id)
+                ? o
+                : labelOpacity
+                  ? 'label' in o
+                    ? { ...o, label: { ...o.label, opacity } }
+                    : o
+                  : { ...o, opacity },
+            ),
+          };
+          if (ownsGesture.current) state.preview(next);
+          else state.commit(next);
+        }}
+      />
+      <output>{mixed ? '—' : `${value}%`}</output>
+    </label>
+  );
+}
 export function SelectionStyle({
   objects,
   apply,
@@ -95,6 +195,10 @@ export function SelectionStyle({
         value={o?.color ?? COLORS.ink}
         onChange={(color) => apply((o) => ({ ...o, color }))}
       />
+      <OpacityControl
+        objects={objects}
+        label={o?.kind === 'text' ? 'Opacità testo' : 'Opacità simbolo'}
+      />
       {hasLabel && (
         <ColorControl
           label="Etichetta"
@@ -104,6 +208,7 @@ export function SelectionStyle({
           }
         />
       )}
+      {hasLabel && <OpacityControl objects={objects} label="Opacità etichetta" labelOpacity />}
       {hasStroke && (
         <label className="style-row" title="Spessore linea">
           <span>

@@ -98,7 +98,7 @@ describe('current geometry follows real canvas zoom', () => {
         expect(group.querySelector('g[stroke]')?.getAttribute('stroke-width')).toBe(
           String(current.width),
         );
-        const label = group.querySelector('[data-label]')!;
+        const label = canvas().querySelector(`[data-layer="labels"] [data-label="${current.id}"]`)!;
         const fontSize =
           label.querySelector<HTMLElement>('.math-label-content')?.style.fontSize ??
           label.getAttribute('font-size');
@@ -119,7 +119,10 @@ describe('current geometry follows real canvas zoom', () => {
         const g = electricalDrawingGeometry(current, state().document);
         fireEvent.doubleClick(canvas().querySelector(`[data-label="${current.id}"]`)!);
         const input = screen.getByLabelText('Modifica testo sul foglio');
-        expect(parseFloat(input.style.fontSize)).toBeCloseTo(g.labelFontSize * zoom);
+        expect(parseFloat(input.style.fontSize)).toBeCloseTo(g.labelFontSize);
+        expect(
+          Number(input.closest('form')!.style.transform.match(/scale\(([^)]+)/)![1]),
+        ).toBeCloseTo(zoom);
         const transform = canvas()
           .querySelector(':scope > g')!
           .getAttribute('transform')!

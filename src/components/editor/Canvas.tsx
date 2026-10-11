@@ -48,6 +48,7 @@ export function Canvas({
     grid = useEditorStore((s) => s.grid),
     selection = useEditorStore((s) => s.selection),
     gestureActive = useEditorStore((s) => Boolean(s.gestureStart)),
+    wireRouting = useEditorStore((s) => s.wireRouting),
     arrowType = useEditorStore((s) => s.arrowType),
     storageError = useEditorStore((s) => s.storageError);
   const personalBlocks = usePersonalBlocks((s) => s.blocks);
@@ -109,7 +110,7 @@ export function Canvas({
                   ? 'Aggiungi una svolta · clic su terminale, nodo o filo per collegare · Enter per terminare'
                   : 'Clicca un terminale, un nodo o un filo per iniziare'
                 : tool === 'junction'
-                  ? 'Clicca per inserire un nodo · Shift + clic per più nodi'
+                  ? 'Clicca per inserire nodi · Esc o V termina'
                   : tool === 'text'
                     ? 'Clicca per inserire Testo · doppio clic per modificarlo'
                     : tool === 'loop-arrow'
@@ -150,6 +151,21 @@ export function Canvas({
         svgRef={svgRef}
         hidden={!!interactions.dragging || !!editing}
       />
+      {tool === 'wire' && (
+        <div className="arrow-tool-options" role="group" aria-label="Routing fili">
+          {(['orthogonal', '45', 'free'] as const).map((routing, i) => (
+            <button
+              key={routing}
+              aria-pressed={wireRouting === routing}
+              className={wireRouting === routing ? 'selected' : ''}
+              onClick={() => useEditorStore.getState().setWireRouting(routing)}
+              title="Shift+W cambia routing"
+            >
+              {['Ortogonale', '45°', 'Libero'][i]}
+            </button>
+          ))}
+        </div>
+      )}
       {tool === 'arrow' && (
         <div className="arrow-tool-options" aria-label="Forma freccia">
           {(['straight', 'curve'] as const).map((type, i) => (
@@ -203,10 +219,11 @@ export function Canvas({
         <g transform={`translate(${v.x} ${v.y}) scale(${v.zoom})`}>
           <CircuitLayer
             doc={doc}
-            selection={selection}
+            selection={editing ? [] : selection}
             terminals={terminalsNeeded}
-            nearbyComponents={terminalProximity.ids}
+            nearbyComponents={editing ? [] : terminalProximity.ids}
             zoom={v.zoom}
+            hoveredArrow={interactions.hoveredArrow}
             activeLabel={interactions.activeLabel}
             editingTextId={editedObject?.kind === 'text' ? editedObject.id : undefined}
             editingLabelId={editedObject?.kind !== 'text' ? editedObject?.id : undefined}

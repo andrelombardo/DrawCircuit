@@ -41,6 +41,7 @@ export const ArrowView = memo(function ArrowView({
       />
       <path
         d={arrowPath(o)}
+        opacity={o.opacity}
         stroke={o.color}
         strokeWidth={o.width}
         fill="none"

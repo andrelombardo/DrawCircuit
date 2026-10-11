@@ -25,6 +25,7 @@ import {
   snap,
   snapPoint,
   rotatePoint,
+  wirePoints,
 } from '../../utils/geometry';
 import { deserializeDocument, serializeDocument } from '../../model/serialization';
 import { cloneObjects, extractSelection, moveSelection } from '../../utils/operations';
@@ -38,7 +39,14 @@ import {
   wireCandidate,
 } from '../../utils/wires';
 import type { WireCandidate, WireDraft } from '../../utils/wires';
-import { loopPositionAt } from '../../utils/loops';
+import {
+  arrowCenter,
+  arrowOrientation,
+  rotateArrow,
+  rotationGesture,
+  rotationHandle,
+} from '../../utils/arrows';
+import { loopPositionAt, resizeLoop } from '../../utils/loops';
 import { createMoveContext, computeMoveGuides } from '../../utils/smartGuides';
 import type { MoveContext, DistanceGuide } from '../../utils/smartGuides';
 import { useSmartPlacement } from '../../smartPlacement/useSmartPlacement';
@@ -97,6 +105,7 @@ export function useCanvasInteractions(
   const [paletteDragType, setPaletteDragType] = useState<(typeof componentTypes)[number] | null>(
     null,
   );
+  const [hoveredArrow, setHoveredArrow] = useState<string | null>(null);
   const [overlay, setOverlay] = useState<Overlay>(blank);
   const doc = useEditorStore((s) => s.document);
   const objectMap = useMemo(() => new Map(doc.objects.map((o) => [o.id, o])), [doc]);
@@ -388,8 +397,13 @@ export function useCanvasInteractions(
           rotatePlacement();
         else s.rotate();
       } else if (!mod && e.key.toLowerCase() === 'v') s.setTool('select');
-      else if (!mod && e.key.toLowerCase() === 'w') s.setTool('wire');
-      else if (!mod && e.key.toLowerCase() === 'n') s.setTool('junction');
+      else if (!mod && e.key.toLowerCase() === 'w') {
+        if (e.shiftKey)
+          s.setWireRouting(
+            s.wireRouting === 'orthogonal' ? '45' : s.wireRouting === '45' ? 'free' : 'orthogonal',
+          );
+        else s.setTool('wire');
+      } else if (!mod && e.key.toLowerCase() === 'n') s.setTool('junction');
       else if (!mod && e.key.toLowerCase() === 'a') s.setTool('arrow');
       else if (!mod && e.key.toLowerCase() === 'l') s.setTool('loop-arrow');
       else if (!mod && e.key.toLowerCase() === 'h') s.setTool('pan');
@@ -439,6 +453,8 @@ export function useCanvasInteractions(
   useEffect(
     () =>
       useEditorStore.subscribe((s, prev) => {
+        if (s.wireRouting !== prev.wireRouting && draftRef.current)
+          setWireDraft({ ...draftRef.current, routing: s.wireRouting });
         if (
           s.tool !== prev.tool ||
           s.pendingPresetId !== prev.pendingPresetId ||
@@ -494,6 +510,22 @@ export function useCanvasInteractions(
     if (result.doc !== s.document) s.commit(result.doc);
     s.select([result.junction.id]);
   };
+  // Alt/Option-click cycles overlapping labels in paint order, before body targeting.
+  const pointerTarget = (e: ReactPointerEvent<SVGSVGElement>) => {
+    if (!e.altKey || !document.elementsFromPoint) return e.target as Element;
+    const labels = document
+      .elementsFromPoint(e.clientX, e.clientY)
+      .map((element) => element.closest('[data-label]'))
+      .filter((element): element is Element => !!element && !!svgRef.current?.contains(element));
+    const unique = [
+      ...new Map(labels.map((element) => [element.getAttribute('data-label'), element])).values(),
+    ];
+    if (!unique.length) return e.target as Element;
+    const current = unique.findIndex(
+      (element) => element.getAttribute('data-label') === useEditorStore.getState().activeLabel,
+    );
+    return unique[(current + 1) % unique.length];
+  };
   const pointerDown = (e: ReactPointerEvent<SVGSVGElement>) => {
     if (e.button !== 0 && e.button !== 1) return;
     e.preventDefault();
@@ -522,7 +554,7 @@ export function useCanvasInteractions(
       const target = wireCandidate(p, s.document, viewport.zoom);
       if (!d) {
         s.beginGesture();
-        const result = beginWire(s.document, target);
+        const result = beginWire(s.document, target, s.wireRouting);
         if (result.doc !== s.document) s.preview(result.doc);
         setWireDraft(result.draft);
       } else if (target.kind !== 'grid' || e.detail >= 2) finishWire(target);
@@ -539,7 +571,7 @@ export function useCanvasInteractions(
     if (s.tool === 'current') {
       const near = nearestWire(p, s.document, 16 / viewport.zoom);
       if (near) {
-        s.add([createCurrent(near.wire, near.point, s.document, s.currentPlacement)]);
+        s.add([createCurrent(near.wire, near.point, s.document)]);
         s.setTool('select');
       } else s.notify('Clicca un filo per associare la freccia di corrente.');
       return;
@@ -555,7 +587,6 @@ export function useCanvasInteractions(
     }
     if (s.tool === 'junction') {
       addJunction(p);
-      if (!e.shiftKey) s.setTool('select');
       return;
     }
     if (s.tool === 'text') {
@@ -594,7 +625,7 @@ export function useCanvasInteractions(
       if (!smart.confirm(type, p, e.altKey)) placeComponent(type, p);
       return;
     }
-    const target = e.target as Element,
+    const target = pointerTarget(e),
       el = target.closest('[data-object]'),
       id = el?.getAttribute('data-object'),
       handle = target.closest('[data-handle]')?.getAttribute('data-handle'),
@@ -631,7 +662,7 @@ export function useCanvasInteractions(
         );
         return;
       }
-      if (e.shiftKey) {
+      if (e.shiftKey && !handle) {
         s.select(
           s.selection.includes(id) ? s.selection.filter((i) => i !== id) : [...s.selection, id],
         );
@@ -642,12 +673,27 @@ export function useCanvasInteractions(
       s.select(ids);
       setActiveLabel(labelId ?? null);
       s.beginGesture();
+      const wire = objectMap.get(id);
+      const segment =
+        !handle &&
+        !labelId &&
+        ids.length === 1 &&
+        wire?.kind === 'wire' &&
+        wire.routing &&
+        wire.routing !== 'orthogonal'
+          ? nearestWire(
+              p,
+              s.document,
+              Infinity,
+              new Set(s.document.objects.filter((o) => o.id !== id).map((o) => o.id)),
+            )?.segment
+          : undefined;
       drag.current = {
-        type: handle ? 'handle' : labelId ? 'label' : 'move',
+        type: handle || segment !== undefined ? 'handle' : labelId ? 'label' : 'move',
         origin: p,
         doc: s.document,
         ids: handle || labelId ? [id] : ids,
-        handle: handle ?? undefined,
+        handle: segment !== undefined ? `segment:${segment}` : (handle ?? undefined),
         moveContext: !handle && !labelId ? createMoveContext(s.document, ids) : undefined,
       };
     } else {
@@ -663,6 +709,25 @@ export function useCanvasInteractions(
     mouseRef.current = p;
     screenPointerRef.current = { x: e.clientX, y: e.clientY };
     const d = drag.current;
+    if (!d) {
+      const hovered =
+        s.tool === 'select'
+          ? s.document.objects.find((o) => {
+              if (!s.selection.includes(o.id) || (o.kind !== 'arrow' && o.kind !== 'loop-arrow'))
+                return false;
+              const b = objectBounds(o, s.document),
+                margin = 28 / viewport.zoom;
+              return (
+                distance(p, rotationHandle(o, viewport.zoom)) < margin ||
+                (p.x >= b.x - margin &&
+                  p.x <= b.x + b.width + margin &&
+                  p.y >= b.y - margin &&
+                  p.y <= b.y + b.height + margin)
+              );
+            })
+          : null;
+      setHoveredArrow(hovered?.id ?? null);
+    }
     if (d?.type === 'pan') {
       setViewport({
         ...d.view,
@@ -675,7 +740,7 @@ export function useCanvasInteractions(
       if (!d.started) {
         if (distance({ x: e.clientX, y: e.clientY }, d.screen) < TERMINAL_DRAG_THRESHOLD) return;
         s.beginGesture();
-        const result = beginWire(s.document, d.start);
+        const result = beginWire(s.document, d.start, s.wireRouting);
         if (result.doc !== s.document) s.preview(result.doc);
         setWireDraft(result.draft);
         d.started = true;
@@ -786,24 +851,16 @@ export function useCanvasInteractions(
             : d.doc.objects.map((o) => {
                 if (!selected.has(o.id)) return o;
                 if (d.type === 'handle') {
+                  if (d.handle === 'rotate' && (o.kind === 'arrow' || o.kind === 'loop-arrow'))
+                    return rotateArrow(
+                      o,
+                      rotationGesture(arrowCenter(o), d.origin, p, e.shiftKey, arrowOrientation(o)),
+                    );
                   if (o.kind === 'loop-arrow') {
                     if (d.handle === 'loopHead')
                       return { ...o, arrowPosition: loopPositionAt(o, p) };
-                    const q = snapPoint(p);
-                    if (d.handle === 'loopNW')
-                      return {
-                        ...o,
-                        x: Math.min(q.x, o.x + o.width - 20),
-                        y: Math.min(q.y, o.y + o.height - 20),
-                        width: Math.max(20, o.x + o.width - q.x),
-                        height: Math.max(20, o.y + o.height - q.y),
-                      };
-                    if (d.handle === 'loopSE')
-                      return {
-                        ...o,
-                        width: Math.max(20, q.x - o.x),
-                        height: Math.max(20, q.y - o.y),
-                      };
+                    if (d.handle === 'loopNW' || d.handle === 'loopSE')
+                      return resizeLoop(o, d.handle, snapPoint(p));
                   }
                   if (o.kind === 'brace' && (d.handle === 'start' || d.handle === 'end')) {
                     return resizeBrace(o, d.handle, snapPoint(p));
@@ -819,6 +876,22 @@ export function useCanvasInteractions(
                     }
                   }
                   if (o.kind === 'wire') {
+                    if (d.handle?.startsWith('segment:')) {
+                      const points = wirePoints(o, d.doc),
+                        index = Number(d.handle.split(':')[1]);
+                      const a = points[index],
+                        b = points[index + 1];
+                      const length = distance(a, b) || 1,
+                        normal = { x: -(b.y - a.y) / length, y: (b.x - a.x) / length };
+                      const amount = raw.x * normal.x + raw.y * normal.y;
+                      const shift = { x: normal.x * amount, y: normal.y * amount };
+                      const route = points.map((point, i) =>
+                        i === index || i === index + 1 ? add(point, shift) : point,
+                      );
+                      if (index === 0) route.unshift(points[0]);
+                      if (index === points.length - 2) route.push(points.at(-1)!);
+                      return { ...o, vertices: route.slice(1, -1) };
+                    }
                     if (d.handle?.startsWith('vertex:'))
                       return {
                         ...o,
@@ -1010,7 +1083,7 @@ export function useCanvasInteractions(
       return;
     }
     if (s.tool !== 'select') return;
-    const id = (e.target as Element).closest('[data-object]')?.getAttribute('data-object'),
+    const id = pointerTarget(e).closest('[data-object]')?.getAttribute('data-object'),
       o = s.document.objects.find((o) => o.id === id);
     if (!o) return;
     const target = inlineTextTarget(o, s.document);
@@ -1054,6 +1127,7 @@ export function useCanvasInteractions(
   };
   return {
     viewport,
+    hoveredArrow,
     voltageStart,
     surfaceSize,
     smart,
@@ -1078,7 +1152,10 @@ export function useCanvasInteractions(
     pointerUp,
     leave: () => {
       smart.leave();
-      if (!drag.current) setOverlay(blank);
+      if (!drag.current) {
+        setOverlay(blank);
+        setHoveredArrow(null);
+      }
     },
     doubleClick,
     drop,

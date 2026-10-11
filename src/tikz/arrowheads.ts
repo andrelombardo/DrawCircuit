@@ -1,5 +1,5 @@
 import type { ArrowAnnotation, LoopArrow, Point } from '../model/types';
-import { distance, midpoint } from '../utils/geometry';
+import { distance, arcGeometry, rotatePoint } from '../utils/geometry';
 import { loopGeometry } from '../utils/loops';
 
 /** SVG marker viewBox="0 -4 9 8", refX=8, path="M0 -3.5 L8 0 L0 3.5". */
@@ -18,21 +18,22 @@ export function canvasArrowHead(arrow: ArrowAnnotation | LoopArrow): Point[] {
     const g = loopGeometry(arrow);
     const angle = (g.endAngle * Math.PI) / 180;
     const sign = arrow.direction === 'clockwise' ? 1 : -1;
-    return chevron(g.end, {
-      x: -sign * (arrow.width / 2) * Math.sin(angle),
-      y: sign * (arrow.height / 2) * Math.cos(angle),
-    });
-  }
-  if (arrow.type === 'arc') {
-    const center = midpoint(arrow.start, arrow.end);
-    const radius = Math.max(20, distance(arrow.start, arrow.end) / 2);
-    const angle = ((arrow.reversed ? -60 : 250) * Math.PI) / 180;
-    const sign = arrow.reversed ? -1 : 1;
     return chevron(
-      { x: center.x + radius * Math.cos(angle), y: center.y + radius * Math.sin(angle) },
-      { x: -sign * Math.sin(angle), y: sign * Math.cos(angle) },
+      g.end,
+      rotatePoint(
+        {
+          x: -sign * (arrow.width / 2) * Math.sin(angle),
+          y: sign * (arrow.height / 2) * Math.cos(angle),
+        },
+        arrow.rotation ?? 0,
+      ),
     );
   }
+  if (arrow.type === 'arc') {
+    const g = arcGeometry(arrow);
+    return chevron(arrow.reversed ? g.start : g.end, g.tangent);
+  }
+
   const tip = arrow.reversed ? arrow.start : arrow.end;
   const candidates =
     arrow.type === 'straight'

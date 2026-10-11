@@ -63,16 +63,16 @@ Responsabile: agente principale. I risultati qui descritti sono nuove verifiche 
 
 ## Verifiche di persistence
 
-| Scenario | Risultato | Metodo |
-|---|---|---|
-| Import JSON invalido conserva il circuito | PASS | UI/file chooser reale; screenshot `malformed-import-before.png`; secondo pass previsto sulla build finale |
-| Missing fields/unknown component/duplicate IDs/broken endpoints/non-finite values | PASS | suite serialization e audit rieseguita |
-| Legacy value/fontFamily/schema supportato | PASS | suite legacy e sostituzioni rieseguita |
-| Autosave e reload | PASS | browser, anche con server spento |
-| New/Open e richieste file fuori ordine | PASS | suite integration, New manuale agent UX |
-| Gestures atomic/Undo/Redo | PASS | 53 entry reali, Undo53/Redo53 e JSON identici; report editor |
-| Corrupted localStorage/quota/storage denied | PASS | fault injection automatizzata, non profilo browser personale |
-| Crash del processo browser/OS | NOT TESTED | nessuna chiusura forzata del browser dell'utente |
+| Scenario                                                                          | Risultato  | Metodo                                                                                                    |
+| --------------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------- |
+| Import JSON invalido conserva il circuito                                         | PASS       | UI/file chooser reale; screenshot `malformed-import-before.png`; secondo pass previsto sulla build finale |
+| Missing fields/unknown component/duplicate IDs/broken endpoints/non-finite values | PASS       | suite serialization e audit rieseguita                                                                    |
+| Legacy value/fontFamily/schema supportato                                         | PASS       | suite legacy e sostituzioni rieseguita                                                                    |
+| Autosave e reload                                                                 | PASS       | browser, anche con server spento                                                                          |
+| New/Open e richieste file fuori ordine                                            | PASS       | suite integration, New manuale agent UX                                                                   |
+| Gestures atomic/Undo/Redo                                                         | PASS       | 53 entry reali, Undo53/Redo53 e JSON identici; report editor                                              |
+| Corrupted localStorage/quota/storage denied                                       | PASS       | fault injection automatizzata, non profilo browser personale                                              |
+| Crash del processo browser/OS                                                     | NOT TESTED | nessuna chiusura forzata del browser dell'utente                                                          |
 
 ## PWA locale reale
 

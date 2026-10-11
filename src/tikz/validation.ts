@@ -13,6 +13,8 @@ export const finitePoint = (p: unknown): p is Point =>
   Number.isFinite(p.y);
 const positive = (n: number) => Number.isFinite(n) && n > 0;
 const rotation = isRotation;
+const opacity = (v: number | undefined) =>
+  v === undefined || (Number.isFinite(v) && v >= 0 && v <= 1);
 
 export function normalizeHex(color: string): string | null {
   if (typeof color !== 'string') return null;
@@ -30,6 +32,7 @@ const endpoint = (e: Endpoint) =>
 
 export function isExportableObject(o: CircuitObject): boolean {
   if (!o || typeof o.id !== 'string' || !o.id || !normalizeHex(o.color)) return false;
+  if (!opacity(o.opacity) || ('label' in o && o.label && !opacity(o.label.opacity))) return false;
   switch (o.kind) {
     case 'component': {
       if (
@@ -110,6 +113,7 @@ export function isExportableObject(o: CircuitObject): boolean {
       );
     case 'wire':
       return (
+        (o.routing === undefined || ['orthogonal', '45', 'free'].includes(o.routing)) &&
         positive(o.width) &&
         endpoint(o.startEndpoint) &&
         endpoint(o.endEndpoint) &&
@@ -118,6 +122,8 @@ export function isExportableObject(o: CircuitObject): boolean {
       );
     case 'arrow':
       return (
+        (o.arcRotation === undefined || Number.isFinite(o.arcRotation)) &&
+        (o.arcMirrored === undefined || typeof o.arcMirrored === 'boolean') &&
         ['straight', 'curve', 'arc'].includes(o.type) &&
         finitePoint(o.start) &&
         finitePoint(o.end) &&
@@ -130,6 +136,7 @@ export function isExportableObject(o: CircuitObject): boolean {
       );
     case 'loop-arrow':
       return (
+        (o.rotation === undefined || Number.isFinite(o.rotation)) &&
         finitePoint(o) &&
         positive(o.width) &&
         positive(o.height) &&

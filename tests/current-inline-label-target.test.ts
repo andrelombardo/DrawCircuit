@@ -13,13 +13,14 @@ describe('current inline editor uses the same document units as component labels
         { kind: 'free', point: { x: 400, y: 0 } },
       );
       const source: CircuitDocument = { version: 1, title: 'Current label', objects: [wire] };
-      const current = createCurrent(wire, { x: 200, y: 0 }, source, placement);
+      const current = createCurrent(wire, { x: 200, y: 0 }, source);
+      current.currentPlacement = placement;
       current.label.offset = { x: 7, y: 9 };
       const doc: CircuitDocument = { ...source, objects: [wire, current] };
       const target = inlineTextTarget(current, doc)!;
       expect(target.fontSize).toBe(current.label.fontSize);
       expect(target.point.x).toBe(207);
-      expect(target.point.y).toBeCloseTo((placement === 'inline' ? 24 : -40) + 9);
+      expect(target.point.y).toBeCloseTo(24 + 9);
     },
   );
 

@@ -1,0 +1,18 @@
+
+> drawcircuit@1.0.0 test
+> vitest run
+
+
+ RUN  v4.1.11 /Users/andrealombardo/Documents/DrawCircuit
+
+(node:14236) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14250) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14258) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  57 passed (57)
+      Tests  1704 passed (1704)
+   Start at  14:47:16
+   Duration  50.77s (transform 1.95s, setup 306ms, import 7.76s, tests 80.60s, environment 6.83s)

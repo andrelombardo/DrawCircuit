@@ -1,15 +1,12 @@
+import { drawingWireGaps, translucentCrossing } from '../utils/wireRendering';
 import { braceGeometry } from '../annotations/brace';
 import { bridgeGeometry, wireCrossings } from '../utils/crossings';
-import {
-  currentWireGaps,
-  electricalDrawingGeometry,
-  wireDrawingPaths,
-} from '../annotations/electrical';
+import { electricalDrawingGeometry, wireDrawingPaths } from '../annotations/electrical';
 import { mathContent, normalizeLatex, renderLatex } from '../math/latex';
 import { symbolText } from '../model/symbolGeometry';
 import type { CircuitDocument, Label, Point, Rotation } from '../model/types';
 import { isRotation } from '../model/types';
-import { add, distance, localToWorld, midpoint, wirePoints } from '../utils/geometry';
+import { arcGeometry, localToWorld, wirePoints } from '../utils/geometry';
 import { loopGeometry, wrapPosition } from '../utils/loops';
 import { componentRegistry } from '../model/catalog';
 import { geometryTikz, svgPathToTikz } from './symbolGeometry';
@@ -97,6 +94,7 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
     align: 'start' | 'middle' | 'end' = 'middle',
     formula = false,
     plain = false,
+    opacity = 1,
   ) => {
     if (
       typeof text !== 'string' ||
@@ -108,6 +106,7 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
       !isRotation(rotation)
     )
       return;
+    if (opacity !== 1) lines.push(`\\begin{scope}[opacity=${fmt(opacity)}, transparency group]`);
     const anchor = align === 'start' ? 'west' : align === 'end' ? 'east' : 'center';
     text.split('\n').forEach((line, i) => {
       if (!line.trim()) return;
@@ -137,6 +136,7 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
         `\\node[text=${col(color)}, anchor=${anchor}, inner sep=0pt, rotate=${-rotation}, font=\\fontsize{${pixelsToPt(size)}}{${pixelsToPt(size * 1.3)}}\\selectfont${canvas ? '\\sffamily' : ''}] at ${tikzCoordinate(position)} {${value}};`,
       );
     });
+    if (opacity !== 1) lines.push('\\end{scope}');
   };
   const label = (o: { x: number; y: number; label: Label }) => {
     if (!o.label || !finitePoint(o.label.offset)) return;
@@ -147,11 +147,14 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
       o.label.fontSize,
       o.label.rotation,
       'middle',
+      false,
+      false,
+      o.label.opacity,
     );
   };
   // Wires first: native component bodies then cover their own interiors.
   const wires = new Set<string>();
-  const currentGaps = currentWireGaps(doc);
+  const currentGaps = drawingWireGaps(doc);
   for (const o of doc.objects)
     if (o.kind === 'wire') {
       let points: Point[];
@@ -165,7 +168,7 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
       for (const subpath of wireDrawingPaths(points, currentGaps.get(o.id))) {
         const path = subpath.map(tikzCoordinate).filter((p, i, all) => !i || p !== all[i - 1]);
         if (path.length < 2) continue;
-        const line = `\\draw[draw=${col(o.color)}, line width=${pixelsToPt(o.width)}pt] ${path.join(' -- ')};`;
+        const line = `\\draw[draw=${col(o.color)}${o.opacity !== undefined ? `, opacity=${fmt(o.opacity)}` : ''}, line width=${pixelsToPt(o.width)}pt] ${path.join(' -- ')};`;
         if (!wires.has(line)) lines.push(line);
         wires.add(line);
       }
@@ -173,6 +176,12 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
   for (const c of wireCrossings(doc)) {
     const g = bridgeGeometry(c),
       whiteWidth = pixelsToPt(Math.max(c.horizontal.width, c.vertical.width) + 4);
+    if (translucentCrossing(c)) {
+      lines.push(
+        `\\draw[draw=${col(g.overWire.color)},opacity=${fmt(g.overWire.opacity ?? 1)},line width=${pixelsToPt(g.overWire.width)}pt] ${tikzCoordinate(g.start)} .. controls ${tikzCoordinate(g.controlA)} and ${tikzCoordinate(g.controlB)} .. ${tikzCoordinate(g.end)};`,
+      );
+      continue;
+    }
     lines.push(`% Unconnected wire crossing: ${c.bridgeAxis} bridge`);
     lines.push(
       `\\draw[draw=white,line width=${whiteWidth}pt] ${tikzCoordinate(g.start)} -- ${tikzCoordinate(g.end)};`,
@@ -196,6 +205,9 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
     if (rank(o) === 2 && labels.length) {
       labels.splice(0).forEach((draw) => draw());
     }
+    const translucent =
+      o.kind !== 'wire' && o.kind !== 'text' && o.opacity !== undefined && o.opacity !== 1;
+    if (translucent) lines.push(`\\begin{scope}[opacity=${fmt(o.opacity!)}, transparency group]`);
     if (o.kind === 'component') {
       const mapping = componentRegistry[o.type].tikz,
         style = `draw=${col(o.color)}, line width=${pixelsToPt(o.width)}pt`,
@@ -262,7 +274,19 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
         `% Annotation: ${o.type}`,
         `\\draw[draw=${col(o.color)}, line width=${pixelsToPt(o.width)}pt] ${svgPathToTikz(g.d, tikzCoordinate)};`,
       );
-      node(o.label.text, g.labelPoint, o.label.color, o.label.fontSize, o.label.rotation);
+      labels.push(() =>
+        node(
+          o.label.text,
+          g.labelPoint,
+          o.label.color,
+          o.label.fontSize,
+          o.label.rotation,
+          'middle',
+          false,
+          false,
+          o.label.opacity,
+        ),
+      );
     } else if (o.kind === 'electrical') {
       const g = electricalDrawingGeometry(o, doc);
       lines.push(`% Electrical annotation: ${o.mode}`);
@@ -274,16 +298,34 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
         lines.push(`\\draw[${style}] ${tikzCoordinate(g.start)} -- ${tikzCoordinate(g.end)};`);
         lines.push(`\\draw[${style}] ${g.head.map(tikzCoordinate).join(' -- ')};`);
       }
-      node(o.label.text, g.labelPoint, o.label.color, g.labelFontSize, o.label.rotation);
-    } else if (o.kind === 'text') node(o.text, o, o.color, o.fontSize, o.rotation, o.align);
+      labels.push(() =>
+        node(
+          o.label.text,
+          g.labelPoint,
+          o.label.color,
+          g.labelFontSize,
+          o.label.rotation,
+          'middle',
+          false,
+          false,
+          o.label.opacity,
+        ),
+      );
+    } else if (o.kind === 'text')
+      node(o.text, o, o.color, o.fontSize, o.rotation, o.align, false, false, o.opacity);
     else if (o.kind === 'loop-arrow') {
-      const g = loopGeometry({ ...o, arrowPosition: wrapPosition(o.arrowPosition) });
+      const g = loopGeometry({ ...o, rotation: 0, arrowPosition: wrapPosition(o.arrowPosition) });
+      if (o.rotation)
+        lines.push(
+          `\\begin{scope}[rotate around={${fmt(-o.rotation)}:${tikzCoordinate({ x: o.x + o.width / 2, y: o.y + o.height / 2 })}}]`,
+        );
       // Shift both angles together so normalization preserves sweep and direction.
       const endAngle = ((-g.endAngle % 360) + 360) % 360;
       const startAngle = endAngle + (g.endAngle - g.startAngle);
       lines.push(
         `\\draw[${canvas ? '' : '->, '}draw=${col(o.color)}, line width=${pixelsToPt(o.strokeWidth)}pt] ${tikzCoordinate(g.start)} arc[start angle=${fmt(startAngle)}, end angle=${fmt(endAngle)}, x radius=${fmt(o.width / (2 * unitsPerCm))}cm, y radius=${fmt(o.height / (2 * unitsPerCm))}cm];`,
       );
+      if (o.rotation) lines.push('\\end{scope}');
     } else if (o.kind === 'arrow') {
       const style = `${canvas ? '' : `${o.reversed ? '<-' : '->'}, `}draw=${col(o.color)}, line width=${pixelsToPt(o.width)}pt`;
       if (o.type === 'straight')
@@ -293,11 +335,9 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
           `\\draw[${style}] ${tikzCoordinate(o.start)} .. controls ${tikzCoordinate(o.controlPoints[0])} and ${tikzCoordinate(o.controlPoints[1])} .. ${tikzCoordinate(o.end)};`,
         );
       else {
-        const c = midpoint(o.start, o.end),
-          r = Math.max(20, distance(o.start, o.end) / 2),
-          s = add(c, { x: r * 0.5, y: (-r * Math.sqrt(3)) / 2 });
+        const g = arcGeometry(o);
         lines.push(
-          `\\draw[${style}] ${tikzCoordinate(s)} arc[start angle=60, end angle=-250, radius=${fmt(r / unitsPerCm)}cm];`,
+          `\\draw[${style}] ${tikzCoordinate(g.start)} arc[start angle=${fmt(-g.startAngle)}, end angle=${fmt(-g.startAngle - g.sign * 310)}, radius=${fmt(g.radius / unitsPerCm)}cm];`,
         );
       }
     }
@@ -305,6 +345,7 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
       lines.push(
         `\\draw[draw=${col(o.color)}, line width=${pixelsToPt(o.kind === 'arrow' ? o.width : o.strokeWidth)}pt] ${canvasArrowHead(o).map(tikzCoordinate).join(' -- ')};`,
       );
+    if (translucent) lines.push('\\end{scope}');
   }
   labels.forEach((draw) => draw());
   lines.push('\\end{circuitikz}');

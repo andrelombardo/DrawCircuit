@@ -378,7 +378,13 @@ describe('compact Style and replacement controls', () => {
         .getAllByRole('button')
         .filter((b) => !b.closest('.context-popover'))
         .map((b) => b.getAttribute('aria-label')),
-    ).toEqual(['Stile', 'Polarità + / -', 'Ruota 45° (R)', 'Duplica (⌘/Ctrl D)', 'Altre proprietà']);
+    ).toEqual([
+      'Stile',
+      'Polarità + / -',
+      'Ruota 45° (R)',
+      'Duplica (⌘/Ctrl D)',
+      'Altre proprietà',
+    ]);
     expect(toolbar.querySelector('.context-more')?.hasAttribute('open')).toBe(false);
     fireEvent.click(screen.getByRole('button', { name: 'Stile' }));
     fireEvent.click(screen.getByRole('button', { name: 'Simbolo: Rosso' }));
@@ -489,7 +495,10 @@ describe('attached annotation hit regions at low zoom', () => {
           const halfWidth = Number(hit.getAttribute('stroke-width')) / 2;
           expect(hit.getAttribute('vector-effect')).toBe('non-scaling-stroke');
           expect(halfWidth).toBeGreaterThan(0);
-          expect(halfWidth).toBeLessThan(distanceToHost * zoom);
+          if (mode === 'current') {
+            expect(distanceToHost).toBe(0);
+            expect(halfWidth).toBeLessThanOrEqual(10);
+          } else expect(halfWidth).toBeLessThan(distanceToHost * zoom);
           unmount();
         }
       }

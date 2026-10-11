@@ -23,6 +23,7 @@ export const JunctionView = memo(function JunctionView({
         cy={o.y}
         r={4.5}
         fill={o.color}
+        opacity={o.opacity}
         className={selected ? 'selected-symbol' : undefined}
         data-selected={selected || undefined}
       />

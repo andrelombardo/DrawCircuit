@@ -1,0 +1,61 @@
+\documentclass[tikz,border=5pt]{standalone}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else
+  \usepackage{fontspec}
+  \IfFontExistsTF{Comic Sans MS}{\setmainfont{Comic Sans MS}}{%
+    \IfFontExistsTF{Comic Sans}{\setmainfont{Comic Sans}}{}%
+  }
+\fi
+\usepackage{amsmath,amssymb}
+\usepackage{circuitikz}
+\begin{document}
+% DrawCircuit — coordinates in cm; SVG Y axis inverted.
+\definecolor{dcColor0}{HTML}{171A20}
+\definecolor{dcColor1}{HTML}{2463CB}
+\definecolor{dcColor2}{HTML}{DF4949}
+\definecolor{dcColor3}{HTML}{2571C7}
+\begin{circuitikz}[european resistors, american inductors, american ports, line cap=round, line join=round]
+\ctikzset{bipoles/length=1.4cm}
+\draw[draw=dcColor0, line width=1.4226pt] (-1,2.5) -- (-2.8,2.5);
+\draw[draw=dcColor0, line width=1.4226pt] (-3.7,2.5) -- (-5,2.5);
+\draw[draw=dcColor0, line width=1.4226pt] (1,2.5) -- (5,2.5);
+\draw[draw=dcColor0, line width=1.4226pt] (-3.2071,4.2929) -- (-5,2.5);
+\draw[draw=dcColor0, line width=1.4226pt] (-1.7929,5.7071) -- (0,7.5);
+\draw[draw=dcColor0, line width=1.4226pt] (1.7929,5.7071) -- (0,7.5);
+\draw[draw=dcColor0, line width=1.4226pt] (3.2071,4.2929) -- (5,2.5);
+\begin{scope}[opacity=0.5, transparency group]
+% Component: resistor
+\draw[draw=dcColor0, line width=1.4226pt] (-1,2.5) to[R, fill=white, name=dcComponent0] (1,2.5);
+\end{scope}
+% Component: resistor
+\draw[draw=dcColor0, line width=1.4226pt] (-3.2071,4.2929) to[R, fill=white, name=dcComponent1] (-1.7929,5.7071);
+% Component: resistor
+\draw[draw=dcColor0, line width=1.4226pt] (1.7929,5.7071) to[R, fill=white, name=dcComponent2] (3.2071,4.2929);
+\fill[dcColor0] (-5,2.5) circle (3.2009pt);
+\fill[dcColor0] (5,2.5) circle (3.2009pt);
+\fill[dcColor0] (0,7.5) circle (3.2009pt);
+\begin{scope}[opacity=0.8, transparency group]
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,3.25) {$R_1$};
+\end{scope}
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (-2.5,5.75) {$R_2$};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (2.5,5.75) {$R_3$};
+\node[text=dcColor2, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{17.0717}{22.1931}\selectfont] at (-5.55,2.5) {A};
+\node[text=dcColor2, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{17.0717}{22.1931}\selectfont] at (5.55,2.5) {B};
+\node[text=dcColor2, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{17.0717}{22.1931}\selectfont] at (0,8.1) {C};
+% Electrical annotation: current
+\draw[draw=dcColor2,line width=1.4226pt,line cap=round,line join=round] (-2.8,2.5) -- (-3.7,2.5);
+\draw[draw=dcColor2,line width=1.4226pt,line cap=round,line join=round] (-3.45,2.6125) -- (-3.7,2.5) -- (-3.45,2.3875);
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (-3.25,3.1) {$i_1$};
+\begin{scope}[opacity=0.5, transparency group]
+\draw[->, draw=dcColor3, line width=2.134pt] (-0.8055,0.8381) .. controls (-3.4134,1.8821) and (-1.7776,-3.536) .. (-4.1945,-2.8381);
+\end{scope}
+\begin{scope}[opacity=0.65, transparency group]
+\begin{scope}[rotate around={-27:(3.25,-0.5)}]
+\draw[->, draw=dcColor2, line width=1.4226pt] (4.945,-0.7487) arc[start angle=345.6, end angle=21.6, x radius=1.75cm, y radius=1cm];
+\end{scope}
+\end{scope}
+\end{circuitikz}
+\end{document}

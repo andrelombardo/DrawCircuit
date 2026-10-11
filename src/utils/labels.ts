@@ -13,6 +13,7 @@ export interface InlineTextTarget {
   text: string;
   point: Point;
   color: string;
+  opacity?: number;
   fontSize: number;
   rotation: Rotation;
   align: 'start' | 'middle' | 'end';
@@ -30,6 +31,7 @@ export function inlineTextTarget(
       text: object.text,
       point: { x: object.x, y: object.y },
       color: object.color,
+      opacity: object.opacity,
       fontSize: object.fontSize,
       rotation: object.rotation,
       align: object.align,
@@ -48,6 +50,7 @@ export function inlineTextTarget(
     text: object.label.text,
     point,
     color: object.label.color,
+    opacity: object.label.opacity,
     fontSize: electrical?.labelFontSize ?? object.label.fontSize,
     rotation: object.label.rotation,
     align: 'middle',

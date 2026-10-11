@@ -60,3 +60,31 @@ export function replaceComponent(
     ),
   };
 }
+
+export function commonReplacements(components: CircuitComponent[]): ComponentType[] {
+  if (!components.length) return [];
+  return (Object.keys(componentRegistry) as ComponentType[]).filter(
+    (type) =>
+      components.some((c) => c.type !== type) &&
+      components.every((c) => c.type === type || compatibleReplacements(c).includes(type)),
+  );
+}
+
+export function replaceComponents(
+  doc: CircuitDocument,
+  ids: string[],
+  type: ComponentType,
+): CircuitDocument {
+  const selected = new Set(ids);
+  const components = doc.objects.filter(
+    (o): o is CircuitComponent => o.kind === 'component' && selected.has(o.id),
+  );
+  if (!commonReplacements(components).includes(type))
+    throw new Error(
+      'Nessuna sostituzione compatibile con tutti i componenti selezionati: i terminali hanno geometrie o funzioni diverse.',
+    );
+  return components.reduce(
+    (next, c) => (c.type === type ? next : replaceComponent(next, c.id, type)),
+    doc,
+  );
+}

@@ -1,3 +1,4 @@
+import { arrowCenter, rotationHandle } from '../../utils/arrows';
 import { braceGeometry } from '../../annotations/brace';
 import { electricalDrawingGeometry } from '../../annotations/electrical';
 import type { CircuitDocument, CircuitObject, Point } from '../../model/types';
@@ -61,9 +62,11 @@ export function SelectionLayer({
   doc,
   selection,
   zoom,
+  hoveredArrow,
 }: {
   doc: CircuitDocument;
   selection: string[];
+  hoveredArrow?: string | null;
   zoom: number;
 }) {
   return (
@@ -134,24 +137,39 @@ export function SelectionLayer({
               )}
               {o.kind === 'loop-arrow' && (
                 <>
-                  <rect
-                    x={o.x}
-                    y={o.y}
-                    width={o.width}
-                    height={o.height}
-                    className="handle-line"
-                    fill="none"
-                    pointerEvents="none"
-                  />
-                  <Handle p={o} name="loopNW" zoom={zoom} square />
-                  <Handle
-                    p={{ x: o.x + o.width, y: o.y + o.height }}
-                    name="loopSE"
-                    zoom={zoom}
-                    square
-                  />
+                  <g
+                    transform={`rotate(${o.rotation ?? 0} ${o.x + o.width / 2} ${o.y + o.height / 2})`}
+                  >
+                    <rect
+                      x={o.x}
+                      y={o.y}
+                      width={o.width}
+                      height={o.height}
+                      className="handle-line"
+                      fill="none"
+                      pointerEvents="none"
+                    />
+                    <Handle p={o} name="loopNW" zoom={zoom} square />
+                    <Handle
+                      p={{ x: o.x + o.width, y: o.y + o.height }}
+                      name="loopSE"
+                      zoom={zoom}
+                      square
+                    />
+                  </g>
                   <Handle p={loopGeometry(o).end} name="loopHead" zoom={zoom} />
                 </>
+              )}
+              {(o.kind === 'arrow' || o.kind === 'loop-arrow') && hoveredArrow === o.id && (
+                <g className="rotation-control" aria-label="Ruota freccia · Shift aggancia a 15°">
+                  <path
+                    d={pointsPath([arrowCenter(o), rotationHandle(o, zoom)])}
+                    className="handle-line"
+                    pointerEvents="none"
+                    opacity={0.35}
+                  />
+                  <Handle p={rotationHandle(o, zoom)} name="rotate" zoom={zoom} />
+                </g>
               )}
             </g>
           );

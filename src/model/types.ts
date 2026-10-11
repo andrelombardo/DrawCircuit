@@ -93,6 +93,8 @@ export interface Label {
   text: string;
   offset: Point;
   color: string;
+  /** Independent of HEX color; missing means fully opaque. */
+  opacity?: number;
   fontSize: number;
   rotation: Rotation;
 }
@@ -107,6 +109,8 @@ export interface CircuitComponent {
   label: Label;
   bodyText?: string;
   color: string;
+  /** Independent of HEX color; missing means fully opaque. */
+  opacity?: number;
   width: number;
 }
 export interface Junction {
@@ -116,18 +120,25 @@ export interface Junction {
   y: number;
   label: Label;
   color: string;
+  /** Independent of HEX color; missing means fully opaque. */
+  opacity?: number;
 }
 export type Endpoint =
   | { kind: 'terminal'; componentId: string; terminalId: string }
   | { kind: 'junction'; junctionId: string }
   | { kind: 'free'; point: Point };
+export type WireRouting = 'orthogonal' | '45' | 'free';
 export interface Wire {
+  /** Missing in v1 documents means orthogonal. */
+  routing?: WireRouting;
   kind: 'wire';
   id: string;
   startEndpoint: Endpoint;
   endEndpoint: Endpoint;
   vertices: Point[];
   color: string;
+  /** Independent of HEX color; missing means fully opaque. */
+  opacity?: number;
   width: number;
 }
 export interface TextAnnotation {
@@ -137,6 +148,8 @@ export interface TextAnnotation {
   y: number;
   text: string;
   color: string;
+  /** Independent of HEX color; missing means fully opaque. */
+  opacity?: number;
   fontSize: number;
   align: 'start' | 'middle' | 'end';
   rotation: Rotation;
@@ -145,15 +158,22 @@ export interface ArrowAnnotation {
   kind: 'arrow';
   id: string;
   type: 'straight' | 'curve' | 'arc';
+  /** Orientation/reflection of legacy circular arrows. */
+  arcRotation?: number;
+  arcMirrored?: boolean;
   start: Point;
   end: Point;
   controlPoints: [Point, Point];
   color: string;
+  /** Independent of HEX color; missing means fully opaque. */
+  opacity?: number;
   width: number;
   reversed: boolean;
 }
 export interface LoopArrow {
   kind: 'loop-arrow';
+  /** Rotation of the ellipse around its center, in degrees. */
+  rotation?: number;
   id: string;
   x: number;
   y: number;
@@ -163,6 +183,8 @@ export interface LoopArrow {
   /** Normalized ellipse parameter: top=0, right=.25, bottom=.5, left=.75. */
   arrowPosition: number;
   color: string;
+  /** Independent of HEX color; missing means fully opaque. */
+  opacity?: number;
   strokeWidth: number;
 }
 export interface ElectricalAnnotation {
@@ -172,7 +194,7 @@ export interface ElectricalAnnotation {
   start: Point;
   end: Point;
   wireId?: string;
-  /** Omitted in older documents: the parallel, external representation. */
+  /** Legacy JSON field; all currents render integrated. External is accepted only for migration. */
   currentPlacement?: 'external' | 'inline';
   /** Position on the chosen route segment, independent of other segment lengths. */
   wireSegment?: { index: number; ratio: number };
@@ -182,6 +204,8 @@ export interface ElectricalAnnotation {
   reversed: boolean;
   label: Label;
   color: string;
+  /** Independent of HEX color; missing means fully opaque. */
+  opacity?: number;
   width: number;
 }
 export interface BraceAnnotation {
@@ -194,6 +218,8 @@ export interface BraceAnnotation {
   side: 1 | -1;
   label: Label;
   color: string;
+  /** Independent of HEX color; missing means fully opaque. */
+  opacity?: number;
   width: number;
 }
 export type CircuitObject =

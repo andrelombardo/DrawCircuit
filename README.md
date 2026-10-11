@@ -19,7 +19,8 @@ DrawCircuit turns circuit sketches into editable vector diagrams. Place componen
 ### Drawing
 
 - **72 electrical symbols** — A searchable library covering passive components, sources, semiconductors, switches, meters, logic gates, and more.
-- **Wires and junctions** — Connect terminals and nodes with editable orthogonal paths; crossings stay disconnected until you add a junction.
+- **Wires and junctions** — Connect terminals and nodes with editable orthogonal, 45° or free paths; crossings stay disconnected until you add a junction.
+- **Continuous nodes** — Press N and click to add nodes, then Esc or V to finish. Each node is separately undoable.
 - **Smart Placement** — Snap a new component to a terminal or node, or explicitly insert a compatible component into a wire.
 - **23 quick blocks** — Start with series and parallel networks, dividers, Wheatstone bridges, RC/RL/RLC circuits, and other common arrangements.
 - **Personal blocks** — Save a selection as a reusable block, then rotate, insert, rename, or transfer your library as JSON.
@@ -27,17 +28,17 @@ DrawCircuit turns circuit sketches into editable vector diagrams. Place componen
 ### Editing
 
 - **Selection and geometry** — Move groups, drag labels independently, and use grid snapping, alignment guides, and equal spacing.
-- **Math labels** — Edit labels and text inline with LaTeX syntax and a live KaTeX preview.
-- **Component replacement** — Swap compatible symbols while preserving their connections, position, label, and style.
+- **Math labels** — Edit directly on the rendered text, with LaTeX and live KaTeX rendering. Node labels choose a clear initial position and stay independently draggable.
+- **Component replacement** — Swap one or several compatible symbols in a single undoable operation while preserving their connections, position, label, and style.
 - **Undo and reuse** — Rotate, duplicate, copy, and paste with keyboard shortcuts and undo/redo.
 - **Flexible workspace** — Press T to show or hide the component sidebar, resize it, and drag the drawing toolbar to a position that suits your circuit. Text remains available in the toolbar.
 
 ### Annotations
 
-- **Current arrows** — Attach a labeled arrow to a branch so it follows the wire as the circuit changes.
+- **Current arrows** — Integrate a labeled arrow into a branch so it follows the wire as the circuit changes.
 - **Voltage and polarity** — Mark a two-terminal component with +/− signs or draw a voltage arrow between chosen points.
-- **Loops, arrows, and text** — Add editable elliptical loop arrows, straight or Bézier arrows, and mathematical notes.
-- **Visual styling** — Adjust colors, line thickness, label size, and alignment from the contextual toolbar.
+- **Loops, arrows, and text** — Add editable elliptical loop arrows, straight or Bézier arrows, and mathematical notes. Mirror arrows horizontally or vertically and drag their rotation handle for arbitrary angles; hold Shift to snap to 15°.
+- **Visual styling** — Adjust colors, symbol and label opacity, line thickness, label size, and alignment from the contextual toolbar.
 
 ### Export & Offline
 
@@ -46,7 +47,6 @@ DrawCircuit turns circuit sketches into editable vector diagrams. Place componen
 - **SVG** — Copy or download a vector diagram with mathematical labels and no editor controls or grid.
 - **Selection export** — Export the whole circuit or only the selected elements, including their internal wires.
 - **Local saving and PWA** — Keep your circuit in the current browser and work offline after the app is cached; available installation options depend on the browser.
-
 
 ## Quick Start
 

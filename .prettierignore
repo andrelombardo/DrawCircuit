@@ -2,4 +2,6 @@ node_modules
 dist
 package-lock.json
 # Preserve downloaded files and generated audit captures verbatim.
-docs/audit/evidence/
+docs/**/evidence/
+# Generated comparison page embeds captured exports.
+docs/release-candidate/export-comparison.html

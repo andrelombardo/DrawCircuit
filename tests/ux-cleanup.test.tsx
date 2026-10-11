@@ -279,8 +279,8 @@ describe('annotation and placement cleanup', () => {
     expect(screen.getByRole('menuitem', { name: 'Staffa' })).toBeTruthy();
     fireEvent.click(screen.getByRole('menuitem', { name: 'Corrente sul filo' }));
     expect(screen.queryByRole('menuitem', { name: 'Graffa' })).toBeNull();
-    expect(screen.getByRole('menuitem', { name: 'Esterna' })).toBeTruthy();
-    expect(screen.getByRole('menuitem', { name: 'Integrata' })).toBeTruthy();
+    expect(useEditorStore.getState().tool).toBe('current');
+    expect(screen.queryByRole('menu')).toBeNull();
     key('Escape');
     expect(screen.queryByRole('menuitem', { name: 'Integrata' })).toBeNull();
     key('Escape');

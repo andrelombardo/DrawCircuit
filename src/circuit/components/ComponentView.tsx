@@ -19,6 +19,7 @@ export const ComponentView = memo(function ComponentView({
         <rect {...bounds} rx={5} className="object-hit" />
         <g
           className={selected ? 'selected-symbol' : undefined}
+          opacity={o.opacity}
           data-selected={selected || undefined}
         >
           <Symbol type={o.type} color={o.color} width={o.width} bodyText={o.bodyText} />

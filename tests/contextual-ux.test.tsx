@@ -68,7 +68,6 @@ beforeEach(() => {
     future: [],
     gestureStart: null,
     notice: '',
-    currentPlacement: 'external',
   });
   vi.mocked(copyPNG).mockClear();
 });
@@ -151,7 +150,7 @@ describe('selection PNG shortcut', () => {
   );
 });
 describe('current mode controls', () => {
-  it('chooses inline insertion and switches an existing annotation with undo/redo', () => {
+  it('inserts integrated current directly and undoes/redoes insertion', () => {
     const wire = createWire(
       { kind: 'free', point: { x: 0, y: 0 } },
       { kind: 'free', point: { x: 240, y: 0 } },
@@ -161,35 +160,24 @@ describe('current mode controls', () => {
     render(<Canvas />);
     fireEvent.click(screen.getByRole('button', { name: 'Disegno e annotazioni' }));
     fireEvent.click(screen.getByRole('menuitem', { name: 'Corrente sul filo' }));
-    fireEvent.click(screen.getByRole('menuitem', { name: 'Integrata' }));
     fireEvent.pointerDown(canvas(), client(120, 0));
     const created = useEditorStore
       .getState()
       .document.objects.find((o) => o.kind === 'electrical')!;
     expect(created).toMatchObject({ currentPlacement: 'inline', wireId: wire.id });
-    fireEvent.click(screen.getByRole('button', { name: 'Altre proprietà' }));
-    fireEvent.change(screen.getByLabelText('Posizione corrente'), {
-      target: { value: 'external' },
-    });
-    expect(useEditorStore.getState().document.objects.at(-1)).toMatchObject({
-      currentPlacement: 'external',
-    });
+    expect(screen.queryByLabelText('Posizione corrente')).toBeNull();
     act(() => useEditorStore.getState().undo());
-    expect(useEditorStore.getState().document.objects.at(-1)).toMatchObject({
-      currentPlacement: 'inline',
-    });
+    expect(useEditorStore.getState().document).toEqual(doc);
     act(() => useEditorStore.getState().redo());
-    expect(useEditorStore.getState().document.objects.at(-1)).toMatchObject({
-      currentPlacement: 'external',
-    });
+    expect(useEditorStore.getState().document.objects.at(-1)).toEqual(created);
     // Geometry shares exactly the same object and wire association for both modes.
-    const inline = createCurrent(wire, { x: 120, y: 0 }, doc, 'inline');
+    const inline = createCurrent(wire, { x: 120, y: 0 }, doc);
     expect(electricalGeometry(inline, doc).arrowEnd.y).toBe(0);
   });
 });
 
 describe('direct contextual annotations and canvas focus', () => {
-  it.each(['inline', 'external'] as const)(
+  it.each(['inline'] as const)(
     'adds %s current to the selected wire without another canvas click',
     (placement) => {
       const wire = createWire(
@@ -201,9 +189,7 @@ describe('direct contextual annotations and canvas focus', () => {
       useEditorStore.setState({ document: doc, selection: [wire.id] });
       render(<Canvas />);
       fireEvent.click(screen.getByRole('button', { name: 'Corrente sul filo' }));
-      fireEvent.click(
-        screen.getByRole('menuitem', { name: placement === 'inline' ? 'Integrata' : 'Esterna' }),
-      );
+
       const state = useEditorStore.getState();
       expect(state.tool).toBe('select');
       expect(state.document.objects).toHaveLength(2);

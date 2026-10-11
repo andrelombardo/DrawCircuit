@@ -468,24 +468,7 @@ svg {
   cursor: crosshair;
   vector-effect: non-scaling-stroke;
 }
-.current-placement-options {
-  padding: 7px 10px;
-}
-.current-placement-options > span {
-  font-size: 12px;
-  color: var(--muted);
-}
-.current-placement-options > div {
-  display: flex;
-  gap: 6px;
-  margin-top: 5px;
-}
-.current-placement-options > div > button {
-  flex: 1;
-  text-align: center;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-}
+
 .tool-wire,
 .tool-junction,
 .tool-arrow,
@@ -573,22 +556,6 @@ svg {
 .drawing-surface.space-pan,
 .drawing-surface.space-pan .circuit-object {
   cursor: grab;
-}
-.inline-editor {
-  position: absolute;
-  z-index: var(--layer-context);
-  transform: translate(-30%, -50%);
-}
-.inline-editor input {
-  width: 180px;
-  padding: 5px 10px;
-  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
-  font-size: 22px;
-  background: white;
-  border: 1px solid #769ded;
-  border-radius: 5px;
-  box-shadow: 0 4px 15px #1c3d6420;
-  color: var(--blue);
 }
 .empty-sheet {
   position: absolute;
@@ -1105,28 +1072,6 @@ kbd {
     grid-template-columns: 1fr;
   }
 }
-.inline-editor {
-  display: flex;
-  background: white;
-  border: 1px solid #769ded;
-  border-radius: 5px;
-  box-shadow: 0 4px 15px #1c3d6420;
-}
-.inline-editor input {
-  border: 0;
-  box-shadow: none;
-  border-radius: 5px 0 0 5px;
-  width: 170px;
-}
-.inline-editor > button {
-  display: flex;
-  align-items: center;
-  padding: 0 9px;
-  color: #2463e8;
-  background: #f0f5ff;
-  border-radius: 0 5px 5px 0;
-}
-
 /* Editing controls stay small; hit regions use constant screen pixels. */
 .tool-loop-arrow {
   cursor: crosshair;
@@ -2692,4 +2637,70 @@ summary:focus-visible {
 .action-menu-trigger:focus-visible {
   outline: 2px solid var(--ui-focus);
   outline-offset: -2px;
+}
+
+/* Inline editing paints exactly the document renderer, without input chrome. */
+.inline-editor.inline-text-editor {
+  position: absolute;
+  display: block;
+  width: 0;
+  height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  transform-origin: 0 0;
+  overflow: visible;
+}
+.inline-editor.inline-text-editor input,
+.inline-editor.inline-text-editor input:focus {
+  position: absolute;
+  min-width: 0;
+  max-width: none;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  caret-color: transparent;
+  outline: none;
+  box-shadow: none;
+}
+.inline-editor.inline-text-editor input::selection {
+  background: transparent;
+}
+.inline-render {
+  overflow: visible;
+  position: absolute;
+  pointer-events: none;
+}
+.inline-caret {
+  animation: inline-caret-blink 1s step-end infinite;
+}
+@keyframes inline-caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+[data-label]:hover {
+  filter: drop-shadow(0 0 2px #6695ed80);
+}
+.opacity-row input[type='range'] {
+  width: 95px;
+  min-width: 0;
+  accent-color: #2463cb;
+}
+.opacity-row output {
+  width: 35px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.handle-rotate {
+  cursor: crosshair;
+}
+.rotation-control .control-handle {
+  fill: #edf4ff;
+  stroke: #2463cb;
 }

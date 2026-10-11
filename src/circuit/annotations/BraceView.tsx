@@ -20,6 +20,7 @@ export function BraceView({
       <path
         d={g.d}
         fill="none"
+        opacity={o.opacity}
         stroke={o.color}
         strokeWidth={o.width}
         strokeLinecap="round"
@@ -31,6 +32,7 @@ export function BraceView({
           x={g.labelPoint.x}
           y={g.labelPoint.y}
           color={o.label.color}
+          opacity={o.label.opacity}
           fontSize={o.label.fontSize}
           rotation={o.label.rotation}
           labelId={o.id}

@@ -40,7 +40,7 @@ function currentBranch(o: ElectricalAnnotation, doc: CircuitDocument) {
 export function electricalGeometry(o: ElectricalAnnotation, doc: CircuitDocument) {
   let start = o.start,
     end = o.end;
-  const inline = o.mode === 'current' && o.currentPlacement === 'inline';
+  const inline = o.mode === 'current';
   let constrainedOffset = false;
   if (o.wireId) {
     const branch = currentBranch(o, doc);
@@ -98,7 +98,6 @@ export function electricalGeometry(o: ElectricalAnnotation, doc: CircuitDocument
 }
 
 export const INLINE_CURRENT_LENGTH = 36;
-export const INLINE_CURRENT_MIN_LENGTH = 18;
 const INLINE_CURRENT_ENDPOINT_CLEARANCE = 4;
 
 export interface CurrentWireGap {
@@ -134,17 +133,15 @@ export function electricalDrawingGeometry(o: ElectricalAnnotation, doc: CircuitD
     : { x: 1, y: 0 };
   const normal = { x: tangent.y, y: -tangent.x };
   const clearance = INLINE_CURRENT_ENDPOINT_CLEARANCE;
-  const available = branch ? Math.max(0, length - 2 * clearance) : Infinity;
-  const fallback = g.inline && available < INLINE_CURRENT_MIN_LENGTH;
+  const available = branch ? Math.max(0, length - 2 * Math.min(clearance, length / 6)) : Infinity;
   // A detached current keeps the canonical shortened replacement it was
   // exported/copied with, in the same document units as its wire.
-  const desiredLength = g.inline ? Math.min(INLINE_CURRENT_LENGTH, branch ? Infinity : length) : 60;
-  const visualLength = g.inline && !fallback ? Math.min(desiredLength, available) : desiredLength;
+  const visualLength = Math.min(INLINE_CURRENT_LENGTH, branch ? available : length);
   let center = midpoint(g.start, g.end);
   if (branch) {
     // The attachment is a ratio of one semantic branch. Only its visible
     // replacement needs clearance; the stored attachment remains unchanged.
-    const margin = g.inline && !fallback ? visualLength / 2 + clearance : 0;
+    const margin = visualLength / 2 + Math.min(clearance, length / 6);
     const along = Math.max(
       margin,
       Math.min(
@@ -153,22 +150,16 @@ export function electricalDrawingGeometry(o: ElectricalAnnotation, doc: CircuitD
       ),
     );
     center = add(branch.a, { x: tangent.x * along, y: tangent.y * along });
-    if (!g.inline) center = add(center, o.offset);
-  }
-  if ((!g.inline && branch) || fallback) {
-    center = add(center, { x: normal.x * 16, y: normal.y * 16 });
   }
   const at = (along: number) => add(center, { x: tangent.x * along, y: tangent.y * along });
-  const start = at(-visualLength / 2),
-    end = at(visualLength / 2);
+  const start = !branch && length <= INLINE_CURRENT_LENGTH ? g.start : at(-visualLength / 2),
+    end = !branch && length <= INLINE_CURRENT_LENGTH ? g.end : at(visualLength / 2);
   const arrowStart = o.reversed ? end : start,
     arrowEnd = o.reversed ? start : end;
   const sign = o.reversed ? -1 : 1;
-  // Short inline segments shrink proportionally, with a document-space minimum; a
-  // branch below that minimum uses the existing external visual convention.
-  const headScale = g.inline ? Math.min(1, visualLength / INLINE_CURRENT_LENGTH) : 1;
-  const headLength = (g.inline ? 10 : 8) * headScale;
-  const headHalfHeight = (g.inline ? 4.5 : 3.5) * headScale;
+  const headScale = Math.min(1, visualLength / INLINE_CURRENT_LENGTH);
+  const headLength = 10 * headScale;
+  const headHalfHeight = 4.5 * headScale;
   const head = [-1, 0, 1].map((side) =>
     side === 0
       ? arrowEnd
@@ -177,15 +168,12 @@ export function electricalDrawingGeometry(o: ElectricalAnnotation, doc: CircuitD
           y: arrowEnd.y - sign * tangent.y * headLength + normal.y * side * headHalfHeight,
         },
   );
-  const labelDistance = g.inline && !fallback ? -24 : 24;
+  const labelDistance = -24;
   const labelPoint = add(
     center,
     add({ x: normal.x * labelDistance, y: normal.y * labelDistance }, o.label.offset),
   );
-  const wireGap =
-    g.inline && !fallback && branch
-      ? { wireId: branch.wireId, segment: branch.segment, start, end }
-      : null;
+  const wireGap = branch ? { wireId: branch.wireId, segment: branch.segment, start, end } : null;
   return {
     ...g,
     start,
@@ -197,7 +185,7 @@ export function electricalDrawingGeometry(o: ElectricalAnnotation, doc: CircuitD
     strokeWidth: o.width,
     labelFontSize: o.label.fontSize,
     wireGap,
-    fallback,
+    fallback: false,
   };
 }
 
@@ -206,8 +194,7 @@ export function electricalDrawingGeometry(o: ElectricalAnnotation, doc: CircuitD
 export function currentWireGaps(doc: CircuitDocument) {
   const gaps = new Map<string, CurrentWireGap[]>();
   for (const o of doc.objects) {
-    if (o.kind !== 'electrical' || o.mode !== 'current' || o.currentPlacement !== 'inline')
-      continue;
+    if (o.kind !== 'electrical' || o.mode !== 'current') continue;
     const gap = electricalDrawingGeometry(o, doc).wireGap;
     if (!gap) continue;
     const wireGaps = gaps.get(gap.wireId) ?? [];
@@ -264,16 +251,15 @@ export function wireDrawingPaths(points: Point[], gaps: CurrentWireGap[] = []): 
   return paths;
 }
 
-/** The selected branch position, before the external display separation or drag offset. */
+/** Semantic attachment before visual endpoint clearance or drag offset. */
 export function currentWireAnchor(o: ElectricalAnnotation, doc: CircuitDocument): Point {
-  const g = electricalGeometry({ ...o, offset: { x: 0, y: 0 } }, doc);
-  const center = midpoint(g.start, g.end);
-  if (g.inline || !o.wireId) return center;
-  const length = distance(g.start, g.end) || 1;
-  return {
-    x: center.x - ((g.end.y - g.start.y) / length) * 16,
-    y: center.y + ((g.end.x - g.start.x) / length) * 16,
-  };
+  const branch = currentBranch(o, doc);
+  if (branch)
+    return {
+      x: branch.a.x + ((branch.b.x - branch.a.x) * branch.remaining) / branch.length,
+      y: branch.a.y + ((branch.b.y - branch.a.y) * branch.remaining) / branch.length,
+    };
+  return midpoint(o.start, o.end);
 }
 export function createElectrical(
   mode: ElectricalAnnotation['mode'],
@@ -285,6 +271,7 @@ export function createElectrical(
     kind: 'electrical',
     id: makeId(),
     mode,
+    ...(mode === 'current' ? { currentPlacement: 'inline' as const } : {}),
     start,
     end,
     ratio: 0.5,
@@ -299,7 +286,6 @@ export function createCurrent(
   wire: Wire,
   point: Point,
   doc: CircuitDocument,
-  placement: NonNullable<ElectricalAnnotation['currentPlacement']> = 'external',
 ): ElectricalAnnotation {
   const attachment = currentAttachment(wire, point, doc);
   const used = new Set(doc.objects.filter((o) => o.kind === 'electrical').map((o) => o.label.text));
@@ -308,7 +294,7 @@ export function createCurrent(
   const o = {
     ...createElectrical('current', point, point, `i_${n}`),
     wireId: wire.id,
-    currentPlacement: placement,
+    currentPlacement: 'inline' as const,
     ...attachment,
   };
   const g = electricalGeometry(o, doc);
@@ -472,7 +458,7 @@ export function detachElectrical(
   };
   if (o.mode === 'current') {
     // Selection export, copy and host deletion freeze the canonical drawing,
-    // including endpoint clamping and the label's external fallback side.
+    // including endpoint clearance and the independently positioned label.
     const target = electricalDrawingGeometry(detached, doc).labelPoint;
     detached.label = {
       ...o.label,

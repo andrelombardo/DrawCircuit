@@ -43,46 +43,46 @@ Retest: Nodo su A porta i fili **16 → 17**; un singolo Undo torna a 16 e un si
 
 ## Workflow finale di 38 passi
 
-| # | Passo | Risultato / prova |
-|---|---|---|
-| 1 | Insert source | PASS — generatore DC dalla palette |
-| 2 | Resistor tramite Smart Placement | PASS — clic sul terminale, anchor, spostamento e clic; componente + filo |
-| 3 | Add another resistor | PASS — secondo resistore |
-| 4 | Inline insertion | PASS — preview di taglio, conferma, filo suddiviso |
-| 5 | Junction | PASS — nodo sul filo e suddivisione |
-| 6 | Crossing senza Junction | PASS — ponte e due rami non collegati |
-| 7 | Crossing con Junction | PASS dopo RC09 — Nodo su A già esistente collega quattro rami; Undo/Redo atomici |
-| 8 | Node labels A/B/C/D | PASS — label dei nodi presenti |
-| 9 | Move labels | PASS — spostamento indipendente di label componente e nodo; corpi invariati nel JSON |
-| 10 | LaTeX `r_{AB}` | PASS — editing/render/source preservata |
-| 11 | LaTeX `50 \ohm` | PASS — editing/render Ω/source preservata |
-| 12 | Current Arrow | PASS — agganciata a un filo |
-| 13 | Voltage annotation | PASS — trascinamento fra due punti |
-| 14 | Loop Arrow | PASS — ellisse disegnata dalla UI |
-| 15 | Equal spacing | PASS — tre resistori a x −220/−40/140, y −120; drag riallineato. Alt placement verificato: preview `anchor-target → free` |
-| 16 | Replace Component | PASS — resistore → condensatore; ID e terminali mantenuti |
-| 17 | Insert preset | PASS — RLC serie, tre componenti e quattro fili |
-| 18 | Create personal block | PASS — selezione RLC salvata come `QA Final RLC 20261003` |
-| 19 | Reinsert personal block | PASS — tre componenti e quattro fili nuovi, riferimenti interni rimappati |
-| 20 | Multi-select | PASS — Shift con due componenti; anche selezione componente+nodo per gli export |
-| 21 | Copy/paste | BLOCKED — il browser intercetta la clipboard delle scorciatoie; Control+V segnala clipboard virtuale vuota, Meta C/V con contenuto QA non aumenta gli oggetti. Nessuna notifica di copia dell’app confermata |
-| 22 | Duplicate | PASS — due componenti selezionati, totale 13 → 15 |
-| 23 | Undo | PASS — duplicazione annullata, 15 → 13 |
-| 24 | Redo | PASS — duplicazione ripristinata, 13 → 15 |
-| 25 | Save JSON | PASS — File → Salva JSON; ripetuto dopo RC09 |
-| 26 | Reload | PASS — JSON risalvato identico, blocco personale ancora presente |
-| 27 | Load JSON | PASS — file chooser reale; JSON risalvato identico |
-| 28 | Export full TikZ | PASS — Copia TikZ dalla UI; anche download `.tex` |
-| 29 | Export selection TikZ | PASS — due selezionati (resistore + Junction) + filo interno, tre esportati; Solo selezione |
-| 30 | Export full Obsidian | PASS produzione clipboard; verifica visiva delegata al passo 34 |
-| 31 | Export selection Obsidian | PASS — due selezionati + filo interno, tre oggetti esportati |
-| 32 | Export full SVG | PASS — download e Copia codice SVG |
-| 33 | Export selection SVG | PASS — download e Copia codice SVG; due selezionati + filo interno, tre esportati |
-| 34 | Verify Obsidian visual result | PASS — medesimo golden di 44 oggetti incollato nella UI nativa e osservato in Reading view; screenshot e verifica sopra |
-| 35 | Reload public site | PASS — asset QAjNzizE caricato dopo Actions/Pages sul commit a81c4f3; reload golden pubblico |
-| 36 | Verify public persistence | PASS — 44 oggetti e tre export esatti dopo reload; nuovo raw JSON download live BLOCKED e dichiarato nel report principale |
-| 37 | Verify PWA/offline | NOT TESTED — rete offline pubblica non controllabile; offline locale reale e update verificati separatamente |
-| 38 | Check public console | PASS — console pubblica warning/error vuota, public-final-console.json |
+| #   | Passo                            | Risultato / prova                                                                                                                                                                                            |
+| --- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Insert source                    | PASS — generatore DC dalla palette                                                                                                                                                                           |
+| 2   | Resistor tramite Smart Placement | PASS — clic sul terminale, anchor, spostamento e clic; componente + filo                                                                                                                                     |
+| 3   | Add another resistor             | PASS — secondo resistore                                                                                                                                                                                     |
+| 4   | Inline insertion                 | PASS — preview di taglio, conferma, filo suddiviso                                                                                                                                                           |
+| 5   | Junction                         | PASS — nodo sul filo e suddivisione                                                                                                                                                                          |
+| 6   | Crossing senza Junction          | PASS — ponte e due rami non collegati                                                                                                                                                                        |
+| 7   | Crossing con Junction            | PASS dopo RC09 — Nodo su A già esistente collega quattro rami; Undo/Redo atomici                                                                                                                             |
+| 8   | Node labels A/B/C/D              | PASS — label dei nodi presenti                                                                                                                                                                               |
+| 9   | Move labels                      | PASS — spostamento indipendente di label componente e nodo; corpi invariati nel JSON                                                                                                                         |
+| 10  | LaTeX `r_{AB}`                   | PASS — editing/render/source preservata                                                                                                                                                                      |
+| 11  | LaTeX `50 \ohm`                  | PASS — editing/render Ω/source preservata                                                                                                                                                                    |
+| 12  | Current Arrow                    | PASS — agganciata a un filo                                                                                                                                                                                  |
+| 13  | Voltage annotation               | PASS — trascinamento fra due punti                                                                                                                                                                           |
+| 14  | Loop Arrow                       | PASS — ellisse disegnata dalla UI                                                                                                                                                                            |
+| 15  | Equal spacing                    | PASS — tre resistori a x −220/−40/140, y −120; drag riallineato. Alt placement verificato: preview `anchor-target → free`                                                                                    |
+| 16  | Replace Component                | PASS — resistore → condensatore; ID e terminali mantenuti                                                                                                                                                    |
+| 17  | Insert preset                    | PASS — RLC serie, tre componenti e quattro fili                                                                                                                                                              |
+| 18  | Create personal block            | PASS — selezione RLC salvata come `QA Final RLC 20261003`                                                                                                                                                    |
+| 19  | Reinsert personal block          | PASS — tre componenti e quattro fili nuovi, riferimenti interni rimappati                                                                                                                                    |
+| 20  | Multi-select                     | PASS — Shift con due componenti; anche selezione componente+nodo per gli export                                                                                                                              |
+| 21  | Copy/paste                       | BLOCKED — il browser intercetta la clipboard delle scorciatoie; Control+V segnala clipboard virtuale vuota, Meta C/V con contenuto QA non aumenta gli oggetti. Nessuna notifica di copia dell’app confermata |
+| 22  | Duplicate                        | PASS — due componenti selezionati, totale 13 → 15                                                                                                                                                            |
+| 23  | Undo                             | PASS — duplicazione annullata, 15 → 13                                                                                                                                                                       |
+| 24  | Redo                             | PASS — duplicazione ripristinata, 13 → 15                                                                                                                                                                    |
+| 25  | Save JSON                        | PASS — File → Salva JSON; ripetuto dopo RC09                                                                                                                                                                 |
+| 26  | Reload                           | PASS — JSON risalvato identico, blocco personale ancora presente                                                                                                                                             |
+| 27  | Load JSON                        | PASS — file chooser reale; JSON risalvato identico                                                                                                                                                           |
+| 28  | Export full TikZ                 | PASS — Copia TikZ dalla UI; anche download `.tex`                                                                                                                                                            |
+| 29  | Export selection TikZ            | PASS — due selezionati (resistore + Junction) + filo interno, tre esportati; Solo selezione                                                                                                                  |
+| 30  | Export full Obsidian             | PASS produzione clipboard; verifica visiva delegata al passo 34                                                                                                                                              |
+| 31  | Export selection Obsidian        | PASS — due selezionati + filo interno, tre oggetti esportati                                                                                                                                                 |
+| 32  | Export full SVG                  | PASS — download e Copia codice SVG                                                                                                                                                                           |
+| 33  | Export selection SVG             | PASS — download e Copia codice SVG; due selezionati + filo interno, tre esportati                                                                                                                            |
+| 34  | Verify Obsidian visual result    | PASS — medesimo golden di 44 oggetti incollato nella UI nativa e osservato in Reading view; screenshot e verifica sopra                                                                                      |
+| 35  | Reload public site               | PASS — asset QAjNzizE caricato dopo Actions/Pages sul commit a81c4f3; reload golden pubblico                                                                                                                 |
+| 36  | Verify public persistence        | PASS — 44 oggetti e tre export esatti dopo reload; nuovo raw JSON download live BLOCKED e dichiarato nel report principale                                                                                   |
+| 37  | Verify PWA/offline               | NOT TESTED — rete offline pubblica non controllabile; offline locale reale e update verificati separatamente                                                                                                 |
+| 38  | Check public console             | PASS — console pubblica warning/error vuota, public-final-console.json                                                                                                                                       |
 
 I sei export finali provengono da uno stesso documento dopo il fix RC09: [TikZ full](evidence/ux-final-full.tikz), [TikZ selection](evidence/ux-final-selection.tikz), [Obsidian full](evidence/ux-final-full-obsidian.md), [Obsidian selection](evidence/ux-final-selection-obsidian.md), [SVG full](evidence/ux-final-full.svg), [SVG selection](evidence/ux-final-selection.svg). Il [file standalone `.tex`](evidence/ux-final-full.tex) e lo [screenshot della selezione](evidence/ux-final-selection-editor.jpg) sono disponibili per i confronti dell’agente export.
 
@@ -90,64 +90,64 @@ I sei export finali provengono da uno stesso documento dopo il fix RC09: [TikZ f
 
 Questa matrice distingue l’esecuzione manuale dalla lettura del codice. Le verifiche esaustive dei 72 componenti, dei 23 preset, degli export/renderer, di persistence/PWA e delle performance hanno rapporti separati del team.
 
-| Funzione | Manuale UI di questo audit | Integrità/history/export | Risultato |
-|---|---|---|---|
-| Select / feedback / toolbar | Circuito iniziale, 60 operazioni e golden finale | Screenshot; ID della selezione finale | PASS |
-| Component placement / ghost | Source, R, C, L; preview source e Smart Placement | JSON ed export | PASS |
-| Smart Placement / click-to-anchor / magnetic terminal | Terminale source → R con filo; anchor esplicito | Operazione 42; golden 2 | PASS |
-| Inline insertion | Filo libero → R con preview del taglio | Operazione 43; golden 4; JSON endpoint | PASS |
-| Alt/Option override | Stesso terminale: preview anchor-target → free con Alt | Guide non sono oggetti del documento | PASS nel caso osservato |
-| Wire / free point / waypoint | Nove fili nel primo circuito; filo con waypoint nella history | JSON exact dopo Undo/Redo | PASS |
-| Terminal → terminal / Junction | Collegamenti della rete e RLC | Riferimenti esportati e preservati | PASS |
-| Junction / split / existing Junction | Split nuovo nodo, drag nodo, retest RC09 | Quattro endpoint sullo stesso A | PASS dopo fix |
-| Crossing / bridge | Incrocio separato e nodo reale | Screenshot + JSON, sei export | PASS dopo fix |
-| Waypoint add / move / remove | Doppio clic filo, drag handle, Alt + clic sul waypoint | Handle creato, mosso a y80, poi rimosso | PASS |
-| Quick Junction / wire merge | Coperti principalmente dal rapporto Library/Topology | Non attribuire a questa sessione una sequenza esaustiva | DELEGATED |
-| Label editing / label drag / LaTeX | R, nodi, corrente, tensione, testo | Offset/source esatti dopo reload e history | PASS |
-| Rotate / label rotate | Operazioni 3/4/9/20/54 | JSON finale uguale dopo 53 Redo | PASS |
-| Replace | R→C nel golden; R→L nella history | ID/mapping preservati; audit esaustivo del team | PASS nei casi UI osservati |
-| Arrow / curve / reverse | Operazioni 26–28 | JSON history e redone identici | PASS |
-| Current / polarity / voltage | Corrente sul filo; polarità source; tensione fra punti | Operazioni 29–34/44–45 e golden | PASS con una frizione di hit area annotata |
-| Loop / resize / arrowhead / reverse | Operazioni 35/46–49 e golden | JSON esatto; export finali | PASS |
-| Text / annotation | `maglia 1`, `50 \ohm`, editing | Primo e ultimo golden | PASS |
-| Multi-select / group move / duplicate / delete | Preset spostato e duplicato; selezioni Shift | Operazioni 51–55; golden 20/22–24 | PASS |
-| Box selection | Drag a rettangolo su due componenti e filo: tre elementi selezionati | Screenshot `ux-extra-box-selection.jpg` | PASS |
-| Copy/paste di oggetti | Tentativi su selezione singola e multipla | Intercettazione della clipboard del browser | BLOCKED manuale |
-| Clipboard TikZ / Obsidian / SVG | Copia attraverso i bottoni dell’app | File salvati dalla clipboard e toast UI | PASS |
-| Equal spacing / alignment | Tre centri equidistanti; drag e snap; verticale/top/bottom esaustivi delegati | Coordinate finali osservate | PASS limitato al caso orizzontale |
-| Hysteresis / guide durante drag / zoom multipli | Non acquisiti durante il gesto nella ripresa | Non inferiti dalla sola posizione finale | NOT TESTED qui |
-| Preset | Serie nella history; RLC nel golden | Riferimenti nei JSON; tutti i preset audit team | PASS nei casi osservati |
-| Personal block | Salva e reinsert; reload con blocco presente | ID univoci e riferimenti del RLC rimappati | PASS |
-| JSON / automatic save / reload / load | File menu + reload + file chooser | Uguaglianza di tutti i campi | PASS |
-| Undo / Redo | 60 operazioni, 53 Undo e 53 Redo; atomica duplicazione e Nodo | Uguaglianza primo/undone e final/redone | PASS |
-| Title editing / Escape | Draft `QA cancel title`, Escape ripristina il titolo precedente | Retest manuale del fix titolo | PASS |
-| Pan / fit / zoom | H + drag nella ripresa; fit dopo preset e load; precedenti screenshot a vari zoom | Transform SVG aggiornato, coordinate helper lette dal DOM | PASS nei casi osservati |
-| Sidebar hide/show durante placement | Ghost a coordinate corrette dopo hide; Escape e show | Nessun oggetto aggiunto accidentalmente | PASS |
-| Sidebar resize/min/max/persistence/search/collapse | Drag a min 200 / max 480; reload mantiene 480; collapse; ricerca condensatore; reset 232 | Placement successivo a `(0,-100)` corretto | PASS |
-| Toolbar/popover/dialog/Export | Selezione, proprietà, replace, block name, file chooser, scope | Screenshot 1024 precedente e golden 1280 | PASS nei flussi osservati |
-| Focus/aria-label | Controlli individuati tramite nomi accessibili; input con label | Non equivale a un audit WCAG/screen reader | PASS pragmatico nei flussi osservati |
-| macOS trackpad / Safari / Firefox / browser zoom | Non disponibili/verificati direttamente in questa ripresa | Browser matrix del coordinatore | NOT TESTED qui |
+| Funzione                                              | Manuale UI di questo audit                                                               | Integrità/history/export                                  | Risultato                                  |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------ |
+| Select / feedback / toolbar                           | Circuito iniziale, 60 operazioni e golden finale                                         | Screenshot; ID della selezione finale                     | PASS                                       |
+| Component placement / ghost                           | Source, R, C, L; preview source e Smart Placement                                        | JSON ed export                                            | PASS                                       |
+| Smart Placement / click-to-anchor / magnetic terminal | Terminale source → R con filo; anchor esplicito                                          | Operazione 42; golden 2                                   | PASS                                       |
+| Inline insertion                                      | Filo libero → R con preview del taglio                                                   | Operazione 43; golden 4; JSON endpoint                    | PASS                                       |
+| Alt/Option override                                   | Stesso terminale: preview anchor-target → free con Alt                                   | Guide non sono oggetti del documento                      | PASS nel caso osservato                    |
+| Wire / free point / waypoint                          | Nove fili nel primo circuito; filo con waypoint nella history                            | JSON exact dopo Undo/Redo                                 | PASS                                       |
+| Terminal → terminal / Junction                        | Collegamenti della rete e RLC                                                            | Riferimenti esportati e preservati                        | PASS                                       |
+| Junction / split / existing Junction                  | Split nuovo nodo, drag nodo, retest RC09                                                 | Quattro endpoint sullo stesso A                           | PASS dopo fix                              |
+| Crossing / bridge                                     | Incrocio separato e nodo reale                                                           | Screenshot + JSON, sei export                             | PASS dopo fix                              |
+| Waypoint add / move / remove                          | Doppio clic filo, drag handle, Alt + clic sul waypoint                                   | Handle creato, mosso a y80, poi rimosso                   | PASS                                       |
+| Quick Junction / wire merge                           | Coperti principalmente dal rapporto Library/Topology                                     | Non attribuire a questa sessione una sequenza esaustiva   | DELEGATED                                  |
+| Label editing / label drag / LaTeX                    | R, nodi, corrente, tensione, testo                                                       | Offset/source esatti dopo reload e history                | PASS                                       |
+| Rotate / label rotate                                 | Operazioni 3/4/9/20/54                                                                   | JSON finale uguale dopo 53 Redo                           | PASS                                       |
+| Replace                                               | R→C nel golden; R→L nella history                                                        | ID/mapping preservati; audit esaustivo del team           | PASS nei casi UI osservati                 |
+| Arrow / curve / reverse                               | Operazioni 26–28                                                                         | JSON history e redone identici                            | PASS                                       |
+| Current / polarity / voltage                          | Corrente sul filo; polarità source; tensione fra punti                                   | Operazioni 29–34/44–45 e golden                           | PASS con una frizione di hit area annotata |
+| Loop / resize / arrowhead / reverse                   | Operazioni 35/46–49 e golden                                                             | JSON esatto; export finali                                | PASS                                       |
+| Text / annotation                                     | `maglia 1`, `50 \ohm`, editing                                                           | Primo e ultimo golden                                     | PASS                                       |
+| Multi-select / group move / duplicate / delete        | Preset spostato e duplicato; selezioni Shift                                             | Operazioni 51–55; golden 20/22–24                         | PASS                                       |
+| Box selection                                         | Drag a rettangolo su due componenti e filo: tre elementi selezionati                     | Screenshot `ux-extra-box-selection.jpg`                   | PASS                                       |
+| Copy/paste di oggetti                                 | Tentativi su selezione singola e multipla                                                | Intercettazione della clipboard del browser               | BLOCKED manuale                            |
+| Clipboard TikZ / Obsidian / SVG                       | Copia attraverso i bottoni dell’app                                                      | File salvati dalla clipboard e toast UI                   | PASS                                       |
+| Equal spacing / alignment                             | Tre centri equidistanti; drag e snap; verticale/top/bottom esaustivi delegati            | Coordinate finali osservate                               | PASS limitato al caso orizzontale          |
+| Hysteresis / guide durante drag / zoom multipli       | Non acquisiti durante il gesto nella ripresa                                             | Non inferiti dalla sola posizione finale                  | NOT TESTED qui                             |
+| Preset                                                | Serie nella history; RLC nel golden                                                      | Riferimenti nei JSON; tutti i preset audit team           | PASS nei casi osservati                    |
+| Personal block                                        | Salva e reinsert; reload con blocco presente                                             | ID univoci e riferimenti del RLC rimappati                | PASS                                       |
+| JSON / automatic save / reload / load                 | File menu + reload + file chooser                                                        | Uguaglianza di tutti i campi                              | PASS                                       |
+| Undo / Redo                                           | 60 operazioni, 53 Undo e 53 Redo; atomica duplicazione e Nodo                            | Uguaglianza primo/undone e final/redone                   | PASS                                       |
+| Title editing / Escape                                | Draft `QA cancel title`, Escape ripristina il titolo precedente                          | Retest manuale del fix titolo                             | PASS                                       |
+| Pan / fit / zoom                                      | H + drag nella ripresa; fit dopo preset e load; precedenti screenshot a vari zoom        | Transform SVG aggiornato, coordinate helper lette dal DOM | PASS nei casi osservati                    |
+| Sidebar hide/show durante placement                   | Ghost a coordinate corrette dopo hide; Escape e show                                     | Nessun oggetto aggiunto accidentalmente                   | PASS                                       |
+| Sidebar resize/min/max/persistence/search/collapse    | Drag a min 200 / max 480; reload mantiene 480; collapse; ricerca condensatore; reset 232 | Placement successivo a `(0,-100)` corretto                | PASS                                       |
+| Toolbar/popover/dialog/Export                         | Selezione, proprietà, replace, block name, file chooser, scope                           | Screenshot 1024 precedente e golden 1280                  | PASS nei flussi osservati                  |
+| Focus/aria-label                                      | Controlli individuati tramite nomi accessibili; input con label                          | Non equivale a un audit WCAG/screen reader                | PASS pragmatico nei flussi osservati       |
+| macOS trackpad / Safari / Firefox / browser zoom      | Non disponibili/verificati direttamente in questa ripresa                                | Browser matrix del coordinatore                           | NOT TESTED qui                             |
 
 ## Inventario shortcut e limiti della prova
 
 Inventario dal codice effettivo e dalla Guida: V/W/N/T/A/L/H; R; Enter; Escape; G; 1; `+`/`=` e `−`; Delete/Backspace; Space+drag; Shift+click; Shift+click Nodo; Alt/Option per guide/placement e rimozione waypoint; Cmd/Ctrl A/C/V/D/Z; Cmd/Ctrl Shift Z; Ctrl/Cmd Y come Redo. Rotellina/trackpad per zoom e drag sul foglio per box selection sono gesti aggiuntivi.
 
-| Shortcut/gesto | Verifica registrata | Stato |
-|---|---|---|
-| Escape | Cancella placement; draft del titolo ripristinato | PASS |
-| Enter | Termina fili liberi; conferma label nel context input | PASS |
-| Cmd D | History operazione 18 aumenta 5 → 6 componenti | PASS |
-| Shift + click | Due componenti; componente+nodo per export | PASS tramite modifier della UI browser |
-| Alt/Option placement | Preview anchor-target → free al medesimo terminale | PASS |
-| H / V | Pan attivato con H, drag, ritorno a Select con V | PASS |
-| Cmd/Ctrl C e V | Nessun aumento di oggetti; browser virtual clipboard intercettata | BLOCKED |
-| Cmd/Ctrl Z / Shift Z / Y | Component rotation 90→0→90 tramite Cmd Z / Cmd Shift Z, Ctrl Z / Ctrl Shift Z e Cmd/Ctrl Y | PASS |
-| W/N/T/A/L/V | Ogni tasto cambia il relativo tool a pressed=true | PASS |
-| R/G/1/+/- | R ruota corpo e ghost; G false→true; 1/+/- zoom 145→174→145% | PASS |
-| Delete/Backspace | Delete elimina duplicato 3→2; Cmd A + Backspace elimina tre componenti e un filo; Undo recupera | PASS |
-| Alt-click waypoint / Cmd A / Shift-repeat Nodo | Waypoint rimosso; quattro elementi selezionati; due nodi inseriti con tool ancora attivo | PASS |
-| Space+drag | Tentativo non modifica transform; API drag espone modifier, senza tenere premuto Space come tasto normale | BLOCKED — limite dell’automazione; H + drag PASS |
-| Shortcut mentre input/dialog è aperto | Input con r/n/w non cambia tool/rotation; dialog con Cmd A / R / Delete non cambia selezione o componenti; Escape chiude dialog e popover File | PASS nei casi espliciti; non tutte le combinazioni possibili |
+| Shortcut/gesto                                 | Verifica registrata                                                                                                                            | Stato                                                        |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Escape                                         | Cancella placement; draft del titolo ripristinato                                                                                              | PASS                                                         |
+| Enter                                          | Termina fili liberi; conferma label nel context input                                                                                          | PASS                                                         |
+| Cmd D                                          | History operazione 18 aumenta 5 → 6 componenti                                                                                                 | PASS                                                         |
+| Shift + click                                  | Due componenti; componente+nodo per export                                                                                                     | PASS tramite modifier della UI browser                       |
+| Alt/Option placement                           | Preview anchor-target → free al medesimo terminale                                                                                             | PASS                                                         |
+| H / V                                          | Pan attivato con H, drag, ritorno a Select con V                                                                                               | PASS                                                         |
+| Cmd/Ctrl C e V                                 | Nessun aumento di oggetti; browser virtual clipboard intercettata                                                                              | BLOCKED                                                      |
+| Cmd/Ctrl Z / Shift Z / Y                       | Component rotation 90→0→90 tramite Cmd Z / Cmd Shift Z, Ctrl Z / Ctrl Shift Z e Cmd/Ctrl Y                                                     | PASS                                                         |
+| W/N/T/A/L/V                                    | Ogni tasto cambia il relativo tool a pressed=true                                                                                              | PASS                                                         |
+| R/G/1/+/-                                      | R ruota corpo e ghost; G false→true; 1/+/- zoom 145→174→145%                                                                                   | PASS                                                         |
+| Delete/Backspace                               | Delete elimina duplicato 3→2; Cmd A + Backspace elimina tre componenti e un filo; Undo recupera                                                | PASS                                                         |
+| Alt-click waypoint / Cmd A / Shift-repeat Nodo | Waypoint rimosso; quattro elementi selezionati; due nodi inseriti con tool ancora attivo                                                       | PASS                                                         |
+| Space+drag                                     | Tentativo non modifica transform; API drag espone modifier, senza tenere premuto Space come tasto normale                                      | BLOCKED — limite dell’automazione; H + drag PASS             |
+| Shortcut mentre input/dialog è aperto          | Input con r/n/w non cambia tool/rotation; dialog con Cmd A / R / Delete non cambia selezione o componenti; Escape chiude dialog e popover File | PASS nei casi espliciti; non tutte le combinazioni possibili |
 
 Le scorciatoie bloccate/non verificate rimangono tali anche con unit test verdi. Non viene classificato come bug del prodotto il limite della clipboard del browser: il sintomo osservato non permette di dimostrare che l’app abbia ricevuto il gesto.
 
@@ -163,13 +163,13 @@ Il golden finale è stato ripristinato tramite Apri JSON e fit. [JSON dopo il ri
 
 ## Frizioni UX osservate
 
-| Frizione | Livello | Severity tecnica / stato |
-|---|---|---|
-| Nodo sovrapposto che sembrava collegare un filo libero | HIGH | P1 RC09, corretto e retestato |
-| Polarità: clic sulla label sovrapposta al source non seleziona il corpo | MEDIUM | Nella history il primo tentativo mostra una notifica; il clic sul corpo visibile funziona. Workaround semplice; nessun redesign implementato |
-| Toolbar proprietà si chiude dopo un clic su Fit/File; clic sull’oggetto selezionato la riapre | LOW | Comportamento osservato; non bloccante |
-| Durante placement la barra assistenze occupa un’area del foglio | LOW | Un clic in quella barra non inserisce; la preview e lo spazio libero rendono recuperabile l’interazione. Nessuna perdita o corruzione |
-| Scope export e azioni clipboard cambiano nome con Solo selezione | LOW | Comportamento coerente e verificato; la distinzione è leggibile nel dialog |
+| Frizione                                                                                      | Livello | Severity tecnica / stato                                                                                                                     |
+| --------------------------------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Nodo sovrapposto che sembrava collegare un filo libero                                        | HIGH    | P1 RC09, corretto e retestato                                                                                                                |
+| Polarità: clic sulla label sovrapposta al source non seleziona il corpo                       | MEDIUM  | Nella history il primo tentativo mostra una notifica; il clic sul corpo visibile funziona. Workaround semplice; nessun redesign implementato |
+| Toolbar proprietà si chiude dopo un clic su Fit/File; clic sull’oggetto selezionato la riapre | LOW     | Comportamento osservato; non bloccante                                                                                                       |
+| Durante placement la barra assistenze occupa un’area del foglio                               | LOW     | Un clic in quella barra non inserisce; la preview e lo spazio libero rendono recuperabile l’interazione. Nessuna perdita o corruzione        |
+| Scope export e azioni clipboard cambiano nome con Solo selezione                              | LOW     | Comportamento coerente e verificato; la distinzione è leggibile nel dialog                                                                   |
 
 Nessun miglioramento speculativo, nuova feature o redesign è stato implementato da questo agente. Le frizioni residue sono documentate con il loro comportamento concreto.
 
@@ -181,67 +181,67 @@ Copia/incolla nativo di oggetti e Space+drag: BLOCKED dal controllo del browser.
 
 Il registro è riportato di seguito dal file di evidenza originale. Sono 60 tentativi/azioni reali e **53 transizioni di history**: i tentativi senza cambiamento e il salvataggio di una libreria personale non devono essere conteggiati come nuovi stati del circuito.
 
-| # | Operazione | Riscontro registrato |
-|---|---|---|
-| 1 | Move wired R1 up | 5 componenti / 9 fili |
-| 2 | Move only R1 label | 5 componenti / 9 fili |
-| 3 | Rotate wired R1 90 | 5 componenti / 9 fili |
-| 4 | Rotate wired R1 180 | 5 componenti / 9 fili |
-| 5 | Edit R1 LaTeX through context input | 5 componenti / 9 fili |
-| 6 | Change R1 label to red | 5 componenti / 9 fili |
-| 7 | Resize R1 label | 5 componenti / 9 fili |
-| 8 | Change R1 body color | 5 componenti / 9 fili |
-| 9 | Rotate only label | 5 componenti / 9 fili |
-| 10 | Duplicate styled R1 | 6 componenti / 9 fili |
-| 11 | Move duplicate to free space | 6 componenti / 9 fili |
-| 12 | Replace duplicate R with capacitor | 6 componenti / 9 fili |
-| 13 | Delete replaced duplicate | 5 componenti / 9 fili |
-| 14 | Paste R1 selection | NO CHANGE — browser copy/paste gesture could not be confirmed |
-| 15 | Paste R1 again | NO CHANGE — browser copy/paste gesture could not be confirmed |
-| 16 | Delete selected original R1 after no-op paste | 4 componenti / 9 fili |
-| 17 | Insert independent capacitor | 5 componenti / 9 fili |
-| 18 | Duplicate capacitor via CMD+D | PASS — component count increased 5 to 6 |
-| 19 | Move capacitor near lower circuit | 6 componenti / 9 fili |
-| 20 | Rotate capacitor | 6 componenti / 9 fili |
-| 21 | Edit capacitor with unit LaTeX | 6 componenti / 9 fili |
-| 22 | Create free wire with waypoint | 6 componenti / 10 fili |
-| 23 | Split free wire by junction | 6 componenti / 11 fili |
-| 24 | Rename inserted junction E | 6 componenti / 11 fili |
-| 25 | Drag renamed junction | 6 componenti / 11 fili |
-| 26 | Draw straight arrow | 6 componenti / 11 fili |
-| 27 | Convert arrow to curve | 6 componenti / 11 fili |
-| 28 | Reverse curve arrow | 6 componenti / 11 fili |
-| 29 | Attach polarity to source | NO CHANGE — voltage label overlapped source hit area |
-| 30 | Attach polarity to visible source body | 6 componenti / 11 fili |
-| 31 | Edit source polarity label | 6 componenti / 11 fili |
-| 32 | Reverse source polarity | 6 componenti / 11 fili |
-| 33 | Reverse original current arrow | 6 componenti / 11 fili |
-| 34 | Edit current label | 6 componenti / 11 fili |
-| 35 | Move loop arrow | 6 componenti / 11 fili |
-| 36 | Rename mesh text | 6 componenti / 11 fili |
-| 37 | Move mesh text | 6 componenti / 11 fili |
-| 38 | Edit node B with LaTeX | 6 componenti / 11 fili |
-| 39 | Move only node label | 6 componenti / 11 fili |
-| 40 | Move wired junction | 6 componenti / 11 fili |
-| 41 | Insert inductor | 7 componenti / 11 fili |
-| 42 | Smart anchor insert resistor and wire atomically | 8 componenti / 12 fili |
-| 43 | Inline resistor insertion into existing wire | 9 componenti / 13 fili |
-| 44 | Draw second voltage arrow | 9 componenti / 13 fili |
-| 45 | Edit voltage LaTeX label | 9 componenti / 13 fili |
-| 46 | Draw second loop | 9 componenti / 13 fili |
-| 47 | Resize second loop using corner handle | 9 componenti / 13 fili |
-| 48 | Move loop arrowhead along ellipse | 9 componenti / 13 fili |
-| 49 | Reverse second loop | 9 componenti / 13 fili |
-| 50 | Insert series preset | 11 componenti / 16 fili |
-| 51 | Move inserted preset as group | 11 componenti / 16 fili |
-| 52 | Duplicate whole preset group | 13 componenti / 19 fili |
-| 53 | Delete duplicated preset group | 11 componenti / 16 fili |
-| 54 | Rotate multi selection | 11 componenti / 16 fili |
-| 55 | Change multi selection color | 11 componenti / 16 fili |
-| 56 | Save selected personal block (library operation) | 11 componenti / 16 fili |
-| 57 | Reinsert saved personal block | 12 componenti / 17 fili |
-| 58 | Insert free text annotation | 12 componenti / 17 fili |
-| 59 | Edit free text with ohm unit | 12 componenti / 17 fili |
-| 60 | Replace wired R2 with inductor | 12 componenti / 17 fili |
+| #   | Operazione                                       | Riscontro registrato                                          |
+| --- | ------------------------------------------------ | ------------------------------------------------------------- |
+| 1   | Move wired R1 up                                 | 5 componenti / 9 fili                                         |
+| 2   | Move only R1 label                               | 5 componenti / 9 fili                                         |
+| 3   | Rotate wired R1 90                               | 5 componenti / 9 fili                                         |
+| 4   | Rotate wired R1 180                              | 5 componenti / 9 fili                                         |
+| 5   | Edit R1 LaTeX through context input              | 5 componenti / 9 fili                                         |
+| 6   | Change R1 label to red                           | 5 componenti / 9 fili                                         |
+| 7   | Resize R1 label                                  | 5 componenti / 9 fili                                         |
+| 8   | Change R1 body color                             | 5 componenti / 9 fili                                         |
+| 9   | Rotate only label                                | 5 componenti / 9 fili                                         |
+| 10  | Duplicate styled R1                              | 6 componenti / 9 fili                                         |
+| 11  | Move duplicate to free space                     | 6 componenti / 9 fili                                         |
+| 12  | Replace duplicate R with capacitor               | 6 componenti / 9 fili                                         |
+| 13  | Delete replaced duplicate                        | 5 componenti / 9 fili                                         |
+| 14  | Paste R1 selection                               | NO CHANGE — browser copy/paste gesture could not be confirmed |
+| 15  | Paste R1 again                                   | NO CHANGE — browser copy/paste gesture could not be confirmed |
+| 16  | Delete selected original R1 after no-op paste    | 4 componenti / 9 fili                                         |
+| 17  | Insert independent capacitor                     | 5 componenti / 9 fili                                         |
+| 18  | Duplicate capacitor via CMD+D                    | PASS — component count increased 5 to 6                       |
+| 19  | Move capacitor near lower circuit                | 6 componenti / 9 fili                                         |
+| 20  | Rotate capacitor                                 | 6 componenti / 9 fili                                         |
+| 21  | Edit capacitor with unit LaTeX                   | 6 componenti / 9 fili                                         |
+| 22  | Create free wire with waypoint                   | 6 componenti / 10 fili                                        |
+| 23  | Split free wire by junction                      | 6 componenti / 11 fili                                        |
+| 24  | Rename inserted junction E                       | 6 componenti / 11 fili                                        |
+| 25  | Drag renamed junction                            | 6 componenti / 11 fili                                        |
+| 26  | Draw straight arrow                              | 6 componenti / 11 fili                                        |
+| 27  | Convert arrow to curve                           | 6 componenti / 11 fili                                        |
+| 28  | Reverse curve arrow                              | 6 componenti / 11 fili                                        |
+| 29  | Attach polarity to source                        | NO CHANGE — voltage label overlapped source hit area          |
+| 30  | Attach polarity to visible source body           | 6 componenti / 11 fili                                        |
+| 31  | Edit source polarity label                       | 6 componenti / 11 fili                                        |
+| 32  | Reverse source polarity                          | 6 componenti / 11 fili                                        |
+| 33  | Reverse original current arrow                   | 6 componenti / 11 fili                                        |
+| 34  | Edit current label                               | 6 componenti / 11 fili                                        |
+| 35  | Move loop arrow                                  | 6 componenti / 11 fili                                        |
+| 36  | Rename mesh text                                 | 6 componenti / 11 fili                                        |
+| 37  | Move mesh text                                   | 6 componenti / 11 fili                                        |
+| 38  | Edit node B with LaTeX                           | 6 componenti / 11 fili                                        |
+| 39  | Move only node label                             | 6 componenti / 11 fili                                        |
+| 40  | Move wired junction                              | 6 componenti / 11 fili                                        |
+| 41  | Insert inductor                                  | 7 componenti / 11 fili                                        |
+| 42  | Smart anchor insert resistor and wire atomically | 8 componenti / 12 fili                                        |
+| 43  | Inline resistor insertion into existing wire     | 9 componenti / 13 fili                                        |
+| 44  | Draw second voltage arrow                        | 9 componenti / 13 fili                                        |
+| 45  | Edit voltage LaTeX label                         | 9 componenti / 13 fili                                        |
+| 46  | Draw second loop                                 | 9 componenti / 13 fili                                        |
+| 47  | Resize second loop using corner handle           | 9 componenti / 13 fili                                        |
+| 48  | Move loop arrowhead along ellipse                | 9 componenti / 13 fili                                        |
+| 49  | Reverse second loop                              | 9 componenti / 13 fili                                        |
+| 50  | Insert series preset                             | 11 componenti / 16 fili                                       |
+| 51  | Move inserted preset as group                    | 11 componenti / 16 fili                                       |
+| 52  | Duplicate whole preset group                     | 13 componenti / 19 fili                                       |
+| 53  | Delete duplicated preset group                   | 11 componenti / 16 fili                                       |
+| 54  | Rotate multi selection                           | 11 componenti / 16 fili                                       |
+| 55  | Change multi selection color                     | 11 componenti / 16 fili                                       |
+| 56  | Save selected personal block (library operation) | 11 componenti / 16 fili                                       |
+| 57  | Reinsert saved personal block                    | 12 componenti / 17 fili                                       |
+| 58  | Insert free text annotation                      | 12 componenti / 17 fili                                       |
+| 59  | Edit free text with ohm unit                     | 12 componenti / 17 fili                                       |
+| 60  | Replace wired R2 with inductor                   | 12 componenti / 17 fili                                       |
 
 Verifica finale della history: [iniziale](evidence/ux-first-time-golden.json) = [dopo Undo](evidence/ux-history-undone.json); [finale](evidence/ux-history-final.json) = [dopo Redo](evidence/ux-history-redone.json). Tutti e quattro i file restano disponibili, insieme ai trace e agli screenshot.

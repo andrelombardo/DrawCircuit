@@ -5,6 +5,7 @@ import type { CircuitDocument, Endpoint, Point, Rotation } from '../model/types'
 import { cloneObjects } from '../utils/operations';
 import { selectionDocument } from '../tikz/selection';
 import { rotatePoint, snapPoint } from '../utils/geometry';
+import { rotateArrow } from '../utils/arrows';
 import { localPersistence } from '../utils/localPersistence';
 export const PERSONAL_BLOCKS_KEY = 'drawcircuit.personal-blocks.v1';
 export interface PersonalBlock {
@@ -96,13 +97,7 @@ export function instantiatePersonalBlock(
           end: rp(o.end),
           label: { ...o.label, offset: rp(o.label.offset) },
         };
-      if (o.kind === 'arrow')
-        return {
-          ...o,
-          start: rp(o.start),
-          end: rp(o.end),
-          controlPoints: [rp(o.controlPoints[0]), rp(o.controlPoints[1])] as [Point, Point],
-        };
+      if (o.kind === 'arrow') return rotateArrow(o, rotation, { x: 0, y: 0 });
       if (o.kind === 'electrical')
         return {
           ...o,
@@ -111,18 +106,7 @@ export function instantiatePersonalBlock(
           offset: rp(o.offset),
           label: { ...o.label, offset: rp(o.label.offset) },
         };
-      const center = rp({ x: o.x + o.width / 2, y: o.y + o.height / 2 });
-      const swap = rotation === 90 || rotation === 270,
-        width = swap ? o.height : o.width,
-        height = swap ? o.width : o.height;
-      return {
-        ...o,
-        x: center.x - width / 2,
-        y: center.y - height / 2,
-        width,
-        height,
-        arrowPosition: (o.arrowPosition + rotation / 360) % 1,
-      };
+      return rotateArrow(o, rotation, { x: 0, y: 0 });
     }),
   };
   const objects = cloneObjects(doc, snapPoint(point), existing);

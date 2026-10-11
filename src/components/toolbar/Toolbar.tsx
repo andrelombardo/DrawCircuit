@@ -19,7 +19,6 @@ import type { MenuAction } from './ActionMenu';
 import {
   BraceToolIcon,
   BracketToolIcon,
-  CurrentExternalIcon,
   CurrentInlineIcon,
   LoopPathIcon,
   PolarityIcon,
@@ -105,15 +104,7 @@ export function DrawingToolbar({
       id: 'current',
       label: 'Corrente sul filo',
       icon: <CurrentInlineIcon />,
-      children: (['inline', 'external'] as const).map((placement) => ({
-        id: placement,
-        label: placement === 'inline' ? 'Integrata' : 'Esterna',
-        icon: placement === 'inline' ? <CurrentInlineIcon /> : <CurrentExternalIcon />,
-        onSelect: () => {
-          useEditorStore.getState().setCurrentPlacement(placement);
-          setTool('current');
-        },
-      })),
+      onSelect: () => setTool('current'),
     },
   ];
   return (
@@ -149,7 +140,7 @@ export function DrawingToolbar({
       </IconButton>
       <ActionMenu
         label="Disegno e annotazioni"
-        icon={<Pencil size={18} />}
+        icon={items.find((item) => item.id === tool)?.icon ?? <Pencil size={18} />}
         items={items}
         active={drawingTools.includes(tool)}
         onEscape={() => setTool('select')}

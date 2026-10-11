@@ -1,0 +1,26 @@
+{
+  "nodesWithoutShift": 5,
+  "duplicatePrevented": true,
+  "singleNodeUndo": true,
+  "inlineBounds": {
+    "before": {
+      "height": 27.940277099609375,
+      "width": 15.7164306640625,
+      "x": 177.6343231201172,
+      "y": 334.2071838378906
+    },
+    "during": {
+      "height": 27.9403076171875,
+      "width": 15.7164306640625,
+      "x": 177.63397216796875,
+      "y": 334.20172119140625
+    }
+  },
+  "routing45Path": "M -540 -380 L -20 140",
+  "opacitySlider": 50,
+  "batchReplacement": 3,
+  "rotationChanged": true,
+  "rotationUndoExact": true,
+  "rotationReloadExact": true,
+  "finalMirroringVerification": "production-checks.json"
+}

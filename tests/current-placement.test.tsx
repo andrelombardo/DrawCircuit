@@ -32,20 +32,24 @@ import { insertJunction, normalizeDocumentWires } from '../src/utils/wires';
 function fixture(placement: 'external' | 'inline' = 'inline', end: Point = { x: 400, y: 0 }) {
   const wire = createWire({ kind: 'free', point: { x: 0, y: 0 } }, { kind: 'free', point: end });
   const source = { ...emptyDocument(), objects: [wire] };
-  const annotation = createCurrent(wire, { x: end.x / 2, y: end.y / 2 }, source, placement);
+  const annotation = createCurrent(wire, { x: end.x / 2, y: end.y / 2 }, source);
+  annotation.currentPlacement = placement;
   const doc: CircuitDocument = { ...source, objects: [wire, annotation] };
   return { wire, annotation, doc };
 }
 
 describe('external and integrated current use one wire-associated annotation', () => {
-  it('keeps legacy current rendering external without changing saved source data', () => {
+  it('migrates legacy currents to integrated rendering without losing source metadata', () => {
     const { annotation, doc } = fixture('external');
     const legacy = { ...annotation, currentPlacement: undefined, wireSegment: undefined };
     const original = serializeDocument({ ...doc, objects: [doc.objects[0], legacy] });
     const loaded = deserializeDocument(original);
-    expect(serializeDocument(loaded)).toBe(original);
+    expect(loaded.objects[1]).toEqual({
+      ...JSON.parse(original).objects[1],
+      currentPlacement: 'inline',
+    });
     expect(electricalGeometry(legacy, doc)).toEqual(electricalGeometry(annotation, doc));
-    expect(electricalGeometry(legacy, doc).start.y).toBe(-16);
+    expect(electricalGeometry(legacy, doc).start.y).toBe(0);
   });
 
   it.each([
@@ -80,7 +84,7 @@ describe('external and integrated current use one wire-associated annotation', (
       ],
     );
     const source = { ...emptyDocument(), objects: [wire] };
-    const annotation = createCurrent(wire, { x: 200, y: 100 }, source, 'inline');
+    const annotation = createCurrent(wire, { x: 200, y: 100 }, source);
     expect(annotation.wireSegment).toEqual({ index: 1, ratio: 0.5 });
     const resized = {
       ...wire,
@@ -127,7 +131,7 @@ describe('external and integrated current use one wire-associated annotation', (
       ],
     );
     const source = { ...emptyDocument(), objects: [wire] };
-    const annotation = createCurrent(wire, { x: 200, y: 300 }, source, 'inline');
+    const annotation = createCurrent(wire, { x: 200, y: 300 }, source);
     const doc = { ...source, objects: [wire, annotation] };
     expect(annotation.wireSegment).toEqual({ index: 3, ratio: 0.5 });
     useEditorStore.setState({ document: doc, past: [], future: [], gestureStart: null });
@@ -152,7 +156,7 @@ describe('external and integrated current use one wire-associated annotation', (
       [{ x: 100, y: 0 }],
     );
     const source = { ...emptyDocument(), objects: [wire] };
-    const annotation = createCurrent(wire, { x: 200, y: 0 }, source, 'inline');
+    const annotation = createCurrent(wire, { x: 200, y: 0 }, source);
     const doc = { ...source, objects: [wire, annotation] };
     expect(annotation.wireSegment?.index).toBe(1);
     const normalized = normalizeDocumentWires(doc);
@@ -187,7 +191,7 @@ describe('external and integrated current use one wire-associated annotation', (
       const rotatedWire = rotated.objects.find((o) => o.id === wire.id)!;
       if (rotatedWire.kind !== 'wire') throw new Error('Missing rotated wire');
       expect(wirePoints(rotatedWire, rotated).length).toBeGreaterThan(wirePoints(wire, doc).length);
-      const expected = createCurrent(rotatedWire, branchPoint, rotated, placement);
+      const expected = createCurrent(rotatedWire, branchPoint, rotated);
       useEditorStore.setState({ document: doc, past: [], future: [], gestureStart: null });
       const store = useEditorStore.getState();
       store.commit(rotated);
@@ -232,7 +236,7 @@ describe('external and integrated current use one wire-associated annotation', (
       ]) {
         const editedWire = { ...wire, endEndpoint: { kind: 'free' as const, point } };
         const preview = { ...doc, objects: [editedWire, annotation] };
-        const expected = createCurrent(editedWire, { x: 300, y: 0 }, preview, placement);
+        const expected = createCurrent(editedWire, { x: 300, y: 0 }, preview);
         store.preview(preview);
         const actual = useEditorStore.getState().document;
         const current = actual.objects[1] as ElectricalAnnotation;
@@ -258,8 +262,8 @@ describe('external and integrated current use one wire-associated annotation', (
         ],
       );
       const source = { ...emptyDocument(), objects: [wire] };
-      const external = createCurrent(wire, { x: 260, y: 60 }, source, 'external');
-      const inline = createCurrent(wire, { x: 260, y: 60 }, source, 'inline');
+      const external = createCurrent(wire, { x: 260, y: 60 }, source);
+      const inline = createCurrent(wire, { x: 260, y: 60 }, source);
       const doc = { ...source, objects: [wire, external, inline] };
       for (const current of [external, inline])
         expect(current.wireSegment).toEqual({ index: 3, ratio: 0.5 });
@@ -349,7 +353,14 @@ describe('external and integrated current use one wire-associated annotation', (
       ) as ElectricalAnnotation;
       expect(insertedCurrent.currentPlacement).toBe(placement);
       expect(electricalGeometry(insertedCurrent, inserted)).toEqual(geometry);
-      expect(deserializeDocument(serializeDocument(inserted))).toEqual(inserted);
+      expect(deserializeDocument(serializeDocument(inserted))).toEqual({
+        ...inserted,
+        objects: inserted.objects.map((o) =>
+          o.kind === 'electrical' && o.mode === 'current'
+            ? { ...o, currentPlacement: 'inline' }
+            : o,
+        ),
+      });
     },
   );
 

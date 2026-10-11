@@ -32,7 +32,7 @@ function visibleMarkup(current: ElectricalAnnotation, doc: CircuitDocument, zoom
 function fixture(end: Point = { x: 400, y: 0 }) {
   const wire = createWire({ kind: 'free', point: { x: 0, y: 0 } }, { kind: 'free', point: end });
   const source = { ...emptyDocument(), objects: [wire] };
-  const current = createCurrent(wire, { x: end.x / 2, y: end.y / 2 }, source, 'inline');
+  const current = createCurrent(wire, { x: end.x / 2, y: end.y / 2 }, source);
   current.label.text = '';
   const doc: CircuitDocument = { ...source, objects: [wire, current] };
   return { wire, current, doc };
@@ -188,7 +188,7 @@ describe('current annotations in document space', () => {
   });
 
   it.each([45, 135, 225, 315] as const)(
-    'follows the real %d° terminal lead and uses a bounded fallback',
+    'follows the real %d° terminal lead and stays integrated even on short leads',
     (rotation) => {
       const component = { ...createComponent('resistor', { x: 0, y: 0 }), rotation };
       const point = localToWorld(component, { x: 40, y: 0 });
@@ -198,7 +198,7 @@ describe('current annotations in document space', () => {
       );
       const source = { ...emptyDocument(), objects: [component, wire] },
         route = wirePoints(wire, source);
-      const current = createCurrent(wire, midpoint(point, route[1]), source, 'inline');
+      const current = createCurrent(wire, midpoint(point, route[1]), source);
       const doc = { ...source, objects: [...source.objects, current] },
         original = serializeDocument(doc);
       expect(current.wireSegment?.index).toBe(0);
@@ -216,8 +216,9 @@ describe('current annotations in document space', () => {
         expect(
           (g.end.x - g.start.x) * direction.y - (g.end.y - g.start.y) * direction.x,
         ).toBeCloseTo(0);
-        const available = Math.max(0, distance(point, route[1]) - 8);
-        expect(g.fallback).toBe(available < 18);
+        const length = distance(point, route[1]);
+        const available = Math.max(0, length - 2 * Math.min(4, length / 6));
+        expect(g.fallback).toBe(false);
         expect(!!g.wireGap).toBe(!g.fallback);
         expect(distance(g.start, g.end)).toBeCloseTo(g.fallback ? 36 : Math.min(36, available));
       }
@@ -276,7 +277,10 @@ describe('current annotations in document space', () => {
       const exported = electricalDrawingGeometry(detached, standalone);
       expect(exported.start).toEqual(source.start);
       expect(exported.end).toEqual(source.end);
-      expect(exported.head).toEqual(source.head);
+      exported.head.forEach((point, i) => {
+        expect(point.x).toBeCloseTo(source.head[i].x, 10);
+        expect(point.y).toBeCloseTo(source.head[i].y, 10);
+      });
       expect(exported.labelPoint).toEqual(source.labelPoint);
       expect(detached.wireId).toBeUndefined();
       expect(doc.objects[0]).toBe(wire);
@@ -287,13 +291,14 @@ describe('current annotations in document space', () => {
       expect(distance(normalizedDrawing.start, normalizedDrawing.end)).toBeCloseTo(
         distance(source.start, source.end),
       );
-      expect({
-        x: normalizedDrawing.labelPoint.x - normalizedDrawing.start.x,
-        y: normalizedDrawing.labelPoint.y - normalizedDrawing.start.y,
-      }).toEqual({
-        x: source.labelPoint.x - source.start.x,
-        y: source.labelPoint.y - source.start.y,
-      });
+      expect(normalizedDrawing.labelPoint.x - normalizedDrawing.start.x).toBeCloseTo(
+        source.labelPoint.x - source.start.x,
+        10,
+      );
+      expect(normalizedDrawing.labelPoint.y - normalizedDrawing.start.y).toBeCloseTo(
+        source.labelPoint.y - source.start.y,
+        10,
+      );
       const canonical = exportSVG(subset);
       for (const zoom of [0.15, 0.5, 1, 2, 4]) {
         const drawing = electricalDrawingGeometry(normalized, subset);
@@ -306,14 +311,16 @@ describe('current annotations in document space', () => {
     },
   );
 
-  it('shrinks to an 18-unit minimum, then falls back outside a shorter branch', () => {
+  it('scales down on short branches without leaving the wire', () => {
     for (const length of [48, 36, 26, 25, 16, 1, 0]) {
       const { current, wire, doc } = fixture({ x: length, y: 0 });
       const stored = serializeDocument(doc),
         g = electricalDrawingGeometry(current, doc);
-      expect(g.fallback).toBe(length < 26);
-      expect(distance(g.start, g.end)).toBeCloseTo(length < 26 ? 36 : Math.min(36, length - 8));
-      expect(midpoint(g.start, g.end).y).toBe(length < 26 ? -16 : 0);
+      expect(g.fallback).toBe(false);
+      expect(distance(g.start, g.end)).toBeCloseTo(
+        Math.min(36, length - 2 * Math.min(4, length / 6)),
+      );
+      expect(midpoint(g.start, g.end).y).toBe(0);
       expect(current.currentPlacement).toBe('inline');
       expect(current.wireId).toBe(wire.id);
       expect(serializeDocument(doc)).toBe(stored);
@@ -321,7 +328,7 @@ describe('current annotations in document space', () => {
     }
   });
 
-  it('keeps segment association through resize and restores inline rendering after fallback', () => {
+  it('keeps segment association through resize and remains integrated through resize', () => {
     const { current, wire, doc } = fixture({ x: 200, y: 0 });
     for (const length of [400, 20, 200]) {
       const resized = {
@@ -331,22 +338,22 @@ describe('current annotations in document space', () => {
       const next = { ...doc, objects: [resized, current] },
         g = electricalDrawingGeometry(current, next);
       expect(midpoint(g.start, g.end).x).toBe(length / 2);
-      expect(g.fallback).toBe(length === 20);
+      expect(g.fallback).toBe(false);
       expect(current.wireSegment).toEqual({ index: 0, ratio: 0.5 });
     }
   });
 
-  it('uses the same document-space rules externally and highlights only the annotation', () => {
+  it('migrates external flags to the same integrated geometry and highlights only the annotation', () => {
     const { current, doc } = fixture(),
       external = { ...current, currentPlacement: 'external' as const };
     for (const zoom of [0.15, 0.5, 1, 2, 4]) {
       const drawing = electricalDrawingGeometry(external, doc);
       expect(visibleMarkup(external, doc, zoom)).toBe(visibleMarkup(external, doc, 1));
-      expect(distance(drawing.start, drawing.end)).toBeCloseTo(60);
-      expect(midpoint(drawing.start, drawing.end).y).toBeCloseTo(-16);
+      expect(distance(drawing.start, drawing.end)).toBeCloseTo(36);
+      expect(midpoint(drawing.start, drawing.end).y).toBeCloseTo(0);
       expect(drawing.strokeWidth).toBe(external.width);
-      expect(drawing.wireGap).toBeNull();
-      expect(drawing.labelPoint.y).toBeCloseTo(-40);
+      expect(drawing.wireGap).not.toBeNull();
+      expect(drawing.labelPoint).toEqual(electricalDrawingGeometry(current, doc).labelPoint);
     }
     const markup = renderToStaticMarkup(
       <ElectricalView object={current} doc={doc} selected hideLabel />,

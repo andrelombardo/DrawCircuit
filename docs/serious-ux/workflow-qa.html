@@ -1,9 +1,24 @@
 <!doctype html>
-<html lang="it"><head><meta charset="utf-8"><title>DrawCircuit · Workflow QA</title></head>
-<body><div id="root"></div><script type="module">
-localStorage.setItem('drawcircuit.zoom.v1', '1');
-const { useEditorStore } = await import('/src/store/editorStore.ts');
-const doc = await (await fetch('./evidence/workflow-fixture.json')).json();
-useEditorStore.setState({document:doc, selection:[], past:[], future:[], tool:'select', grid:true});
-await import('/src/main.tsx');
-</script></body></html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <title>DrawCircuit · Workflow QA</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module">
+      localStorage.setItem('drawcircuit.zoom.v1', '1');
+      const { useEditorStore } = await import('/src/store/editorStore.ts');
+      const doc = await (await fetch('./evidence/workflow-fixture.json')).json();
+      useEditorStore.setState({
+        document: doc,
+        selection: [],
+        past: [],
+        future: [],
+        tool: 'select',
+        grid: true,
+      });
+      await import('/src/main.tsx');
+    </script>
+  </body>
+</html>

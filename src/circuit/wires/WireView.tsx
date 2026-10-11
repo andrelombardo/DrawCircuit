@@ -25,6 +25,7 @@ export const WireView = memo(
         <path
           d={d}
           fill="none"
+          opacity={o.opacity}
           stroke={o.color}
           strokeWidth={o.width}
           strokeLinecap="round"

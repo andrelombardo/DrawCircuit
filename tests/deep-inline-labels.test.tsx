@@ -232,11 +232,9 @@ describe('one lightweight editor for every renameable object', () => {
         .getAttribute('transform')!
         .match(/scale\(([^)]+)\)/)![1],
     );
-    expect(parseFloat(input.style.fontSize)).toBeCloseTo(31 * zoom);
-    expect(input.style.color).toBe('rgb(136, 85, 194)');
-    expect(input.closest('form')?.style.transform).toContain(
-      'translate(-100%, -50%) rotate(90deg)',
-    );
+    expect(parseFloat(input.style.fontSize)).toBeCloseTo(31);
+    expect(input.closest('form')!.querySelector('[fill="#8855c2"]')).toBeTruthy();
+    expect(input.closest('form')?.style.transform).toContain(`scale(${zoom}) rotate(90deg)`);
   });
 });
 

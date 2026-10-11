@@ -1,5 +1,5 @@
 import { detachElectrical } from '../annotations/electrical';
-import { wrapPosition } from './loops';
+import { rotateArrow } from './arrows';
 import { makeId } from '../model/catalog';
 import {
   add,
@@ -122,6 +122,7 @@ export function moveSelection(doc: CircuitDocument, ids: string[], delta: Point)
       if (!selected.has(o.id)) {
         if (
           o.kind === 'wire' &&
+          (!o.routing || o.routing === 'orthogonal') &&
           !o.vertices.length &&
           (delta.x || delta.y) &&
           (attachedToSelection(o.startEndpoint) || attachedToSelection(o.endEndpoint))
@@ -207,6 +208,7 @@ export function rotateObjects(doc: CircuitDocument, ids: string[]): CircuitDocum
       if (!selected.has(o.id)) {
         if (
           o.kind === 'wire' &&
+          (!o.routing || o.routing === 'orthogonal') &&
           !o.vertices.length &&
           [o.startEndpoint, o.endEndpoint].some(
             (endpoint) => endpoint.kind === 'terminal' && selected.has(endpoint.componentId),
@@ -232,17 +234,7 @@ export function rotateObjects(doc: CircuitDocument, ids: string[]): CircuitDocum
         };
       if (o.kind === 'junction') return { ...o, ...rp(o) };
       if (o.kind === 'text') return { ...o, ...rp(o), rotation: next(o.rotation) };
-      if (o.kind === 'loop-arrow') {
-        const c = rp({ x: o.x + o.width / 2, y: o.y + o.height / 2 });
-        return {
-          ...o,
-          x: c.x - o.height / 2,
-          y: c.y - o.width / 2,
-          width: o.height,
-          height: o.width,
-          arrowPosition: wrapPosition(o.arrowPosition + 0.25),
-        };
-      }
+      if (o.kind === 'loop-arrow') return rotateArrow(o, angle, center);
       if (o.kind === 'electrical') {
         const attached =
           (o.wireId && !selected.has(o.wireId)) || (o.componentId && !selected.has(o.componentId));
@@ -272,13 +264,7 @@ export function rotateObjects(doc: CircuitDocument, ids: string[]): CircuitDocum
           label: { ...o.label, offset: rotatePoint(o.label.offset, 90) },
         };
       }
-      if (o.kind === 'arrow')
-        return {
-          ...o,
-          start: rp(o.start),
-          end: rp(o.end),
-          controlPoints: [rp(o.controlPoints[0]), rp(o.controlPoints[1])],
-        };
+      if (o.kind === 'arrow') return rotateArrow(o, angle, center);
       return {
         ...o,
         startEndpoint: ep(o.startEndpoint),

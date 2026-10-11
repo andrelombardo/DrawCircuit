@@ -1,3 +1,4 @@
+import { drawingWireGaps, translucentCrossing } from '../utils/wireRendering';
 import { braceGeometry } from '../annotations/brace';
 import { componentRegistry } from '../model/catalog';
 import { symbolText } from '../model/symbolGeometry';
@@ -10,11 +11,7 @@ import { arrowPath, pointsPath, wirePoints } from '../utils/geometry';
 import { loopPath } from '../utils/loops';
 import { visualBounds, unionBounds } from '../utils/visualBounds';
 import type { Bounds } from '../utils/visualBounds';
-import {
-  currentWireGaps,
-  electricalDrawingGeometry,
-  wireDrawingPaths,
-} from '../annotations/electrical';
+import { electricalDrawingGeometry, wireDrawingPaths } from '../annotations/electrical';
 import { CIRCUIT_FONT } from '../model/fonts';
 import { formatNumber as f } from '../tikz/units';
 const attr = (s: string) =>
@@ -40,6 +37,7 @@ export function exportSVG(source: CircuitDocument): string {
     size: number,
     rotation: Rotation = 0,
     align: 'start' | 'middle' | 'end' = 'middle',
+    opacity = 1,
   ) => {
     if (!value.trim()) return '';
     return value
@@ -75,17 +73,19 @@ export function exportSVG(source: CircuitDocument): string {
         const content =
           layout?.svg ??
           `<text text-anchor="middle" dominant-baseline="middle" font-family="${attr(CIRCUIT_FONT)}" font-size="${f(size)}">${xmlText(line)}</text>`;
-        return `<g transform="translate(${f(p.x)} ${f(p.y)}) rotate(${rotation})" fill="${color}"><g transform="translate(${f(shift)} ${f(y)})">${content}</g></g>`;
+        return `<g opacity="${f(opacity)}" transform="translate(${f(p.x)} ${f(p.y)}) rotate(${rotation})" fill="${color}"><g transform="translate(${f(shift)} ${f(y)})">${content}</g></g>`;
       })
       .join('');
   };
   const path = (d: string, color: string, width: number, cap = 'round') =>
     `<path d="${attr(d)}" fill="none" stroke="${color}" stroke-width="${f(width)}" stroke-linecap="${cap}" stroke-linejoin="round"/>`;
-  const currentGaps = currentWireGaps(doc);
+  const currentGaps = drawingWireGaps(doc);
   for (const o of doc.objects.filter((o) => o.kind === 'wire')) {
     try {
       const paths = wireDrawingPaths(wirePoints(o, doc), currentGaps.get(o.id));
-      parts.push(path(paths.map(pointsPath).join(' '), o.color, o.width));
+      parts.push(
+        `<g opacity="${f(o.opacity ?? 1)}">${path(paths.map(pointsPath).join(' '), o.color, o.width)}</g>`,
+      );
       boxes.push(visualBounds(o, doc));
     } catch {
       /* Skip a dangling invalid wire like TikZ does. */
@@ -94,6 +94,12 @@ export function exportSVG(source: CircuitDocument): string {
   for (const c of wireCrossings(doc)) {
     const p = bridgePaths(c),
       w = Math.max(c.horizontal.width, c.vertical.width) + 4;
+    if (translucentCrossing(c)) {
+      parts.push(
+        `<g opacity="${f(p.overWire.opacity ?? 1)}">${path(p.arc, p.overWire.color, p.overWire.width)}</g>`,
+      );
+      continue;
+    }
     parts.push(
       path(p.gap, 'white', w),
       path(p.under, p.underWire.color, p.underWire.width),
@@ -102,6 +108,7 @@ export function exportSVG(source: CircuitDocument): string {
     );
   }
   for (const o of doc.objects.filter((o) => o.kind !== 'wire')) {
+    const firstPart = parts.length;
     if (o.kind !== 'text' && o.kind !== 'electrical') boxes.push(visualBounds(o, doc));
     if (o.kind === 'component') {
       const shapes = componentRegistry[o.type].shapes
@@ -126,6 +133,8 @@ export function exportSVG(source: CircuitDocument): string {
           o.label.color,
           o.label.fontSize,
           o.label.rotation,
+          'middle',
+          o.label.opacity,
         ),
       );
     } else if (o.kind === 'junction') {
@@ -137,10 +146,12 @@ export function exportSVG(source: CircuitDocument): string {
           o.label.color,
           o.label.fontSize,
           o.label.rotation,
+          'middle',
+          o.label.opacity,
         ),
       );
     } else if (o.kind === 'text')
-      labels.push(text(o.text, o, o.color, o.fontSize, o.rotation, o.align));
+      labels.push(text(o.text, o, o.color, o.fontSize, o.rotation, o.align, o.opacity));
     else if (o.kind === 'arrow' || o.kind === 'loop-arrow') {
       const width = o.kind === 'arrow' ? o.width : o.strokeWidth;
       boxes.push(
@@ -161,7 +172,15 @@ export function exportSVG(source: CircuitDocument): string {
       const g = braceGeometry(o);
       parts.push(path(g.d, o.color, o.width));
       labels.push(
-        text(o.label.text, g.labelPoint, o.label.color, o.label.fontSize, o.label.rotation),
+        text(
+          o.label.text,
+          g.labelPoint,
+          o.label.color,
+          o.label.fontSize,
+          o.label.rotation,
+          'middle',
+          o.label.opacity,
+        ),
       );
     } else if (o.kind === 'electrical') {
       const g = electricalDrawingGeometry(o, doc);
@@ -192,10 +211,25 @@ export function exportSVG(source: CircuitDocument): string {
         parts.push(path(pointsPath(head), o.color, g.strokeWidth));
       }
       labels.push(
-        text(o.label.text, g.labelPoint, o.label.color, g.labelFontSize, o.label.rotation),
+        text(
+          o.label.text,
+          g.labelPoint,
+          o.label.color,
+          g.labelFontSize,
+          o.label.rotation,
+          'middle',
+          o.label.opacity,
+        ),
       );
     }
+    if (parts.length > firstPart && o.opacity !== undefined)
+      parts.splice(
+        firstPart,
+        parts.length - firstPart,
+        `<g opacity="${f(o.opacity)}">${parts.slice(firstPart).join('')}</g>`,
+      );
   }
+
   const bounds = unionBounds(boxes),
     padding = 12;
   const x = bounds.x - padding,

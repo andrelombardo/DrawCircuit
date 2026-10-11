@@ -20,11 +20,11 @@ SVG e TikZ usano la geometria canonica a zoom 1. PNG deriva dall'SVG; Obsidian d
 
 Fixture: un Wire nero di 440 unità, Junction A/B, corrente integrata rossa e griglia visibile. Misure ricavate dagli elementi SVG effettivamente renderizzati:
 
-| Zoom | Tratto freccia | Punta | Stroke corrente |
-| --- | --- | --- | --- |
-| 50% | 36 px | 10 × 9 px | 2 px |
-| 100% | 36 px | 10 × 9 px | 2 px |
-| 200% | 36 px | 10 × 9 px | 2 px |
+| Zoom | Tratto freccia | Punta     | Stroke corrente |
+| ---- | -------------- | --------- | --------------- |
+| 50%  | 36 px          | 10 × 9 px | 2 px            |
+| 100% | 36 px          | 10 × 9 px | 2 px            |
+| 200% | 36 px          | 10 × 9 px | 2 px            |
 
 Il Wire cresce normalmente con lo zoom. Screenshot: [50%](evidence/current-50.jpg), [100%](evidence/current-100.jpg), [200%](evidence/current-200.jpg). [Misure originali](evidence/current-zoom-measurements.json).
 
@@ -78,14 +78,14 @@ Verificati nel browser click su canvas vuoto, resistenza, Wire, Junction, Text e
 
 ## Qualità e copertura
 
-| Controllo | Risultato locale |
-| --- | --- |
-| Node | 26.5.0 da `.nvmrc` |
-| `npm ci` | Riuscito, zero vulnerabilità segnalate |
-| `npm run lint` | PASS |
-| `npm run test -- --maxWorkers=2 --testTimeout=30000` | **54 file, 1.667 test PASS** |
-| `npm run build` | PASS, bundle e precache PWA generati |
-| `git diff --check` | PASS |
+| Controllo                                            | Risultato locale                       |
+| ---------------------------------------------------- | -------------------------------------- |
+| Node                                                 | 26.5.0 da `.nvmrc`                     |
+| `npm ci`                                             | Riuscito, zero vulnerabilità segnalate |
+| `npm run lint`                                       | PASS                                   |
+| `npm run test -- --maxWorkers=2 --testTimeout=30000` | **54 file, 1.667 test PASS**           |
+| `npm run build`                                      | PASS, bundle e precache PWA generati   |
+| `git diff --check`                                   | PASS                                   |
 
 La suite completa copre placement, terminal hover, Smart Placement, Wire, trascinamento diretto dei terminali, Junction, crossing, Text/etichette, nudge, Smart Measurements, rotazioni a 45°, annotazioni grafiche/elettriche, Undo/Redo, Copy/Paste, Blocchi Personali, localStorage e pipeline di export. I test nuovi aggiungono raster golden, zoom, segmenti corti/degeneri, inversione, geometria di selezione e label, normalizzazione/sagome prime, menu annidati, azioni contestuali e focus.
 

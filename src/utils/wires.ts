@@ -1,4 +1,5 @@
 import { createCurrent, currentWireAnchor } from '../annotations/electrical';
+import { placeNodeLabel } from './nodeLabels';
 import { makeId } from '../model/catalog';
 import { createJunction, createWire } from '../model/factories';
 import type {
@@ -8,6 +9,7 @@ import type {
   Junction,
   Point,
   Wire,
+  WireRouting,
 } from '../model/types';
 import {
   distance,
@@ -23,6 +25,7 @@ export type WireCandidate =
   | { point: Point; endpoint: Endpoint; kind: 'terminal' | 'junction' | 'grid' }
   | { point: Point; kind: 'wire'; wireId: string };
 export interface WireDraft {
+  routing?: WireRouting;
   start: Endpoint;
   vertices: Point[];
 }
@@ -39,9 +42,16 @@ export function resolveWireCandidate(doc: CircuitDocument, candidate: WireCandid
 }
 
 /** Shared by the multi-step tool and the quick terminal gesture. */
-export function beginWire(doc: CircuitDocument, candidate: WireCandidate) {
+export function beginWire(
+  doc: CircuitDocument,
+  candidate: WireCandidate,
+  routing: WireRouting = 'orthogonal',
+) {
   const resolved = resolveWireCandidate(doc, candidate);
-  return { doc: resolved.doc, draft: { start: resolved.endpoint, vertices: [] } as WireDraft };
+  return {
+    doc: resolved.doc,
+    draft: { start: resolved.endpoint, vertices: [], routing } as WireDraft,
+  };
 }
 
 function routeNewWire(wire: Wire, doc: CircuitDocument): Wire {
@@ -64,6 +74,7 @@ export function wirePreview(
         draft.start,
         candidate.kind === 'wire' ? { kind: 'free', point: candidate.point } : candidate.endpoint,
         draft.vertices,
+        draft.routing,
       ),
       id: 'preview',
     },
@@ -74,7 +85,10 @@ export function wirePreview(
 /** Commit all auto-created nodes/splits and the new wire as one document change. */
 export function commitWire(doc: CircuitDocument, draft: WireDraft, candidate: WireCandidate) {
   const resolved = resolveWireCandidate(doc, candidate),
-    wire = routeNewWire(createWire(draft.start, resolved.endpoint, draft.vertices), resolved.doc),
+    wire = routeNewWire(
+      createWire(draft.start, resolved.endpoint, draft.vertices, draft.routing),
+      resolved.doc,
+    ),
     points = wirePoints(wire, resolved.doc);
   if (points.length < 2 || points.every((point) => distance(point, points[0]) < 0.001)) return null;
   const key = (endpoint: Endpoint) =>
@@ -188,7 +202,7 @@ export function insertJunction(
   let index = 0;
   const name = (n: number) => (n < 26 ? String.fromCharCode(65 + n) : `N${n - 25}`);
   while (used.has(name(index))) index++;
-  const junction = existing ?? createJunction(point, name(index));
+  const junction = existing ?? placeNodeLabel(createJunction(point, name(index)), doc);
   const ep: Endpoint = { kind: 'junction', junctionId: junction.id },
     objects: CircuitObject[] = [];
   const linked = new Set<string>();
@@ -288,7 +302,7 @@ export function remapSplitWireCurrents(
         new Set(next.objects.filter((x) => !ids.has(x.id)).map((x) => x.id)),
       );
       if (!candidate) return o;
-      const attached = createCurrent(candidate.wire, center, next, original.currentPlacement);
+      const attached = createCurrent(candidate.wire, center, next);
       return {
         ...o,
         wireId: attached.wireId,

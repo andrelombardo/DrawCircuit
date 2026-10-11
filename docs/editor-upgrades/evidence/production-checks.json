@@ -1,0 +1,26 @@
+{
+  "origin": "http://127.0.0.1:52781/",
+  "bundle": "index-BgzLp2oi.js",
+  "mirrorChanged": true,
+  "mirrorUndoExact": true,
+  "rotationChanged": true,
+  "rotationUndoExact": true,
+  "rotationReloadExact": true,
+  "unselectedLoopUnchanged": true,
+  "export": {
+    "nativeTexBytes": 3434,
+    "obsidianBytes": 11663,
+    "svgBytes": 6055,
+    "pngDownloaded": true,
+    "svgOpacity": true,
+    "svgNoEditorControls": true
+  },
+  "browserLogs": [
+    {
+      "level": "error",
+      "message": "[vite] failed to connect to websocket.\nyour current setup:\n  (browser) 127.0.0.1:5189/ <--[HTTP]--> 127.0.0.1:5189/ (server)\n  (browser) 127.0.0.1:5189/ <--[WebSocket (failing)]--> 127.0.0.1:5189/ (server)\nCheck out your Vite / network configuration and https://vite.dev/config/server-options.html#server-hmr .",
+      "timestamp": "2026-10-11T12:48:36.903Z",
+      "url": "http://127.0.0.1:5189/@vite/client"
+    }
+  ]
+}

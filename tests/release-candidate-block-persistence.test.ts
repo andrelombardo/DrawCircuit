@@ -53,7 +53,9 @@ describe('release candidate: personal blocks never silently overwrite unreadable
     const { library, values, block } = await loadLibrary(null);
     library.usePersonalBlocks.getState().add(block);
     const saved = values.get(key);
-    expect(() => library.usePersonalBlocks.getState().import('{"version":1,"blocks":[{}]}')).toThrow();
+    expect(() =>
+      library.usePersonalBlocks.getState().import('{"version":1,"blocks":[{}]}'),
+    ).toThrow();
     expect(library.usePersonalBlocks.getState().blocks).toEqual([block]);
     expect(values.get(key)).toBe(saved);
     expect(() => library.usePersonalBlocks.getState().import('{not valid JSON')).toThrow(

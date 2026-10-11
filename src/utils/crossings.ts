@@ -1,10 +1,11 @@
 import type { CircuitDocument, Point, Wire } from '../model/types';
-import { resolveEndpoint, wirePoints } from './geometry';
+import { distance, resolveEndpoint, wirePoints } from './geometry';
 export interface WireCrossing extends Point {
   horizontal: Wire;
   vertical: Wire;
   bridgeAxis: 'horizontal' | 'vertical';
   radius: number;
+  directions?: { over: Point; under: Point };
 }
 type Segment = { wire: Wire; a: Point; b: Point; min: number; max: number };
 type Interval = { min: number; max: number };
@@ -48,7 +49,8 @@ export function wireCrossings(doc: CircuitDocument): WireCrossing[] {
   const cached = cache.get(doc);
   if (cached) return cached;
   const horizontal: Segment[] = [],
-    vertical: Segment[] = [];
+    vertical: Segment[] = [],
+    diagonal: Segment[] = [];
   let minX = Infinity,
     maxX = -Infinity;
   for (const o of doc.objects)
@@ -68,6 +70,8 @@ export function wireCrossings(doc: CircuitDocument): WireCrossing[] {
           horizontal.push({ wire: o, a, b, min: Math.min(a.x, b.x), max: Math.max(a.x, b.x) });
         else if (Math.abs(a.x - b.x) < epsilon && Math.abs(a.y - b.y) > epsilon)
           vertical.push({ wire: o, a, b, min: Math.min(a.y, b.y), max: Math.max(a.y, b.y) });
+        else if (distance(a, b) > epsilon)
+          diagonal.push({ wire: o, a, b, min: Math.min(a.x, b.x), max: Math.max(a.x, b.x) });
       }
     }
   const hRows = rows(horizontal, 'y'),
@@ -134,6 +138,68 @@ export function wireCrossings(doc: CircuitDocument): WireCrossing[] {
             radius: Math.min(radius, room * 0.7),
           });
       }
+  // Only oblique segments need the general intersection pass. X buckets bound the
+  // candidate set; the existing indexed orthogonal path remains unchanged.
+  if (diagonal.length) {
+    const all = [...horizontal, ...vertical, ...diagonal];
+    const strips = new Map<number, Segment[]>();
+    for (const segment of all)
+      for (
+        let k = Math.floor(Math.min(segment.a.x, segment.b.x) / cell);
+        k <= Math.floor(Math.max(segment.a.x, segment.b.x) / cell);
+        k++
+      ) {
+        const list = strips.get(k) ?? [];
+        list.push(segment);
+        strips.set(k, list);
+      }
+    const cross = (a: Point, b: Point) => a.x * b.y - a.y * b.x;
+    for (const a of diagonal) {
+      const checked = new Set<Segment>();
+      for (let k = Math.floor(a.min / cell); k <= Math.floor(a.max / cell); k++)
+        for (const b of strips.get(k) ?? []) {
+          if (a.wire.id === b.wire.id || checked.has(b)) continue;
+          checked.add(b);
+          const u = { x: a.b.x - a.a.x, y: a.b.y - a.a.y },
+            v = { x: b.b.x - b.a.x, y: b.b.y - b.a.y };
+          const denominator = cross(u, v);
+          if (Math.abs(denominator) < epsilon) continue;
+          const offset = { x: b.a.x - a.a.x, y: b.a.y - a.a.y };
+          const t = cross(offset, v) / denominator,
+            q = cross(offset, u) / denominator;
+          if (t < -epsilon || t > 1 + epsilon || q < -epsilon || q > 1 + epsilon) continue;
+          const p = { x: a.a.x + t * u.x, y: a.a.y + t * u.y },
+            id = key(p);
+          if (found.has(id)) continue;
+          const node = (wire: Wire) =>
+            [wire.startEndpoint, wire.endEndpoint].find(
+              (ep) => ep.kind !== 'free' && key(resolveEndpoint(ep, doc)) === id,
+            );
+          const an = node(a.wire),
+            bn = node(b.wire);
+          if (an && bn && JSON.stringify(an) === JSON.stringify(bn)) continue;
+          const over = an && !bn ? b : a,
+            under = over === a ? b : a;
+          const room = Math.min(distance(p, over.a), distance(p, over.b));
+          if (room <= 1) continue;
+          const direction = (segment: Segment) => {
+            const length = distance(segment.a, segment.b);
+            return {
+              x: (segment.b.x - segment.a.x) / length,
+              y: (segment.b.y - segment.a.y) / length,
+            };
+          };
+          found.set(id, {
+            ...p,
+            horizontal: over.wire,
+            vertical: under.wire,
+            bridgeAxis: 'horizontal',
+            radius: Math.min(an || bn ? 16 : 7, room * 0.7),
+            directions: { over: direction(over), under: direction(under) },
+          });
+        }
+    }
+  }
   const result = [...found.values()].sort((a, b) => a.x - b.x || a.y - b.y);
   cache.set(doc, result);
   return result;
@@ -143,6 +209,23 @@ export function bridgeGeometry(c: WireCrossing) {
     vertical = c.bridgeAxis === 'vertical',
     point = (along: number, offset: number): Point =>
       vertical ? { x: x + offset, y: y + along } : { x: x + along, y: y - offset };
+  if (c.directions) {
+    const { over, under } = c.directions;
+    const at = (v: Point, along: number, lift = 0) => ({
+      x: x + v.x * along + v.y * lift,
+      y: y + v.y * along - v.x * lift,
+    });
+    return {
+      overWire: c.horizontal,
+      underWire: c.vertical,
+      start: at(over, -r),
+      end: at(over, r),
+      controlA: at(over, -r * 0.6, r),
+      controlB: at(over, r * 0.6, r),
+      underStart: at(under, -r),
+      underEnd: at(under, r),
+    };
+  }
   return {
     overWire: vertical ? c.vertical : c.horizontal,
     underWire: vertical ? c.horizontal : c.vertical,
