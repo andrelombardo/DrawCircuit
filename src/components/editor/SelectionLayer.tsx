@@ -85,15 +85,17 @@ export function SelectionLayer({
         .filter((o) => selection.includes(o.id))
         .map((o) => {
           const path =
-            o.kind === 'brace'
-              ? braceGeometry(o).d
-              : o.kind === 'wire'
-                ? pointsPath(wirePoints(o, doc))
-                : o.kind === 'arrow'
-                  ? arrowPath(o)
-                  : o.kind === 'loop-arrow'
-                    ? loopPath(o)
-                    : null;
+            o.kind === 'line'
+              ? pointsPath([o.start, o.end])
+              : o.kind === 'brace'
+                ? braceGeometry(o).d
+                : o.kind === 'wire'
+                  ? pointsPath(wirePoints(o, doc))
+                  : o.kind === 'arrow'
+                    ? arrowPath(o)
+                    : o.kind === 'loop-arrow'
+                      ? loopPath(o)
+                      : null;
           return (
             <g key={o.id} data-object={o.id}>
               {path ? (
@@ -117,7 +119,32 @@ export function SelectionLayer({
                   ))}
                 </>
               )}
-              {(o.kind === 'arrow' || o.kind === 'brace') && (
+              {o.kind === 'rectangle' && (
+                <>
+                  <rect
+                    x={o.x}
+                    y={o.y}
+                    width={o.width}
+                    height={o.height}
+                    className="selection-box"
+                    fill="none"
+                    pointerEvents="none"
+                  />
+                  {(['NW', 'NE', 'SW', 'SE'] as const).map((corner) => (
+                    <Handle
+                      key={corner}
+                      name={`rect${corner}`}
+                      zoom={zoom}
+                      square
+                      p={{
+                        x: o.x + (corner.endsWith('E') ? o.width : 0),
+                        y: o.y + (corner.startsWith('S') ? o.height : 0),
+                      }}
+                    />
+                  ))}
+                </>
+              )}
+              {(o.kind === 'arrow' || o.kind === 'brace' || o.kind === 'line') && (
                 <>
                   {o.kind === 'arrow' && o.type === 'curve' && (
                     <>

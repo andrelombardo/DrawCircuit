@@ -138,7 +138,11 @@ describe('persistent resizable component sidebar', () => {
     render(<App />);
     expect(screen.queryByRole('complementary')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Mostra componenti' }));
-    expect(screen.getByRole('separator').getAttribute('aria-valuenow')).toBe('480');
+    expect(
+      screen
+        .getByRole('separator', { name: 'Ridimensiona barra componenti' })
+        .getAttribute('aria-valuenow'),
+    ).toBe('480');
     expect(canvas().getBoundingClientRect().width).toBe(800);
     expect(serializeDocument(useEditorStore.getState().document)).not.toMatch(
       /sidebar|visible|480/,
@@ -157,7 +161,11 @@ describe('persistent resizable component sidebar', () => {
     expect(separator.getAttribute('aria-valuenow')).toBe('232');
     cleanup();
     render(<App />);
-    expect(screen.getByRole('separator').getAttribute('aria-valuenow')).toBe('232');
+    expect(
+      screen
+        .getByRole('separator', { name: 'Ridimensiona barra componenti' })
+        .getAttribute('aria-valuenow'),
+    ).toBe('232');
   });
   it('keeps zoom and the world centre through show/hide and resize; placement, smart snap, wire and pan still work', () => {
     render(<App />);
@@ -177,7 +185,9 @@ describe('persistent resizable component sidebar', () => {
     expect((hiddenSize.height / 2 - hidden[1]) / hidden[2]).toBeCloseTo(centre[1]);
     fireEvent.click(screen.getByRole('button', { name: 'Mostra componenti' }));
     notifyResize();
-    fireEvent.keyDown(screen.getByRole('separator'), { key: 'End' });
+    fireEvent.keyDown(screen.getByRole('separator', { name: 'Ridimensiona barra componenti' }), {
+      key: 'End',
+    });
     notifyResize();
     expect(viewport()[2]).toBe(before[2]);
     fireEvent.click(screen.getByRole('button', { name: 'Inserisci resistenza' }));
@@ -217,7 +227,11 @@ describe('persistent resizable component sidebar', () => {
   it('ignores malformed preferences and tolerates unavailable storage', () => {
     stored.set(SIDEBAR_STORAGE_KEY, '{bad');
     render(<App />);
-    expect(screen.getByRole('separator').getAttribute('aria-valuenow')).toBe('232');
+    expect(
+      screen
+        .getByRole('separator', { name: 'Ridimensiona barra componenti' })
+        .getAttribute('aria-valuenow'),
+    ).toBe('232');
     cleanup();
     vi.stubGlobal('localStorage', {
       getItem: () => {

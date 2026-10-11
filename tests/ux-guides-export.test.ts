@@ -78,9 +78,9 @@ describe('contextual distances and spatial search', () => {
       expect(result.distances.every((g) => g.equal)).toBe(true);
       expect(result.alignment[vertical ? 'x' : 'y']).toBeDefined();
     });
-  it('Alt disables spacing, alignment and terminal assistance while retaining grid movement', () => {
+  it('Alt disables spacing, alignment and terminal assistance including grid movement', () => {
     const result = computeMoveGuides(createMoveContext(row(), ['R3']), { x: 46, y: 4 }, 1, true);
-    expect(result).toEqual({ delta: { x: 40, y: 0 }, alignment: {}, distances: [], target: null });
+    expect(result).toEqual({ delta: { x: 46, y: 4 }, alignment: {}, distances: [], target: null });
   });
   it('uses screen-pixel snapping thresholds consistently across zoom', () => {
     const c = createMoveContext(row(), ['R3']);
@@ -125,7 +125,7 @@ describe('contextual distances and spatial search', () => {
       ]),
       c = createMoveContext(d, ['a', 'b']);
     expect(c.moving.bounds.width).toBe(240);
-    expect(c.moving.pins).toEqual([]);
+    expect(c.moving.pins).toHaveLength(4); // Group terminal guides use the actual pins.
     const result = computeMoveGuides(c, { x: 2, y: 0 }, 1);
     expect(result.distances.map((g) => g.neighborId)).toEqual(['left', 'right']);
   });

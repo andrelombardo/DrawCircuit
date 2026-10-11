@@ -1,3 +1,5 @@
+import { rectangleFromDrag, resizeRectangle } from '../../utils/rectangles';
+import type { RectangleAnnotation, LineAnnotation } from '../../model/types';
 import { createBrace, resizeBrace } from '../../annotations/brace';
 import { createCurrent, createElectrical, createPolarity } from '../../annotations/electrical';
 import { supportsPolarity } from '../../model/capabilities';
@@ -6,7 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { DragEvent, PointerEvent as ReactPointerEvent, RefObject } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import { catalog, createComponent, makeId } from '../../model/catalog';
-import { createTextAnnotation, createWire } from '../../model/factories';
+import { createTextAnnotation, createWire, createLine } from '../../model/factories';
 import { COLORS, componentTypes } from '../../model/types';
 import type {
   ArrowAnnotation,
@@ -27,10 +29,10 @@ import {
   rotatePoint,
   wirePoints,
 } from '../../utils/geometry';
-import { deserializeDocument, serializeDocument } from '../../model/serialization';
-import { cloneObjects, extractSelection, moveSelection } from '../../utils/operations';
+import { moveSelection } from '../../utils/operations';
 import { inlineTextTarget, moveLabel, replaceInlineText } from '../../utils/labels';
 import {
+  splitWireAtPoint,
   beginWire,
   commitWire,
   insertJunction,
@@ -64,13 +66,23 @@ type Drag =
     }
   | { type: 'marquee'; origin: Point; additive: boolean }
   | { type: 'terminal-wire'; screen: Point; start: WireCandidate; started: boolean }
-  | { type: 'arrow' | 'loop-arrow' | 'voltage' | 'brace' | 'bracket'; origin: Point };
+  | {
+      type: 'arrow' | 'loop-arrow' | 'voltage' | 'brace' | 'bracket' | 'rectangle' | 'line';
+      origin: Point;
+    };
 export interface Overlay {
   mouse: Point | null;
   target: Point | null;
   box: { x: number; y: number; width: number; height: number } | null;
   guides: { x?: number; y?: number };
-  arrow: ArrowAnnotation | LoopArrow | ElectricalAnnotation | BraceAnnotation | null;
+  arrow:
+    | ArrowAnnotation
+    | LoopArrow
+    | ElectricalAnnotation
+    | BraceAnnotation
+    | RectangleAnnotation
+    | LineAnnotation
+    | null;
   distances: DistanceGuide[];
   componentTarget: string | null;
   wireTarget: string | null;
@@ -149,8 +161,7 @@ export function useCanvasInteractions(
     spaceDown = useRef(false),
     draftRef = useRef<WireDraft | null>(null),
     mouseRef = useRef<Point>({ x: 0, y: 0 }),
-    screenPointerRef = useRef<Point | null>(null),
-    clipboard = useRef<CircuitDocument | null>(null);
+    screenPointerRef = useRef<Point | null>(null);
   const setWireDraft = (d: WireDraft | null) => {
     draftRef.current = d;
     setDraft(d);
@@ -288,19 +299,35 @@ export function useCanvasInteractions(
     s.select([result.wireId]);
   }, []);
   useEffect(() => {
-    const keydown = async (e: KeyboardEvent) => {
-      const el = e.target as HTMLElement;
-      if (
-        e.isComposing ||
+    const isEditing = (target: EventTarget | null) => {
+      const el = target as HTMLElement | null;
+      return !!(
         el instanceof HTMLInputElement ||
         el instanceof HTMLTextAreaElement ||
         el instanceof HTMLSelectElement ||
-        el.isContentEditable ||
-        el.closest?.('[contenteditable]:not([contenteditable="false"])') ||
-        document.querySelector('[role="dialog"]')
-      )
-        return;
-      if (document.querySelector('[role="menu"]')) return;
+        el?.isContentEditable ||
+        el?.closest?.('[contenteditable]:not([contenteditable="false"])') ||
+        document.querySelector('[role="dialog"], [role="menu"]')
+      );
+    };
+    // WebKit and application Edit menus can dispatch clipboard events without keydown.
+    const clipboard = (e: ClipboardEvent) => {
+      if (e.defaultPrevented || isEditing(e.target)) return;
+      const s = useEditorStore.getState();
+      if (e.type !== 'paste' && !s.selection.length) return;
+      e.preventDefault();
+      if (e.type === 'paste') void s.paste(e.clipboardData?.getData('text/plain'));
+      else if (e.type === 'copy') void s.copy(e.clipboardData);
+      else {
+        s.endGesture();
+        drag.current = null;
+        setDragging(null);
+        setOverlay(blank);
+        void s.cut(e.clipboardData);
+      }
+    };
+    const keydown = async (e: KeyboardEvent) => {
+      if (e.isComposing || isEditing(e.target)) return;
       if (e.key === 'Escape' && document.querySelector('.context-more[open]')) return;
       modifierKey(e);
       const s = useEditorStore.getState(),
@@ -343,33 +370,23 @@ export function useCanvasInteractions(
       } else if (mod && e.key.toLowerCase() === 'a') {
         e.preventDefault();
         s.select(s.document.objects.map((o) => o.id));
-      } else if (mod && e.key.toLowerCase() === 'c' && s.selection.length) {
+      } else if (mod && ['c', 'x'].includes(e.key.toLowerCase()) && s.selection.length) {
         e.preventDefault();
-        clipboard.current = extractSelection(s.document, s.selection);
-        try {
-          await navigator.clipboard.writeText(serializeDocument(clipboard.current));
-        } catch {
-          /* In-memory copy also works without clipboard permission. */
-        }
-        s.notify('Selezione copiata');
+        if (e.key.toLowerCase() === 'x') {
+          s.endGesture();
+          drag.current = null;
+          setDragging(null);
+          setOverlay(blank);
+          await s.cut();
+        } else await s.copy();
       } else if (mod && e.key.toLowerCase() === 'v') {
         e.preventDefault();
-        let copied = clipboard.current;
-        try {
-          const raw = await navigator.clipboard.readText();
-          if (raw.trim().startsWith('{')) copied = deserializeDocument(raw);
-        } catch {
-          /* Use the in-memory clipboard on restricted browsers. */
-        }
-        if (copied) {
-          const latest = useEditorStore.getState();
-          latest.add(cloneObjects(copied, { x: 40, y: 40 }, latest.document));
-          s.notify('Selezione incollata');
-        }
+        await s.paste();
       } else if (e.key === 'Delete' || e.key === 'Backspace') {
         e.preventDefault();
         s.remove(e.shiftKey);
       } else if (e.key === 'Escape') {
+        s.setSplitWire(null);
         setFirstPoint(null);
         s.cancelGesture();
         drag.current = null;
@@ -430,10 +447,13 @@ export function useCanvasInteractions(
       spaceDown.current = false;
       setSpace(false);
     };
+    for (const type of ['copy', 'cut', 'paste'] as const) window.addEventListener(type, clipboard);
     window.addEventListener('keydown', keydown);
     window.addEventListener('keyup', keyup);
     window.addEventListener('blur', blur);
     return () => {
+      for (const type of ['copy', 'cut', 'paste'] as const)
+        window.removeEventListener(type, clipboard);
       window.removeEventListener('keydown', keydown);
       window.removeEventListener('keyup', keyup);
       window.removeEventListener('blur', blur);
@@ -544,6 +564,21 @@ export function useCanvasInteractions(
       drag.current = { type: 'pan', screen: { x: e.clientX, y: e.clientY }, view: viewport };
       return;
     }
+    if (s.splittingWireId) {
+      const excluded = new Set(
+        s.document.objects.filter((o) => o.id !== s.splittingWireId).map((o) => o.id),
+      );
+      const near = nearestWire(p, s.document, 14 / viewport.zoom, excluded);
+      if (near) {
+        const result = splitWireAtPoint(s.document, near.wire.id, near.point);
+        if (result) {
+          s.commit(result.doc);
+          s.select([result.secondId]);
+          s.setSplitWire(null);
+        } else s.notify('Scegli un punto interno al filo, lontano da incroci e terminali.');
+      }
+      return;
+    }
     if (s.tool === 'preset') {
       s.insertPreset(p);
       return;
@@ -611,6 +646,8 @@ export function useCanvasInteractions(
       return;
     }
     if (
+      s.tool === 'rectangle' ||
+      s.tool === 'line' ||
       s.tool === 'arrow' ||
       s.tool === 'loop-arrow' ||
       s.tool === 'brace' ||
@@ -773,6 +810,29 @@ export function useCanvasInteractions(
       });
       return;
     }
+    if (d?.type === 'rectangle' || d?.type === 'line') {
+      let end = snapPoint(p);
+      if (d.type === 'line' && e.shiftKey) {
+        const dx = end.x - d.origin.x,
+          dy = end.y - d.origin.y,
+          length = Math.hypot(dx, dy);
+        const angle = (Math.round(Math.atan2(dy, dx) / (Math.PI / 4)) * Math.PI) / 4;
+        end = {
+          x: d.origin.x + Math.cos(angle) * length,
+          y: d.origin.y + Math.sin(angle) * length,
+        };
+      }
+      setOverlay({
+        ...blank,
+        arrow: {
+          ...(d.type === 'rectangle'
+            ? rectangleFromDrag(d.origin, end, e.shiftKey, e.altKey)
+            : createLine(d.origin, end)),
+          id: 'preview',
+        },
+      });
+      return;
+    }
     if (d?.type === 'brace' || d?.type === 'bracket') {
       setOverlay({
         ...blank,
@@ -832,7 +892,14 @@ export function useCanvasInteractions(
       const raw = { x: p.x - d.origin.x, y: p.y - d.origin.y };
       const feedback =
         d.type === 'move' && d.moveContext
-          ? computeMoveGuides(d.moveContext, raw, viewport.zoom, e.altKey)
+          ? computeMoveGuides(
+              d.moveContext,
+              raw,
+              viewport.zoom,
+              e.altKey || !s.snapEnabled,
+              false,
+              e.shiftKey,
+            )
           : {
               delta: { x: snap(raw.x), y: snap(raw.y) },
               alignment: {},
@@ -865,6 +932,10 @@ export function useCanvasInteractions(
                   if (o.kind === 'brace' && (d.handle === 'start' || d.handle === 'end')) {
                     return resizeBrace(o, d.handle, snapPoint(p));
                   }
+                  if (o.kind === 'rectangle' && d.handle?.startsWith('rect'))
+                    return resizeRectangle(o, d.handle, snapPoint(p), e.shiftKey);
+                  if (o.kind === 'line' && (d.handle === 'start' || d.handle === 'end'))
+                    return { ...o, [d.handle]: snapPoint(p) };
                   if (o.kind === 'arrow') {
                     const q = snapPoint(p),
                       handle = d.handle;
@@ -952,6 +1023,21 @@ export function useCanvasInteractions(
                   : null,
             },
       );
+      return;
+    }
+    if (s.splittingWireId) {
+      const excluded = new Set(
+        s.document.objects.filter((o) => o.id !== s.splittingWireId).map((o) => o.id),
+      );
+      const near = nearestWire(p, s.document, 14 / viewport.zoom, excluded);
+      if (near) {
+        const result = splitWireAtPoint(s.document, near.wire.id, near.point);
+        if (result) {
+          s.commit(result.doc);
+          s.select([result.secondId]);
+          s.setSplitWire(null);
+        } else s.notify('Scegli un punto interno al filo, lontano da incroci e terminali.');
+      }
       return;
     }
     if (s.tool === 'preset') {
@@ -1050,14 +1136,20 @@ export function useCanvasInteractions(
       }
     }
     if (
-      (d?.type === 'arrow' ||
+      (d?.type === 'rectangle' ||
+        d?.type === 'line' ||
+        d?.type === 'arrow' ||
         d?.type === 'loop-arrow' ||
         d?.type === 'brace' ||
         d?.type === 'bracket') &&
       overlay.arrow &&
-      (overlay.arrow.kind === 'loop-arrow'
-        ? distance(d.origin, world(e.clientX, e.clientY)) > 20
-        : distance(overlay.arrow.start, overlay.arrow.end) > 20)
+      (overlay.arrow.kind === 'rectangle'
+        ? overlay.arrow.width >= 2 &&
+          overlay.arrow.height >= 2 &&
+          distance(d.origin, world(e.clientX, e.clientY)) > 3 / viewport.zoom
+        : overlay.arrow.kind === 'loop-arrow'
+          ? distance(d.origin, world(e.clientX, e.clientY)) > 20
+          : distance(overlay.arrow.start, overlay.arrow.end) > 20)
     ) {
       s.add([{ ...overlay.arrow, id: makeId() }]);
       s.setTool('select');

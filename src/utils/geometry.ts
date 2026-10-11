@@ -399,7 +399,8 @@ export function moveObject(o: CircuitObject, delta: Point, moved: Set<string>): 
     o.kind === 'component' ||
     o.kind === 'junction' ||
     o.kind === 'text' ||
-    o.kind === 'loop-arrow'
+    o.kind === 'loop-arrow' ||
+    o.kind === 'rectangle'
   )
     return { ...o, x: o.x + delta.x, y: o.y + delta.y };
   if (o.kind === 'electrical') {
@@ -409,7 +410,8 @@ export function moveObject(o: CircuitObject, delta: Point, moved: Set<string>): 
       ? { ...o, offset: add(o.offset, delta) }
       : { ...o, start: add(o.start, delta), end: add(o.end, delta) };
   }
-  if (o.kind === 'brace') return { ...o, start: add(o.start, delta), end: add(o.end, delta) };
+  if (o.kind === 'brace' || o.kind === 'line')
+    return { ...o, start: add(o.start, delta), end: add(o.end, delta) };
   if (o.kind === 'arrow')
     return {
       ...o,
@@ -503,7 +505,9 @@ export function objectBounds(
       { x: g.labelPoint.x + w / 2, y: g.labelPoint.y + o.label.fontSize },
     ];
     if (drawing) points.push(...drawing.head);
-  } else if (o.kind === 'wire') points = wirePoints(o, doc);
+  } else if (o.kind === 'rectangle') return { x: o.x, y: o.y, width: o.width, height: o.height };
+  else if (o.kind === 'line') points = [o.start, o.end];
+  else if (o.kind === 'wire') points = wirePoints(o, doc);
   else if (o.kind === 'loop-arrow') {
     const angle = ((o.rotation ?? 0) * Math.PI) / 180;
     const width = Math.hypot(o.width * Math.cos(angle), o.height * Math.sin(angle));

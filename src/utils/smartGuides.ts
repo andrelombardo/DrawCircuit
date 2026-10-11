@@ -28,6 +28,7 @@ export interface DistanceGuide {
   referenceKind?: 'component' | 'junction' | 'bend' | 'endpoint';
   /** Dimension rail is offset from the measured branch; witnesses end at `at`. */
   displayAt?: number;
+  measurement?: 'centers' | 'gaps';
 }
 export interface MoveGuides {
   delta: Point;
@@ -169,7 +170,7 @@ export function createMoveContext(doc: CircuitDocument, ids: string[]): MoveCont
             alignmentBounds: unionBounds(entries.map((e) => e.alignmentBounds ?? e.bounds)),
             displayBounds: unionBounds(entries.map((e) => e.displayBounds ?? e.bounds)),
             anchor: { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 },
-            pins: [],
+            pins: entries.flatMap((e) => e.pins),
           },
   };
 }
@@ -399,14 +400,48 @@ function placeDistanceChips(
     return { ...guide, displayAt: rail };
   });
 }
+function centerNeighbors(
+  context: MoveContext,
+  candidates: GuideItem[],
+  axis: 'x' | 'y',
+  delta: Point,
+  tolerance: number,
+) {
+  const moving = context.moving,
+    cross = axis === 'x' ? 'y' : 'x';
+  const anchor = { x: moving.anchor.x + delta.x, y: moving.anchor.y + delta.y };
+  let before: GuideItem | undefined, after: GuideItem | undefined;
+  for (const c of candidates) {
+    if (
+      c.spacingFamily !== moving.spacingFamily ||
+      Math.abs(c.anchor[cross] - anchor[cross]) > tolerance
+    )
+      continue;
+    if (c.anchor[axis] < anchor[axis] - 0.001 && (!before || c.anchor[axis] > before.anchor[axis]))
+      before = c;
+    if (c.anchor[axis] > anchor[axis] + 0.001 && (!after || c.anchor[axis] < after.anchor[axis]))
+      after = c;
+  }
+  return { before, after };
+}
+function parallelAxis(context: MoveContext, axis: 'x' | 'y') {
+  const pins = context.moving.pins,
+    cross = axis === 'x' ? 'y' : 'x';
+  return (
+    pins.length >= 2 &&
+    Math.max(...pins.map((p) => p[axis])) - Math.min(...pins.map((p) => p[axis])) < 0.001 &&
+    Math.max(...pins.map((p) => p[cross])) - Math.min(...pins.map((p) => p[cross])) > 1
+  );
+}
 export function computeMoveGuides(
   context: MoveContext,
   raw: Point,
   zoom: number,
   disabled = false,
   precision = false,
+  detailed = false,
 ): MoveGuides {
-  const delta = precision ? { ...raw } : { x: snap(raw.x), y: snap(raw.y) },
+  const delta = precision || disabled ? { ...raw } : { x: snap(raw.x), y: snap(raw.y) },
     alignment: MoveGuides['alignment'] = {};
   if (disabled) return { delta, alignment, distances: [], target: null };
   const moving = context.moving,
@@ -464,8 +499,24 @@ export function computeMoveGuides(
         }
       }
     }
-    // Equal spacing takes precedence on its axis, but keeps cross-axis alignment.
+    // Parallel branches use centers; branch clearance still measures authored body gaps.
     for (const axis of ['x', 'y'] as const) {
+      if (!parallelAxis(context, axis) || alignment[axis] !== undefined) continue;
+      const { before, after } = centerNeighbors(
+        context,
+        candidates,
+        axis,
+        { ...delta, [axis]: raw[axis] },
+        threshold,
+      );
+      if (before && after) {
+        const desired = (before.anchor[axis] + after.anchor[axis]) / 2 - moving.anchor[axis];
+        if (Math.abs(desired - raw[axis]) <= threshold) delta[axis] = desired;
+      }
+    }
+    // An existing axis/terminal alignment wins over equal spacing.
+    for (const axis of ['x', 'y'] as const) {
+      if (alignment[axis] !== undefined || parallelAxis(context, axis)) continue;
       // Connected bodies distribute along their branches. A perpendicular row
       // of nearby symbols must not pull a vertical component sideways off wire.
       if (context.branches.length && !context.branches.some((branch) => branch.axis === axis))
@@ -578,6 +629,58 @@ export function computeMoveGuides(
       }
     }
   }
+  const centerDistances: DistanceGuide[] = [];
+  for (const axis of ['x', 'y'] as const) {
+    if (!parallelAxis(context, axis) && !detailed) continue;
+    const { before, after } = centerNeighbors(context, candidates, axis, delta, threshold);
+    const center = moving.anchor[axis] + delta[axis],
+      cross = axis === 'x' ? 'y' : 'x',
+      at = moving.anchor[cross] + delta[cross];
+    const equal =
+      !!before &&
+      !!after &&
+      Math.abs(center - before.anchor[axis] - (after.anchor[axis] - center)) < 0.01;
+    if (before)
+      centerDistances.push({
+        axis,
+        from: before.anchor[axis],
+        to: center,
+        at,
+        value: center - before.anchor[axis],
+        equal,
+        neighborId: before.id,
+        referenceKind: before.referenceKind,
+        measurement: 'centers',
+      });
+    if (after)
+      centerDistances.push({
+        axis,
+        from: center,
+        to: after.anchor[axis],
+        at,
+        value: after.anchor[axis] - center,
+        equal,
+        neighborId: after.id,
+        referenceKind: after.referenceKind,
+        measurement: 'centers',
+      });
+  }
+  const parallelDistances = centerDistances.filter((g) => parallelAxis(context, g.axis));
+  if (parallelDistances.length && !target)
+    return {
+      delta,
+      alignment,
+      target,
+      distances: placeDistanceChips(
+        context,
+        (detailed ? [...parallelDistances, ...distances] : parallelDistances).slice(
+          0,
+          detailed ? 4 : 2,
+        ),
+        delta,
+        zoom,
+      ),
+    };
   // One useful axis, at most two measurements; terminal feedback has priority.
   const preferred =
     distances.find((d) => d.equal)?.axis ??
@@ -593,7 +696,9 @@ export function computeMoveGuides(
       ? []
       : placeDistanceChips(
           context,
-          distances.filter((d) => d.axis === preferred).slice(0, 2),
+          detailed
+            ? [...centerDistances, ...distances].slice(0, 4)
+            : distances.filter((d) => d.axis === preferred).slice(0, 2),
           delta,
           zoom,
         ),

@@ -208,7 +208,9 @@ describe('Golden spacing and group workflow in the canvas', () => {
     render(<Canvas />);
     fireEvent.pointerDown(body('R3'), client(200, 0));
     fireEvent.pointerMove(canvas(), client(246, 4, { altKey: true }));
-    expect(useEditorStore.getState().document.objects[1]).toMatchObject({ x: 240, y: 0 });
+    const moved = useEditorStore.getState().document.objects[1];
+    expect('x' in moved && moved.x).toBeCloseTo(246);
+    expect('y' in moved && moved.y).toBeCloseTo(4);
     expect(canvas().querySelectorAll('[data-distance]')).toHaveLength(0);
     fireEvent.pointerCancel(canvas(), client(246, 4));
     expect(useEditorStore.getState().document.objects[1]).toMatchObject({ x: 200, y: 0 });
@@ -233,7 +235,7 @@ describe('adaptive accessible toolbar', () => {
   it('shows labeled frequent properties and keeps only secondary controls in More', () => {
     render(<Canvas />);
     select('R3', 200);
-    fireEvent.click(screen.getByRole('button', { name: 'Stile' }));
+
     expect(screen.getByLabelText('Dimensione testo')).toBeDefined();
     expect(screen.getByLabelText('Spessore linea')).toBeDefined();
     for (const name of ['Duplica (⌘/Ctrl D)', 'Ruota 45° (R)']) {
@@ -241,30 +243,23 @@ describe('adaptive accessible toolbar', () => {
       expect(button.title).toBe(name);
       expect(button.getAttribute('data-tooltip')).toBe(name);
     }
-    fireEvent.click(screen.getByLabelText('Altre proprietà'));
+
     expect(screen.queryByLabelText('Ruota solo label')).toBeNull();
     expect(screen.getByText('Salva come blocco')).toBeDefined();
     expect(screen.queryByLabelText('Ruota selezione')).toBeNull();
     fireEvent.keyDown(canvas(), { key: 'Escape' });
-    expect(useEditorStore.getState().selection).toEqual(['R3']);
-    expect(document.querySelector('.context-more')?.hasAttribute('open')).toBe(false);
-    fireEvent.keyDown(canvas(), { key: 'Escape' });
     expect(useEditorStore.getState().selection).toEqual([]);
   });
-  it('closes properties on outside click while preserving selection and reopens on component click', () => {
+  it('keeps the inspector stable on outside click and hides only on explicit request', () => {
     render(<Canvas />);
     select('R3', 200);
-    fireEvent.click(screen.getByLabelText('Altre proprietà'));
     fireEvent.pointerDown(screen.getByRole('button', { name: 'Griglia (G)' }));
     expect(useEditorStore.getState().selection).toEqual(['R3']);
-    expect(document.querySelector('.context-more')?.hasAttribute('open')).toBe(false);
-    expect((document.querySelector('.context-toolbar') as HTMLElement).style.visibility).toBe(
-      'hidden',
-    );
-    select('R3', 200);
-    expect((document.querySelector('.context-toolbar') as HTMLElement).style.visibility).toBe(
-      'visible',
-    );
+    expect(screen.getByRole('region', { name: 'Proprietà' })).toBeDefined();
+    fireEvent.click(screen.getByRole('button', { name: 'Nascondi proprietà' }));
+    expect(screen.queryByRole('region', { name: 'Proprietà' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Mostra proprietà' }));
+    expect(screen.getByRole('region', { name: 'Proprietà' })).toBeDefined();
   });
   for (const loop of [false, true])
     it(`keeps functional handles and the right actions for ${loop ? 'Loop Arrow' : 'Arrow'}`, () => {
@@ -300,7 +295,7 @@ describe('adaptive accessible toolbar', () => {
       expect(canvas().querySelectorAll('[data-handle]').length).toBe(loop ? 3 : 4);
       expect(screen.getByLabelText('Inverti freccia')).toBeDefined();
       expect(screen.queryByLabelText('Dimensione testo')).toBeNull();
-      expect(screen.getByLabelText('Altre proprietà')).toBeDefined();
+      expect(screen.getByRole('region', { name: 'Proprietà' })).toBeDefined();
     });
   it('wire groups stroke/color in Style and secondary actions in More without rotation', () => {
     const w = createWire(
@@ -310,7 +305,7 @@ describe('adaptive accessible toolbar', () => {
     useEditorStore.setState({ document: documentWith([w]), selection: [w.id] });
     render(<Canvas />);
     expect(screen.getByLabelText('Spessore linea')).toBeDefined();
-    expect(screen.getByLabelText('Altre proprietà')).toBeDefined();
+    expect(screen.getByRole('region', { name: 'Proprietà' })).toBeDefined();
     expect(screen.queryByLabelText('Ruota 90° (R)')).toBeNull();
   });
   it('Junction exposes node color and text properties without stroke or rotation controls', () => {
@@ -320,7 +315,7 @@ describe('adaptive accessible toolbar', () => {
     expect(screen.getByLabelText('Nome nodo')).toBeDefined();
     expect(screen.queryByLabelText('Spessore')).toBeNull();
     expect(screen.queryByLabelText('Ruota 90° (R)')).toBeNull();
-    fireEvent.click(screen.getByLabelText('Altre proprietà'));
+
     expect(screen.getByLabelText('Colore etichetta personalizzato')).toBeDefined();
   });
 });
@@ -372,21 +367,11 @@ describe('compact Style and replacement controls', () => {
   it('keeps frequent actions direct and edits symbol/label separately inside Style', () => {
     render(<Canvas />);
     select('R3', 200);
-    const toolbar = screen.getByRole('toolbar', { name: 'Proprietà selezione' });
-    expect(
-      within(toolbar)
-        .getAllByRole('button')
-        .filter((b) => !b.closest('.context-popover'))
-        .map((b) => b.getAttribute('aria-label')),
-    ).toEqual([
-      'Stile',
-      'Polarità + / -',
-      'Ruota 45° (R)',
-      'Duplica (⌘/Ctrl D)',
-      'Altre proprietà',
-    ]);
-    expect(toolbar.querySelector('.context-more')?.hasAttribute('open')).toBe(false);
-    fireEvent.click(screen.getByRole('button', { name: 'Stile' }));
+    const inspector = screen.getByRole('region', { name: 'Proprietà' });
+    expect(within(inspector).getByRole('button', { name: 'Polarità + / -' })).toBeDefined();
+    expect(within(inspector).getByRole('button', { name: 'Duplica (⌘/Ctrl D)' })).toBeDefined();
+    expect(document.querySelector('.context-toolbar')).toBeNull();
+
     fireEvent.click(screen.getByRole('button', { name: 'Simbolo: Rosso' }));
     fireEvent.click(screen.getByRole('button', { name: 'Etichetta: Verde' }));
     fireEvent.change(screen.getByLabelText('Spessore linea'), { target: { value: '3' } });
@@ -396,15 +381,14 @@ describe('compact Style and replacement controls', () => {
       width: 3,
       label: { color: '#269978', fontSize: 28 },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Altre proprietà' }));
-    expect(document.querySelector('.context-style')?.hasAttribute('open')).toBe(false);
+
     expect(screen.getByRole('button', { name: 'Salva come blocco' })).toBeDefined();
     expect(screen.getByRole('button', { name: 'Elimina (Delete)' })).toBeDefined();
   });
   it('shows live compatible previews in Replace and filters through shared palette search', () => {
     render(<Canvas />);
     select('R3', 200);
-    fireEvent.click(screen.getByRole('button', { name: 'Altre proprietà' }));
+
     fireEvent.click(screen.getByRole('button', { name: 'Sostituisci…' }));
     const dialog = screen.getByRole('dialog', { name: 'Sostituisci componente' });
     expect(dialog.querySelectorAll('.replace-option svg').length).toBeGreaterThan(5);

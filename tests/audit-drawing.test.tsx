@@ -119,7 +119,7 @@ function select(o: CircuitObject) {
   const p =
     o.kind === 'wire'
       ? resolveEndpoint(o.startEndpoint, current())
-      : o.kind === 'arrow' || o.kind === 'electrical' || o.kind === 'brace'
+      : o.kind === 'arrow' || o.kind === 'electrical' || o.kind === 'brace' || o.kind === 'line'
         ? o.start
         : o;
   fireEvent.pointerDown(hit, point(p.x, p.y));
@@ -247,9 +247,9 @@ describe('audit: actual rendered drawing workflows (jsdom, not manual browser)',
     expect(screen.queryByRole('combobox', { name: 'Font' })).toBeNull();
     select(rs[0]);
     expect(screen.queryByRole('combobox', { name: 'Font' })).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Stile' }));
+
     fireEvent.click(screen.getByRole('button', { name: 'Etichetta: Viola' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Stile' }));
+
     key('d', { metaKey: true });
     expect(current().objects.filter((o) => o.kind === 'component')).toHaveLength(7);
     drag(rs[3], [-240, 120], [-220, 120]);
@@ -523,9 +523,9 @@ describe('audit: snapping, cancellation, topology and history edges', () => {
     save();
     drawArrow('l', [240, 0], [400, 120]);
     save();
-    fireEvent.click(screen.getByRole('button', { name: 'Stile' }));
+
     fireEvent.click(screen.getByRole('button', { name: 'Simbolo: Verde' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Stile' }));
+
     save();
     key('d', { ctrlKey: true });
     save();

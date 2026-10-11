@@ -1,3 +1,4 @@
+import { GraphicView } from '../../circuit/annotations/GraphicView';
 import { drawingWireGaps } from '../../utils/wireRendering';
 import { BraceView } from '../../circuit/annotations/BraceView';
 import { WireBridges } from '../../circuit/wires/WireBridges';
@@ -47,6 +48,13 @@ export const CircuitLayer = memo(function CircuitLayer({
   );
   return (
     <>
+      <g data-layer="graphics">
+        {doc.objects.map((o) =>
+          o.kind === 'rectangle' || o.kind === 'line' ? (
+            <GraphicView key={o.id} object={o} />
+          ) : null,
+        )}
+      </g>
       <g data-layer="wires">
         {wires.map(({ object, points }) => (
           <WireView

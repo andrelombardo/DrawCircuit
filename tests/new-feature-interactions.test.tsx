@@ -98,7 +98,7 @@ describe('new feature UI integrates with the existing editor', () => {
       selection: [c.id, d.id],
     });
     render(<App />);
-    fireEvent.click(screen.getByLabelText('Altre proprietà'));
+
     fireEvent.click(screen.getByRole('button', { name: 'Salva come blocco' }));
     fireEvent.change(screen.getByLabelText('Nome blocco'), { target: { value: 'R-C personale' } });
     fireEvent.click(screen.getByRole('button', { name: 'Salva blocco' }));
@@ -145,7 +145,7 @@ describe('new feature UI integrates with the existing editor', () => {
     });
     fireEvent.blur(screen.getByLabelText('Etichetta annotazione'));
     fireEvent.click(screen.getByRole('button', { name: 'Inverti freccia' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Stile' }));
+
     fireEvent.click(screen.getByRole('button', { name: 'Simbolo: Verde' }));
     expect(doc().objects.at(-1)).toMatchObject({
       reversed: true,
@@ -207,7 +207,7 @@ describe('new feature UI integrates with the existing editor', () => {
     const c = createComponent('resistor', { x: 0, y: 0 }, 1);
     useEditorStore.setState({ document: { ...emptyDocument(), objects: [c] }, selection: [c.id] });
     render(<App />);
-    fireEvent.click(screen.getByLabelText('Altre proprietà'));
+
     fireEvent.click(screen.getByRole('button', { name: 'Sostituisci…' }));
     expect(screen.queryByRole('button', { name: 'Transistor NPN' })).toBeNull();
     fireEvent.change(screen.getByLabelText('Cerca sostituzione'), {

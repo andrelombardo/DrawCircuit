@@ -128,7 +128,14 @@ export type Endpoint =
   | { kind: 'junction'; junctionId: string }
   | { kind: 'free'; point: Point };
 export type WireRouting = 'orthogonal' | '45' | 'free';
-export interface Wire {
+export type LineStyle = 'solid' | 'dashed' | 'dotted';
+export interface StrokeStyle {
+  /** Missing in legacy documents means solid. Lengths are document units. */
+  lineStyle?: LineStyle;
+  dashLength?: number;
+  dashGap?: number;
+}
+export interface Wire extends StrokeStyle {
   /** Missing in v1 documents means orthogonal. */
   routing?: WireRouting;
   kind: 'wire';
@@ -222,6 +229,28 @@ export interface BraceAnnotation {
   opacity?: number;
   width: number;
 }
+export interface RectangleAnnotation extends StrokeStyle {
+  kind: 'rectangle';
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  color: string;
+  strokeWidth: number;
+  opacity?: number;
+  fill: string | 'none';
+  fillOpacity?: number;
+}
+export interface LineAnnotation extends StrokeStyle {
+  kind: 'line';
+  id: string;
+  start: Point;
+  end: Point;
+  color: string;
+  width: number;
+  opacity?: number;
+}
 export type CircuitObject =
   | CircuitComponent
   | Junction
@@ -230,7 +259,9 @@ export type CircuitObject =
   | ArrowAnnotation
   | LoopArrow
   | ElectricalAnnotation
-  | BraceAnnotation;
+  | BraceAnnotation
+  | RectangleAnnotation
+  | LineAnnotation;
 export interface CircuitDocument {
   version: 1;
   title: string;
@@ -238,6 +269,8 @@ export interface CircuitDocument {
 }
 export type Tool =
   | 'select'
+  | 'rectangle'
+  | 'line'
   | 'wire'
   | 'junction'
   | 'text'

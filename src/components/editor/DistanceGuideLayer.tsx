@@ -20,6 +20,7 @@ export function DistanceGuideLayer({ guides, zoom }: { guides: DistanceGuide[]; 
             key={i}
             className={`distance-guide${g.equal ? ' equal-spacing' : ''}`}
             data-axis={g.axis}
+            data-measurement={g.measurement ?? 'gaps'}
             data-distance={value}
             data-equal={g.equal || undefined}
           >
@@ -39,6 +40,9 @@ export function DistanceGuideLayer({ guides, zoom }: { guides: DistanceGuide[]; 
               height={height}
               rx={3 / zoom}
             />
+            <title>
+              {g.measurement === 'centers' ? 'Distanza tra centri' : 'Spazio libero'}: {value} u
+            </title>
             <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={11 / zoom}>
               {value}
             </text>

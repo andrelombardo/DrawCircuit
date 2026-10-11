@@ -9,8 +9,16 @@ import { reconcileCurrentSegments } from '../annotations/electrical';
 import { demoDocument } from '../model/demo';
 import { deserializeDocument, serializeDocument } from '../model/serialization';
 import { cloneObjects, extractSelection, removeObjects, rotateObjects } from '../utils/operations';
+import { alignSelection, distributeSelection, positionSelection } from '../utils/selectionGeometry';
+import type { Axis, Alignment, DistributionMode } from '../utils/selectionGeometry';
+import { copySelection, pasteSelection } from '../utils/clipboard';
 import { mirrorArrows } from '../utils/arrows';
-import { hasAssociatedLabel, replaceInlineText } from '../utils/labels';
+import {
+  hasAssociatedLabel,
+  inlineTextTarget,
+  moveLabel,
+  replaceInlineText,
+} from '../utils/labels';
 import { instantiatePreset } from '../presets/instantiate';
 import { presetRegistry } from '../presets/registry';
 import { localPersistence } from '../utils/localPersistence';
@@ -47,6 +55,10 @@ interface EditorState {
   wireRouting: WireRouting;
   setWireRouting: (routing: WireRouting) => void;
   grid: boolean;
+  snapEnabled: boolean;
+  toggleSnap: () => void;
+  splittingWireId: string | null;
+  setSplitWire: (id: string | null) => void;
   past: CircuitDocument[];
   future: CircuitDocument[];
   gestureStart: CircuitDocument | null;
@@ -59,6 +71,13 @@ interface EditorState {
   toggleGrid: () => void;
   commit: (doc: CircuitDocument) => void;
   add: (objects: CircuitObject[]) => void;
+  updateSelection: (fn: (o: CircuitObject) => CircuitObject) => void;
+  align: (axis: Axis, alignment: Alignment) => void;
+  distribute: (axis: Axis, mode?: DistributionMode, spacing?: number) => void;
+  position: (axis: Axis, value: number) => void;
+  copy: (clipboardData?: DataTransfer | null) => Promise<boolean>;
+  cut: (clipboardData?: DataTransfer | null) => Promise<boolean>;
+  paste: (nativeText?: string) => Promise<void>;
   update: (id: string, fn: (o: CircuitObject) => CircuitObject) => void;
   beginGesture: () => void;
   preview: (doc: CircuitDocument) => void;
@@ -113,6 +132,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   wireRouting: 'orthogonal',
   setWireRouting: (wireRouting) => set({ wireRouting }),
   grid: true,
+  snapEnabled: true,
+  toggleSnap: () => set((s) => ({ snapEnabled: !s.snapEnabled })),
+  splittingWireId: null,
+  setSplitWire: (splittingWireId) => set({ splittingWireId, tool: 'select' }),
   past: [],
   future: [],
   gestureStart: null,
@@ -121,6 +144,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   setTool: (tool) =>
     set((s) => ({
       tool,
+      splittingWireId: null,
       pendingPresetId: null,
       placementRotation: 0,
       selection: tool === 'select' ? s.selection : [],
@@ -141,6 +165,73 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const s = get();
     s.commit({ ...s.document, objects: [...s.document.objects, ...objects] });
     s.select(objects.map((o) => o.id));
+  },
+  updateSelection: (fn) => {
+    const s = get(),
+      ids = new Set(s.selection);
+    const objects = s.document.objects.map((o) => (ids.has(o.id) ? fn(o) : o));
+    if (objects.some((o, i) => o !== s.document.objects[i])) {
+      const next = { ...s.document, objects };
+      if (s.gestureStart) s.preview(next);
+      else s.commit(next);
+    }
+  },
+  align: (axis, alignment) => {
+    const s = get();
+    const next = alignSelection(s.document, s.selection, axis, alignment);
+    if (next !== s.document) s.commit(next);
+  },
+  distribute: (axis, mode = 'centers', spacing) => {
+    const s = get();
+    const next = distributeSelection(s.document, s.selection, axis, mode, spacing);
+    if (next !== s.document) s.commit(next);
+  },
+  position: (axis, value) => {
+    const s = get();
+    const target =
+      s.activeLabel && s.selection.length === 1
+        ? inlineTextTarget(
+            s.document.objects.find((o) => o.id === s.activeLabel),
+            s.document,
+          )
+        : null;
+    const next =
+      target && Number.isFinite(value)
+        ? moveLabel(s.document, s.activeLabel!, {
+            x: axis === 'x' ? value - target.point.x : 0,
+            y: axis === 'y' ? value - target.point.y : 0,
+          })
+        : positionSelection(s.document, s.selection, axis, value);
+    if (next !== s.document) s.commit(next);
+  },
+  copy: async (clipboardData) => {
+    const s = get();
+    const result = copySelection(s.document, s.selection, clipboardData);
+    if (!result) return false;
+    await result;
+    s.notify('Selezione copiata');
+    return true;
+  },
+  cut: async (clipboardData) => {
+    const s = get();
+    // The fallback is populated synchronously before deletion. Clipboard permission
+    // can resolve after a selection change, so never delete from an async continuation.
+    const result = copySelection(s.document, s.selection, clipboardData);
+    if (!result) {
+      s.notify('Impossibile copiare la selezione.');
+      return false;
+    }
+    s.remove(true);
+    s.notify('Selezione tagliata');
+    await result;
+    return true;
+  },
+  paste: async (nativeText) => {
+    const copied = await pasteSelection(nativeText);
+    if (!copied) return;
+    const s = get();
+    s.add(cloneObjects(copied, { x: 40, y: 40 }, s.document));
+    s.notify('Selezione incollata');
   },
   update: (id, fn) => {
     const s = get();
@@ -177,6 +268,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       activeLabel: null,
       gestureStart: null,
       tool: 'select',
+      splittingWireId: null,
       pendingPresetId: null,
     });
   },
@@ -196,6 +288,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       activeLabel: null,
       gestureStart: null,
       tool: 'select',
+      splittingWireId: null,
       pendingPresetId: null,
     });
   },

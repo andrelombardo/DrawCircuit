@@ -72,6 +72,8 @@ describe('compact pencil drawing menu', () => {
       'Polarità + / -',
       'Tensione tra due punti',
       'Corrente sul filo',
+      'Rettangolo',
+      'Linea decorativa',
     ]);
     expect(within(menu).getAllByRole('separator')).toHaveLength(2);
     for (const button of within(menu).getAllByRole('menuitem'))

@@ -7,6 +7,8 @@ import {
   MousePointer2,
   Pencil,
   Redo2,
+  Square,
+  Minus,
   Spline,
   Type,
   Undo2,
@@ -48,6 +50,8 @@ export function DrawingToolbar({
     redo = useEditorStore((s) => s.redo);
   const drawingTools = [
     'wire',
+    'rectangle',
+    'line',
     'junction',
     'arrow',
     'loop-arrow',
@@ -105,6 +109,18 @@ export function DrawingToolbar({
       label: 'Corrente sul filo',
       icon: <CurrentInlineIcon />,
       onSelect: () => setTool('current'),
+    },
+    {
+      id: 'rectangle',
+      label: 'Rettangolo',
+      icon: <Square size={18} />,
+      onSelect: () => setTool('rectangle'),
+    },
+    {
+      id: 'line',
+      label: 'Linea decorativa',
+      icon: <Minus size={18} />,
+      onSelect: () => setTool('line'),
     },
   ];
   return (

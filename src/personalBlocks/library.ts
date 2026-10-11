@@ -83,6 +83,13 @@ export function instantiatePersonalBlock(
       if (o.kind === 'junction')
         return { ...o, ...rp(o), label: { ...o.label, offset: rp(o.label.offset) } };
       if (o.kind === 'text') return { ...o, ...rp(o), rotation: next(o.rotation) };
+      if (o.kind === 'rectangle') {
+        const center = rp({ x: o.x + o.width / 2, y: o.y + o.height / 2 });
+        const width = rotation % 180 === 90 ? o.height : o.width,
+          height = rotation % 180 === 90 ? o.width : o.height;
+        return { ...o, x: center.x - width / 2, y: center.y - height / 2, width, height };
+      }
+      if (o.kind === 'line') return { ...o, start: rp(o.start), end: rp(o.end) };
       if (o.kind === 'wire')
         return {
           ...o,

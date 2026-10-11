@@ -138,7 +138,7 @@ describe('precision/annotation/export UI workflows', () => {
     act(() => state().redo());
     expect(brace()).toEqual(final);
     act(() => state().select([o.id]));
-    fireEvent.click(screen.getByRole('button', { name: 'Stile' }));
+
     fireEvent.click(screen.getByRole('button', { name: 'Simbolo: Viola' }));
     fireEvent.change(screen.getByLabelText('Spessore linea'), { target: { value: '4' } });
     fireEvent.change(screen.getByLabelText('Dimensione testo'), { target: { value: '32' } });

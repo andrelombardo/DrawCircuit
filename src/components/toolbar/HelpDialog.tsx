@@ -58,7 +58,9 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
             ['Alt + clic handle', 'Rimuovi svolta filo'],
             ['L', 'Disegna maglia ellittica'],
             ['⌘/Ctrl D', 'Duplica'],
-            ['⌘/Ctrl C / V', 'Copia / incolla'],
+            ['⌘/Ctrl C / X / V', 'Copia / taglia / incolla'],
+            ['Option/Alt + trascina', 'Disabilita snapping nello spostamento'],
+            ['Shift durante spostamento', 'Mostra altre quote'],
             ['Delete / Backspace', 'Elimina selezione · su un’etichetta elimina solo il testo'],
             ['Shift + Delete / Backspace', 'Da un’etichetta elimina anche l’oggetto'],
             ['⌘/Ctrl Z', 'Annulla'],
@@ -85,22 +87,26 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
           <code>r_&#123;AB&#125;</code> per un pedice.
         </p>
         <p className="help-note">
-          Stile regola colore e opacità, separatamente per simbolo e label, anche sui gruppi.
-          Seleziona più componenti e usa ••• → Sostituisci per cambiarli insieme. La toolbar
-          specchia frecce e maglie nei due assi; il piccolo handle che appare vicino a una freccia
-          selezionata permette di ruotarla liberamente. Ogni gesto ha un solo undo.
+          La sidebar Proprietà regola colore e opacità, separatamente per simbolo e label, anche sui
+          gruppi. Seleziona più componenti e usa Sostituisci nell’inspector per cambiarli insieme.
+          L’inspector specchia frecce e maglie nei due assi; il piccolo handle che appare vicino a
+          una freccia selezionata permette di ruotarla liberamente. Ogni gesto ha un solo undo.
+          Distribuisci per centri o spazi liberi; la distanza esatta mantiene fermo il primo
+          elemento. Scegli lo stile dei fili o Dividi filo per una continuazione tratteggiata.
+          Rettangoli e linee decorative non creano connessioni elettriche.
         </p>
         <p className="help-note">
           L’anteprima Smart Placement indica aggancio e collegamento; Alt/Option li ignora.
           “Inserisci in filo” è nel feedback in basso. La matita “Disegno e annotazioni” raccoglie
-          fili, nodi, frecce, maglie e annotazioni elettriche. “Corrente sul filo” crea direttamente
-          una freccia integrata; dalla toolbar di un filo selezionato si applica subito. “Polarità +
-          / −” si applica direttamente anche dalla toolbar dei componenti compatibili. “Graffa /
-          Staffa” apre Graffa e Staffa: trascina per raggruppare, poi aggiungi l’etichetta; R ruota
-          di 90° e “Inverti lato” cambia lato. Trascina il grip per spostare la toolbar: la
-          posizione viene ricordata. Export offre TikZ, Obsidian, File .tex, SVG e le azioni dirette
-          “Copia PNG” e “Scarica PNG”, anche per la selezione. Il circuito e il livello di zoom
-          vengono salvati automaticamente in questo browser.
+          fili, nodi, frecce, maglie, rettangoli, linee decorative e annotazioni elettriche.
+          “Corrente sul filo” crea direttamente una freccia integrata; dalle proprietà di un filo
+          selezionato si applica subito. “Polarità + / −” si applica direttamente anche dalle
+          proprietà dei componenti compatibili. “Graffa / Staffa” apre Graffa e Staffa: trascina per
+          raggruppare, poi aggiungi l’etichetta; R ruota di 90° e “Inverti lato” cambia lato.
+          Trascina il grip per spostare la toolbar: la posizione viene ricordata. Export offre TikZ,
+          Obsidian, File .tex, SVG e le azioni dirette “Copia PNG” e “Scarica PNG”, anche per la
+          selezione. Il circuito e il livello di zoom vengono salvati automaticamente in questo
+          browser.
         </p>
       </section>
     </div>

@@ -1,3 +1,4 @@
+import { dashPattern } from '../../utils/strokeStyle';
 import { translucentCrossing } from '../../utils/wireRendering';
 import { memo } from 'react';
 import type { CircuitDocument } from '../../model/types';
@@ -24,6 +25,7 @@ export const WireBridges = memo(function WireBridges({ doc }: { doc: CircuitDocu
                   fill="none"
                   stroke={p.underWire.color}
                   strokeWidth={p.underWire.width}
+                  strokeDasharray={dashPattern(p.underWire, p.underWire.width)?.join(' ')}
                 />
                 <path d={p.arc} fill="none" stroke="white" strokeWidth={w} strokeLinecap="round" />
               </>
@@ -34,6 +36,7 @@ export const WireBridges = memo(function WireBridges({ doc }: { doc: CircuitDocu
               fill="none"
               stroke={p.overWire.color}
               strokeWidth={p.overWire.width}
+              strokeDasharray={dashPattern(p.overWire, p.overWire.width)?.join(' ')}
               strokeLinecap="round"
             />
           </g>

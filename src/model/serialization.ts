@@ -66,6 +66,14 @@ export function deserializeDocument(raw: string): CircuitDocument {
     if (!str(o.id) || !o.id || ids.has(String(o.id))) fail();
     ids.add(String(o.id));
     if (!opacity(o.opacity)) fail();
+    if (
+      ['wire', 'rectangle', 'line'].includes(String(o.kind)) &&
+      ((o.lineStyle !== undefined &&
+        !['solid', 'dashed', 'dotted'].includes(String(o.lineStyle))) ||
+        (o.dashLength !== undefined && !positive(o.dashLength, 1000)) ||
+        (o.dashGap !== undefined && !positive(o.dashGap, 1000)))
+    )
+      fail();
     if (o.kind === 'component') {
       const definition = componentRegistry[o.type as (typeof componentTypes)[number]];
       if (definition && (o.label === undefined || typeof o.label === 'string')) {
@@ -108,6 +116,20 @@ export function deserializeDocument(raw: string): CircuitDocument {
         )
           fail();
       });
+    } else if (o.kind === 'rectangle') {
+      if (
+        !num(o.x) ||
+        !num(o.y) ||
+        !positive(o.width, 1e7) ||
+        !positive(o.height, 1e7) ||
+        !color(o.color) ||
+        !positive(o.strokeWidth, 20) ||
+        (o.fill !== 'none' && !color(o.fill)) ||
+        !opacity(o.fillOpacity)
+      )
+        fail();
+    } else if (o.kind === 'line') {
+      if (!point(o.start) || !point(o.end) || !color(o.color) || !positive(o.width, 20)) fail();
     } else if (o.kind === 'junction') {
       if (!num(o.x) || !num(o.y) || !label(o.label) || !color(o.color)) fail();
     } else if (o.kind === 'wire') {

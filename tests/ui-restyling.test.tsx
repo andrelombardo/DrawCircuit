@@ -19,7 +19,8 @@ import { exportSVG } from '../src/svg/exporter';
 const saved = new Map<string, string>();
 let clipboard = '';
 const component = () => useEditorStore.getState().document.objects[0] as CircuitComponent;
-const openStyle = () => fireEvent.click(screen.getByRole('button', { name: 'Stile' }));
+const openStyle = () =>
+  expect(screen.getByRole('group', { name: 'Stile selezione' })).toBeDefined();
 const input = (label: string) => screen.getByLabelText(`Colore ${label} personalizzato`);
 const choose = (label: string, value: string) => {
   fireEvent.input(input(label), { target: { value } });
@@ -162,7 +163,7 @@ describe('native custom color workflow', () => {
       fireEvent.change(size, { target: { value: option.value } });
       expect(component().label.fontSize).toBe(Number(option.value));
     }
-    fireEvent.click(screen.getByRole('button', { name: 'Altre proprietà' }));
+
     expect(screen.getByText('Sostituisci…')).toBeDefined();
     expect(screen.getByText('Salva come blocco')).toBeDefined();
     expect(screen.queryByText('Ruota label')).toBeNull();

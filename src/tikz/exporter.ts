@@ -1,3 +1,5 @@
+import { dashPattern } from '../utils/strokeStyle';
+import type { StrokeStyle } from '../model/types';
 import { drawingWireGaps, translucentCrossing } from '../utils/wireRendering';
 import { braceGeometry } from '../annotations/brace';
 import { bridgeGeometry, wireCrossings } from '../utils/crossings';
@@ -64,6 +66,12 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
   const tikzCoordinate = (point: Point) => {
     if (!finitePoint(point)) throw new Error('Invalid TikZ coordinate.');
     return `(${fmt(point.x / unitsPerCm)},${fmt(-point.y / unitsPerCm)})`;
+  };
+  const dash = (style: StrokeStyle, width: number) => {
+    const pattern = dashPattern(style, width);
+    return pattern
+      ? `, dash pattern=on ${pixelsToPt(pattern[0])}pt off ${pixelsToPt(pattern[1])}pt`
+      : '';
   };
   const ids = new Set<string>();
   const doc = {
@@ -152,6 +160,22 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
       o.label.opacity,
     );
   };
+  // Graphic annotations sit behind the electrical circuit, matching the canvas.
+  for (const o of doc.objects) {
+    if (o.kind === 'rectangle') {
+      const end = { x: o.x + o.width, y: o.y + o.height };
+      if (o.fill !== 'none')
+        lines.push(
+          `\\path[fill=${col(o.fill)}, fill opacity=${fmt(o.fillOpacity ?? 1)}] ${tikzCoordinate(o)} rectangle ${tikzCoordinate(end)};`,
+        );
+      lines.push(
+        `\\draw[draw=${col(o.color)}, opacity=${fmt(o.opacity ?? 1)}, line width=${pixelsToPt(o.strokeWidth)}pt${dash(o, o.strokeWidth)}] ${tikzCoordinate(o)} rectangle ${tikzCoordinate(end)};`,
+      );
+    } else if (o.kind === 'line')
+      lines.push(
+        `\\draw[draw=${col(o.color)}, opacity=${fmt(o.opacity ?? 1)}, line width=${pixelsToPt(o.width)}pt${dash(o, o.width)}] ${tikzCoordinate(o.start)} -- ${tikzCoordinate(o.end)};`,
+      );
+  }
   // Wires first: native component bodies then cover their own interiors.
   const wires = new Set<string>();
   const currentGaps = drawingWireGaps(doc);
@@ -168,7 +192,7 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
       for (const subpath of wireDrawingPaths(points, currentGaps.get(o.id))) {
         const path = subpath.map(tikzCoordinate).filter((p, i, all) => !i || p !== all[i - 1]);
         if (path.length < 2) continue;
-        const line = `\\draw[draw=${col(o.color)}${o.opacity !== undefined ? `, opacity=${fmt(o.opacity)}` : ''}, line width=${pixelsToPt(o.width)}pt] ${path.join(' -- ')};`;
+        const line = `\\draw[draw=${col(o.color)}${o.opacity !== undefined ? `, opacity=${fmt(o.opacity)}` : ''}, line width=${pixelsToPt(o.width)}pt${dash(o, o.width)}] ${path.join(' -- ')};`;
         if (!wires.has(line)) lines.push(line);
         wires.add(line);
       }
@@ -178,7 +202,7 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
       whiteWidth = pixelsToPt(Math.max(c.horizontal.width, c.vertical.width) + 4);
     if (translucentCrossing(c)) {
       lines.push(
-        `\\draw[draw=${col(g.overWire.color)},opacity=${fmt(g.overWire.opacity ?? 1)},line width=${pixelsToPt(g.overWire.width)}pt] ${tikzCoordinate(g.start)} .. controls ${tikzCoordinate(g.controlA)} and ${tikzCoordinate(g.controlB)} .. ${tikzCoordinate(g.end)};`,
+        `\\draw[draw=${col(g.overWire.color)},opacity=${fmt(g.overWire.opacity ?? 1)},line width=${pixelsToPt(g.overWire.width)}pt${dash(g.overWire, g.overWire.width)}] ${tikzCoordinate(g.start)} .. controls ${tikzCoordinate(g.controlA)} and ${tikzCoordinate(g.controlB)} .. ${tikzCoordinate(g.end)};`,
       );
       continue;
     }
@@ -187,21 +211,23 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
       `\\draw[draw=white,line width=${whiteWidth}pt] ${tikzCoordinate(g.start)} -- ${tikzCoordinate(g.end)};`,
     );
     lines.push(
-      `\\draw[draw=${col(g.underWire.color)},line width=${pixelsToPt(g.underWire.width)}pt] ${tikzCoordinate(g.underStart)} -- ${tikzCoordinate(g.underEnd)};`,
+      `\\draw[draw=${col(g.underWire.color)},line width=${pixelsToPt(g.underWire.width)}pt${dash(g.underWire, g.underWire.width)}] ${tikzCoordinate(g.underStart)} -- ${tikzCoordinate(g.underEnd)};`,
     );
     for (const [color, width] of [
       ['white', whiteWidth],
       [col(g.overWire.color), pixelsToPt(g.overWire.width)],
     ])
       lines.push(
-        `\\draw[draw=${color},line width=${width}pt] ${tikzCoordinate(g.start)} .. controls ${tikzCoordinate(g.controlA)} and ${tikzCoordinate(g.controlB)} .. ${tikzCoordinate(g.end)};`,
+        `\\draw[draw=${color},line width=${width}pt${color === 'white' ? '' : dash(g.overWire, g.overWire.width)}] ${tikzCoordinate(g.start)} .. controls ${tikzCoordinate(g.controlA)} and ${tikzCoordinate(g.controlB)} .. ${tikzCoordinate(g.end)};`,
       );
   }
   let index = 0;
   const rank = (o: CircuitDocument['objects'][number]) =>
     o.kind === 'component' ? 0 : o.kind === 'junction' ? 1 : 2;
   const labels: (() => void)[] = [];
-  for (const o of [...doc.objects].sort((a, b) => rank(a) - rank(b))) {
+  for (const o of [...doc.objects]
+    .filter((o) => o.kind !== 'rectangle' && o.kind !== 'line')
+    .sort((a, b) => rank(a) - rank(b))) {
     if (rank(o) === 2 && labels.length) {
       labels.splice(0).forEach((draw) => draw());
     }

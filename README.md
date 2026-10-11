@@ -27,18 +27,19 @@ DrawCircuit turns circuit sketches into editable vector diagrams. Place componen
 
 ### Editing
 
-- **Selection and geometry** — Move groups, drag labels independently, and use grid snapping, alignment guides, and equal spacing.
+- **Selection and geometry** — Move groups, drag labels independently, align selections, and distribute centers or free gaps with exact numeric spacing. Temporary guides show document distances and equal spacing.
 - **Math labels** — Edit directly on the rendered text, with LaTeX and live KaTeX rendering. Node labels choose a clear initial position and stay independently draggable.
 - **Component replacement** — Swap one or several compatible symbols in a single undoable operation while preserving their connections, position, label, and style.
-- **Undo and reuse** — Rotate, duplicate, copy, and paste with keyboard shortcuts and undo/redo.
-- **Flexible workspace** — Press T to show or hide the component sidebar, resize it, and drag the drawing toolbar to a position that suits your circuit. Text remains available in the toolbar.
+- **Undo and reuse** — Rotate, duplicate, copy, cut, and paste with keyboard shortcuts and undo/redo; native text editing keeps its usual clipboard behavior.
+- **Flexible workspace** — Press T to show or hide the component sidebar, resize both sidebars, edit selection properties in a persistent right inspector, and drag the drawing toolbar to a position that suits your circuit. Text remains available in the toolbar.
 
 ### Annotations
 
 - **Current arrows** — Integrate a labeled arrow into a branch so it follows the wire as the circuit changes.
 - **Voltage and polarity** — Mark a two-terminal component with +/− signs or draw a voltage arrow between chosen points.
 - **Loops, arrows, and text** — Add editable elliptical loop arrows, straight or Bézier arrows, and mathematical notes. Mirror arrows horizontally or vertically and drag their rotation handle for arbitrary angles; hold Shift to snap to 15°.
-- **Visual styling** — Adjust colors, symbol and label opacity, line thickness, label size, and alignment from the contextual toolbar.
+- **Visual styling** — Adjust colors, symbol and label opacity, line thickness, label size, and alignment from the right Properties inspector. Mixed selections display mixed values.
+- **Styled wires and graphics** — Use solid, dashed, or dotted wires; split a wire to style its continuation independently. Draw decorative lines and resizable rectangles with independent fill and outline opacity, without creating electrical connections.
 
 ### Export & Offline
 

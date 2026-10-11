@@ -252,9 +252,8 @@ describe('complete editor workflows', () => {
     expect(useEditorStore.getState().tool).toBe('select');
     expect(screen.queryByLabelText('Modifica testo sul foglio')).toBeNull();
     expect(screen.queryByLabelText('Testo annotazione')).toBeNull();
-    expect((document.querySelector('.context-toolbar') as HTMLElement).style.visibility).toBe(
-      'hidden',
-    );
+    expect(document.querySelector('.context-toolbar')).toBeNull();
+    expect(screen.getByLabelText('Contenuto testo')).toBeDefined();
     expect(document.querySelector('.inline-latex-preview')).toBeNull();
     fireEvent.pointerDown(target(), client(100, -80));
     fireEvent.pointerMove(canvas(), client(120, -60));
@@ -818,7 +817,7 @@ describe('expanded library and annotation fonts in the rendered interface', () =
     fireEvent.click(screen.getByRole('button', { name: 'Inserisci blocco rettangolare' }));
     click(0, 0);
     key('v');
-    fireEvent.click(screen.getByLabelText('Altre proprietà'));
+
     const internal = screen.getByRole('textbox', { name: 'Testo interno' });
     fireEvent.change(internal, { target: { value: 'H(s)' } });
     fireEvent.blur(internal);
@@ -836,7 +835,7 @@ describe('expanded library and annotation fonts in the rendered interface', () =
     fireEvent.click(screen.getByRole('button', { name: 'Inserisci resistenza' }));
     click(400, 0);
     key('v');
-    fireEvent.click(screen.getByLabelText('Altre proprietà'));
+
     expect(screen.queryByRole('textbox', { name: 'Valore' })).toBeNull();
     key('n');
     click(400, 100);

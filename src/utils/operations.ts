@@ -264,6 +264,14 @@ export function rotateObjects(doc: CircuitDocument, ids: string[]): CircuitDocum
           label: { ...o.label, offset: rotatePoint(o.label.offset, 90) },
         };
       }
+      if (o.kind === 'rectangle') {
+        // Rectangles stay axis aligned; quarter turns exchange dimensions.
+        const c = rp({ x: o.x + o.width / 2, y: o.y + o.height / 2 });
+        const width = angle === 90 ? o.height : o.width,
+          height = angle === 90 ? o.width : o.height;
+        return { ...o, x: c.x - width / 2, y: c.y - height / 2, width, height };
+      }
+      if (o.kind === 'line') return { ...o, start: rp(o.start), end: rp(o.end) };
       if (o.kind === 'arrow') return rotateArrow(o, angle, center);
       return {
         ...o,

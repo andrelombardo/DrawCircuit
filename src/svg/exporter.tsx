@@ -1,3 +1,5 @@
+import { dashPattern } from '../utils/strokeStyle';
+import type { StrokeStyle } from '../model/types';
 import { drawingWireGaps, translucentCrossing } from '../utils/wireRendering';
 import { braceGeometry } from '../annotations/brace';
 import { componentRegistry } from '../model/catalog';
@@ -77,14 +79,35 @@ export function exportSVG(source: CircuitDocument): string {
       })
       .join('');
   };
-  const path = (d: string, color: string, width: number, cap = 'round') =>
-    `<path d="${attr(d)}" fill="none" stroke="${color}" stroke-width="${f(width)}" stroke-linecap="${cap}" stroke-linejoin="round"/>`;
+  const path = (d: string, color: string, width: number, cap = 'round', style: StrokeStyle = {}) =>
+    `<path d="${attr(d)}" fill="none" stroke="${color}" stroke-width="${f(width)}" stroke-linecap="${cap}" stroke-linejoin="round"${dashPattern(style, width) ? ` stroke-dasharray="${dashPattern(style, width)!.map(f).join(' ')}"` : ''}/>`;
+  for (const o of doc.objects) {
+    if (o.kind === 'rectangle') {
+      boxes.push({
+        x: o.x - o.strokeWidth / 2,
+        y: o.y - o.strokeWidth / 2,
+        width: o.width + o.strokeWidth,
+        height: o.height + o.strokeWidth,
+      });
+      const rect = `x="${f(o.x)}" y="${f(o.y)}" width="${f(o.width)}" height="${f(o.height)}"`;
+      if (o.fill !== 'none')
+        parts.push(`<rect ${rect} fill="${o.fill}" fill-opacity="${f(o.fillOpacity ?? 1)}"/>`);
+      parts.push(
+        `<rect ${rect} fill="none" stroke="${o.color}" stroke-width="${f(o.strokeWidth)}" opacity="${f(o.opacity ?? 1)}" stroke-linejoin="round"${dashPattern(o, o.strokeWidth) ? ` stroke-dasharray="${dashPattern(o, o.strokeWidth)!.map(f).join(' ')}"` : ''} stroke-linecap="round"/>`,
+      );
+    } else if (o.kind === 'line') {
+      boxes.push(visualBounds(o, doc));
+      parts.push(
+        `<g opacity="${f(o.opacity ?? 1)}">${path(pointsPath([o.start, o.end]), o.color, o.width, 'round', o)}</g>`,
+      );
+    }
+  }
   const currentGaps = drawingWireGaps(doc);
   for (const o of doc.objects.filter((o) => o.kind === 'wire')) {
     try {
       const paths = wireDrawingPaths(wirePoints(o, doc), currentGaps.get(o.id));
       parts.push(
-        `<g opacity="${f(o.opacity ?? 1)}">${path(paths.map(pointsPath).join(' '), o.color, o.width)}</g>`,
+        `<g opacity="${f(o.opacity ?? 1)}">${path(paths.map(pointsPath).join(' '), o.color, o.width, 'round', o)}</g>`,
       );
       boxes.push(visualBounds(o, doc));
     } catch {
@@ -96,18 +119,20 @@ export function exportSVG(source: CircuitDocument): string {
       w = Math.max(c.horizontal.width, c.vertical.width) + 4;
     if (translucentCrossing(c)) {
       parts.push(
-        `<g opacity="${f(p.overWire.opacity ?? 1)}">${path(p.arc, p.overWire.color, p.overWire.width)}</g>`,
+        `<g opacity="${f(p.overWire.opacity ?? 1)}">${path(p.arc, p.overWire.color, p.overWire.width, 'round', p.overWire)}</g>`,
       );
       continue;
     }
     parts.push(
       path(p.gap, 'white', w),
-      path(p.under, p.underWire.color, p.underWire.width),
+      path(p.under, p.underWire.color, p.underWire.width, 'round', p.underWire),
       path(p.arc, 'white', w),
-      path(p.arc, p.overWire.color, p.overWire.width),
+      path(p.arc, p.overWire.color, p.overWire.width, 'round', p.overWire),
     );
   }
-  for (const o of doc.objects.filter((o) => o.kind !== 'wire')) {
+  for (const o of doc.objects.filter(
+    (o) => o.kind !== 'wire' && o.kind !== 'rectangle' && o.kind !== 'line',
+  )) {
     const firstPart = parts.length;
     if (o.kind !== 'text' && o.kind !== 'electrical') boxes.push(visualBounds(o, doc));
     if (o.kind === 'component') {

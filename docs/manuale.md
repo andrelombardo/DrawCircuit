@@ -34,8 +34,8 @@ npm run format:check
 - **T**: mostra/nascondi Componenti. **Testo** si seleziona dalla toolbar. **A**: freccia dritta o Bézier. **L**: trascina un’area per una maglia ellittica; gli angoli ne cambiano larghezza e altezza, il punto sulla punta la sposta continuamente. La toolbar inverte il verso mantenendo il percorso.
 - **V** o Esc: selezione. Shift + clic seleziona più oggetti; trascinare sullo sfondo crea una selezione rettangolare.
 - Trascina un oggetto per spostarlo, oppure la sua label per riposizionarla. I fili seguono i terminali e i nodi. Trascinare un filo collegato modifica il suo percorso; doppio clic sul filo aggiunge una svolta modificabile. Gli handle alle estremità consentono di ricollegare il filo.
-- Doppio clic su una label o un testo per modificarlo. Conferma con Enter o un clic esterno; Esc annulla. Il cursore appare direttamente sul testo, senza riquadri, usando lo stesso rendering SVG/KaTeX del circuito anche con zoom, colore e rotazione personalizzati. La toolbar contestuale permette di cambiare label, colore, spessore, dimensione e allineamento. Per i blocchi, il menu **••• → Testo interno** modifica il testo nel simbolo.
-- **R** ruota i componenti di 45° e gli altri oggetti di 90°. **Delete/Backspace** elimina. **Cmd/Ctrl D** duplica. **Cmd/Ctrl C/V** copia/incolla. **Cmd/Ctrl A** seleziona tutto.
+- Doppio clic su una label o un testo per modificarlo. Conferma con Enter o un clic esterno; Esc annulla. Il cursore appare direttamente sul testo, senza riquadri, usando lo stesso rendering SVG/KaTeX del circuito anche con zoom, colore e rotazione personalizzati. L’inspector **Proprietà** sulla destra permette di cambiare label, colore, opacità, spessore, dimensione e allineamento. Per i blocchi, **Generale → Testo interno** modifica il testo nel simbolo.
+- **R** ruota i componenti di 45° e gli altri oggetti di 90°. **Delete/Backspace** elimina. **Cmd/Ctrl D** duplica. **Cmd/Ctrl C/X/V** copia/taglia/incolla. **Cmd/Ctrl A** seleziona tutto.
 - **Cmd/Ctrl Z** annulla; **Cmd/Ctrl Shift Z** oppure **Ctrl Y** ripete. Uno spostamento completo occupa una sola voce di cronologia.
 - **Space + trascina** o **H** sposta la vista. Rotellina/trackpad e i pulsanti +/− controllano lo zoom. **1** adatta alla vista. **G** nasconde la griglia.
 - Il workspace parte dal bordo superiore, senza header, branding o gestione File. Il circuito viene salvato automaticamente in localStorage dopo 400 ms di inattività e prima di chiusura/reload. La cronologia conserva le ultime 100 operazioni durante la sessione.
@@ -49,7 +49,7 @@ L'esempio iniziale è la rete con nodi A/B/C/D, sei resistenze, label con pedici
 
 - **Fili diagonali:** con W scegli **Ortogonale**, **45°** o **Libero** nel controllo sul canvas; **Shift + W** passa alla modalità successiva anche durante il disegno. Ogni filo conserva la modalità scelta. Il routing libero collega direttamente i punti, quello a 45° usa diagonali e un eventuale tratto orizzontale/verticale. Trascina il tratto selezionato per modificarlo: i terminali rimangono collegati. Inserisci N su una diagonale per dividerla con un nodo reale. Gli incroci restano scollegati senza junction.
 - **Corrente sul filo:** il comando applica direttamente una corrente integrata. La freccia segue il ramo e si accorcia sui segmenti brevi; la toolbar ne inverte il verso. Le vecchie correnti esterne vengono lette come integrate, conservando testo, direzione e riferimenti.
-- **Sostituzione multipla:** seleziona componenti con Shift + clic o con un rettangolo, poi **••• → Sostituisci**. Il dialogo propone soltanto simboli compatibili con tutti i componenti selezionati e spiega quando non ci sono destinazioni comuni. Fili e nodi eventualmente selezionati rimangono intatti; un solo undo ripristina l’intero gruppo.
+- **Sostituzione multipla:** seleziona componenti con Shift + clic o con un rettangolo, poi **Proprietà → Azioni → Sostituisci…**. Il dialogo propone soltanto simboli compatibili con tutti i componenti selezionati e spiega quando non ci sono destinazioni comuni. Fili e nodi eventualmente selezionati rimangono intatti; un solo undo ripristina l’intero gruppo.
 - **Label dei nodi:** la posizione iniziale evita per quanto possibile simboli, testi e fili vicini. Le label già spostate restano dove sono. Clicca e trascina il testo per muoverlo indipendentemente dal nodo; i tasti freccia lo spostano di una unità, Shift + freccia di dieci. **Alt/Option + clic** passa tra label sovrapposte nello stesso punto.
 - **Opacità:** apri **Stile** e regola lo slider da 0% a 100%. Simbolo e label hanno controlli indipendenti; il testo autonomo ha un solo controllo. Funziona anche sulla selezione multipla, con preview immediata e un solo undo per gesto. Colore HEX e opacità sono salvati separatamente e vengono esportati in SVG, PNG, TikZ/CircuitikZ e Obsidian.
 - **Frecce e maglie:** **Specchia orizzontalmente/verticalmente** riflette forma e punti di controllo; **Inverti freccia** cambia invece il verso della punta. I comandi di mirroring agiscono anche su più frecce selezionate. Avvicina il mouse a una freccia selezionata e trascina il piccolo handle esterno per ruotarla; **Shift** aggancia l’orientamento a multipli di 15°, **Esc** annulla. La rotazione conserva curva, punta e dimensioni dell’ellisse, viene salvata e rimane negli export.
@@ -65,7 +65,7 @@ Il JSON resta alla versione 1: i nuovi campi opzionali hanno default compatibili
 | Geometria   | `src/utils/geometry.ts`, `operations.ts`                       | Trasformazioni, rotazioni, routing ortogonale/45°/libero, snapping, bounds, duplicazione e cancellazione  |
 | Editor      | `src/components/editor/Canvas.tsx`, `useCanvasInteractions.ts` | SVG, viewport, pointer events, scorciatoie, drag, nodi su fili, handle e anteprime                        |
 | Rendering   | `src/circuit/`, `CircuitLayer.tsx`                             | Simboli SVG riutilizzabili, fili, nodi, testo con pedici e frecce; componenti React memoizzati            |
-| Interfaccia | `src/components/toolbar/`, `palette/`, `properties/`           | Palette ricercabile, toolbar, proprietà contestuali, export e guida                                       |
+| Interfaccia | `src/components/toolbar/`, `palette/`, `properties/`           | Palette ricercabile, toolbar, inspector delle proprietà, export e guida                                   |
 | TikZ        | `src/tikz/exporter.ts`, `componentMappings.ts`                 | Conversione coordinate, simboli CircuitikZ, colori, label, Bézier, archi e standalone                     |
 | Test        | `tests/`                                                       | Geometria, modello, riferimenti, esportazione, cronologia e workflow completi nel DOM                     |
 
@@ -93,7 +93,7 @@ Il documento di verifica con **72 simboli × 4 rotazioni = 288 componenti** comp
 
 ## Verifiche
 
-La verifica dell’11 ottobre 2026 passa **1.704 test**, lint, formattazione e build. Le nove funzioni aggiornate, le prove nel browser e gli export compilati sono documentati nel [report editor](editor-upgrades/report.md). I conteggi riportati negli audit seguenti si riferiscono alle rispettive versioni storiche.
+La verifica dell’11 ottobre 2026 passa **1.767 test**, lint, formattazione e build. Inspector, precisione geometrica, stili dei fili, annotazioni e Taglia sono documentati nel [report proprietà e precisione](properties-precision/report.md), con prove nel browser, screenshot ed export compilati. Le precedenti nove funzioni sono documentate nel [report editor](editor-upgrades/report.md). I conteggi riportati negli audit seguenti si riferiscono alle rispettive versioni storiche.
 
 **401 test automatici** verificano geometria e terminali dei 72 componenti, Smart Placement, fili, junction, frecce/maglie, storia, JSON, migrazione di valore e font legacy, rendering KaTeX, export e sidebar. Il [report label e sidebar](../docs/labels-sidebar/report.md) documenta il Golden Workflow nel browser reale, le tre viewport richieste e le compilazioni LaTeX.
 
@@ -123,8 +123,8 @@ Il fixture di carico viene scritto in `/private/tmp/drawcircuit-stress.json` ed 
 - Doppio clic sul filo aggiunge una svolta, trascina il quadrato per modificarla, **Alt/Option + clic** sul quadrato la rimuove. La normalizzazione rimuove ridondanze solo quando il percorso visibile rimane identico, senza eliminare ritorni intenzionali.
 - Snap: terminale vicino, nodo/terminale, filo, griglia; soglie in pixel dello schermo. Hit area di fili, terminali e handle indipendenti dallo zoom.
 - **Cmd/Ctrl D** genera nuovi ID e numeri di label automatiche, mantenendo le label personalizzate. Le connessioni esterne alla selezione vengono scollegate dalle copie.
-- Toolbar contestuale con controlli frequenti e menu **•••** per dimensione, allineamento e proprietà rare.
-- Livelli del canvas: fili, componenti, nodi, annotazioni, label associate; selezione e handle sono sempre sopra e non entrano nell’export.
+- Inspector destro persistente con sezioni Generale, Aspetto, Geometria e Azioni; le proprietà dipendono dal tipo e dalla selezione.
+- Livelli del canvas: rettangoli e linee decorative, fili, componenti, nodi, altre annotazioni, label associate; selezione e handle sono sempre sopra e non entrano nell’export.
 - Il JSON v1 rimane compatibile con i documenti precedenti; aggiunge l’oggetto `loop-arrow` con bounding box, verso, posizione della punta, colore e spessore.
 
 ### Terzo passaggio: libreria e font
@@ -164,7 +164,7 @@ Il registro dichiarativo in `src/presets/registry.ts` genera normali componenti,
 
 La selezione singola evidenzia il simbolo senza cornice; quella multipla conserva un bounds comune. Corpo e label usano grab/grabbing, con drag indipendente delle label. Durante lo spostamento compaiono quote locali e allineamenti: la spaziatura uniforme scatta entro 7 pixel dello schermo; Alt/Option ignora le assistenze. Le quote spariscono a fine gesto e non entrano nel documento, negli export o nella cronologia.
 
-Nel dialogo Export scegli **Tutto il circuito** oppure **Solo selezione** per TikZ, Obsidian e standalone. La selezione include automaticamente i fili interni; esclude i collegamenti verso oggetti esterni se non selezionati esplicitamente. La toolbar mostra proprietà comprensibili per il tipo di oggetto, con tooltip; More conserva i controlli secondari e offre Sostituisci anche nei gruppi che contengono componenti.
+Nel dialogo Export scegli **Tutto il circuito** oppure **Solo selezione** per TikZ, Obsidian e standalone. La selezione include automaticamente i fili interni; esclude i collegamenti verso oggetti esterni se non selezionati esplicitamente. L’inspector mostra le proprietà del tipo di oggetto e offre Sostituisci anche nei gruppi che contengono componenti.
 
 **788 test passano**, inclusi 48 nuovi test. Il [report UX completo](../docs/ux-refinement/report.md) contiene audit delle azioni, regole geometriche, Golden Workflow nel browser, screenshot ed evidenze di export.
 
@@ -172,4 +172,38 @@ Nel dialogo Export scegli **Tutto il circuito** oppure **Solo selezione** per Ti
 
 **T** mostra/nasconde Componenti usando lo stesso comando del pulsante sidebar. Non agisce durante la scrittura in input, ricerca, etichette, testo, contenteditable o dialoghi. Testo si seleziona dalla toolbar e non ha una nuova shortcut. Il precedente ⌘/Ctrl T resta compatibile quando ricevuto dall’app.
 
-Gli hint di placement omettono Alt/Option, che continua a disattivare temporaneamente le assistenze. La toolbar contestuale usa 5 px verticali e 10 px orizzontali. Il branding usa un unico [master XNOR vettoriale trasparente](../assets/brand/drawcircuit-logo.svg); favicon, PNG e icone PWA derivano dal master, senza branding nel workspace.
+Gli hint di placement omettono Alt/Option, che continua a disattivare temporaneamente le assistenze. La precedente toolbar contestuale è stata sostituita dall’inspector delle proprietà. Il branding usa un unico [master XNOR vettoriale trasparente](../assets/brand/drawcircuit-logo.svg); favicon, PNG e icone PWA derivano dal master, senza branding nel workspace.
+
+## Proprietà, precisione e nuove annotazioni (11 ottobre 2026)
+
+**Proprietà** è la sidebar destra. Il pulsante nell’intestazione la nasconde; quello sul canvas la riapre. Trascina il bordo sinistro per ridimensionarla (252–440 px, inizialmente 292 px); doppio clic ripristina la larghezza. Il separatore è utilizzabile anche con frecce, Home ed End. Stato e larghezza sono salvati in `drawcircuit.inspector.v1`, separatamente dal circuito e dalla palette sinistra. Su finestre fino a 1050 px l’inspector si sovrappone al canvas e può essere chiuso. L’apertura e il ridimensionamento conservano zoom e punto al centro della vista.
+
+Le sezioni **Generale**, **Aspetto**, **Geometria** e **Azioni** mostrano solo proprietà pertinenti. Valori diversi nella selezione mostrano **Valori misti**, **Misto** o un trattino. Una modifica comune riguarda tutti gli oggetti compatibili, con un solo undo. I campi numerici/testuali si confermano con Enter o perdendo il focus; Escape annulla il draft. Slider e selettore colore raggruppano le anteprime in un gesto. Le proprietà locali ancora in scrittura non modificano il circuito.
+
+### Allineare e distribuire
+
+Seleziona più oggetti e usa i sei pulsanti in **Geometria** per allineare bordi o centri. **Distribuisci orizzontalmente/verticalmente** tiene fermi gli estremi e sposta gli oggetti intermedi. **Per centri** è il default: nel circuito con tre generatori produce distanze uguali tra i centri. **Per spazi liberi** uguaglia gli intervalli tra i bounding box, utile per dimensioni diverse. Le label non influenzano le misure del simbolo.
+
+Per una distanza precisa scegli l’asse X/Y, inserisci **Distanza esatta**, quindi **Applica** o Enter. Il primo oggetto sull’asse rimane fermo; gli altri si spostano nell’ordine geometrico. Il valore è in unità documento (`u`); la griglia è 20 u. I comandi riutilizzano lo spostamento dei componenti: terminali, junction e riferimenti elettrici vengono conservati. Le junction non selezionate restano ferme e il routing può aggiungere gomiti ai fili per mantenere la connessione.
+
+Durante un drag le guide mostrano allineamenti, terminali, quote e spaziatura uniforme. Nei rami paralleli si privilegiano i centri dei generatori e gli assi dei rami. Le quote usano le coordinate del documento e restano leggibili allo zoom; spariscono al rilascio. **Shift** mostra ulteriori quote di centri e spazi liberi; **Alt/Option** disabilita temporaneamente anche lo snap alla griglia. In assenza di selezione, **Aggancia durante spostamento** abilita/disabilita le assistenze del drag. Inserimento e disegno mantengono i propri comandi di snapping.
+
+### Stili di linea e continuazioni
+
+Per fili, linee decorative e rettangoli scegli **Stile linea → Continua / Tratteggiata / Puntinata**. Trattino e intervallo si misurano in unità documento e possono essere modificati anche per più oggetti. Un filo privo di stile nei JSON precedenti resta continuo. Il tratteggio mantiene endpoint e topologia; una hit area continua permette di selezionarlo anche nei vuoti.
+
+Per rendere tratteggiata solo una continuazione, seleziona il filo, premi **Dividi filo…**, poi clicca sul punto desiderato. Il filo viene diviso in due oggetti collegati da una junction; il secondo rimane selezionato e può ricevere uno stile indipendente. Escape annulla la scelta del punto. La divisione conserva eventuali annotazioni di corrente e non viene eseguita sugli endpoint o su incroci con altri oggetti, evitando collegamenti involontari.
+
+### Rettangoli e linee decorative
+
+In **Disegno e annotazioni** trovi **Rettangolo** e **Linea decorativa**. Trascina per creare; la preview segue la griglia. Per il rettangolo **Shift** crea un quadrato e **Alt/Option** disegna dal centro; tutti i versi di trascinamento sono supportati. Per la linea **Shift** vincola a multipli di 45°. Escape annulla la preview.
+
+Il rettangolo nasce senza riempimento. Selezionalo sul bordo, spostalo, trascina i quattro handle oppure modifica larghezza e altezza nell’inspector. **Aspetto** controlla colore, spessore e stile del contorno, riempimento e opacità indipendenti. Un rettangolo vuoto lascia selezionabili gli oggetti interni; entrambi i nuovi oggetti vengono disegnati dietro i componenti e non creano connessioni elettriche. La rotazione di 90° scambia larghezza e altezza: il rettangolo resta allineato agli assi. Un ridimensionamento completo è un solo undo; Escape ripristina la geometria iniziale.
+
+### Taglia e appunti
+
+**Cmd/Ctrl X** oppure **Proprietà → Azioni → Taglia** copia la selezione nella stessa rappresentazione JSON di Copia e poi rimuove gli originali. La copia interna validata è disponibile prima della cancellazione; appunti negati non impediscono l’incolla nella stessa sessione. Se non è possibile ottenere una copia valida, il documento non viene modificato. Incolla genera nuovi ID, rimappa i collegamenti interni e usa le regole esistenti per le connessioni esterne. Undo e redo registrano il taglio come un’azione.
+
+Gli eventi nativi Copia/Taglia/Incolla dei menu del browser sono supportati anche quando non viene inviato un keydown. In input, textarea, ricerca, editing inline e contenteditable rimane il comportamento nativo del testo.
+
+JSON v1, blocchi personali, SVG, CircuitikZ e Obsidian conservano rettangoli, linee, stili e opacità. Guide, griglia, selezione e handle restano fuori dagli export. Il [report di verifica](properties-precision/report.md) comprende mappa delle azioni migrate, prove del circuito a tre generatori, screenshot responsive e file riapribili/esportati.

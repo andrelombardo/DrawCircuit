@@ -1,6 +1,7 @@
 import { componentRegistry } from '../model/catalog';
 import type { CircuitObject, Endpoint, Point } from '../model/types';
 import { isRotation } from '../model/types';
+import { validStroke } from '../utils/strokeStyle';
 import { localToWorld } from '../utils/geometry';
 
 /** Export-only validation: never repair or mutate the editor's document. */
@@ -111,10 +112,23 @@ export function isExportableObject(o: CircuitObject): boolean {
         rotation(o.rotation) &&
         ['start', 'middle', 'end'].includes(o.align)
       );
+    case 'rectangle':
+      return (
+        finitePoint(o) &&
+        positive(o.width) &&
+        positive(o.height) &&
+        positive(o.strokeWidth) &&
+        (o.fill === 'none' || !!normalizeHex(o.fill)) &&
+        opacity(o.fillOpacity) &&
+        validStroke(o)
+      );
+    case 'line':
+      return finitePoint(o.start) && finitePoint(o.end) && positive(o.width) && validStroke(o);
     case 'wire':
       return (
         (o.routing === undefined || ['orthogonal', '45', 'free'].includes(o.routing)) &&
         positive(o.width) &&
+        validStroke(o) &&
         endpoint(o.startEndpoint) &&
         endpoint(o.endEndpoint) &&
         Array.isArray(o.vertices) &&

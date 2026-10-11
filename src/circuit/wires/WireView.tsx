@@ -1,3 +1,4 @@
+import { dashPattern } from '../../utils/strokeStyle';
 import { memo } from 'react';
 import type { Point, Wire } from '../../model/types';
 import { pointsPath } from '../../utils/geometry';
@@ -28,6 +29,7 @@ export const WireView = memo(
           opacity={o.opacity}
           stroke={o.color}
           strokeWidth={o.width}
+          strokeDasharray={dashPattern(o, o.width)?.join(' ')}
           strokeLinecap="round"
           strokeLinejoin="round"
         />

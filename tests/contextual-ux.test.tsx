@@ -141,7 +141,7 @@ describe('selection PNG shortcut', () => {
       const selection = multi ? [r1.id, r2.id, j.id, w.id] : [r1.id];
       useEditorStore.setState({ document: doc, selection });
       render(<Canvas />);
-      fireEvent.click(screen.getByRole('button', { name: 'Altre proprietà' }));
+
       fireEvent.click(screen.getByRole('button', { name: 'Copia come immagine' }));
       await waitFor(() => expect(useEditorStore.getState().notice).toBe('PNG copiato'));
       expect(copyPNG).toHaveBeenCalledExactlyOnceWith(getExportSelection(doc, selection));

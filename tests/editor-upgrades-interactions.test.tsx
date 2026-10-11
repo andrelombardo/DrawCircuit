@@ -171,7 +171,7 @@ describe('complete canvas gestures', () => {
       { shiftKey: true },
     );
     expect(state().selection).toHaveLength(6);
-    fireEvent.click(screen.getByRole('button', { name: 'Altre proprietà' }));
+
     fireEvent.click(screen.getByRole('button', { name: 'Sostituisci…' }));
     fireEvent.change(screen.getByLabelText('Cerca sostituzione'), {
       target: { value: 'condensatore' },
@@ -195,7 +195,7 @@ describe('complete canvas gestures', () => {
     fireEvent.pointerMove(canvas(), client(150, 100));
     fireEvent.pointerUp(canvas(), client(150, 100));
     expect(state().selection).toHaveLength(2);
-    fireEvent.click(screen.getByRole('button', { name: 'Altre proprietà' }));
+
     fireEvent.click(screen.getByRole('button', { name: 'Sostituisci…' }));
     expect(screen.getByText(/Nessuna destinazione comune/)).toBeTruthy();
     expect(state().past).toHaveLength(0);
@@ -205,7 +205,7 @@ describe('complete canvas gestures', () => {
       j = { ...createJunction({ x: 100, y: 0 }, 'B'), id: 'b' };
     load([c, j], ['a', 'b']);
     const original = state().document;
-    fireEvent.click(screen.getByRole('button', { name: 'Stile' }));
+
     const opacity = screen.getByLabelText('Opacità simbolo');
     fireEvent.pointerDown(opacity, { pointerId: 1 });
     for (const value of ['80', '50', '0']) fireEvent.change(opacity, { target: { value } });

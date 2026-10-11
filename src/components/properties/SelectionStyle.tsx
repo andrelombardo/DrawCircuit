@@ -1,7 +1,8 @@
 import { ChevronDown, Type, Minus } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import type { FormEvent } from 'react';
 import { useEditorStore } from '../../store/editorStore';
+import { commonValue } from './commonValue';
 import { COLORS } from '../../model/types';
 import type { CircuitObject } from '../../model/types';
 
@@ -12,15 +13,41 @@ function ColorControl({
   onChange,
 }: {
   label: string;
-  value: string;
+  value: string | undefined;
   onChange: (color: string) => void;
 }) {
   const lastColor = useRef(value);
+  const ownsGesture = useRef(false);
+  const picker = useRef<HTMLInputElement>(null);
+  const finish = useCallback(() => {
+    if (ownsGesture.current) {
+      ownsGesture.current = false;
+      useEditorStore.getState().endGesture();
+    }
+  }, []);
+  useEffect(
+    () => () => {
+      if (ownsGesture.current) useEditorStore.getState().endGesture();
+    },
+    [],
+  );
   useEffect(() => {
     lastColor.current = value;
   }, [value]);
-  // Native pickers emit input while choosing and change on confirmation.
-  // Commit each new value once, including browsers that emit both events.
+  // React suppresses change if the last input already contained the final color.
+  // Listen to native confirmation so all previews remain a single transaction.
+  useEffect(() => {
+    const input = picker.current;
+    const confirm = () => {
+      if (input && input.value !== lastColor.current) {
+        lastColor.current = input.value;
+        onChange(input.value);
+      }
+      finish();
+    };
+    input?.addEventListener('change', confirm);
+    return () => input?.removeEventListener('change', confirm);
+  }, [onChange, finish]);
   const chooseCustom = (event: FormEvent<HTMLInputElement>) => {
     const color = event.currentTarget.value;
     if (color === lastColor.current) return;
@@ -29,7 +56,10 @@ function ColorControl({
   };
   return (
     <div className="style-row">
-      <span>{label}</span>
+      <span>
+        {label}
+        {value === undefined && <small className="mixed-value">Misto</small>}
+      </span>
       <div className="style-colors" role="group" aria-label={`Colore ${label.toLowerCase()}`}>
         {Object.entries(COLORS).map(([name, color]) => (
           <button
@@ -38,7 +68,7 @@ function ColorControl({
             className="color-choice"
             aria-label={`${label}: ${colorNames[name as keyof typeof colorNames]}`}
             title={`${label}: ${colorNames[name as keyof typeof colorNames]}`}
-            aria-pressed={value.toLowerCase() === color}
+            aria-pressed={value?.toLowerCase() === color}
             onClick={() => onChange(color)}
           >
             <span style={{ background: color }} />
@@ -47,34 +77,59 @@ function ColorControl({
         <label
           className="color-choice custom-color-choice"
           title="Colore personalizzato"
-          data-selected={!Object.values(COLORS).some((color) => color === value.toLowerCase())}
+          data-selected={!Object.values(COLORS).some((color) => color === value?.toLowerCase())}
         >
           <span className="rgb-swatch" aria-hidden="true" />
           <input
+            ref={picker}
             type="color"
-            value={value}
+            value={value ?? COLORS.ink}
             aria-label={`Colore ${label.toLowerCase()} personalizzato`}
             title="Colore personalizzato"
+            onPointerDown={() => {
+              if (!ownsGesture.current) {
+                useEditorStore.getState().beginGesture();
+                ownsGesture.current = true;
+              }
+            }}
             onInput={chooseCustom}
             onChange={chooseCustom}
+            onBlur={finish}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape' && ownsGesture.current) {
+                e.stopPropagation();
+                ownsGesture.current = false;
+                useEditorStore.getState().cancelGesture();
+              }
+            }}
           />
         </label>
       </div>
     </div>
   );
 }
-function OpacityControl({
+export function OpacityControl({
   objects,
   label,
   labelOpacity = false,
+  fillOpacity = false,
 }: {
   objects: CircuitObject[];
   label: string;
   labelOpacity?: boolean;
+  fillOpacity?: boolean;
 }) {
   const ids = new Set(objects.map((o) => o.id));
   const values = objects.flatMap((o) =>
-    labelOpacity ? ('label' in o ? [o.label.opacity ?? 1] : []) : [o.opacity ?? 1],
+    fillOpacity
+      ? o.kind === 'rectangle' && o.fill !== 'none'
+        ? [o.fillOpacity ?? 1]
+        : []
+      : labelOpacity
+        ? 'label' in o
+          ? [o.label.opacity ?? 1]
+          : []
+        : [o.opacity ?? 1],
   );
   const value = Math.round((values[0] ?? 1) * 100);
   const mixed = values.some((v) => v !== values[0]);
@@ -99,13 +154,16 @@ function OpacityControl({
   );
   return (
     <label className="style-row opacity-row">
-      <span>{label}</span>
+      <span>
+        {label}
+        {value === undefined && <small className="mixed-value">Misto</small>}
+      </span>
       <input
         type="range"
         min="0"
         max="100"
         step="1"
-        value={value}
+        value={mixed ? 50 : value}
         aria-label={label}
         aria-valuetext={mixed ? 'Valori misti' : `${value}%`}
         onPointerDown={(e) => {
@@ -147,11 +205,15 @@ function OpacityControl({
             objects: state.document.objects.map((o) =>
               !ids.has(o.id)
                 ? o
-                : labelOpacity
-                  ? 'label' in o
-                    ? { ...o, label: { ...o.label, opacity } }
+                : fillOpacity
+                  ? o.kind === 'rectangle' && o.fill !== 'none'
+                    ? { ...o, fillOpacity: opacity }
                     : o
-                  : { ...o, opacity },
+                  : labelOpacity
+                    ? 'label' in o
+                      ? { ...o, label: { ...o.label, opacity } }
+                      : o
+                    : { ...o, opacity },
             ),
           };
           if (ownsGesture.current) state.preview(next);
@@ -183,26 +245,55 @@ export function SelectionStyle({
       o.kind === 'wire' ||
       o.kind === 'arrow' ||
       o.kind === 'loop-arrow' ||
+      o.kind === 'rectangle' ||
+      o.kind === 'line' ||
       o.kind === 'electrical' ||
       o.kind === 'brace',
   );
-  const size = o?.kind === 'text' ? o.fontSize : o && 'label' in o ? o.label.fontSize : 22;
-  const width = o?.kind === 'loop-arrow' ? o.strokeWidth : o && 'width' in o ? o.width : 2;
+  const size = commonValue(
+    objects.flatMap((o) =>
+      o.kind === 'text' ? [o.fontSize] : 'label' in o ? [o.label.fontSize] : [],
+    ),
+  );
+  const width = commonValue(
+    objects.flatMap((o) =>
+      o.kind === 'loop-arrow' || o.kind === 'rectangle'
+        ? [o.strokeWidth]
+        : 'width' in o
+          ? [o.width]
+          : [],
+    ),
+  );
+  const fillObjects = objects.filter((o) => o.kind === 'rectangle' && o.fill !== 'none');
   return (
-    <div className="context-popover style-popover" role="group" aria-label="Stile selezione">
+    <div className="inspector-style" role="group" aria-label="Stile selezione">
       <ColorControl
         label={o?.kind === 'text' ? 'Testo' : o?.kind === 'wire' ? 'Filo' : 'Simbolo'}
-        value={o?.color ?? COLORS.ink}
+        value={commonValue(objects.map((o) => o.color))}
         onChange={(color) => apply((o) => ({ ...o, color }))}
       />
       <OpacityControl
         objects={objects}
         label={o?.kind === 'text' ? 'Opacità testo' : 'Opacità simbolo'}
       />
+      {!!fillObjects.length && (
+        <>
+          <ColorControl
+            label="Riempimento"
+            value={commonValue(
+              fillObjects.map((o) => (o.kind === 'rectangle' ? o.fill : COLORS.ink)),
+            )}
+            onChange={(fill) =>
+              apply((o) => (o.kind === 'rectangle' && o.fill !== 'none' ? { ...o, fill } : o))
+            }
+          />
+          <OpacityControl objects={fillObjects} label="Opacità riempimento" fillOpacity />
+        </>
+      )}
       {hasLabel && (
         <ColorControl
           label="Etichetta"
-          value={o && 'label' in o ? o.label.color : COLORS.blue}
+          value={commonValue(objects.flatMap((o) => ('label' in o ? [o.label.color] : [])))}
           onChange={(color) =>
             apply((o) => ('label' in o ? { ...o, label: { ...o.label, color } } : o))
           }
@@ -220,13 +311,14 @@ export function SelectionStyle({
               <select
                 aria-label="Spessore linea"
                 title="Spessore linea"
-                value={width}
+                value={width ?? ''}
                 onChange={(e) =>
                   apply((o) =>
-                    o.kind === 'loop-arrow'
+                    o.kind === 'loop-arrow' || o.kind === 'rectangle'
                       ? { ...o, strokeWidth: Number(e.target.value) }
                       : o.kind === 'component' ||
                           o.kind === 'wire' ||
+                          o.kind === 'line' ||
                           o.kind === 'arrow' ||
                           o.kind === 'electrical' ||
                           o.kind === 'brace'
@@ -235,7 +327,12 @@ export function SelectionStyle({
                   )
                 }
               >
-                {[...new Set([1, 1.5, 1.8, 2, 3, 4, width])]
+                {width === undefined && (
+                  <option value="" disabled>
+                    Valori misti
+                  </option>
+                )}
+                {[...new Set([1, 1.5, 1.8, 2, 3, 4, ...(width === undefined ? [] : [width])])]
                   .sort((a, b) => a - b)
                   .map((w) => (
                     <option key={w} value={w}>
@@ -260,7 +357,7 @@ export function SelectionStyle({
               <select
                 aria-label="Dimensione testo"
                 title="Dimensione testo"
-                value={size}
+                value={size ?? ''}
                 onChange={(e) =>
                   apply((o) =>
                     o.kind === 'text'
@@ -271,7 +368,26 @@ export function SelectionStyle({
                   )
                 }
               >
-                {[...new Set([16, 18, 20, 22, 23, 24, 27, 28, 32, 40, size])]
+                {size === undefined && (
+                  <option value="" disabled>
+                    Valori misti
+                  </option>
+                )}
+                {[
+                  ...new Set([
+                    16,
+                    18,
+                    20,
+                    22,
+                    23,
+                    24,
+                    27,
+                    28,
+                    32,
+                    40,
+                    ...(size === undefined ? [] : [size]),
+                  ]),
+                ]
                   .sort((a, b) => a - b)
                   .map((s) => (
                     <option key={s} value={s}>

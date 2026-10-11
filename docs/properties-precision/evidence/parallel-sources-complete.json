@@ -1,0 +1,469 @@
+{
+  "version": 1,
+  "title": "Tre generatori in parallelo",
+  "objects": [
+    {
+      "kind": "component",
+      "id": "source-1",
+      "type": "currentSource",
+      "x": 0,
+      "y": 0,
+      "rotation": 270,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "I_1",
+        "offset": {
+          "x": -44,
+          "y": 0
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "source-2",
+      "type": "currentSource",
+      "x": 120,
+      "y": 0,
+      "rotation": 270,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "I_2",
+        "offset": {
+          "x": -44,
+          "y": 0
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "source-3",
+      "type": "currentSource",
+      "x": 240,
+      "y": 0,
+      "rotation": 270,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "I_3",
+        "offset": {
+          "x": -44,
+          "y": 0
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "junction",
+      "id": "rail-1-0",
+      "x": 0,
+      "y": -100,
+      "color": "#171a20",
+      "label": {
+        "text": "",
+        "offset": {
+          "x": 0,
+          "y": -24
+        },
+        "color": "#df4949",
+        "fontSize": 24,
+        "rotation": 0
+      }
+    },
+    {
+      "kind": "junction",
+      "id": "rail-1-1",
+      "x": 0,
+      "y": 100,
+      "color": "#171a20",
+      "label": {
+        "text": "",
+        "offset": {
+          "x": 0,
+          "y": -24
+        },
+        "color": "#df4949",
+        "fontSize": 24,
+        "rotation": 0
+      }
+    },
+    {
+      "kind": "junction",
+      "id": "rail-2-0",
+      "x": 140,
+      "y": -100,
+      "color": "#171a20",
+      "label": {
+        "text": "",
+        "offset": {
+          "x": 0,
+          "y": -24
+        },
+        "color": "#df4949",
+        "fontSize": 24,
+        "rotation": 0
+      }
+    },
+    {
+      "kind": "junction",
+      "id": "rail-2-1",
+      "x": 140,
+      "y": 100,
+      "color": "#171a20",
+      "label": {
+        "text": "",
+        "offset": {
+          "x": 0,
+          "y": -24
+        },
+        "color": "#df4949",
+        "fontSize": 24,
+        "rotation": 0
+      }
+    },
+    {
+      "kind": "junction",
+      "id": "rail-3-0",
+      "x": 300,
+      "y": -100,
+      "color": "#171a20",
+      "label": {
+        "text": "",
+        "offset": {
+          "x": 0,
+          "y": -24
+        },
+        "color": "#df4949",
+        "fontSize": 24,
+        "rotation": 0
+      }
+    },
+    {
+      "kind": "junction",
+      "id": "rail-3-1",
+      "x": 300,
+      "y": 100,
+      "color": "#171a20",
+      "label": {
+        "text": "",
+        "offset": {
+          "x": 0,
+          "y": -24
+        },
+        "color": "#df4949",
+        "fontSize": 24,
+        "rotation": 0
+      }
+    },
+    {
+      "kind": "wire",
+      "id": "9bd001ba-0440-4464-a4bd-68b0ad3ab190",
+      "startEndpoint": {
+        "kind": "terminal",
+        "componentId": "source-1",
+        "terminalId": "b"
+      },
+      "endEndpoint": {
+        "kind": "junction",
+        "junctionId": "rail-1-0"
+      },
+      "vertices": [],
+      "routing": "orthogonal",
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "wire",
+      "id": "7e2a9c05-751e-4eb2-9da3-e847fcd132ad",
+      "startEndpoint": {
+        "kind": "terminal",
+        "componentId": "source-1",
+        "terminalId": "a"
+      },
+      "endEndpoint": {
+        "kind": "junction",
+        "junctionId": "rail-1-1"
+      },
+      "vertices": [],
+      "routing": "orthogonal",
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "wire",
+      "id": "72058a62-7f41-4c00-9e40-ee93ebaeaf03",
+      "startEndpoint": {
+        "kind": "junction",
+        "junctionId": "rail-1-0"
+      },
+      "endEndpoint": {
+        "kind": "junction",
+        "junctionId": "rail-2-0"
+      },
+      "vertices": [],
+      "routing": "orthogonal",
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "wire",
+      "id": "cb2f6686-6ad1-4151-8922-2c3a1b31eb33",
+      "startEndpoint": {
+        "kind": "junction",
+        "junctionId": "rail-1-1"
+      },
+      "endEndpoint": {
+        "kind": "junction",
+        "junctionId": "rail-2-1"
+      },
+      "vertices": [],
+      "routing": "orthogonal",
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "wire",
+      "id": "2290f52f-ff71-4b44-b3b3-e96500445f3a",
+      "startEndpoint": {
+        "kind": "terminal",
+        "componentId": "source-2",
+        "terminalId": "b"
+      },
+      "endEndpoint": {
+        "kind": "junction",
+        "junctionId": "rail-2-0"
+      },
+      "vertices": [
+        {
+          "x": 140,
+          "y": -70
+        }
+      ],
+      "routing": "orthogonal",
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "wire",
+      "id": "9c4d25d4-e131-476b-9cee-0becf742fc01",
+      "startEndpoint": {
+        "kind": "terminal",
+        "componentId": "source-2",
+        "terminalId": "a"
+      },
+      "endEndpoint": {
+        "kind": "junction",
+        "junctionId": "rail-2-1"
+      },
+      "vertices": [
+        {
+          "x": 140,
+          "y": 70
+        }
+      ],
+      "routing": "orthogonal",
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "wire",
+      "id": "11ecc177-c078-4ddf-8cda-13f06d8d866d",
+      "startEndpoint": {
+        "kind": "junction",
+        "junctionId": "rail-2-0"
+      },
+      "endEndpoint": {
+        "kind": "junction",
+        "junctionId": "rail-3-0"
+      },
+      "vertices": [],
+      "routing": "orthogonal",
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "wire",
+      "id": "8244abfd-34b7-4b07-b330-1c4cd075ffcb",
+      "startEndpoint": {
+        "kind": "junction",
+        "junctionId": "rail-2-1"
+      },
+      "endEndpoint": {
+        "kind": "junction",
+        "junctionId": "rail-3-1"
+      },
+      "vertices": [],
+      "routing": "orthogonal",
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "wire",
+      "id": "7b6dca03-9ae9-4a9c-b9b7-80fb0f58408b",
+      "startEndpoint": {
+        "kind": "terminal",
+        "componentId": "source-3",
+        "terminalId": "b"
+      },
+      "endEndpoint": {
+        "kind": "junction",
+        "junctionId": "rail-3-0"
+      },
+      "vertices": [
+        {
+          "x": 300,
+          "y": -70
+        }
+      ],
+      "routing": "orthogonal",
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "wire",
+      "id": "47b8ebbe-5e02-4a02-9389-061a3883f1f3",
+      "startEndpoint": {
+        "kind": "terminal",
+        "componentId": "source-3",
+        "terminalId": "a"
+      },
+      "endEndpoint": {
+        "kind": "junction",
+        "junctionId": "rail-3-1"
+      },
+      "vertices": [
+        {
+          "x": 300,
+          "y": 70
+        }
+      ],
+      "routing": "orthogonal",
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "wire",
+      "id": "extension-0",
+      "startEndpoint": {
+        "kind": "junction",
+        "junctionId": "rail-3-0"
+      },
+      "endEndpoint": {
+        "kind": "free",
+        "point": {
+          "x": 400,
+          "y": -100
+        }
+      },
+      "vertices": [],
+      "routing": "orthogonal",
+      "color": "#171a20",
+      "width": 2,
+      "lineStyle": "dashed"
+    },
+    {
+      "kind": "wire",
+      "id": "extension-1",
+      "startEndpoint": {
+        "kind": "junction",
+        "junctionId": "rail-3-1"
+      },
+      "endEndpoint": {
+        "kind": "free",
+        "point": {
+          "x": 400,
+          "y": 100
+        }
+      },
+      "vertices": [],
+      "routing": "orthogonal",
+      "color": "#171a20",
+      "width": 2,
+      "lineStyle": "dashed"
+    },
+    {
+      "kind": "rectangle",
+      "id": "837ad280-9d35-47fb-b5e0-e91c933150ed",
+      "x": -75,
+      "y": -135,
+      "width": 520,
+      "height": 270,
+      "color": "#8855c2",
+      "strokeWidth": 2,
+      "fill": "none",
+      "lineStyle": "dotted"
+    },
+    {
+      "kind": "line",
+      "id": "b0926d87-666e-4d88-9a9d-200a5d687739",
+      "start": {
+        "x": -65,
+        "y": 155
+      },
+      "end": {
+        "x": 425,
+        "y": 155
+      },
+      "color": "#2463cb",
+      "width": 2,
+      "lineStyle": "dashed"
+    }
+  ]
+}

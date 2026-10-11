@@ -314,3 +314,37 @@ export function remapSplitWireCurrents(
     }),
   };
 }
+
+/** Split only the chosen wire. A style continuation never joins an unrelated crossing. */
+export function splitWireAtPoint(
+  doc: CircuitDocument,
+  id: string,
+  point: Point,
+): { doc: CircuitDocument; secondId: string } | null {
+  const wire = doc.objects.find((o) => o.id === id);
+  if (wire?.kind !== 'wire') return null;
+  const pts = wirePoints(wire, doc);
+  const segment = pts.findIndex(
+    (a, i) => i < pts.length - 1 && distance(point, projectOnSegment(point, a, pts[i + 1])) < 0.001,
+  );
+  if (segment < 0 || distance(point, pts[0]) < 0.001 || distance(point, pts.at(-1)!) < 0.001)
+    return null;
+  if (nearestTarget(point, doc, 0.01) || nearestWire(point, doc, 0.01, new Set([id]))) return null;
+  const junction = createJunction(point, ''),
+    ep: Endpoint = { kind: 'junction', junctionId: junction.id };
+  const first: Wire = { ...wire, endEndpoint: ep, vertices: pts.slice(1, segment + 1) };
+  const second: Wire = {
+    ...wire,
+    id: makeId(),
+    startEndpoint: ep,
+    vertices: pts.slice(segment + 1, -1),
+  };
+  const next = {
+    ...doc,
+    objects: doc.objects.flatMap((o) => (o.id === id ? [first, second] : [o])).concat(junction),
+  };
+  return {
+    doc: remapSplitWireCurrents(doc, next, new Map([[id, [id, second.id]]])),
+    secondId: second.id,
+  };
+}

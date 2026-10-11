@@ -170,12 +170,12 @@ describe('sidebar shortcut received by the app', () => {
     expect(screen.queryByRole('complementary')).toBeNull();
     key('t', {}, canvas());
     expect(screen.getByRole('complementary')).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Stile' }));
-    const details = screen.getByRole('button', { name: 'Stile' }).closest('details')!;
-    details.open = true;
-    key('t', {}, canvas());
+
+    const input = screen.getByLabelText('Etichetta annotazione');
+    input.focus();
+    key('t', {}, input);
     expect(screen.getByRole('complementary')).toBeTruthy();
-    details.open = false;
+    input.blur();
     key('t', {}, canvas());
     expect(screen.queryByRole('complementary')).toBeNull();
     expect(state().selection).toEqual([brace.id]);
@@ -334,7 +334,7 @@ describe('annotation and placement cleanup', () => {
       }
       expect(state().document.objects).toEqual([brace]);
       expect(state().past).toHaveLength(4);
-      fireEvent.click(screen.getByRole('button', { name: 'Stile' }));
+
       const ui = [
         ...document.querySelectorAll(
           'button,input,select,textarea,summary,[role="dialog"],.property-control > span',

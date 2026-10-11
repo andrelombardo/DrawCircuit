@@ -32,6 +32,8 @@ export function toolbarActions(o: CircuitObject | null) {
       };
     case 'text':
       return { primary: ['style', ...common], secondary: [...secondary, 'alignment'] };
+    case 'rectangle':
+    case 'line':
     case 'wire':
       return { primary: ['style', ...common], secondary };
     case 'arrow':
