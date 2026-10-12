@@ -1,5 +1,6 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import type { KeyboardEvent, ReactNode, RefObject } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronRight } from 'lucide-react';
 import { actionMenuPosition } from './actionMenuPosition';
 
@@ -7,6 +8,7 @@ export type MenuAction = {
   id: string;
   label: string;
   icon?: ReactNode;
+  shortcut?: string;
   onSelect?: () => void;
   children?: MenuAction[];
   separatorBefore?: boolean;
@@ -35,7 +37,8 @@ function MenuPanel({
   label: string;
   items: MenuAction[];
   level: number;
-  anchor: RefObject<HTMLButtonElement | null> | HTMLButtonElement | undefined;
+  anchor:
+    RefObject<HTMLButtonElement | null> | HTMLButtonElement | { x: number; y: number } | undefined;
   openItem?: string;
   focusRequest: FocusRequest | null;
   onBranch: (item: MenuAction, keyboard: boolean) => void;
@@ -51,11 +54,14 @@ function MenuPanel({
   useLayoutEffect(() => {
     const element = panel.current;
     const trigger = anchor && ('current' in anchor ? anchor.current : anchor);
+    const point = trigger && 'x' in trigger ? trigger : null;
     if (!element || !trigger) return;
     const position = () => {
       const rect = element.getBoundingClientRect();
       const p = actionMenuPosition(
-        trigger.getBoundingClientRect(),
+        point
+          ? { left: point.x, right: point.x, top: point.y, bottom: point.y }
+          : (trigger as HTMLButtonElement).getBoundingClientRect(),
         { width: rect.width, height: rect.height },
         { width: window.innerWidth, height: window.innerHeight },
         level > 0,
@@ -67,7 +73,7 @@ function MenuPanel({
     position();
     const observer = new ResizeObserver(position);
     observer.observe(element);
-    observer.observe(trigger);
+    if (!point) observer.observe(trigger as HTMLButtonElement);
     window.addEventListener('resize', position);
     window.addEventListener('scroll', position, true);
     return () => {
@@ -150,6 +156,8 @@ function MenuPanel({
             }}
             type="button"
             role="menuitem"
+            aria-label={item.label}
+            aria-description={item.shortcut}
             className="action-menu-item"
             tabIndex={index === 0 ? 0 : -1}
             disabled={item.disabled}
@@ -167,6 +175,7 @@ function MenuPanel({
           >
             <span className="action-menu-icon">{item.icon}</span>
             <span className="action-menu-label">{item.label}</span>
+            {item.shortcut && <kbd className="action-menu-shortcut">{item.shortcut}</kbd>}
             {item.children && (
               <ChevronRight className="action-menu-chevron" size={14} aria-hidden="true" />
             )}
@@ -187,24 +196,30 @@ export function ActionMenu({
   className = '',
   onOpenChange,
   onEscape,
+  context,
 }: {
   label: string;
-  icon: ReactNode;
+  icon?: ReactNode;
   items: MenuAction[];
   active?: boolean;
   showLabel?: boolean;
   className?: string;
   onOpenChange?: (open: boolean) => void;
   onEscape?: () => void;
+  context?: { x: number; y: number; onClose: () => void; returnFocus: () => void };
 }) {
   const id = useId();
   const root = useRef<HTMLDivElement>(null);
+  const floating = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const [rowRefs] = useState(() => new Map<string, HTMLButtonElement>());
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [open, setOpen] = useState(false);
+  const [opened, setOpen] = useState(false);
+  const open = !!context || opened;
   const [path, setPath] = useState<string[]>([]);
-  const [focusRequest, setFocusRequest] = useState<FocusRequest | null>(null);
+  const [focusRequest, setFocusRequest] = useState<FocusRequest | null>(
+    context ? { level: 0, edge: 'first' } : null,
+  );
   const cancelHover = () => {
     if (hoverTimer.current !== null) clearTimeout(hoverTimer.current);
     hoverTimer.current = null;
@@ -214,12 +229,20 @@ export function ActionMenu({
     setOpen(false);
     setPath([]);
     onOpenChange?.(false);
-    if (restoreFocus) trigger.current?.focus();
+    context?.onClose();
+    if (restoreFocus) {
+      if (context) context.returnFocus();
+      else trigger.current?.focus();
+    }
   };
   useEffect(() => {
     if (!open) return;
     const outside = (event: PointerEvent) => {
-      if (!root.current?.contains(event.target as Node)) close();
+      if (
+        !root.current?.contains(event.target as Node) &&
+        !floating.current?.contains(event.target as Node)
+      )
+        close();
     };
     const escape = (event: globalThis.KeyboardEvent) => {
       if (event.key !== 'Escape') return;
@@ -262,7 +285,8 @@ export function ActionMenu({
   for (let level = 0; open; level++) {
     const panelLevel = level;
     const selected = options.find((item) => item.id === path[level]);
-    const anchor = level === 0 ? trigger : rowRefs.get(`${level - 1}:${path[level - 1]}`);
+    const anchor =
+      level === 0 ? (context ?? trigger) : rowRefs.get(`${level - 1}:${path[level - 1]}`);
     panels.push(
       <MenuPanel
         key={panelId}
@@ -318,29 +342,31 @@ export function ActionMenu({
   }
   return (
     <div ref={root} className="action-menu-root" data-open={open || undefined}>
-      <button
-        ref={trigger}
-        type="button"
-        className={`icon-button action-menu-trigger${active ? ' active' : ''}${showLabel ? ' action-menu-trigger-label' : ''}${className ? ` ${className}` : ''}`}
-        aria-label={label}
-        aria-pressed={active}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-controls={open ? id : undefined}
-        title={label}
-        data-tooltip={label}
-        onClick={(event) => (open ? close() : show(event.detail === 0 ? 'first' : undefined))}
-        onKeyDown={(event) => {
-          if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
-          event.preventDefault();
-          event.stopPropagation();
-          show(event.key === 'ArrowDown' ? 'first' : 'last');
-        }}
-      >
-        {icon}
-        {showLabel && <span>{label}</span>}
-      </button>
-      {panels}
+      {!context && (
+        <button
+          ref={trigger}
+          type="button"
+          className={`icon-button action-menu-trigger${active ? ' active' : ''}${showLabel ? ' action-menu-trigger-label' : ''}${className ? ` ${className}` : ''}`}
+          aria-label={label}
+          aria-pressed={active}
+          aria-haspopup="menu"
+          aria-expanded={open}
+          aria-controls={open ? id : undefined}
+          title={label}
+          data-tooltip={label}
+          onClick={(event) => (open ? close() : show(event.detail === 0 ? 'first' : undefined))}
+          onKeyDown={(event) => {
+            if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+            event.preventDefault();
+            event.stopPropagation();
+            show(event.key === 'ArrowDown' ? 'first' : 'last');
+          }}
+        >
+          {icon}
+          {showLabel && <span>{label}</span>}
+        </button>
+      )}
+      {open && createPortal(<div ref={floating}>{panels}</div>, document.body)}
     </div>
   );
 }

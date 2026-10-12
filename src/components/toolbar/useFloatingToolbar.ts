@@ -39,7 +39,11 @@ export function useFloatingToolbar(sidebarVisible: boolean) {
     offsetY: number;
     original: Position;
   } | null>(null);
-  const [layout, setLayout] = useState<{ position: Position; menuAbove: boolean } | null>(null);
+  const [layout, setLayout] = useState<{
+    position: Position;
+    menuAbove: boolean;
+    maxWidth: number;
+  } | null>(null);
   const [dragging, setDragging] = useState(false);
 
   const place = useCallback(
@@ -55,7 +59,11 @@ export function useFloatingToolbar(sidebarVisible: boolean) {
         else position.y = Math.min(58, MARGIN + b.travelY);
       }
       point.current = position;
-      setLayout({ position, menuAbove: position.y + b.toolbarHeight + 140 > b.height - MARGIN });
+      setLayout({
+        position,
+        menuAbove: position.y + b.toolbarHeight + 140 > b.height - MARGIN,
+        maxWidth: Math.max(100, b.width - MARGIN * 2),
+      });
       return position;
     },
     [sidebarVisible],
@@ -80,10 +88,18 @@ export function useFloatingToolbar(sidebarVisible: boolean) {
     const measure = () => {
       const surface = editor.getBoundingClientRect(),
         size = toolbar.getBoundingClientRect();
+      const inspector = editor.parentElement?.querySelector<HTMLElement>(
+        '.properties-inspector:not([hidden])',
+      );
+      const edge = inspector?.getBoundingClientRect().left;
+      const width =
+        edge !== undefined && edge > surface.left && edge < surface.right
+          ? edge - surface.left
+          : surface.width;
       bounds.current = {
-        width: surface.width,
+        width,
         height: surface.height,
-        travelX: Math.max(0, surface.width - size.width - MARGIN * 2),
+        travelX: Math.max(0, width - size.width - MARGIN * 2),
         // Reserve the bottom utility controls, even while dragging near the edge.
         travelY: Math.max(0, surface.height - size.height - MARGIN - 64),
         toolbarHeight: size.height,
@@ -98,6 +114,8 @@ export function useFloatingToolbar(sidebarVisible: boolean) {
     const observer = new ResizeObserver(measure);
     observer.observe(editor);
     observer.observe(toolbar);
+    const inspector = editor.parentElement?.querySelector('.properties-inspector');
+    if (inspector) observer.observe(inspector);
     window.addEventListener('resize', measure);
     return () => {
       observer.disconnect();
@@ -120,7 +138,12 @@ export function useFloatingToolbar(sidebarVisible: boolean) {
     dragging,
     menuAbove: layout?.menuAbove ?? false,
     style: layout
-      ? ({ left: layout.position.x, top: layout.position.y, transform: 'none' } as CSSProperties)
+      ? ({
+          left: layout.position.x,
+          top: layout.position.y,
+          transform: 'none',
+          maxWidth: layout.maxWidth,
+        } as CSSProperties)
       : undefined,
     handle: {
       onPointerDown: (event: ReactPointerEvent<HTMLButtonElement>) => {

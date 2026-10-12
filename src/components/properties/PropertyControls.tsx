@@ -1,8 +1,9 @@
-import { useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 function DraftInput({
   value,
   label,
+  id,
   numeric,
   min,
   max,
@@ -11,6 +12,7 @@ function DraftInput({
 }: {
   value: string | number | undefined;
   label: string;
+  id?: string;
   numeric?: boolean;
   min?: number;
   max?: number;
@@ -40,6 +42,7 @@ function DraftInput({
   };
   return (
     <input
+      id={id}
       className="property-text"
       type={numeric ? 'number' : 'text'}
       step={numeric ? 'any' : undefined}
@@ -71,19 +74,47 @@ function DraftInput({
     />
   );
 }
-export function PropertyField(props: Parameters<typeof DraftInput>[0] & { caption?: ReactNode }) {
+/** All property controls share one label axis and one control axis. */
+export function PropertyRow({
+  caption,
+  children,
+  secondary,
+  htmlFor,
+}: {
+  caption: ReactNode;
+  children: ReactNode;
+  secondary?: ReactNode;
+  htmlFor?: string;
+}) {
   return (
-    <label className={`inspector-field${props.numeric ? ' inspector-number' : ''}`}>
-      <span className="inspector-field-caption">{props.caption ?? props.label}</span>
-      <span className="inspector-input">
-        <DraftInput key={`${props.label}:${props.value}`} {...props} />
-        {props.unit && (
-          <span className="inspector-unit" aria-hidden="true">
-            {props.unit}
-          </span>
-        )}
-      </span>
-    </label>
+    <div className={`property-row${secondary ? ' property-row-secondary' : ''}`}>
+      <label className="inspector-field-caption" htmlFor={htmlFor}>
+        {caption}
+      </label>
+      <div className="inspector-control">{children}</div>
+      {secondary && <div className="property-secondary">{secondary}</div>}
+    </div>
+  );
+}
+export function PropertyField(props: Parameters<typeof DraftInput>[0] & { caption?: ReactNode }) {
+  const id = useId();
+  const field = (
+    <span className="inspector-input">
+      <DraftInput key={`${props.label}:${props.value}`} {...props} id={id} />
+      {props.unit && (
+        <span className="inspector-unit" aria-hidden="true">
+          {props.unit}
+        </span>
+      )}
+    </span>
+  );
+  // An empty caption is an embedded secondary control (for example opacity).
+  return props.caption === '' ? (
+    field
+  ) : (
+    <PropertyRow caption={props.caption ?? props.label} htmlFor={id}>
+      {field}
+    </PropertyRow>
   );
 }
 export function PropertySelect({
@@ -99,10 +130,15 @@ export function PropertySelect({
   children: ReactNode;
   onChange: (value: string) => void;
 }) {
+  const id = useId();
   return (
-    <label className="inspector-field">
-      <span className="inspector-field-caption">{caption ?? label}</span>
-      <select aria-label={label} value={value ?? ''} onChange={(e) => onChange(e.target.value)}>
+    <PropertyRow caption={caption ?? label} htmlFor={id}>
+      <select
+        id={id}
+        aria-label={label}
+        value={value ?? ''}
+        onChange={(e) => onChange(e.target.value)}
+      >
         {value === undefined && (
           <option value="" disabled>
             Valori misti
@@ -110,7 +146,7 @@ export function PropertySelect({
         )}
         {children}
       </select>
-    </label>
+    </PropertyRow>
   );
 }
 export function InspectorSection({ title, children }: { title: string; children: ReactNode }) {

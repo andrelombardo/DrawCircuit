@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { chooseSelectionColor } from './helpers/selectionMenu';
+import { openSelectionMenu, chooseSelectionColor } from './helpers/selectionMenu';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { Canvas } from '../src/components/editor/Canvas';
@@ -171,7 +171,7 @@ describe('native custom color workflow', () => {
       expect(component().label.fontSize).toBe(Number(option.value));
     }
 
-    fireEvent.click(screen.getByRole('button', { name: 'Comandi selezione' }));
+    openSelectionMenu();
     expect(screen.getByRole('menuitem', { name: 'Sostituisci…' })).toBeDefined();
     expect(screen.getByRole('menuitem', { name: 'Salva come blocco' })).toBeDefined();
     expect(screen.queryByText('Ruota label')).toBeNull();

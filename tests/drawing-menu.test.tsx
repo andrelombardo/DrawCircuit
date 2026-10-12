@@ -1,3 +1,4 @@
+import { shortcut } from '../src/utils/platform';
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
@@ -51,8 +52,9 @@ describe('compact pencil drawing menu', () => {
       'Selezione (V)',
       'Testo',
       'Disegno e annotazioni',
-      'Annulla (⌘/Ctrl Z)',
-      'Ripeti (⌘/Ctrl Shift Z)',
+      'Modifica',
+      `Annulla (${shortcut('Z')})`,
+      `Ripeti (${shortcut('Z', true)})`,
       'Sposta vista (H o Space)',
       'Esporta',
     ]);

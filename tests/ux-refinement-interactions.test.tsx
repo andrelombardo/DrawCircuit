@@ -1,5 +1,9 @@
 // @vitest-environment jsdom
-import { chooseSelectionCommand, chooseSelectionColor } from './helpers/selectionMenu';
+import {
+  openSelectionMenu,
+  chooseSelectionCommand,
+  chooseSelectionColor,
+} from './helpers/selectionMenu';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { DistanceGuideLayer } from '../src/components/editor/DistanceGuideLayer';
@@ -233,15 +237,15 @@ describe('Golden spacing and group workflow in the canvas', () => {
   });
 });
 describe('adaptive accessible toolbar', () => {
-  it('shows properties directly and preserves commands in an accessible overflow menu', () => {
+  it('shows properties directly and preserves commands in an accessible context menu', () => {
     render(<Canvas />);
     select('R3', 200);
 
     expect(screen.getByLabelText('Dimensione testo')).toBeDefined();
     expect(screen.getByLabelText('Spessore linea')).toBeDefined();
-    fireEvent.click(screen.getByRole('button', { name: 'Comandi selezione' }));
-    for (const name of ['Duplica (⌘/Ctrl D)', 'Ruota 45° (R)'])
-      expect(screen.getByRole('menuitem', { name })).toBeDefined();
+    openSelectionMenu();
+    expect(screen.getByRole('menuitem', { name: 'Duplica' })).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Ruota 45° (R)' })).toBeDefined();
     expect(screen.queryByLabelText('Ruota solo label')).toBeNull();
     expect(screen.getByText('Salva come blocco')).toBeDefined();
     expect(screen.queryByLabelText('Ruota selezione')).toBeNull();
@@ -292,8 +296,8 @@ describe('adaptive accessible toolbar', () => {
       useEditorStore.setState({ document: documentWith([o]), selection: ['a'] });
       render(<Canvas />);
       expect(canvas().querySelectorAll('[data-handle]').length).toBe(loop ? 3 : 4);
-      fireEvent.click(screen.getByRole('button', { name: 'Comandi selezione' }));
-      expect(screen.getByRole('menuitem', { name: 'Inverti freccia' })).toBeDefined();
+      openSelectionMenu();
+      expect(screen.getByRole('button', { name: 'Inverti freccia' })).toBeDefined();
       fireEvent.keyDown(window, { key: 'Escape' });
       expect(screen.queryByLabelText('Dimensione testo')).toBeNull();
       expect(screen.getByRole('region', { name: 'Proprietà' })).toBeDefined();
@@ -365,14 +369,14 @@ describe('selection export scope in the existing dialog', () => {
 });
 
 describe('compact Style and replacement controls', () => {
-  it('keeps commands in overflow and edits symbol/label separately as properties', () => {
+  it('keeps commands on canvas right-click and edits symbol/label separately as properties', () => {
     render(<Canvas />);
     select('R3', 200);
     const inspector = screen.getByRole('region', { name: 'Proprietà' });
-    expect(within(inspector).queryByRole('button', { name: 'Duplica (⌘/Ctrl D)' })).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Comandi selezione' }));
-    expect(screen.getByRole('menuitem', { name: 'Polarità + / -' })).toBeDefined();
-    expect(screen.getByRole('menuitem', { name: 'Duplica (⌘/Ctrl D)' })).toBeDefined();
+    expect(within(inspector).queryByRole('button', { name: 'Duplica' })).toBeNull();
+    openSelectionMenu();
+    expect(screen.getByRole('button', { name: 'Polarità + / -' })).toBeDefined();
+    expect(screen.getByRole('menuitem', { name: 'Duplica' })).toBeDefined();
     fireEvent.keyDown(window, { key: 'Escape' });
     expect(document.querySelector('.context-toolbar')).toBeNull();
 
@@ -386,9 +390,9 @@ describe('compact Style and replacement controls', () => {
       label: { color: '#269978', fontSize: 28 },
     });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Comandi selezione' }));
+    openSelectionMenu();
     expect(screen.getByRole('menuitem', { name: 'Salva come blocco' })).toBeDefined();
-    expect(screen.getByRole('menuitem', { name: 'Elimina (Delete)' })).toBeDefined();
+    expect(screen.getByRole('menuitem', { name: 'Elimina' })).toBeDefined();
   });
   it('shows live compatible previews in Replace and filters through shared palette search', () => {
     render(<Canvas />);

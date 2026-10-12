@@ -12,6 +12,16 @@ import {
   AlignVerticalDistributeCenter,
   Check,
   RotateCw,
+  ArrowLeftRight,
+  FlipHorizontal,
+  FlipVertical,
+  Square,
+  Spline,
+  CircleDot,
+  Type,
+  Layers,
+  ArrowRight,
+  Braces,
 } from 'lucide-react';
 import { useEditorStore } from '../../store/editorStore';
 import { componentRegistry } from '../../model/catalog';
@@ -25,9 +35,13 @@ import type { Axis, Alignment, DistributionMode } from '../../utils/selectionGeo
 import { arrowOrientation, rotateArrow } from '../../utils/arrows';
 import { inlineTextTarget, replaceInlineText } from '../../utils/labels';
 import { SelectionStyle, SelectionTypography } from './SelectionStyle';
-import { SelectionActions } from './SelectionActions';
+import { ComponentPreview } from '../palette/ComponentPreview';
+import { supportsPolarity } from '../../model/capabilities';
+import { createPolarity } from '../../annotations/electrical';
+import { reverseLoop } from '../../utils/loops';
+import { PolarityIcon } from '../toolbar/DrawingIcons';
 import { IconButton } from '../toolbar/IconButton';
-import { InspectorSection, PropertyField, PropertySelect } from './PropertyControls';
+import { InspectorSection, PropertyField, PropertySelect, PropertyRow } from './PropertyControls';
 const names: Record<CircuitObject['kind'], string> = {
   component: 'Componente',
   junction: 'Nodo',
@@ -128,6 +142,25 @@ export function PropertiesContent() {
   return (
     <div className="inspector-properties" key={objects.map((o) => o.id).join(',')}>
       <div className="inspector-selection">
+        <span className="inspector-object-icon" aria-hidden="true">
+          {o?.kind === 'component' ? (
+            <ComponentPreview component={componentRegistry[o.type]} />
+          ) : o?.kind === 'rectangle' ? (
+            <Square size={16} />
+          ) : o?.kind === 'wire' || o?.kind === 'line' ? (
+            <Spline size={16} />
+          ) : o?.kind === 'junction' ? (
+            <CircleDot size={16} />
+          ) : o?.kind === 'text' ? (
+            <Type size={16} />
+          ) : o?.kind === 'brace' ? (
+            <Braces size={16} />
+          ) : o ? (
+            <ArrowRight size={16} />
+          ) : (
+            <Layers size={16} />
+          )}
+        </span>
         <div className="inspector-type">
           <span>
             {o?.kind === 'component'
@@ -141,7 +174,6 @@ export function PropertiesContent() {
             <small>Proprietà comuni</small>
           )}
         </div>
-        <SelectionActions objects={objects} />
       </div>
       {((o && ('label' in o || o.kind === 'text')) ||
         objects.every((o) => 'label' in o) ||
@@ -205,33 +237,59 @@ export function PropertiesContent() {
             />
           ))}
         </div>
-        <div className="inspector-rotation">
-          {(rotatables.length === objects.length || !!labelTarget) &&
-            (labelTarget || rotatables.some((o) => o.kind === 'component' || o.kind === 'text') ? (
-              <PropertySelect
-                label="Rotazione"
-                caption={<RotateCw size={14} aria-hidden="true" />}
-                value={rotation}
-                onChange={(v) => setRotation(Number(v))}
+        {(rotatables.length > 0 || labelTarget || objects.some((o) => o.kind === 'brace')) && (
+          <div className="inspector-rotation">
+            {(rotatables.length === objects.length || !!labelTarget) &&
+              (labelTarget ||
+              rotatables.some((o) => o.kind === 'component' || o.kind === 'text') ? (
+                <PropertySelect
+                  label="Rotazione"
+                  caption="Angolo"
+                  value={rotation}
+                  onChange={(v) => setRotation(Number(v))}
+                >
+                  {ROTATIONS.map((r) => (
+                    <option key={r} value={r}>
+                      {r}°
+                    </option>
+                  ))}
+                </PropertySelect>
+              ) : (
+                <PropertyField
+                  label="Rotazione"
+                  caption="Angolo"
+                  numeric
+                  unit="°"
+                  value={rotation === undefined ? undefined : Number(rotation.toFixed(2))}
+                  onCommit={(v) => setRotation(Number(v))}
+                />
+              ))}
+            {!labelTarget && (
+              <IconButton
+                label={`Ruota ${rotatables.some((o) => o.kind === 'component') ? 45 : 90}° (R)`}
+                onClick={() => state().rotate()}
               >
-                {ROTATIONS.map((r) => (
-                  <option key={r} value={r}>
-                    {r}°
-                  </option>
-                ))}
-              </PropertySelect>
-            ) : (
-              <PropertyField
-                label="Rotazione"
-                caption={<RotateCw size={14} aria-hidden="true" />}
-                numeric
-                unit="°"
-                value={rotation === undefined ? undefined : Number(rotation.toFixed(2))}
-                onCommit={(v) => setRotation(Number(v))}
-              />
-            ))}
-        </div>
+                <RotateCw size={14} />
+              </IconButton>
+            )}
+          </div>
+        )}
       </InspectorSection>
+      {!labelTarget && o && supportsPolarity(o) && (
+        <InspectorSection title="Proprietà elettriche">
+          <PropertyRow caption="Polarità">
+            <button
+              className="inspector-property-action"
+              onClick={() => {
+                const annotation = createPolarity(o);
+                if (annotation) state().add([annotation]);
+              }}
+            >
+              <PolarityIcon size={14} /> Polarità + / -
+            </button>
+          </PropertyRow>
+        </InspectorSection>
+      )}
       <InspectorSection title="Aspetto">
         <SelectionStyle objects={objects} apply={apply} labelOnly={!!labelTarget} />
         {!labelTarget && lineObjects.length === objects.length && (
@@ -310,9 +368,61 @@ export function PropertiesContent() {
       {!labelTarget &&
         (objects.length > 1 ||
           objects.some((o) =>
-            ['rectangle', 'line', 'wire', 'arrow', 'loop-arrow', 'electrical'].includes(o.kind),
+            ['rectangle', 'line', 'wire', 'arrow', 'loop-arrow', 'electrical', 'brace'].includes(
+              o.kind,
+            ),
           )) && (
           <InspectorSection title="Geometria">
+            {objects.every((item) => item.kind === 'brace') && (
+              <PropertyRow caption="Lato">
+                <button
+                  className="inspector-property-action"
+                  onClick={() =>
+                    apply((item) =>
+                      item.kind === 'brace' ? { ...item, side: item.side === 1 ? -1 : 1 } : item,
+                    )
+                  }
+                >
+                  <FlipHorizontal size={14} /> Inverti lato
+                </button>
+              </PropertyRow>
+            )}
+            {objects.every((item) => ['arrow', 'electrical', 'loop-arrow'].includes(item.kind)) && (
+              <PropertyRow caption="Direzione">
+                <button
+                  className="inspector-property-action"
+                  onClick={() =>
+                    apply((item) =>
+                      item.kind === 'arrow' || item.kind === 'electrical'
+                        ? { ...item, reversed: !item.reversed }
+                        : item.kind === 'loop-arrow'
+                          ? reverseLoop(item)
+                          : item,
+                    )
+                  }
+                >
+                  <ArrowLeftRight size={14} /> Inverti freccia
+                </button>
+              </PropertyRow>
+            )}
+            {objects.every((item) => item.kind === 'arrow' || item.kind === 'loop-arrow') && (
+              <PropertyRow caption="Specchia">
+                <div className="inspector-segmented">
+                  <IconButton
+                    label="Specchia orizzontalmente"
+                    onClick={() => state().mirror('horizontal')}
+                  >
+                    <FlipHorizontal size={14} />
+                  </IconButton>
+                  <IconButton
+                    label="Specchia verticalmente"
+                    onClick={() => state().mirror('vertical')}
+                  >
+                    <FlipVertical size={14} />
+                  </IconButton>
+                </div>
+              </PropertyRow>
+            )}
             {rectangles.length === objects.length && (
               <div className="inspector-pair">
                 {(['width', 'height'] as const).map((dimension) => (

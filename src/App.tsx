@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { SelectionActions } from './components/properties/SelectionActions';
 import { X } from 'lucide-react';
 import { PwaStatus } from './pwa/PwaStatus';
 import { ComponentSidebar } from './components/palette/ComponentSidebar';
@@ -17,31 +18,33 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [notice]);
   return (
-    <div className="app-shell">
-      <PwaStatus />
-      <div className="workspace">
-        <ComponentSidebar {...sidebar} />
-        <Canvas
-          onExport={() => setDialog('export')}
-          onHelp={() => setDialog('help')}
-          sidebarVisible={sidebar.preferences.visible}
-          onToggleSidebar={sidebar.toggleSidebar}
-        />
-      </div>
-      {dialog === 'export' && <ExportDialog onClose={() => setDialog(null)} />}{' '}
-      {dialog === 'help' && <HelpDialog onClose={() => setDialog(null)} />}
-      {notice && (
-        <div className="toast" role="status">
-          {notice}
-          <button
-            aria-label="Chiudi notifica"
-            title="Chiudi notifica"
-            onClick={() => useEditorStore.getState().notify('')}
-          >
-            <X size={15} />
-          </button>
+    <SelectionActions>
+      <div className="app-shell">
+        <PwaStatus />
+        <div className="workspace">
+          <ComponentSidebar {...sidebar} />
+          <Canvas
+            onExport={() => setDialog('export')}
+            onHelp={() => setDialog('help')}
+            sidebarVisible={sidebar.preferences.visible}
+            onToggleSidebar={sidebar.toggleSidebar}
+          />
         </div>
-      )}
-    </div>
+        {dialog === 'export' && <ExportDialog onClose={() => setDialog(null)} />}{' '}
+        {dialog === 'help' && <HelpDialog onClose={() => setDialog(null)} />}
+        {notice && (
+          <div className="toast" role="status">
+            {notice}
+            <button
+              aria-label="Chiudi notifica"
+              title="Chiudi notifica"
+              onClick={() => useEditorStore.getState().notify('')}
+            >
+              <X size={15} />
+            </button>
+          </div>
+        )}
+      </div>
+    </SelectionActions>
   );
 }

@@ -2,7 +2,10 @@ import { GraphicView } from '../../circuit/annotations/GraphicView';
 import { BraceView } from '../../circuit/annotations/BraceView';
 import { ElectricalView } from '../../circuit/annotations/ElectricalView';
 import { usePersonalBlocks } from '../../personalBlocks/library';
-import { useRef } from 'react';
+import { SelectionActions } from '../properties/SelectionActions';
+import { ActionMenu } from '../toolbar/ActionMenu';
+import { useEditActions } from '../toolbar/useEditActions';
+import { useRef, useState } from 'react';
 import { CircleAlert, Grid2X2, HelpCircle, Maximize, Minus, Plus } from 'lucide-react';
 import { useEditorStore } from '../../store/editorStore';
 import { catalog } from '../../model/catalog';
@@ -31,17 +34,27 @@ import { presetRegistry } from '../../presets/registry';
 import { inlineCompatible } from '../../smartPlacement/findCandidates';
 import { useTerminalProximity } from './useTerminalProximity';
 import { useCanvasFocus } from './useCanvasFocus';
-export function Canvas({
-  sidebarVisible = true,
-  onToggleSidebar,
-  onExport,
-  onHelp,
-}: {
+type CanvasProps = {
   sidebarVisible?: boolean;
   onToggleSidebar?: () => void;
   onExport?: () => void;
   onHelp?: () => void;
-}) {
+};
+export function Canvas(props: CanvasProps) {
+  return (
+    <SelectionActions>
+      <CanvasContent {...props} />
+    </SelectionActions>
+  );
+}
+function CanvasContent({ sidebarVisible = true, onToggleSidebar, onExport, onHelp }: CanvasProps) {
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+    canvasOnly: boolean;
+    key: number;
+  } | null>(null);
+  const { contextItems } = useEditActions(contextMenu?.canvasOnly);
   const inspector = useInspectorPreferences();
   const focusModality = useCanvasFocus();
   const svgRef = useRef<SVGSVGElement>(null),
@@ -180,6 +193,25 @@ export function Canvas({
           aria-label="Foglio SVG del circuito"
           data-testid="circuit-canvas"
           data-focus-modality={focusModality}
+          onKeyDown={(e) => {
+            if (e.key !== 'ContextMenu' && !(e.shiftKey && e.key === 'F10')) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const id = useEditorStore.getState().selection[0];
+            const object = id
+              ? [...(svgRef.current?.querySelectorAll('[data-object]') ?? [])].find(
+                  (element) => element.getAttribute('data-object') === id,
+                )
+              : null;
+            const rect = (object ?? svgRef.current)?.getBoundingClientRect();
+            if (rect)
+              setContextMenu({
+                x: rect.left + rect.width / 2,
+                y: rect.top + rect.height / 2,
+                canvasOnly: !id,
+                key: Date.now(),
+              });
+          }}
           onPointerDown={interactions.pointerDown}
           onPointerMove={(event) => {
             terminalProximity.move(event);
@@ -195,7 +227,19 @@ export function Canvas({
           onDragOver={interactions.dragOver}
           onDragLeave={smart.leave}
           onDrop={interactions.drop}
-          onContextMenu={(e) => e.preventDefault()}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            if (editing) return;
+            if (useEditorStore.getState().gestureStart) interactions.cancel();
+            const id = (e.target as Element).closest('[data-object]')?.getAttribute('data-object');
+            const s = useEditorStore.getState();
+            if (id && s.document.objects.some((o) => o.id === id)) {
+              if (!s.selection.includes(id)) s.select(e.shiftKey ? [...s.selection, id] : [id]);
+              // A body click targets the object; a selected label retains its subtarget.
+              else if (!(e.target as Element).closest('[data-label]')) s.setActiveLabel(null);
+            }
+            setContextMenu({ x: e.clientX, y: e.clientY, canvasOnly: !id, key: Date.now() });
+          }}
         >
           <defs>
             <pattern
@@ -310,6 +354,18 @@ export function Canvas({
             <PresetPlacementLayer point={overlay.mouse} zoom={v.zoom} />
           </g>
         </svg>
+        {contextMenu && (
+          <ActionMenu
+            key={contextMenu.key}
+            label={contextMenu.canvasOnly ? 'Comandi canvas' : 'Comandi selezione'}
+            items={contextItems}
+            context={{
+              ...contextMenu,
+              onClose: () => setContextMenu(null),
+              returnFocus: () => svgRef.current?.focus({ preventScroll: true }),
+            }}
+          />
+        )}
         {editing && editTarget && (
           <InlineTextEditor
             key={`inline:${editing.id}`}

@@ -1,3 +1,4 @@
+import { shortcut } from '../src/utils/platform';
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -70,7 +71,9 @@ describe('Obsidian copy in the existing export dialog', () => {
         }),
       );
       await waitFor(() =>
-        expect(screen.getByText('Codice selezionato: premi ⌘/Ctrl C per copiarlo.')).toBeTruthy(),
+        expect(
+          screen.getByText(`Codice selezionato: premi ${shortcut('C')} per copiarlo.`),
+        ).toBeTruthy(),
       );
       const expected = (format === 'obsidian' ? exportObsidian : exportTikz)(
         useEditorStore.getState().document,

@@ -1,3 +1,4 @@
+import App from '../src/App';
 // @vitest-environment jsdom
 import { chooseSelectionCommand } from './helpers/selectionMenu';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -141,12 +142,15 @@ describe('selection PNG shortcut', () => {
       const doc: CircuitDocument = { version: 1, title: 'PNG subset', objects: [r1, r2, j, w] };
       const selection = multi ? [r1.id, r2.id, j.id, w.id] : [r1.id];
       useEditorStore.setState({ document: doc, selection });
-      render(<Canvas />);
-
-      chooseSelectionCommand('Copia come immagine');
-      await waitFor(() => expect(useEditorStore.getState().notice).toBe('PNG copiato'));
+      render(<App />);
+      fireEvent.click(screen.getByRole('button', { name: 'Esporta' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Solo selezione' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Copia PNG' }));
+      await waitFor(() =>
+        expect(screen.getByRole('button', { name: 'PNG copiato' })).toBeDefined(),
+      );
       expect(copyPNG).toHaveBeenCalledExactlyOnceWith(getExportSelection(doc, selection));
-      expect(screen.queryByRole('dialog')).toBeNull();
+      expect(screen.getByRole('dialog', { name: 'Esporta circuito' })).toBeDefined();
     },
   );
 });

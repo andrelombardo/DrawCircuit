@@ -1,3 +1,4 @@
+import { shortcut } from '../../utils/platform';
 import { copyPNG, exportPNG } from '../../png/exporter';
 import { exportSVG } from '../../svg/exporter';
 import { useMemo, useRef, useState } from 'react';
@@ -192,7 +193,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
           </p>
         )}
         {copyError && (
-          <p className="copy-error">Codice selezionato: premi ⌘/Ctrl C per copiarlo.</p>
+          <p className="copy-error">Codice selezionato: premi {shortcut('C')} per copiarlo.</p>
         )}
         <div className="export-dialog-footer">
           <span>

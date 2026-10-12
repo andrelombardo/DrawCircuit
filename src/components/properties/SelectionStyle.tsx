@@ -5,7 +5,7 @@ import { commonValue } from './commonValue';
 import { COLORS } from '../../model/types';
 import type { CircuitObject } from '../../model/types';
 import { ActionMenu } from '../toolbar/ActionMenu';
-import { PropertyField, PropertySelect } from './PropertyControls';
+import { PropertyField, PropertySelect, PropertyRow } from './PropertyControls';
 
 const colorNames = { ink: 'Nero', blue: 'Blu', red: 'Rosso', green: 'Verde', purple: 'Viola' };
 const labeled = (o: CircuitObject) => 'label' in o;
@@ -66,8 +66,7 @@ function ColorControl({
     }
   };
   return (
-    <div className="inspector-paint-row">
-      <span className="inspector-paint-label">{label}</span>
+    <PropertyRow caption={label} secondary={children}>
       <div className="inspector-color">
         <ActionMenu
           label={'Colore ' + label.toLowerCase()}
@@ -121,8 +120,7 @@ function ColorControl({
           }}
         />
       </div>
-      {children}
-    </div>
+    </PropertyRow>
   );
 }
 

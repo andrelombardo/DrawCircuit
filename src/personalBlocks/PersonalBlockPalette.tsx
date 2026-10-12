@@ -1,3 +1,4 @@
+import { useEditorCommands } from '../components/properties/EditorCommandContext';
 import { useRef, useState } from 'react';
 import { ChevronDown, Pencil, Trash2 } from 'lucide-react';
 import { usePersonalBlocks, serializePersonalBlocks } from './library';
@@ -5,6 +6,8 @@ import { useEditorStore } from '../store/editorStore';
 import { BlockNameDialog } from '../components/toolbar/BlockNameDialog';
 import { download } from '../utils/files';
 export function PersonalBlockPalette({ search }: { search: string }) {
+  const commands = useEditorCommands();
+  const selected = useEditorStore((s) => s.selection.length);
   const blocks = usePersonalBlocks((s) => s.blocks),
     error = usePersonalBlocks((s) => s.error);
   const [renaming, setRenaming] = useState<string | null>(null),
@@ -62,6 +65,13 @@ export function PersonalBlockPalette({ search }: { search: string }) {
               Seleziona elementi sul foglio e scegli “Salva come blocco”.
             </p>
           )}
+          <button
+            className="personal-save-selection"
+            disabled={!selected}
+            onClick={commands.saveBlock}
+          >
+            Salva selezione come blocco
+          </button>
           <div className="personal-library-actions">
             <button
               onClick={() =>

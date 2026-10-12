@@ -1,3 +1,4 @@
+import { openSelectionMenu } from './helpers/selectionMenu';
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
@@ -306,8 +307,8 @@ describe('annotation and placement cleanup', () => {
       });
       render(<App />);
       const centre = midpoint(brace.start, brace.end);
-      fireEvent.click(screen.getByRole('button', { name: 'Comandi selezione' }));
-      expect(screen.getByRole('menuitem', { name: 'Ruota 90° (R)' })).toBeTruthy();
+      openSelectionMenu();
+      expect(screen.getByRole('button', { name: 'Ruota 90° (R)' })).toBeTruthy();
       fireEvent.keyDown(window, { key: 'Escape' });
       for (let i = 1; i <= 4; i++) {
         key('r');

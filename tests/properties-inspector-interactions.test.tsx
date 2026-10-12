@@ -1,11 +1,17 @@
 // @vitest-environment jsdom
-import { chooseSelectionCommand, chooseSelectionColor } from './helpers/selectionMenu';
+import {
+  openSelectionMenu,
+  chooseSelectionCommand,
+  chooseSelectionColor,
+} from './helpers/selectionMenu';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../src/App';
+import { usePersonalBlocks } from '../src/personalBlocks/library';
 import { useEditorStore, saveDocumentNow, STORAGE_KEY } from '../src/store/editorStore';
 import {
   createLine,
+  createJunction,
   createRectangle,
   createTextAnnotation,
   createWire,
@@ -299,22 +305,22 @@ describe('persistent inspector and property transactions', () => {
   });
 });
 describe('contextual properties and selection commands', () => {
-  it('orders properties by purpose and keeps generic commands behind the overflow', () => {
+  it('orders properties by purpose and exposes commands on canvas right-click', () => {
     renderSelection([createComponent('currentSource', { x: 0, y: 0 })]);
     const inspector = screen.getByRole('region', { name: 'Proprietà' });
     expect(
       within(inspector)
         .getAllByRole('heading', { level: 3 })
         .map((h) => h.textContent),
-    ).toEqual(['Generale', 'Posizione', 'Aspetto', 'Testo']);
+    ).toEqual(['Generale', 'Posizione', 'Proprietà elettriche', 'Aspetto', 'Testo']);
     expect(within(inspector).queryByRole('slider')).toBeNull();
     expect(within(inspector).queryByText('Azioni')).toBeNull();
     expect(
       within(inspector).queryByRole('button', { name: /Duplica|Elimina|Sostituisci/ }),
     ).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Comandi selezione' }));
+    openSelectionMenu();
     expect(screen.getByRole('menuitem', { name: 'Sostituisci…' })).toBeDefined();
-    expect(screen.getByRole('menuitem', { name: 'Taglia (⌘/Ctrl X)' })).toBeDefined();
+    expect(screen.getByRole('menuitem', { name: 'Taglia' })).toBeDefined();
   });
   it('shows only common properties for a component and a wire while preserving contextual commands', () => {
     const c = createComponent('currentSource', { x: 0, y: 0 });
@@ -336,7 +342,7 @@ describe('contextual properties and selection commands', () => {
       'Stile linea',
     ])
       expect(screen.queryByLabelText(label)).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Comandi selezione' }));
+    openSelectionMenu();
     expect(screen.getByRole('menuitem', { name: 'Sostituisci…' })).toBeDefined();
     expect(screen.queryByRole('menuitem', { name: 'Dividi filo…' })).toBeNull();
   });
@@ -374,19 +380,18 @@ describe('contextual properties and selection commands', () => {
     act(() => state().undo());
     expect(current().objects[0]).toMatchObject({ label: { text: c.label.text, opacity: 0.25 } });
   });
-  it('closes the overflow with Escape, restores focus and executes duplicate by keyboard once', () => {
+  it('closes Edit with Escape, restores focus and executes duplicate by keyboard once', () => {
     const c = createComponent('currentSource', { x: 0, y: 0 });
     renderSelection([c]);
-    const trigger = screen.getByRole('button', { name: 'Comandi selezione' });
+    const trigger = screen.getByRole('button', { name: 'Modifica' });
     fireEvent.keyDown(trigger, { key: 'ArrowDown' });
-    expect(document.activeElement).toBe(
-      screen.getByRole('menuitem', { name: 'Duplica (⌘/Ctrl D)' }),
-    );
+    expect(document.activeElement).toBe(screen.getByRole('menuitem', { name: 'Taglia' }));
     fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
     expect(screen.queryByRole('menu')).toBeNull();
     expect(document.activeElement).toBe(trigger);
     expect(state().selection).toEqual([c.id]);
     fireEvent.keyDown(trigger, { key: 'ArrowDown' });
+    fireEvent.keyDown(document.activeElement!, { key: 'd' });
     fireEvent.keyDown(document.activeElement!, { key: 'Enter' });
     expect(current().objects).toHaveLength(2);
     expect(state().past).toHaveLength(1);
@@ -625,5 +630,200 @@ describe('cut shortcuts and editing focus', () => {
     expect(current()).toBe(before);
     expect(state().past).toHaveLength(0);
     fireEvent.keyDown(textbox, { key: 'Escape' });
+  });
+});
+
+describe('canvas context and Edit menus', () => {
+  const body = (id: string) =>
+    [...canvas().querySelectorAll('[data-object]')].find(
+      (element) => element.getAttribute('data-object') === id,
+    )!;
+  const open = (id: string, extra = {}) =>
+    fireEvent.contextMenu(body(id), { clientX: 500, clientY: 300, ...extra });
+  it('keeps a valid multiselection on right-click and targets an unselected object without modifying history', () => {
+    const a = createComponent('resistor', { x: 0, y: 0 });
+    const b = createComponent('resistor', { x: 160, y: 0 });
+    const c = createComponent('resistor', { x: 320, y: 0 });
+    renderSelection([a, b, c]);
+    act(() => state().select([a.id, b.id]));
+    open(b.id);
+    expect(state().selection).toEqual([a.id, b.id]);
+    expect(screen.getByText('2 elementi selezionati')).toBeDefined();
+    fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
+    expect(document.activeElement).toBe(canvas());
+    expect(state().selection).toEqual([a.id, b.id]);
+    open(c.id, { shiftKey: true });
+    expect(state().selection).toEqual([a.id, b.id, c.id]);
+    fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
+    open(c.id);
+    expect(state().selection).toEqual([a.id, b.id, c.id]);
+    fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
+    act(() => state().select([a.id, b.id]));
+    open(c.id);
+    expect(state().selection).toEqual([c.id]);
+    expect(state().past).toEqual([]);
+    expect(current().objects).toEqual([a, b, c]);
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Elimina' }));
+    expect(current().objects).toEqual([a, b]);
+    act(() => state().undo());
+    expect(current().objects).toEqual([a, b, c]);
+  });
+  it('offers only canvas actions on empty space and closes on outside click', () => {
+    const c = createComponent('resistor', { x: 0, y: 0 });
+    renderSelection([c]);
+    fireEvent.contextMenu(canvas(), { clientX: 1100, clientY: 750 });
+    expect(screen.getAllByRole('menuitem').map((item) => item.getAttribute('aria-label'))).toEqual([
+      'Incolla',
+      'Seleziona tutto',
+    ]);
+    expect(state().selection).toEqual([c.id]);
+    fireEvent.pointerDown(screen.getByRole('heading', { name: 'Proprietà' }));
+    expect(screen.queryByRole('menu')).toBeNull();
+    expect(current().objects).toEqual([c]);
+  });
+  it.each([
+    createComponent('resistor', { x: 0, y: 0 }),
+    createWire({ kind: 'free', point: { x: 0, y: 0 } }, { kind: 'free', point: { x: 160, y: 0 } }),
+    createRectangle({ x: 0, y: 0 }, { x: 160, y: 80 }),
+    createLine({ x: 0, y: 0 }, { x: 160, y: 80 }),
+    createTextAnnotation({ x: 0, y: 0 }, 'Nota'),
+    createJunction({ x: 0, y: 0 }, 'A'),
+    {
+      kind: 'arrow',
+      id: 'context-arrow',
+      type: 'straight',
+      start: { x: 0, y: 0 },
+      end: { x: 160, y: 0 },
+      controlPoints: [
+        { x: 50, y: 0 },
+        { x: 100, y: 0 },
+      ],
+      color: '#171a20',
+      width: 2,
+      reversed: false,
+    } satisfies CircuitObject,
+    {
+      kind: 'loop-arrow',
+      id: 'context-loop',
+      x: 0,
+      y: 0,
+      width: 160,
+      height: 80,
+      color: '#171a20',
+      strokeWidth: 2,
+      direction: 'clockwise',
+      arrowPosition: 0.125,
+    } satisfies CircuitObject,
+    createBrace('brace', { x: 0, y: 0 }, { x: 160, y: 0 }),
+  ])('offers type-specific context commands for $kind', (object) => {
+    renderSelection([object]);
+    expect(screen.queryByRole('button', { name: 'Comandi selezione' })).toBeNull();
+    open(object.id);
+    const commands = screen.getAllByRole('menuitem').map((item) => item.getAttribute('aria-label'));
+    expect(commands.slice(0, 4)).toEqual(['Taglia', 'Copia', 'Duplica', 'Incolla']);
+    expect(commands).toContain('Salva come blocco');
+    expect(commands.at(-1)).toBe('Elimina');
+    expect(commands.includes('Sostituisci…')).toBe(object.kind === 'component');
+    expect(commands.includes('Dividi filo…')).toBe(object.kind === 'wire');
+    expect(commands.includes('Corrente sul filo')).toBe(object.kind === 'wire');
+    expect(commands).not.toContain('Polarità + / -');
+    expect(commands).not.toContain('Copia come immagine');
+    expect(commands.some((label) => label?.startsWith('Ruota'))).toBe(false);
+  });
+  it('opens the selected object menu with Shift+F10, supports navigation and invokes duplicate once', () => {
+    const c = createComponent('resistor', { x: 0, y: 0 });
+    renderSelection([c]);
+    canvas().focus();
+    fireEvent.keyDown(canvas(), { key: 'F10', shiftKey: true });
+    expect(document.activeElement).toBe(screen.getByRole('menuitem', { name: 'Taglia' }));
+    fireEvent.keyDown(document.activeElement!, { key: 'End' });
+    expect(document.activeElement).toBe(screen.getByRole('menuitem', { name: 'Elimina' }));
+    fireEvent.keyDown(document.activeElement!, { key: 'Home' });
+    fireEvent.keyDown(document.activeElement!, { key: 'd' });
+    fireEvent.keyDown(document.activeElement!, { key: 'Enter' });
+    expect(current().objects).toHaveLength(2);
+    expect(state().past).toHaveLength(1);
+    expect(screen.queryByRole('menu')).toBeNull();
+  });
+  it.each(['MacIntel', 'Win32', 'Linux x86_64'])(
+    'shows shortcuts appropriate to %s and leaves focused input editing alone',
+    (platform) => {
+      Object.defineProperty(navigator, 'platform', { configurable: true, value: platform });
+      const c = createComponent('resistor', { x: 0, y: 0 });
+      renderSelection([c]);
+      fireEvent.click(screen.getByRole('button', { name: 'Modifica' }));
+      const copy = screen.getByRole('menuitem', { name: 'Copia' });
+      expect(copy.querySelector('kbd')?.textContent).toBe(
+        platform === 'MacIntel' ? '⌘C' : 'Ctrl+C',
+      );
+      expect(document.body.textContent).not.toContain('⌘/Ctrl');
+      fireEvent.keyDown(window, { key: 'Escape' });
+      const input = screen.getByLabelText('Etichetta componente');
+      input.focus();
+      fireEvent.keyDown(input, { key: 'd', metaKey: true, ctrlKey: true });
+      fireEvent.keyDown(input, { key: 'Delete' });
+      fireEvent.keyDown(input, { key: 'r' });
+      expect(current().objects).toEqual([c]);
+      expect(state().past).toEqual([]);
+    },
+  );
+  it('clamps a pointer-anchored menu inside the viewport even at the bottom right', () => {
+    const c = createComponent('resistor', { x: 0, y: 0 });
+    renderSelection([c]);
+    vi.mocked(Element.prototype.getBoundingClientRect).mockImplementation(function (this: Element) {
+      const width = this.getAttribute('role') === 'menu' ? 224 : 1200;
+      const height = this.getAttribute('role') === 'menu' ? 244 : 800;
+      return {
+        x: 0,
+        y: 0,
+        left: 0,
+        top: 0,
+        width,
+        height,
+        right: width,
+        bottom: height,
+        toJSON: () => ({}),
+      };
+    });
+    open(c.id, { clientX: window.innerWidth - 1, clientY: window.innerHeight - 1 });
+    const menu = screen.getByRole('menu', { name: 'Comandi selezione' });
+    expect(Number.parseFloat(menu.style.left)).toBe(window.innerWidth - 224 - 8);
+    expect(Number.parseFloat(menu.style.top)).toBeGreaterThanOrEqual(8);
+    expect(Number.parseFloat(menu.style.top) + 244).toBeLessThanOrEqual(window.innerHeight - 8);
+    expect(screen.getByRole('region', { name: 'Proprietà' }).contains(menu)).toBe(false);
+  });
+  it('saves the selection from the personal block library using the shared dialog', () => {
+    const c = createComponent('resistor', { x: 0, y: 0 });
+    renderSelection([c]);
+    const count = usePersonalBlocks.getState().blocks.length;
+    fireEvent.click(screen.getByRole('button', { name: 'Salva selezione come blocco' }));
+    expect(screen.getByRole('dialog', { name: 'Salva come blocco' })).toBeDefined();
+    fireEvent.change(screen.getByLabelText('Nome blocco'), { target: { value: 'Resistenza QA' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Salva blocco' }));
+    expect(usePersonalBlocks.getState().blocks).toHaveLength(count + 1);
+    expect(usePersonalBlocks.getState().blocks.at(-1)?.document.objects[0]).toMatchObject({
+      kind: 'component',
+      type: 'resistor',
+    });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(state().past).toEqual([]);
+  });
+  it('keeps Edit enabled state coherent with selection and undo/redo', () => {
+    render(<App />);
+    act(() => state().replace({ version: 1, title: 'Vuoto', objects: [] }));
+    fireEvent.click(screen.getByRole('button', { name: 'Modifica' }));
+    for (const name of ['Taglia', 'Copia', 'Duplica', 'Elimina', 'Seleziona tutto', 'Ripristina'])
+      expect((screen.getByRole('menuitem', { name }) as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Annulla' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Modifica' }));
+    expect(
+      (screen.getByRole('menuitem', { name: 'Ripristina' }) as HTMLButtonElement).disabled,
+    ).toBe(false);
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Seleziona tutto' }));
+    expect(state().selection).toEqual(current().objects.map((o) => o.id));
+    fireEvent.click(screen.getByRole('button', { name: 'Modifica' }));
+    expect((screen.getByRole('menuitem', { name: 'Taglia' }) as HTMLButtonElement).disabled).toBe(
+      false,
+    );
   });
 });

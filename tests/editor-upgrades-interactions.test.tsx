@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { chooseSelectionCommand } from './helpers/selectionMenu';
+import { openSelectionMenu, chooseSelectionCommand } from './helpers/selectionMenu';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { Canvas } from '../src/components/editor/Canvas';
@@ -188,7 +188,7 @@ describe('complete canvas gestures', () => {
     act(() => state().undo());
     expect(state().document.objects).toEqual([...components, node]);
   });
-  it('offers batch replacement after marquee and explains incompatible selections', () => {
+  it('omits batch replacement when a marquee selects incompatible components', () => {
     const a = { ...createComponent('resistor', { x: -60, y: 0 }), id: 'a' },
       b = { ...createComponent('npn', { x: 60, y: 0 }), id: 'b' };
     load([a, b]);
@@ -197,8 +197,9 @@ describe('complete canvas gestures', () => {
     fireEvent.pointerUp(canvas(), client(150, 100));
     expect(state().selection).toHaveLength(2);
 
-    chooseSelectionCommand('Sostituisci…');
-    expect(screen.getByText(/Nessuna destinazione comune/)).toBeTruthy();
+    openSelectionMenu();
+    expect(screen.queryByRole('menuitem', { name: 'Sostituisci…' })).toBeNull();
+    expect(screen.getByRole('menuitem', { name: 'Salva come blocco' })).toBeDefined();
     expect(state().past).toHaveLength(0);
   });
   it('edits opacity percentages locally and commits one undo; label alpha stays independent', () => {

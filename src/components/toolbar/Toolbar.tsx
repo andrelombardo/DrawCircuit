@@ -16,6 +16,8 @@ import {
 import { useEditorStore } from '../../store/editorStore';
 import { IconButton } from './IconButton';
 import { useFloatingToolbar } from './useFloatingToolbar';
+import { shortcut } from '../../utils/platform';
+import { useEditActions } from './useEditActions';
 import { ActionMenu } from './ActionMenu';
 import type { MenuAction } from './ActionMenu';
 import {
@@ -48,6 +50,7 @@ export function DrawingToolbar({
     future = useEditorStore((s) => s.future),
     undo = useEditorStore((s) => s.undo),
     redo = useEditorStore((s) => s.redo);
+  const { editItems } = useEditActions();
   const drawingTools = [
     'wire',
     'rectangle',
@@ -162,14 +165,19 @@ export function DrawingToolbar({
         onEscape={() => setTool('select')}
       />
       <div className="toolbar-divider" />
+      <ActionMenu label="Modifica" showLabel items={editItems} />
       <IconButton
-        label="Annulla (⌘/Ctrl Z)"
+        label={`Annulla (${shortcut('Z')})`}
         disabled={!past.length && !gestureStart}
         onClick={undo}
       >
         <Undo2 size={18} />
       </IconButton>
-      <IconButton label="Ripeti (⌘/Ctrl Shift Z)" disabled={!future.length} onClick={redo}>
+      <IconButton
+        label={`Ripeti (${shortcut('Z', true)})`}
+        disabled={!future.length}
+        onClick={redo}
+      >
         <Redo2 size={18} />
       </IconButton>
       <div className="toolbar-divider" />

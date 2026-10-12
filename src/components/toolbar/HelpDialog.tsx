@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { isMac, isStandalone } from '../../utils/platform';
+import { isMac, isStandalone, shortcut } from '../../utils/platform';
 import { X } from 'lucide-react';
 import { useDialogFocus } from './useDialogFocus';
 export function HelpDialog({ onClose }: { onClose: () => void }) {
@@ -57,20 +57,20 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
             ['Enter', 'Modifica nome o etichetta'],
             ['Alt + clic handle', 'Rimuovi svolta filo'],
             ['L', 'Disegna maglia ellittica'],
-            ['⌘/Ctrl D', 'Duplica'],
-            ['⌘/Ctrl C / X / V', 'Copia / taglia / incolla'],
+            [shortcut('D'), 'Duplica'],
+            [`${shortcut('C')} / ${shortcut('X')} / ${shortcut('V')}`, 'Copia / taglia / incolla'],
             ['Option/Alt + trascina', 'Disabilita snapping nello spostamento'],
             ['Shift durante spostamento', 'Mostra altre quote'],
             ['Delete / Backspace', 'Elimina selezione · su un’etichetta elimina solo il testo'],
             ['Shift + Delete / Backspace', 'Da un’etichetta elimina anche l’oggetto'],
-            ['⌘/Ctrl Z', 'Annulla'],
-            ['⌘/Ctrl Shift Z', 'Ripeti'],
+            [shortcut('Z'), 'Annulla'],
+            [shortcut('Z', true), 'Ripeti'],
             ['G', 'Mostra / nascondi griglia'],
             ['T', 'Mostra/nascondi componenti'],
             ['1', 'Adatta alla vista'],
             ['+ / −', 'Zoom avanti / indietro'],
             ['H · V', 'Pan / selezione'],
-            ['⌘/Ctrl A', 'Seleziona tutto'],
+            [shortcut('A'), 'Seleziona tutto'],
             ['Esc', 'Selezione / annulla filo'],
             ...(isStandalone() && isMac() ? [['⌘T', 'Mostra / nascondi Componenti (PWA)']] : []),
           ].map(([key, description]) => (
@@ -88,10 +88,10 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
         </p>
         <p className="help-note">
           La sidebar Proprietà regola colore e opacità, separatamente per simbolo e label, anche sui
-          gruppi. Seleziona più componenti e usa Sostituisci nell’inspector per cambiarli insieme.
-          L’inspector specchia frecce e maglie nei due assi; il piccolo handle che appare vicino a
-          una freccia selezionata permette di ruotarla liberamente. Ogni gesto ha un solo undo.
-          Distribuisci per centri o spazi liberi; la distanza esatta mantiene fermo il primo
+          gruppi. Seleziona più componenti e usa Sostituisci nel menu contestuale per cambiarli
+          insieme. L’inspector specchia frecce e maglie nei due assi; il piccolo handle che appare
+          vicino a una freccia selezionata permette di ruotarla liberamente. Ogni gesto ha un solo
+          undo. Distribuisci per centri o spazi liberi; la distanza esatta mantiene fermo il primo
           elemento. Scegli lo stile dei fili o Dividi filo per una continuazione tratteggiata.
           Rettangoli e linee decorative non creano connessioni elettriche.
         </p>
@@ -99,11 +99,13 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
           L’anteprima Smart Placement indica aggancio e collegamento; Alt/Option li ignora.
           “Inserisci in filo” è nel feedback in basso. La matita “Disegno e annotazioni” raccoglie
           fili, nodi, frecce, maglie, rettangoli, linee decorative e annotazioni elettriche.
-          “Corrente sul filo” crea direttamente una freccia integrata; dalle proprietà di un filo
-          selezionato si applica subito. “Polarità + / −” si applica direttamente anche dalle
+          “Corrente sul filo” crea direttamente una freccia integrata; dal menu contestuale di un
+          filo selezionato si applica subito. “Polarità + / −” si applica direttamente anche dalle
           proprietà dei componenti compatibili. “Graffa / Staffa” apre Graffa e Staffa: trascina per
-          raggruppare, poi aggiungi l’etichetta; R ruota di 90° e “Inverti lato” cambia lato.
-          Trascina il grip per spostare la toolbar: la posizione viene ricordata. Export offre TikZ,
+          raggruppare, poi aggiungi l’etichetta; R ruota di 90° e “Inverti lato” cambia lato. Clic
+          destro sul foglio o sugli elementi apre le azioni pertinenti; il menu Modifica raccoglie i
+          comandi di modifica. Salva come blocco è anche nella libreria Blocchi personali. Trascina
+          il grip per spostare la toolbar: la posizione viene ricordata. Export offre TikZ,
           Obsidian, File .tex, SVG e le azioni dirette “Copia PNG” e “Scarica PNG”, anche per la
           selezione. Il circuito e il livello di zoom vengono salvati automaticamente in questo
           browser.
