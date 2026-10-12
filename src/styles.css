@@ -2616,9 +2616,10 @@ summary:focus-visible {
   --property-height: 30px;
   --property-gap: 8px;
   --property-padding: 12px;
-  --property-label-width: 72px;
-  --property-secondary-width: 54px;
+  --property-label-width: clamp(56px, 22cqi, 72px);
+  --property-secondary-width: 70px;
   --property-radius: 5px;
+  container-type: inline-size;
   --property-field-bg: #f0f2f5;
   --property-border: #e8ebef;
   --property-muted: #77818e;
@@ -2703,7 +2704,9 @@ summary:focus-visible {
 }
 .property-row {
   display: grid;
-  grid-template-columns: var(--property-label-width) minmax(0, 1fr) var(--property-secondary-width);
+  grid-template-columns: var(--property-label-width) minmax(82px, 1fr) var(
+      --property-secondary-width
+    );
   align-items: center;
   gap: var(--property-gap);
   margin-top: var(--property-gap);
@@ -2791,10 +2794,9 @@ summary:focus-visible {
   padding: 0 6px 0 2px;
   flex: none;
 }
-.inspector-pair,
-.inspector-align {
+.inspector-pair {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 112px), 1fr));
   gap: var(--property-gap);
 }
 .inspector-pair .property-row {
@@ -2818,10 +2820,10 @@ summary:focus-visible {
   display: flex;
   gap: var(--property-gap);
   align-items: center;
-  margin-top: var(--property-gap);
+  flex-wrap: wrap;
 }
 .inspector-rotation .property-row {
-  flex: 1;
+  flex: 1 1 100%;
   margin: 0;
 }
 .inspector-rotation .icon-button {
@@ -2892,71 +2894,108 @@ summary:focus-visible {
   gap: 6px;
   font-size: 11px;
 }
-.inspector-align {
-  margin: var(--property-gap) 0;
-}
-.inspector-segmented,
-.inspector-distribute {
-  display: flex;
-  background: var(--property-field-bg);
-  border-radius: var(--property-radius);
-  padding: 1px;
-}
-.inspector-segmented .icon-button,
-.inspector-distribute .icon-button {
-  flex: 1;
-  width: 28px;
-  height: calc(var(--property-height) - 2px);
-  border-radius: var(--property-radius);
-}
-.inspector-distribution-row {
+.inspector-segmented {
   display: flex;
   gap: var(--property-gap);
-  align-items: center;
 }
-.inspector-distribution-row > .property-row {
+.inspector-segmented .icon-button {
   flex: 1;
-  display: block;
-  margin: 0;
+  height: var(--property-height);
 }
-.inspector-distribution-row .inspector-field-caption {
-  display: none;
+.inspector-geometry-group + .inspector-geometry-group {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--property-border);
 }
-.inspector-distribute {
+.inspector-geometry-group h4,
+.inspector-offsets h4 {
+  font-size: 11px;
+  font-weight: 500;
+  margin: 0 0 8px;
+}
+.inspector-axis-group + .inspector-axis-group {
+  margin-top: 10px;
+}
+.inspector-alignment-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 4px;
+}
+.inspector-alignment-buttons .inspector-property-action {
+  flex-direction: column;
+  justify-content: center;
+  height: 48px;
+  gap: 4px;
+  padding: 4px;
+}
+.inspector-axis-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 138px), 1fr));
+  gap: var(--property-gap);
+  margin-top: var(--property-gap);
+}
+.inspector-property-action svg {
   flex: none;
-  width: 64px;
 }
-.inspector-spacing {
-  display: flex;
+.inspector-property-action:focus-visible {
+  outline: 2px solid var(--ui-focus);
+  outline-offset: 1px;
+}
+.inspector-property-action:active:not(:disabled) {
+  background: var(--ui-hover);
+}
+.inspector-exact-spacing {
+  display: grid;
+  grid-template-columns: minmax(80px, 1fr) minmax(72px, 1fr) 30px;
   gap: var(--property-gap);
   align-items: center;
   margin-top: var(--property-gap);
 }
-.inspector-spacing select {
-  width: 42px;
-  flex: none;
+.inspector-exact-spacing .inspector-property-action {
+  padding: 6px;
 }
-.inspector-spacing-value {
-  flex: 1;
-  width: 0;
+.inspector-offsets {
+  margin-top: 12px;
 }
-.inspector-spacing-value > .inspector-unit:first-child {
-  padding-left: 7px;
+.inspector-annotation + .inspector-annotation {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--property-border);
 }
-.inspector-spacing button {
-  width: var(--property-height);
-  height: var(--property-height);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: var(--property-radius);
-  background: var(--property-field-bg);
-  color: var(--property-muted);
-  flex: none;
+.inspector-annotation > .inspector-property-action {
+  margin-top: 8px;
 }
-.inspector-spacing button:hover:not(:disabled) {
-  background: var(--ui-hover);
-  color: var(--ui-accent);
+.inspector-note.inspector-scope {
+  margin-bottom: 12px;
+}
+/* Reserve independent tracks for digits and unit, including at large UI zoom.
+   At narrow widths the caption gets its own row, leaving HEX and % intact. */
+.property-secondary .inspector-input {
+  display: grid;
+  grid-template-columns: minmax(4ch, 1fr) auto;
+  min-width: var(--property-secondary-width);
+}
+.properties-inspector .property-secondary .inspector-input input {
+  width: 100%;
+  min-width: 4ch;
+  padding: 4px 6px;
+  font-size: 12px;
+}
+@container (max-width: 280px) {
+  .property-row {
+    grid-template-columns: minmax(82px, 1fr) var(--property-secondary-width);
+    row-gap: 5px;
+  }
+  .property-row > .inspector-field-caption {
+    grid-column: 1 / -1;
+  }
+  .property-row > .inspector-control {
+    grid-column: 1 / -1;
+  }
+  .property-row-secondary > .inspector-control {
+    grid-column: 1;
+  }
 }
 .inspector-note {
   font-size: 10px;

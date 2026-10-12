@@ -129,11 +129,13 @@ export function OpacityControl({
   label,
   labelOpacity = false,
   fillOpacity = false,
+  apply,
 }: {
   objects: CircuitObject[];
   label: string;
   labelOpacity?: boolean;
   fillOpacity?: boolean;
+  apply: (fn: (o: CircuitObject) => CircuitObject) => void;
 }) {
   const value = commonValue(
     objects.map((o) =>
@@ -155,15 +157,13 @@ export function OpacityControl({
       value={value === undefined ? undefined : Math.round(value * 100)}
       onCommit={(raw) => {
         const opacity = Number(raw) / 100;
-        useEditorStore
-          .getState()
-          .updateSelection((o) =>
-            fillOpacity && o.kind === 'rectangle'
-              ? { ...o, fillOpacity: opacity }
-              : labelOpacity && 'label' in o
-                ? { ...o, label: { ...o.label, opacity } }
-                : { ...o, opacity },
-          );
+        apply((o) =>
+          fillOpacity && o.kind === 'rectangle'
+            ? { ...o, fillOpacity: opacity }
+            : labelOpacity && 'label' in o
+              ? { ...o, label: { ...o.label, opacity } }
+              : { ...o, opacity },
+        );
       }}
     />
   );
@@ -204,6 +204,7 @@ export function SelectionStyle({
         >
           <OpacityControl
             objects={objects}
+            apply={apply}
             label={o?.kind === 'text' ? 'Opacità testo' : 'Opacità simbolo'}
           />
         </ColorControl>
@@ -216,7 +217,7 @@ export function SelectionStyle({
             apply((o) => ('label' in o ? { ...o, label: { ...o.label, color } } : o))
           }
         >
-          <OpacityControl objects={objects} label="Opacità etichetta" labelOpacity />
+          <OpacityControl objects={objects} apply={apply} label="Opacità etichetta" labelOpacity />
         </ColorControl>
       )}
       {hasStroke && (
@@ -267,7 +268,12 @@ export function SelectionStyle({
           value={commonValue(fillObjects.map((o) => (o.kind === 'rectangle' ? o.fill : '')))}
           onChange={(fill) => apply((o) => (o.kind === 'rectangle' ? { ...o, fill } : o))}
         >
-          <OpacityControl objects={fillObjects} label="Opacità riempimento" fillOpacity />
+          <OpacityControl
+            objects={fillObjects}
+            apply={apply}
+            label="Opacità riempimento"
+            fillOpacity
+          />
         </ColorControl>
       )}
     </div>

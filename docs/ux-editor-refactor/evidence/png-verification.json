@@ -1,0 +1,17 @@
+{
+  "size": [
+    1568,
+    900
+  ],
+  "alpha_range": [
+    0,
+    255
+  ],
+  "margins_pixels": [
+    32,
+    32,
+    32,
+    32
+  ],
+  "transparent_pixels": 1299042
+}

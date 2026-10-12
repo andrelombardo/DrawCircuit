@@ -173,7 +173,7 @@ describe('complete canvas gestures', () => {
     );
     expect(state().selection).toHaveLength(6);
 
-    chooseSelectionCommand('Sostituisci…');
+    chooseSelectionCommand('Sostituisci componenti…');
     fireEvent.change(screen.getByLabelText('Cerca sostituzione'), {
       target: { value: 'condensatore' },
     });

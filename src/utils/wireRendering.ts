@@ -7,10 +7,10 @@ export const translucentCrossing = (c: WireCrossing) =>
 
 /** Translucent crossings cannot be painted twice or erased with opaque white.
  * Cut only the over-wire and draw its bridge once; the under-wire is untouched. */
-export function drawingWireGaps(doc: CircuitDocument) {
+export function drawingWireGaps(doc: CircuitDocument, transparent = false) {
   const gaps = currentWireGaps(doc);
   for (const crossing of wireCrossings(doc)) {
-    if (!translucentCrossing(crossing)) continue;
+    if (!transparent && !translucentCrossing(crossing)) continue;
     const g = bridgeGeometry(crossing),
       points = wirePoints(g.overWire, doc);
     const segment = points.findIndex(

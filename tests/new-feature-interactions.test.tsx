@@ -141,11 +141,11 @@ describe('new feature UI integrates with the existing editor', () => {
     const annotation = doc().objects.at(-1) as ElectricalAnnotation;
     expect(annotation.wireId).toBe(w.id);
     expect(useEditorStore.getState().tool).toBe('select');
-    fireEvent.change(screen.getByLabelText('Etichetta annotazione'), {
+    fireEvent.change(screen.getByLabelText('Etichetta corrente'), {
       target: { value: 'i_{AB}' },
     });
-    fireEvent.blur(screen.getByLabelText('Etichetta annotazione'));
-    chooseSelectionCommand('Inverti freccia');
+    fireEvent.blur(screen.getByLabelText('Etichetta corrente'));
+    chooseSelectionCommand('Inverti verso corrente');
 
     chooseSelectionColor('Simbolo', 'Verde');
     expect(doc().objects.at(-1)).toMatchObject({
@@ -201,7 +201,7 @@ describe('new feature UI integrates with the existing editor', () => {
       client(0, 0),
     );
     expect(doc().objects.at(-1)).toMatchObject({ mode: 'polarity', componentId: c.id });
-    chooseSelectionCommand('Inverti freccia');
+    chooseSelectionCommand('Inverti polarità');
     expect(doc().objects.at(-1)).toMatchObject({ reversed: true });
   });
   it('replaces with a compatible picker and supports atomic undo and redo', () => {

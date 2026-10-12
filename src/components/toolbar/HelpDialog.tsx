@@ -103,12 +103,12 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
           filo selezionato si applica subito. “Polarità + / −” si applica direttamente anche dalle
           proprietà dei componenti compatibili. “Graffa / Staffa” apre Graffa e Staffa: trascina per
           raggruppare, poi aggiungi l’etichetta; R ruota di 90° e “Inverti lato” cambia lato. Clic
-          destro sul foglio o sugli elementi apre le azioni pertinenti; il menu Modifica raccoglie i
-          comandi di modifica. Salva come blocco è anche nella libreria Blocchi personali. Trascina
-          il grip per spostare la toolbar: la posizione viene ricordata. Export offre TikZ,
-          Obsidian, File .tex, SVG e le azioni dirette “Copia PNG” e “Scarica PNG”, anche per la
-          selezione. Il circuito e il livello di zoom vengono salvati automaticamente in questo
-          browser.
+          destro sul foglio o sugli elementi apre le azioni pertinenti; le scorciatoie mantengono
+          disponibili i comandi di modifica. Salva come blocco è anche nella libreria Blocchi
+          personali. Trascina il grip per spostare la toolbar: la posizione viene ricordata. Export
+          offre TikZ, Obsidian, File .tex, SVG e le azioni dirette “Copia PNG” e “Scarica PNG”,
+          anche per la selezione. Il circuito e il livello di zoom vengono salvati automaticamente
+          in questo browser.
         </p>
       </section>
     </div>

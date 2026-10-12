@@ -273,8 +273,10 @@ describe('persistent inspector and property transactions', () => {
         .objects.filter((o) => o.kind === 'component')
         .map((o) => o.x),
     ).toEqual([0, 150, 300]);
-    fireEvent.change(screen.getByLabelText('Distanza esatta'), { target: { value: '120' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Applica' }));
+    fireEvent.change(screen.getByLabelText('Spaziatura orizzontale (u)'), {
+      target: { value: '120' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Applica spaziatura orizzontale' }));
     expect(
       current()
         .objects.filter((o) => o.kind === 'component')
@@ -312,7 +314,14 @@ describe('contextual properties and selection commands', () => {
       within(inspector)
         .getAllByRole('heading', { level: 3 })
         .map((h) => h.textContent),
-    ).toEqual(['Generale', 'Posizione', 'Proprietà elettriche', 'Aspetto', 'Testo']);
+    ).toEqual([
+      'Generale',
+      'Posizione',
+      'Aspetto',
+      'Testo',
+      'Trasformazioni',
+      'Annotazioni elettriche',
+    ]);
     expect(within(inspector).queryByRole('slider')).toBeNull();
     expect(within(inspector).queryByText('Azioni')).toBeNull();
     expect(
@@ -343,7 +352,7 @@ describe('contextual properties and selection commands', () => {
     ])
       expect(screen.queryByLabelText(label)).toBeNull();
     openSelectionMenu();
-    expect(screen.getByRole('menuitem', { name: 'Sostituisci…' })).toBeDefined();
+    expect(screen.getByRole('menuitem', { name: 'Sostituisci componenti…' })).toBeDefined();
     expect(screen.queryByRole('menuitem', { name: 'Dividi filo…' })).toBeNull();
   });
   it('changes label opacity independently, rejects invalid percentages and records one confirmation', () => {
@@ -380,17 +389,18 @@ describe('contextual properties and selection commands', () => {
     act(() => state().undo());
     expect(current().objects[0]).toMatchObject({ label: { text: c.label.text, opacity: 0.25 } });
   });
-  it('closes Edit with Escape, restores focus and executes duplicate by keyboard once', () => {
+  it('closes the context menu with Escape, restores focus and executes duplicate by keyboard once', () => {
     const c = createComponent('currentSource', { x: 0, y: 0 });
     renderSelection([c]);
-    const trigger = screen.getByRole('button', { name: 'Modifica' });
-    fireEvent.keyDown(trigger, { key: 'ArrowDown' });
+    const trigger = canvas();
+    trigger.focus();
+    fireEvent.keyDown(trigger, { key: 'F10', shiftKey: true });
     expect(document.activeElement).toBe(screen.getByRole('menuitem', { name: 'Taglia' }));
     fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
     expect(screen.queryByRole('menu')).toBeNull();
     expect(document.activeElement).toBe(trigger);
     expect(state().selection).toEqual([c.id]);
-    fireEvent.keyDown(trigger, { key: 'ArrowDown' });
+    fireEvent.keyDown(trigger, { key: 'F10', shiftKey: true });
     fireEvent.keyDown(document.activeElement!, { key: 'd' });
     fireEvent.keyDown(document.activeElement!, { key: 'Enter' });
     expect(current().objects).toHaveLength(2);
@@ -751,7 +761,7 @@ describe('canvas context and Edit menus', () => {
       Object.defineProperty(navigator, 'platform', { configurable: true, value: platform });
       const c = createComponent('resistor', { x: 0, y: 0 });
       renderSelection([c]);
-      fireEvent.click(screen.getByRole('button', { name: 'Modifica' }));
+      openSelectionMenu();
       const copy = screen.getByRole('menuitem', { name: 'Copia' });
       expect(copy.querySelector('kbd')?.textContent).toBe(
         platform === 'MacIntel' ? '⌘C' : 'Ctrl+C',
@@ -808,20 +818,23 @@ describe('canvas context and Edit menus', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(state().past).toEqual([]);
   });
-  it('keeps Edit enabled state coherent with selection and undo/redo', () => {
+  it('keeps toolbar history and background selection commands reachable without Edit', () => {
     render(<App />);
+    expect(screen.queryByRole('button', { name: 'Modifica' })).toBeNull();
     act(() => state().replace({ version: 1, title: 'Vuoto', objects: [] }));
-    fireEvent.click(screen.getByRole('button', { name: 'Modifica' }));
-    for (const name of ['Taglia', 'Copia', 'Duplica', 'Elimina', 'Seleziona tutto', 'Ripristina'])
-      expect((screen.getByRole('menuitem', { name }) as HTMLButtonElement).disabled).toBe(true);
-    fireEvent.click(screen.getByRole('menuitem', { name: 'Annulla' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Modifica' }));
+    fireEvent.contextMenu(canvas());
     expect(
-      (screen.getByRole('menuitem', { name: 'Ripristina' }) as HTMLButtonElement).disabled,
-    ).toBe(false);
+      (screen.getByRole('menuitem', { name: 'Seleziona tutto' }) as HTMLButtonElement).disabled,
+    ).toBe(true);
+    fireEvent.keyDown(window, { key: 'Escape' });
+    fireEvent.click(screen.getByRole('button', { name: /^Annulla/ }));
+    expect((screen.getByRole('button', { name: /^Ripeti/ }) as HTMLButtonElement).disabled).toBe(
+      false,
+    );
+    fireEvent.contextMenu(canvas());
     fireEvent.click(screen.getByRole('menuitem', { name: 'Seleziona tutto' }));
     expect(state().selection).toEqual(current().objects.map((o) => o.id));
-    fireEvent.click(screen.getByRole('button', { name: 'Modifica' }));
+    openSelectionMenu();
     expect((screen.getByRole('menuitem', { name: 'Taglia' }) as HTMLButtonElement).disabled).toBe(
       false,
     );

@@ -72,6 +72,7 @@ interface EditorState {
   commit: (doc: CircuitDocument) => void;
   add: (objects: CircuitObject[]) => void;
   updateSelection: (fn: (o: CircuitObject) => CircuitObject) => void;
+  updateObjects: (ids: readonly string[], fn: (o: CircuitObject) => CircuitObject) => void;
   align: (axis: Axis, alignment: Alignment) => void;
   distribute: (axis: Axis, mode?: DistributionMode, spacing?: number) => void;
   position: (axis: Axis, value: number) => void;
@@ -166,9 +167,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     s.commit({ ...s.document, objects: [...s.document.objects, ...objects] });
     s.select(objects.map((o) => o.id));
   },
-  updateSelection: (fn) => {
+  updateSelection: (fn) => get().updateObjects(get().selection, fn),
+  updateObjects: (objectIds, fn) => {
     const s = get(),
-      ids = new Set(s.selection);
+      ids = new Set(objectIds);
     const objects = s.document.objects.map((o) => (ids.has(o.id) ? fn(o) : o));
     if (objects.some((o, i) => o !== s.document.objects[i])) {
       const next = { ...s.document, objects };

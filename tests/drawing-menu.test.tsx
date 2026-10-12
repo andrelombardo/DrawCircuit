@@ -52,7 +52,6 @@ describe('compact pencil drawing menu', () => {
       'Selezione (V)',
       'Testo',
       'Disegno e annotazioni',
-      'Modifica',
       `Annulla (${shortcut('Z')})`,
       `Ripeti (${shortcut('Z', true)})`,
       'Sposta vista (H o Space)',

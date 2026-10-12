@@ -206,7 +206,7 @@ describe('direct contextual annotations and canvas focus', () => {
         currentPlacement: placement,
         wireSegment: { index: 0, ratio: 0.5 },
       });
-      expect(state.selection).toEqual([current.id]);
+      expect(state.selection).toEqual([wire.id]);
       act(() => state.undo());
       expect(useEditorStore.getState().document).toEqual(doc);
       act(() => state.redo());
@@ -220,7 +220,7 @@ describe('direct contextual annotations and canvas focus', () => {
       const doc: CircuitDocument = { version: 1, title: 'Direct polarity', objects: [component] };
       useEditorStore.setState({ document: doc, selection: [component.id] });
       render(<Canvas />);
-      chooseSelectionCommand('Polarità + / -');
+      fireEvent.click(screen.getByRole('checkbox', { name: 'Polarità e tensione' }));
       const state = useEditorStore.getState();
       expect(state.tool).toBe('select');
       expect(state.document.objects[1]).toMatchObject({

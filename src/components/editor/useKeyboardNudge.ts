@@ -19,7 +19,7 @@ function focusConsumesArrows(target: EventTarget | null) {
   return (
     target instanceof Element &&
     !!target.closest(
-      'input, textarea, select, button, summary, [contenteditable]:not([contenteditable="false"]), [role="menu"], [role="listbox"], [role="combobox"], [role="slider"], [role="dialog"], [role="textbox"]',
+      'input, textarea, select, button, summary, [contenteditable]:not([contenteditable="false"]), [role="menu"], [role="listbox"], [role="combobox"], [role="slider"], [role="separator"], [role="dialog"], [role="textbox"]',
     )
   );
 }

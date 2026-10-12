@@ -6,14 +6,13 @@ import {
   Replace,
   Scissors,
   Trash2,
-  Undo2,
-  Redo2,
+  ImageDown,
   Scan,
 } from 'lucide-react';
 import { commonReplacements } from '../../model/replacement';
 import { useEditorStore } from '../../store/editorStore';
 import { useEditorCommands } from '../properties/EditorCommandContext';
-import { currentOnSelectedWire } from '../properties/annotationActions';
+import { annotationsForHost, withHostAnnotation } from '../properties/annotationActions';
 import { CurrentInlineIcon } from './DrawingIcons';
 import type { MenuAction } from './ActionMenu';
 import { isMac, shortcut } from '../../utils/platform';
@@ -85,63 +84,55 @@ export function useEditActions(canvasOnly = false) {
     if (replaceable)
       contextItems.push({
         id: 'replace',
-        label: 'Sostituisci…',
+        label: objects.every((o) => o.kind === 'component')
+          ? 'Sostituisci…'
+          : 'Sostituisci componenti…',
         icon: <Replace size={15} />,
         separatorBefore: true,
         onSelect: commands.replace,
       });
     const wire = objects.length === 1 && objects[0].kind === 'wire' ? objects[0] : null;
-    if (wire)
-      contextItems.push(
-        {
+    if (wire) {
+      const hasCurrent = annotationsForHost(wire, s.document).length > 0;
+      if (!hasCurrent)
+        contextItems.push({
           id: 'current',
           label: 'Corrente sul filo',
           icon: <CurrentInlineIcon size={15} />,
           separatorBefore: true,
-          onSelect: () => state().add([currentOnSelectedWire(wire, state().document)]),
-        },
-        {
-          id: 'split',
-          label: 'Dividi filo…',
           onSelect: () => {
-            state().setSplitWire(wire.id);
-            state().notify('Clicca il filo nel punto da dividere · Esc annulla.');
+            const s = state();
+            const next = withHostAnnotation(wire, s.document);
+            if (next !== s.document) s.commit(next);
           },
+        });
+      contextItems.push({
+        id: 'split',
+        label: 'Dividi filo…',
+        separatorBefore: hasCurrent,
+        onSelect: () => {
+          state().setSplitWire(wire.id);
+          state().notify('Clicca il filo nel punto da dividere · Esc annulla.');
         },
-      );
+      });
+    }
     contextItems.push(
+      {
+        id: 'image',
+        label: 'Salva come immagine',
+        icon: <ImageDown size={15} />,
+        separatorBefore: true,
+        disabled: commands.imageBusy,
+        onSelect: commands.saveImage,
+      },
       {
         id: 'block',
         label: 'Salva come blocco',
         icon: <BookmarkPlus size={15} />,
-        separatorBefore: !replaceable && !wire,
         onSelect: commands.saveBlock,
       },
       remove,
     );
   }
-  return {
-    contextItems,
-    editItems: [
-      {
-        id: 'undo',
-        label: 'Annulla',
-        shortcut: shortcut('Z'),
-        icon: <Undo2 size={15} />,
-        disabled: !s.past.length && !s.gestureStart,
-        onSelect: () => state().undo(),
-      },
-      {
-        id: 'redo',
-        label: 'Ripristina',
-        shortcut: shortcut('Z', true),
-        icon: <Redo2 size={15} />,
-        disabled: !s.future.length,
-        onSelect: () => state().redo(),
-      },
-      ...selectionItems.map((item, i) => ({ ...item, separatorBefore: i === 0 })),
-      remove,
-      { ...selectAll, separatorBefore: true },
-    ] as MenuAction[],
-  };
+  return { contextItems };
 }

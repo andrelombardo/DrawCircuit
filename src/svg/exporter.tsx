@@ -19,7 +19,10 @@ import { formatNumber as f } from '../tikz/units';
 const attr = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 /** Pure vector content. Browser-measured KaTeX becomes SVG text, rules and paths, never foreignObject. */
-export function exportSVG(source: CircuitDocument): string {
+export function exportSVG(
+  source: CircuitDocument,
+  options: { transparent?: boolean } = {},
+): string {
   const seen = new Set<string>();
   const doc = {
     ...source,
@@ -102,7 +105,7 @@ export function exportSVG(source: CircuitDocument): string {
       );
     }
   }
-  const currentGaps = drawingWireGaps(doc);
+  const currentGaps = drawingWireGaps(doc, options.transparent);
   for (const o of doc.objects.filter((o) => o.kind === 'wire')) {
     try {
       const paths = wireDrawingPaths(wirePoints(o, doc), currentGaps.get(o.id));
@@ -117,7 +120,7 @@ export function exportSVG(source: CircuitDocument): string {
   for (const c of wireCrossings(doc)) {
     const p = bridgePaths(c),
       w = Math.max(c.horizontal.width, c.vertical.width) + 4;
-    if (translucentCrossing(c)) {
+    if (options.transparent || translucentCrossing(c)) {
       parts.push(
         `<g opacity="${f(p.overWire.opacity ?? 1)}">${path(p.arc, p.overWire.color, p.overWire.width, 'round', p.overWire)}</g>`,
       );
@@ -261,5 +264,8 @@ export function exportSVG(source: CircuitDocument): string {
     y = bounds.y - padding,
     width = Math.max(24, bounds.width + padding * 2),
     height = Math.max(24, bounds.height + padding * 2);
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="${f(x)} ${f(y)} ${f(width)} ${f(height)}" width="${f(width)}" height="${f(height)}"><title>${xmlText(doc.title)}</title><rect x="${f(x)}" y="${f(y)}" width="${f(width)}" height="${f(height)}" fill="white"/>${parts.join('')}${labels.join('')}</svg>`;
+  const background = options.transparent
+    ? ''
+    : `<rect x="${f(x)}" y="${f(y)}" width="${f(width)}" height="${f(height)}" fill="white"/>`;
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="${f(x)} ${f(y)} ${f(width)} ${f(height)}" width="${f(width)}" height="${f(height)}"><title>${xmlText(doc.title)}</title>${background}${parts.join('')}${labels.join('')}</svg>`;
 }

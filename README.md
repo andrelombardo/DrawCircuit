@@ -38,7 +38,7 @@ DrawCircuit turns circuit sketches into editable vector diagrams. Place componen
 - **Current arrows** — Integrate a labeled arrow into a branch so it follows the wire as the circuit changes.
 - **Voltage and polarity** — Mark a two-terminal component with +/− signs or draw a voltage arrow between chosen points.
 - **Loops, arrows, and text** — Add editable elliptical loop arrows, straight or Bézier arrows, and mathematical notes. Mirror arrows horizontally or vertically and drag their rotation handle for arbitrary angles; hold Shift to snap to 15°.
-- **Visual styling** — A compact right Properties inspector groups position, appearance, typography, and geometry. Paired coordinate fields and color/opacity rows keep the panel easy to scan; mixed selections show common properties and mixed values. Contextual commands stay in the selection’s overflow menu.
+- **Visual styling** — A compact right Properties inspector groups position, appearance, typography, and geometry. Paired coordinate fields and color/opacity rows keep the panel easy to scan; mixed selections show common properties and mixed values. Contextual commands stay in the canvas right-click menu. Electrical annotations are edited in the same inspector as their component or wire; alignment, distribution, exact X/Y spacing, and transforms have separate groups.
 - **Styled wires and graphics** — Use solid, dashed, or dotted wires; split a wire to style its continuation independently. Draw decorative lines and resizable rectangles with independent fill and outline opacity, without creating electrical connections.
 
 ### Export & Offline
@@ -46,7 +46,7 @@ DrawCircuit turns circuit sketches into editable vector diagrams. Place componen
 - **TikZ / CircuitikZ** — Copy circuit code or download a standalone `.tex` document.
 - **Obsidian** — Copy a complete Markdown TikZ block for notes using Inline TikZ or a compatible TikZ renderer.
 - **SVG** — Copy or download a vector diagram with mathematical labels and no editor controls or grid.
-- **Selection export** — Export the whole circuit or only the selected elements, including their internal wires.
+- **Selection export** — Export the whole circuit or only the selected elements, including their internal wires and attached annotations. Right-click a selection and choose **Salva come immagine** for a transparent PNG at 4× resolution.
 - **Local saving and PWA** — Keep your circuit in the current browser and work offline after the app is cached; available installation options depend on the browser.
 
 ## Quick Start
@@ -121,4 +121,5 @@ Run `npm run test`. The suite covers component terminals and rotations, wire rou
 
 - [User manual and technical details](docs/manuale.md) — Usage, shortcuts, architecture, and export conventions.
 - [Personal blocks, annotations, SVG, and offline support](docs/nuove-feature.md) — Detailed behavior of the newer editing and PWA features.
+- [Editor UX refactoring and verification](docs/ux-editor-refactor/report.md) — Unified electrical properties, transparent PNG, selection geometry, and responsive checks.
 - [Properties inspector design and verification](docs/inspector-design/report.md) — Layout choices, preserved commands, regression checks, and browser screenshots.

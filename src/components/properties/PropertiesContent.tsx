@@ -1,16 +1,6 @@
 import { commonValue } from './commonValue';
-import { useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import {
-  AlignHorizontalJustifyStart,
-  AlignHorizontalJustifyCenter,
-  AlignHorizontalJustifyEnd,
-  AlignVerticalJustifyStart,
-  AlignVerticalJustifyCenter,
-  AlignVerticalJustifyEnd,
-  AlignHorizontalDistributeCenter,
-  AlignVerticalDistributeCenter,
-  Check,
   RotateCw,
   ArrowLeftRight,
   FlipHorizontal,
@@ -31,15 +21,14 @@ import { rotatePoint } from '../../utils/geometry';
 import { unionBounds } from '../../utils/visualBounds';
 import { measurementBounds } from '../../utils/measurementGeometry';
 import { objectCenter } from '../../utils/selectionGeometry';
-import type { Axis, Alignment, DistributionMode } from '../../utils/selectionGeometry';
+import type { Axis } from '../../utils/selectionGeometry';
 import { arrowOrientation, rotateArrow } from '../../utils/arrows';
 import { inlineTextTarget, replaceInlineText } from '../../utils/labels';
 import { SelectionStyle, SelectionTypography } from './SelectionStyle';
+import { ElectricalProperties } from './ElectricalProperties';
+import { SelectionGeometry } from './SelectionGeometry';
 import { ComponentPreview } from '../palette/ComponentPreview';
-import { supportsPolarity } from '../../model/capabilities';
-import { createPolarity } from '../../annotations/electrical';
 import { reverseLoop } from '../../utils/loops';
-import { PolarityIcon } from '../toolbar/DrawingIcons';
 import { IconButton } from '../toolbar/IconButton';
 import { InspectorSection, PropertyField, PropertySelect, PropertyRow } from './PropertyControls';
 const names: Record<CircuitObject['kind'], string> = {
@@ -65,9 +54,6 @@ export function PropertiesContent() {
   const activeLabel = useEditorStore((s) => s.activeLabel),
     grid = useEditorStore((s) => s.grid),
     snapEnabled = useEditorStore((s) => s.snapEnabled);
-  const [distribution, setDistribution] = useState<DistributionMode>('centers');
-  const [spacing, setSpacing] = useState('120'),
-    [spacingAxis, setSpacingAxis] = useState<Axis>('x');
   const state = () => useEditorStore.getState();
   const apply = (fn: (o: CircuitObject) => CircuitObject) => state().updateSelection(fn);
   const doc = state().document;
@@ -97,6 +83,34 @@ export function PropertiesContent() {
   const lineObjects = objects.filter(
     (o) => o.kind === 'wire' || o.kind === 'line' || o.kind === 'rectangle',
   );
+  const independentRotation = rotatables.length === objects.length;
+  const groupRotation =
+    objects.every(
+      (item) =>
+        [
+          'component',
+          'text',
+          'arrow',
+          'loop-arrow',
+          'junction',
+          'wire',
+          'brace',
+          'rectangle',
+          'line',
+        ].includes(item.kind) &&
+        !(
+          objects.some((o) => o.kind === 'component') && ['brace', 'rectangle'].includes(item.kind)
+        ) &&
+        (item.kind !== 'wire' ||
+          [item.startEndpoint, item.endEndpoint].every(
+            (ep) =>
+              ep.kind === 'free' ||
+              objects.some(
+                (o) => o.id === (ep.kind === 'terminal' ? ep.componentId : ep.junctionId),
+              ),
+          )),
+    ) && objects.some((item) => !['wire', 'junction'].includes(item.kind));
+  const electricalOnly = o?.kind === 'electrical' && !labelTarget;
   const rectangles = objects.filter((o) => o.kind === 'rectangle');
   const setRotation = (value: number) =>
     apply((o) => {
@@ -175,53 +189,54 @@ export function PropertiesContent() {
           )}
         </div>
       </div>
-      {((o && ('label' in o || o.kind === 'text')) ||
-        objects.every((o) => 'label' in o) ||
-        objects.every((o) => o.kind === 'text')) && (
-        <InspectorSection title="Generale">
-          {o && ('label' in o || o.kind === 'text') && (
-            <PropertyField
-              label={
-                o.kind === 'junction'
-                  ? 'Nome nodo'
-                  : o.kind === 'component'
-                    ? 'Etichetta componente'
-                    : o.kind === 'text'
-                      ? 'Contenuto testo'
-                      : 'Etichetta annotazione'
-              }
-              caption={o.kind === 'text' ? 'Contenuto' : 'Etichetta'}
-              value={o.kind === 'text' ? o.text : 'label' in o ? o.label.text : ''}
-              onCommit={(text) => apply((o) => replaceInlineText(o, text))}
-            />
-          )}
-          {objects.length > 1 && objects.every((o) => 'label' in o) && (
-            <PropertyField
-              label="Etichetta comune"
-              caption="Etichetta"
-              value={commonValue(objects.map((o) => ('label' in o ? o.label.text : '')))}
-              onCommit={(text) => apply((o) => replaceInlineText(o, text))}
-            />
-          )}
-          {objects.length > 1 && objects.every((o) => o.kind === 'text') && (
-            <PropertyField
-              label="Contenuto comune"
-              caption="Contenuto"
-              value={commonValue(objects.map((o) => (o.kind === 'text' ? o.text : '')))}
-              onCommit={(text) => apply((o) => replaceInlineText(o, text))}
-            />
-          )}
-          {o?.kind === 'component' && componentRegistry[o.type].internalText !== undefined && (
-            <PropertyField
-              label="Testo interno"
-              value={o.bodyText ?? '='}
-              onCommit={(bodyText) =>
-                apply((o) => (o.kind === 'component' ? { ...o, bodyText } : o))
-              }
-            />
-          )}
-        </InspectorSection>
-      )}
+      {!electricalOnly &&
+        ((o && ('label' in o || o.kind === 'text')) ||
+          objects.every((o) => 'label' in o) ||
+          objects.every((o) => o.kind === 'text')) && (
+          <InspectorSection title="Generale">
+            {o && ('label' in o || o.kind === 'text') && (
+              <PropertyField
+                label={
+                  o.kind === 'junction'
+                    ? 'Nome nodo'
+                    : o.kind === 'component'
+                      ? 'Etichetta componente'
+                      : o.kind === 'text'
+                        ? 'Contenuto testo'
+                        : 'Etichetta annotazione'
+                }
+                caption={o.kind === 'text' ? 'Contenuto' : 'Etichetta'}
+                value={o.kind === 'text' ? o.text : 'label' in o ? o.label.text : ''}
+                onCommit={(text) => apply((o) => replaceInlineText(o, text))}
+              />
+            )}
+            {objects.length > 1 && objects.every((o) => 'label' in o) && (
+              <PropertyField
+                label="Etichetta comune"
+                caption="Etichetta"
+                value={commonValue(objects.map((o) => ('label' in o ? o.label.text : '')))}
+                onCommit={(text) => apply((o) => replaceInlineText(o, text))}
+              />
+            )}
+            {objects.length > 1 && objects.every((o) => o.kind === 'text') && (
+              <PropertyField
+                label="Contenuto comune"
+                caption="Contenuto"
+                value={commonValue(objects.map((o) => (o.kind === 'text' ? o.text : '')))}
+                onCommit={(text) => apply((o) => replaceInlineText(o, text))}
+              />
+            )}
+            {o?.kind === 'component' && componentRegistry[o.type].internalText !== undefined && (
+              <PropertyField
+                label="Testo interno"
+                value={o.bodyText ?? '='}
+                onCommit={(bodyText) =>
+                  apply((o) => (o.kind === 'component' ? { ...o, bodyText } : o))
+                }
+              />
+            )}
+          </InspectorSection>
+        )}
       <InspectorSection title="Posizione">
         <div className="inspector-pair">
           {(['x', 'y'] as const).map((axis) => (
@@ -237,140 +252,156 @@ export function PropertiesContent() {
             />
           ))}
         </div>
-        {(rotatables.length > 0 || labelTarget || objects.some((o) => o.kind === 'brace')) && (
-          <div className="inspector-rotation">
-            {(rotatables.length === objects.length || !!labelTarget) &&
-              (labelTarget ||
-              rotatables.some((o) => o.kind === 'component' || o.kind === 'text') ? (
-                <PropertySelect
-                  label="Rotazione"
-                  caption="Angolo"
-                  value={rotation}
-                  onChange={(v) => setRotation(Number(v))}
-                >
-                  {ROTATIONS.map((r) => (
-                    <option key={r} value={r}>
-                      {r}°
-                    </option>
-                  ))}
-                </PropertySelect>
-              ) : (
-                <PropertyField
-                  label="Rotazione"
-                  caption="Angolo"
-                  numeric
-                  unit="°"
-                  value={rotation === undefined ? undefined : Number(rotation.toFixed(2))}
-                  onCommit={(v) => setRotation(Number(v))}
-                />
-              ))}
-            {!labelTarget && (
-              <IconButton
-                label={`Ruota ${rotatables.some((o) => o.kind === 'component') ? 45 : 90}° (R)`}
-                onClick={() => state().rotate()}
-              >
-                <RotateCw size={14} />
-              </IconButton>
-            )}
-          </div>
+        {objects.length > 1 && (
+          <p className="inspector-note">
+            X/Y: angolo superiore sinistro dei limiti geometrici della selezione, in unità canvas.
+          </p>
         )}
       </InspectorSection>
-      {!labelTarget && o && supportsPolarity(o) && (
-        <InspectorSection title="Proprietà elettriche">
-          <PropertyRow caption="Polarità">
-            <button
-              className="inspector-property-action"
-              onClick={() => {
-                const annotation = createPolarity(o);
-                if (annotation) state().add([annotation]);
-              }}
+      {!electricalOnly && (
+        <InspectorSection title="Aspetto">
+          <SelectionStyle objects={objects} apply={apply} labelOnly={!!labelTarget} />
+          {!labelTarget && lineObjects.length === objects.length && (
+            <PropertySelect
+              label="Stile linea"
+              value={commonValue(lineObjects.map((o) => o.lineStyle ?? 'solid'))}
+              onChange={(v) =>
+                apply((o) =>
+                  o.kind === 'wire' || o.kind === 'line' || o.kind === 'rectangle'
+                    ? { ...o, lineStyle: v as LineStyle }
+                    : o,
+                )
+              }
             >
-              <PolarityIcon size={14} /> Polarità + / -
-            </button>
-          </PropertyRow>
+              <option value="solid">Continua</option>
+              <option value="dashed">Tratteggiata</option>
+              <option value="dotted">Puntinata</option>
+            </PropertySelect>
+          )}
+          {!labelTarget &&
+            lineObjects.length === objects.length &&
+            lineObjects.every((o) => o.lineStyle === 'dashed') && (
+              <div className="inspector-pair">
+                <PropertyField
+                  label="Lunghezza trattino"
+                  caption="Trattino"
+                  numeric
+                  min={0.1}
+                  max={1000}
+                  value={commonValue(
+                    lineObjects
+                      .filter((o) => o.lineStyle === 'dashed')
+                      .map(
+                        (o) =>
+                          o.dashLength ?? (o.kind === 'rectangle' ? o.strokeWidth : o.width) * 4,
+                      ),
+                  )}
+                  onCommit={(v) =>
+                    apply((o) =>
+                      (o.kind === 'wire' || o.kind === 'line' || o.kind === 'rectangle') &&
+                      o.lineStyle === 'dashed'
+                        ? { ...o, dashLength: Number(v) }
+                        : o,
+                    )
+                  }
+                />
+                <PropertyField
+                  label="Spazio trattini"
+                  caption="Intervallo"
+                  numeric
+                  min={0.1}
+                  max={1000}
+                  value={commonValue(
+                    lineObjects
+                      .filter((o) => o.lineStyle === 'dashed')
+                      .map(
+                        (o) => o.dashGap ?? (o.kind === 'rectangle' ? o.strokeWidth : o.width) * 2,
+                      ),
+                  )}
+                  onCommit={(v) =>
+                    apply((o) =>
+                      (o.kind === 'wire' || o.kind === 'line' || o.kind === 'rectangle') &&
+                      o.lineStyle === 'dashed'
+                        ? { ...o, dashGap: Number(v) }
+                        : o,
+                    )
+                  }
+                />
+              </div>
+            )}
         </InspectorSection>
       )}
-      <InspectorSection title="Aspetto">
-        <SelectionStyle objects={objects} apply={apply} labelOnly={!!labelTarget} />
-        {!labelTarget && lineObjects.length === objects.length && (
-          <PropertySelect
-            label="Stile linea"
-            value={commonValue(lineObjects.map((o) => o.lineStyle ?? 'solid'))}
-            onChange={(v) =>
-              apply((o) =>
-                o.kind === 'wire' || o.kind === 'line' || o.kind === 'rectangle'
-                  ? { ...o, lineStyle: v as LineStyle }
-                  : o,
-              )
-            }
-          >
-            <option value="solid">Continua</option>
-            <option value="dashed">Tratteggiata</option>
-            <option value="dotted">Puntinata</option>
-          </PropertySelect>
-        )}
-        {!labelTarget &&
-          lineObjects.length === objects.length &&
-          lineObjects.every((o) => o.lineStyle === 'dashed') && (
-            <div className="inspector-pair">
-              <PropertyField
-                label="Lunghezza trattino"
-                caption="Trattino"
-                numeric
-                min={0.1}
-                max={1000}
-                value={commonValue(
-                  lineObjects
-                    .filter((o) => o.lineStyle === 'dashed')
-                    .map(
-                      (o) => o.dashLength ?? (o.kind === 'rectangle' ? o.strokeWidth : o.width) * 4,
-                    ),
-                )}
-                onCommit={(v) =>
-                  apply((o) =>
-                    (o.kind === 'wire' || o.kind === 'line' || o.kind === 'rectangle') &&
-                    o.lineStyle === 'dashed'
-                      ? { ...o, dashLength: Number(v) }
-                      : o,
-                  )
-                }
-              />
-              <PropertyField
-                label="Spazio trattini"
-                caption="Intervallo"
-                numeric
-                min={0.1}
-                max={1000}
-                value={commonValue(
-                  lineObjects
-                    .filter((o) => o.lineStyle === 'dashed')
-                    .map(
-                      (o) => o.dashGap ?? (o.kind === 'rectangle' ? o.strokeWidth : o.width) * 2,
-                    ),
-                )}
-                onCommit={(v) =>
-                  apply((o) =>
-                    (o.kind === 'wire' || o.kind === 'line' || o.kind === 'rectangle') &&
-                    o.lineStyle === 'dashed'
-                      ? { ...o, dashGap: Number(v) }
-                      : o,
-                  )
-                }
-              />
-            </div>
-          )}
-      </InspectorSection>
-      {objects.every((o) => 'label' in o || o.kind === 'text') && (
+      {!electricalOnly && objects.every((o) => 'label' in o || o.kind === 'text') && (
         <InspectorSection title="Testo">
           <SelectionTypography objects={objects} apply={apply} />
+        </InspectorSection>
+      )}
+      {(labelTarget || groupRotation) && (
+        <InspectorSection title="Trasformazioni">
+          {(groupRotation || labelTarget) && (
+            <div className="inspector-rotation">
+              {(independentRotation || !!labelTarget) &&
+                (labelTarget ||
+                rotatables.some((o) => o.kind === 'component' || o.kind === 'text') ? (
+                  <PropertySelect
+                    label="Rotazione"
+                    caption="Angolo"
+                    value={rotation}
+                    onChange={(v) => setRotation(Number(v))}
+                  >
+                    {ROTATIONS.map((r) => (
+                      <option key={r} value={r}>
+                        {r}°
+                      </option>
+                    ))}
+                  </PropertySelect>
+                ) : (
+                  <PropertyField
+                    label="Rotazione"
+                    caption="Angolo"
+                    numeric
+                    unit="°"
+                    value={rotation === undefined ? undefined : Number(rotation.toFixed(2))}
+                    onCommit={(v) => setRotation(Number(v))}
+                  />
+                ))}
+              {!labelTarget && (
+                <button
+                  className="inspector-property-action"
+                  aria-label={`Ruota ${rotatables.some((o) => o.kind === 'component') ? 45 : 90}° (R)`}
+                  title="Ruota la selezione attorno al suo centro (R)"
+                  onClick={() => state().rotate()}
+                >
+                  <RotateCw size={14} />
+                  Ruota {rotatables.some((o) => o.kind === 'component') ? 45 : 90}°
+                </button>
+              )}
+            </div>
+          )}
+          {objects.every((item) => item.kind === 'arrow' || item.kind === 'loop-arrow') && (
+            <PropertyRow caption="Specchia">
+              <div className="inspector-segmented">
+                <IconButton
+                  label="Specchia orizzontalmente"
+                  onClick={() => state().mirror('horizontal')}
+                >
+                  <FlipHorizontal size={14} />
+                </IconButton>
+                <IconButton
+                  label="Specchia verticalmente"
+                  onClick={() => state().mirror('vertical')}
+                >
+                  <FlipVertical size={14} />
+                </IconButton>
+              </div>
+            </PropertyRow>
+          )}
         </InspectorSection>
       )}
       {!labelTarget &&
         (objects.length > 1 ||
           objects.some((o) =>
-            ['rectangle', 'line', 'wire', 'arrow', 'loop-arrow', 'electrical', 'brace'].includes(
-              o.kind,
-            ),
+            ['rectangle', 'line', 'wire', 'arrow', 'loop-arrow', 'brace'].includes(o.kind),
           )) && (
           <InspectorSection title="Geometria">
             {objects.every((item) => item.kind === 'brace') && (
@@ -387,7 +418,7 @@ export function PropertiesContent() {
                 </button>
               </PropertyRow>
             )}
-            {objects.every((item) => ['arrow', 'electrical', 'loop-arrow'].includes(item.kind)) && (
+            {objects.every((item) => ['arrow', 'loop-arrow'].includes(item.kind)) && (
               <PropertyRow caption="Direzione">
                 <button
                   className="inspector-property-action"
@@ -403,24 +434,6 @@ export function PropertiesContent() {
                 >
                   <ArrowLeftRight size={14} /> Inverti freccia
                 </button>
-              </PropertyRow>
-            )}
-            {objects.every((item) => item.kind === 'arrow' || item.kind === 'loop-arrow') && (
-              <PropertyRow caption="Specchia">
-                <div className="inspector-segmented">
-                  <IconButton
-                    label="Specchia orizzontalmente"
-                    onClick={() => state().mirror('horizontal')}
-                  >
-                    <FlipHorizontal size={14} />
-                  </IconButton>
-                  <IconButton
-                    label="Specchia verticalmente"
-                    onClick={() => state().mirror('vertical')}
-                  >
-                    <FlipVertical size={14} />
-                  </IconButton>
-                </div>
               </PropertyRow>
             )}
             {rectangles.length === objects.length && (
@@ -490,26 +503,6 @@ export function PropertiesContent() {
                 <option value="arc">Maglia</option>
               </PropertySelect>
             )}
-            {o?.kind === 'electrical' && (
-              <div className="inspector-pair">
-                {(['x', 'y'] as const).map((axis) => (
-                  <PropertyField
-                    key={axis}
-                    label={`Offset annotazione ${axis.toUpperCase()}`}
-                    caption={`Offset ${axis.toUpperCase()}`}
-                    numeric
-                    value={o.offset[axis]}
-                    onCommit={(v) =>
-                      apply((o) =>
-                        o.kind === 'electrical'
-                          ? { ...o, offset: { ...o.offset, [axis]: Number(v) } }
-                          : o,
-                      )
-                    }
-                  />
-                ))}
-              </div>
-            )}
             {o?.kind === 'line' &&
               (['start', 'end'] as const).map((end) => (
                 <div className="inspector-pair" key={end}>
@@ -528,114 +521,34 @@ export function PropertiesContent() {
                   ))}
                 </div>
               ))}
-            {objects.length > 1 && (
-              <>
-                <div className="inspector-align" role="group" aria-label="Allinea selezione">
-                  {(['x', 'y'] as const).map((groupAxis) => (
-                    <div className="inspector-segmented" key={groupAxis}>
-                      {(
-                        [
-                          ['x', 'start', 'Allinea a sinistra', AlignHorizontalJustifyStart],
-                          [
-                            'x',
-                            'center',
-                            'Allinea al centro orizzontalmente',
-                            AlignHorizontalJustifyCenter,
-                          ],
-                          ['x', 'end', 'Allinea a destra', AlignHorizontalJustifyEnd],
-                          ['y', 'start', 'Allinea in alto', AlignVerticalJustifyStart],
-                          [
-                            'y',
-                            'center',
-                            'Allinea al centro verticalmente',
-                            AlignVerticalJustifyCenter,
-                          ],
-                          ['y', 'end', 'Allinea in basso', AlignVerticalJustifyEnd],
-                        ] as const
-                      )
-                        .filter(([axis]) => axis === groupAxis)
-                        .map(([axis, alignment, label, Icon]) => (
-                          <IconButton
-                            key={label}
-                            label={label}
-                            onClick={() => state().align(axis as Axis, alignment as Alignment)}
-                          >
-                            <Icon size={17} />
-                          </IconButton>
-                        ))}
-                    </div>
-                  ))}
-                </div>
-                <div className="inspector-distribution-row">
-                  <PropertySelect
-                    label="Distribuzione"
-                    value={distribution}
-                    onChange={(v) => setDistribution(v as DistributionMode)}
-                  >
-                    <option value="centers">Per centri</option>
-                    <option value="gaps">Per spazi liberi</option>
-                  </PropertySelect>
-                  <div className="inspector-distribute">
-                    <IconButton
-                      disabled={objects.length < 3}
-                      onClick={() => state().distribute('x', distribution)}
-                      label="Distribuisci orizzontalmente"
-                    >
-                      <AlignHorizontalDistributeCenter size={16} />
-                    </IconButton>
-                    <IconButton
-                      disabled={objects.length < 3}
-                      onClick={() => state().distribute('y', distribution)}
-                      label="Distribuisci verticalmente"
-                    >
-                      <AlignVerticalDistributeCenter size={16} />
-                    </IconButton>
-                  </div>
-                </div>
-                <div className="inspector-spacing">
-                  <select
-                    aria-label="Asse spaziatura"
-                    value={spacingAxis}
-                    onChange={(e) => setSpacingAxis(e.target.value as Axis)}
-                  >
-                    <option value="x">X</option>
-                    <option value="y">Y</option>
-                  </select>
-                  <label className="inspector-input inspector-spacing-value">
-                    <span className="inspector-unit">Spazio</span>
-                    <input
-                      aria-label="Distanza esatta"
-                      type="number"
-                      min="0"
-                      max="10000000"
-                      step="any"
-                      value={spacing}
-                      onChange={(e) => setSpacing(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && spacing.trim() && Number(spacing) >= 0) {
-                          e.preventDefault();
-                          state().distribute(spacingAxis, distribution, Number(spacing));
-                        }
-                      }}
-                    />
-                    <span className="inspector-unit">u</span>
-                  </label>
-                  <button
-                    aria-label="Applica"
-                    title="Applica distanza esatta"
-                    disabled={
-                      !spacing.trim() || !Number.isFinite(Number(spacing)) || Number(spacing) < 0
-                    }
-                    onClick={() => state().distribute(spacingAxis, distribution, Number(spacing))}
-                  >
-                    <Check size={16} />
-                  </button>
-                </div>
-                <p className="inspector-note">
-                  Automatica: estremi fermi. Esatta: primo elemento fermo.
-                </p>
-              </>
-            )}
+            {objects.length > 1 && <SelectionGeometry objects={objects} />}
+          </InspectorSection>
+        )}
+      {!labelTarget && o && <ElectricalProperties object={o} />}
+      {!labelTarget &&
+        objects.length > 1 &&
+        objects.every(
+          (item) =>
+            item.kind === 'electrical' &&
+            objects[0].kind === 'electrical' &&
+            item.mode === objects[0].mode,
+        ) && (
+          <InspectorSection title="Annotazioni elettriche">
+            <button
+              className="inspector-property-action"
+              onClick={() =>
+                apply((item) =>
+                  item.kind === 'electrical' ? { ...item, reversed: !item.reversed } : item,
+                )
+              }
+            >
+              <ArrowLeftRight size={14} />{' '}
+              {objects[0].kind === 'electrical' && objects[0].mode === 'polarity'
+                ? 'Inverti polarità'
+                : objects[0].kind === 'electrical' && objects[0].mode === 'current'
+                  ? 'Inverti verso corrente'
+                  : 'Inverti freccia tensione'}
+            </button>
           </InspectorSection>
         )}
     </div>

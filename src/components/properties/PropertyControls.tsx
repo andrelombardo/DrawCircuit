@@ -53,7 +53,7 @@ function DraftInput({
       aria-valuetext={
         numeric ? (value === undefined ? 'Valori misti' : `${value}${unit ?? ''}`) : undefined
       }
-      placeholder={value === undefined ? (numeric ? '—' : 'Valori misti') : label}
+      placeholder={value === undefined ? (numeric ? 'Misto' : 'Valori misti') : label}
       onFocus={() => {
         cancelled.current = false;
       }}

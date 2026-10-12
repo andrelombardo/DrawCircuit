@@ -208,7 +208,7 @@ describe('exact keyboard movement through the shared drag operation', () => {
       expect(state().gestureStart).toBeNull();
     },
   );
-  it.each(['dialog', 'menu', 'listbox', 'combobox', 'slider'])(
+  it.each(['dialog', 'menu', 'listbox', 'combobox', 'slider', 'separator'])(
     'does not nudge when navigating a %s',
     (role) => {
       setup([createTextAnnotation({ x: 0, y: 0 })]);

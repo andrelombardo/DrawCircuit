@@ -375,7 +375,7 @@ describe('compact Style and replacement controls', () => {
     const inspector = screen.getByRole('region', { name: 'Proprietà' });
     expect(within(inspector).queryByRole('button', { name: 'Duplica' })).toBeNull();
     openSelectionMenu();
-    expect(screen.getByRole('button', { name: 'Polarità + / -' })).toBeDefined();
+    expect(screen.getByRole('checkbox', { name: 'Polarità e tensione' })).toBeDefined();
     expect(screen.getByRole('menuitem', { name: 'Duplica' })).toBeDefined();
     fireEvent.keyDown(window, { key: 'Escape' });
     expect(document.querySelector('.context-toolbar')).toBeNull();

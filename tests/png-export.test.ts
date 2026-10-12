@@ -6,6 +6,7 @@ import {
   embedSVGFonts,
   exportPNG,
   pngDimensions,
+  pngContentFrame,
   PNG_MAX_DIMENSION,
   PNG_MAX_PIXELS,
   preparePNGFonts,
@@ -77,10 +78,15 @@ function fixture(): CircuitDocument {
 }
 let rasterSource = '';
 let imageURL = '';
+let encodedSource = '';
+let pixelData = new Uint8Array();
+let offset = { x: 0, y: 0 };
 const urls = new Map<string, Blob>();
 beforeEach(() => {
   rasterSource = '';
   imageURL = '';
+  encodedSource = '';
+  offset = { x: 0, y: 0 };
   urls.clear();
   vi.stubGlobal(
     'Image',
@@ -88,7 +94,13 @@ beforeEach(() => {
       onload?: () => void;
       set src(url: string) {
         imageURL = url;
-        queueMicrotask(() => this.onload?.());
+        const reader = new FileReader();
+        reader.onload = () => {
+          rasterSource = String(reader.result);
+          pixelData = new Uint8Array(new Resvg(rasterSource).render().pixels);
+          this.onload?.();
+        };
+        reader.readAsText(urls.get(url)!);
       }
     },
   );
@@ -100,30 +112,27 @@ beforeEach(() => {
     }),
     revokeObjectURL: vi.fn(),
   });
-  const fillRect = vi.fn(),
-    drawImage = vi.fn();
-  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
-    fillStyle: '',
-    fillRect,
-    drawImage,
-  } as unknown as CanvasRenderingContext2D);
+  const fillRect = vi.fn();
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(function (
+    this: HTMLCanvasElement,
+  ) {
+    return {
+      fillRect,
+      drawImage: (source: CanvasImageSource, x: number, y: number) => {
+        if (source instanceof HTMLCanvasElement) offset = { x, y };
+      },
+      getImageData: (_x: number, y: number, width: number, rows: number) => ({
+        data: pixelData.slice(y * width * 4, (y + rows) * width * 4),
+      }),
+    } as unknown as CanvasRenderingContext2D;
+  });
   vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation(function (
     this: HTMLCanvasElement,
     callback,
   ) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      rasterSource = String(reader.result);
-      // A browser canvas encodes both independently rounded dimensions. Match that
-      // allocation here instead of letting Resvg round height from width alone.
-      const svg = new DOMParser().parseFromString(rasterSource, 'image/svg+xml').documentElement;
-      svg.setAttribute('width', String(this.width));
-      svg.setAttribute('height', String(this.height));
-      svg.setAttribute('preserveAspectRatio', 'none');
-      const png = new Resvg(new XMLSerializer().serializeToString(svg)).render().asPng();
-      callback(new Blob([new Uint8Array(png)], { type: 'image/png' }));
-    };
-    reader.readAsText(urls.get(imageURL)!);
+    encodedSource = `<svg xmlns="http://www.w3.org/2000/svg" width="${this.width}" height="${this.height}"><g transform="translate(${offset.x} ${offset.y})">${rasterSource.replace(/<\?xml[^>]+>/, '')}</g></svg>`;
+    const png = new Resvg(encodedSource).render().asPng();
+    callback(new Blob([new Uint8Array(png)], { type: 'image/png' }));
   });
 });
 afterEach(() => {
@@ -144,15 +153,15 @@ const vectorContent = (svg: string) =>
 describe('SVG-driven PNG export', () => {
   it('produces a valid PNG at 4× with the exact SVG geometry for every supported kind', async () => {
     const doc = fixture(),
-      svg = exportSVG(doc),
+      svg = exportSVG(doc, { transparent: true }),
       dimensions = pngDimensions(svg);
     const png = await exportPNG(doc),
       data = await bytes(png);
     expect(png.type).toBe('image/png');
     expect([...data.slice(0, 8)]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
     const header = new DataView(data.buffer);
-    expect(header.getUint32(16)).toBe(dimensions.width);
-    expect(header.getUint32(20)).toBe(dimensions.height);
+    expect(header.getUint32(16)).toBeLessThanOrEqual(dimensions.width);
+    expect(header.getUint32(20)).toBeLessThanOrEqual(dimensions.height);
     expect(vectorContent(rasterSource)).toBe(vectorContent(svg));
     expect(rasterSource).toContain(`width="${dimensions.width}" height="${dimensions.height}"`);
     for (const o of doc.objects.filter((o) => o.kind === 'brace'))
@@ -178,13 +187,13 @@ describe('SVG-driven PNG export', () => {
       let doc = { version: 1 as const, title: 'Rotazioni', objects: [o] };
       for (let i = 0; i < 4; i++) {
         const subset = getExportSelection(doc, [o.id]);
-        const svg = exportSVG(subset),
+        const svg = exportSVG(subset, { transparent: true }),
           dimensions = pngDimensions(svg);
         const data = await bytes(await exportPNG(subset));
         expect([...data.slice(0, 8)]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
         const header = new DataView(data.buffer);
-        expect(header.getUint32(16)).toBe(dimensions.width);
-        expect(header.getUint32(20)).toBe(dimensions.height);
+        expect(header.getUint32(16)).toBeLessThanOrEqual(dimensions.width);
+        expect(header.getUint32(20)).toBeLessThanOrEqual(dimensions.height);
         expect(rasterSource).toContain(braceGeometry(subset.objects[0] as typeof o).d);
         expect(rasterSource).toContain('stroke="#8855c2" stroke-width="3"');
         for (const code of [exportTikz(subset), exportObsidian(subset)]) {
@@ -208,16 +217,20 @@ describe('SVG-driven PNG export', () => {
       brace = doc.objects.find((o) => o.kind === 'brace')!;
     const subset = getExportSelection(doc, [brace.id]);
     await exportPNG(subset);
-    expect(vectorContent(rasterSource)).toBe(vectorContent(exportSVG(subset)));
+    expect(vectorContent(rasterSource)).toBe(
+      vectorContent(exportSVG(subset, { transparent: true })),
+    );
     expect(rasterSource).not.toContain('stroke="#269978"');
-    expect(pngDimensions(rasterSource).width).toBeLessThan(pngDimensions(exportSVG(doc)).width);
+    expect(pngDimensions(rasterSource).width).toBeLessThan(
+      pngDimensions(exportSVG(doc, { transparent: true })).width,
+    );
   });
-  it('renders a white opaque background and shares 12-unit export padding', () => {
-    const svg = exportSVG(fixture()),
+  it('renders a transparent background and shares 12-unit export padding', () => {
+    const svg = exportSVG(fixture(), { transparent: true }),
       rendered = new Resvg(svg).render();
-    expect([...rendered.pixels.slice(0, 4)]).toEqual([255, 255, 255, 255]);
-    expect(svg).toContain('fill="white"');
+    expect([...rendered.pixels.slice(0, 4)]).toEqual([0, 0, 0, 0]);
     const svgDoc = new DOMParser().parseFromString(svg, 'image/svg+xml');
+    expect(svgDoc.documentElement.querySelector(':scope > rect')).toBeNull();
     const [, , width, height] = svgDoc.documentElement
       .getAttribute('viewBox')!
       .split(' ')
@@ -238,12 +251,14 @@ describe('SVG-driven PNG export', () => {
         }
       },
     );
-    await expect(rasterizeSVG(exportSVG(fixture()))).rejects.toThrow('rasterizzare');
+    await expect(rasterizeSVG(exportSVG(fixture(), { transparent: true }))).rejects.toThrow(
+      'rasterizzare',
+    );
     expect(URL.revokeObjectURL).toHaveBeenCalledOnce();
   });
   it('rejects impossible allocations and bad scale before creating a canvas', () => {
     for (const scale of [0, -1, Infinity])
-      expect(() => pngDimensions(exportSVG(fixture()), scale)).toThrow();
+      expect(() => pngDimensions(exportSVG(fixture(), { transparent: true }), scale)).toThrow();
     expect(() => pngDimensions('<svg viewBox="0 0 999999 999999"/>')).toThrow('troppo grande');
     for (const box of ['0 0 0 2', '0 0 NaN 2', '0 0 -4 2', '0 0 1'])
       expect(() => pngDimensions(`<svg viewBox="${box}"/>`)).toThrow('non valide');
@@ -292,20 +307,34 @@ describe('SVG-driven PNG export', () => {
       else Reflect.deleteProperty(document, 'fonts');
     }
   });
-  it('keeps a white margin around arrowheads, brace ends, rotated labels and curves at final size', async () => {
+  it('keeps a transparent margin around arrowheads, brace ends, rotated labels and curves at final size', async () => {
     await exportPNG(fixture());
-    const image = new Resvg(rasterSource).render();
+    const image = new Resvg(encodedSource).render();
     const { pixels, width, height } = image;
-    const white = (x: number, y: number) => [
+    const pixel = (x: number, y: number) => [
       ...pixels.slice((y * width + x) * 4, (y * width + x) * 4 + 4),
     ];
+    let left = width,
+      top = height,
+      right = -1,
+      bottom = -1;
+    for (let y = 0; y < height; y++)
+      for (let x = 0; x < width; x++) {
+        if (!pixel(x, y)[3]) continue;
+        left = Math.min(left, x);
+        top = Math.min(top, y);
+        right = Math.max(right, x);
+        bottom = Math.max(bottom, y);
+      }
+    expect(left).toBeGreaterThan(0);
+    expect([left, top, width - right - 1, height - bottom - 1]).toEqual([left, left, left, left]);
     for (let x = 0; x < width; x++) {
-      expect(white(x, 0)).toEqual([255, 255, 255, 255]);
-      expect(white(x, height - 1)).toEqual([255, 255, 255, 255]);
+      expect(pixel(x, 0)).toEqual([0, 0, 0, 0]);
+      expect(pixel(x, height - 1)).toEqual([0, 0, 0, 0]);
     }
     for (let y = 0; y < height; y++) {
-      expect(white(0, y)).toEqual([255, 255, 255, 255]);
-      expect(white(width - 1, y)).toEqual([255, 255, 255, 255]);
+      expect(pixel(0, y)).toEqual([0, 0, 0, 0]);
+      expect(pixel(width - 1, y)).toEqual([0, 0, 0, 0]);
     }
   });
   it('copies a real image/png promise immediately to preserve browser user activation', async () => {
@@ -356,4 +385,22 @@ describe('SVG-driven PNG export', () => {
     expect(svg).toContain('data:font/woff2;base64,');
     expect(fetcher).toHaveBeenCalled();
   });
+});
+
+it('finds faint ink, reads bounded strips, and keeps padding within the canvas budget', () => {
+  const getImageData = vi.fn((_x: number, y: number, w: number, h: number) => {
+    const data = new Uint8ClampedArray(w * h * 4);
+    for (let row = 0; row < h; row++)
+      for (let x = 20; x <= 89; x++)
+        if (row + y >= 12 && row + y <= 276) data[(row * w + x) * 4 + 3] = 1;
+    return { data };
+  });
+  const frame = pngContentFrame(
+    { getImageData } as unknown as CanvasRenderingContext2D,
+    120,
+    300,
+    4,
+  );
+  expect(frame).toEqual({ x: 3, y: -5, width: 104, height: 299 });
+  expect(getImageData.mock.calls.map((args) => args[3])).toEqual([128, 128, 44]);
 });

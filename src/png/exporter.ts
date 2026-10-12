@@ -6,6 +6,7 @@ import { isMathSource } from '../math/latex';
 export const PNG_SCALE = 4;
 export const PNG_MAX_DIMENSION = 16_384;
 export const PNG_MAX_PIXELS = 32_000_000;
+export const PNG_PADDING = 8;
 const fontURLs = import.meta.glob<string>('/node_modules/katex/dist/fonts/*.woff2', {
   eager: true,
   query: '?url',
@@ -77,6 +78,51 @@ export function pngDimensions(svg: string, scale = PNG_SCALE) {
   return { width, height };
 }
 
+/** Font ink bounds can differ from SVG text metrics. Crop only transparent pixels,
+ * then give all four edges the same margin without changing the drawing scale.
+ * Scan in strips to avoid another full-size RGBA allocation for large circuits. */
+export function pngContentFrame(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  scale: number,
+) {
+  let left = width,
+    top = height,
+    right = -1,
+    bottom = -1;
+  for (let y = 0; y < height; y += 128) {
+    const rows = Math.min(128, height - y);
+    const { data } = context.getImageData(0, y, width, rows);
+    for (let row = 0; row < rows; row++)
+      for (let x = 0; x < width; x++) {
+        if (data[(row * width + x) * 4 + 3] === 0) continue;
+        left = Math.min(left, x);
+        right = Math.max(right, x);
+        top = Math.min(top, y + row);
+        bottom = Math.max(bottom, y + row);
+      }
+  }
+  if (right < left) return { x: 0, y: 0, width, height };
+  const inkWidth = right - left + 1,
+    inkHeight = bottom - top + 1;
+  // Never exceed the existing dimension/pixel budgets, including rounding.
+  const padding = Math.max(
+    0,
+    Math.min(
+      Math.round(PNG_PADDING * scale),
+      Math.floor((width - inkWidth) / 2),
+      Math.floor((height - inkHeight) / 2),
+    ),
+  );
+  return {
+    x: left - padding,
+    y: top - padding,
+    width: inkWidth + padding * 2,
+    height: inkHeight + padding * 2,
+  };
+}
+
 export async function rasterizeSVG(svg: string, scale = PNG_SCALE): Promise<Blob> {
   const { width, height } = pngDimensions(svg, scale);
   // Give the SVG image its final physical size before decoding, so the browser
@@ -88,6 +134,7 @@ export async function rasterizeSVG(svg: string, scale = PNG_SCALE): Promise<Blob
   );
   const url = URL.createObjectURL(new Blob([sizedSVG], { type: 'image/svg+xml' }));
   let canvas: HTMLCanvasElement | undefined;
+  let trimmed: HTMLCanvasElement | undefined;
   try {
     const image = new Image();
     await new Promise<void>((resolve, reject) => {
@@ -102,11 +149,19 @@ export async function rasterizeSVG(svg: string, scale = PNG_SCALE): Promise<Blob
     if (!context) throw new Error('Canvas PNG non disponibile.');
     context.imageSmoothingEnabled = true;
     context.imageSmoothingQuality = 'high';
-    context.fillStyle = 'white';
-    context.fillRect(0, 0, width, height);
     context.drawImage(image, 0, 0, width, height);
+    const sourceWidth = Number(/viewBox="([^"]+)"/.exec(svg)![1].trim().split(/\s+/)[2]);
+    const frame = pngContentFrame(context, width, height, width / sourceWidth);
+    trimmed = document.createElement('canvas');
+    trimmed.width = frame.width;
+    trimmed.height = frame.height;
+    const output = trimmed.getContext('2d');
+    if (!output) throw new Error('Canvas PNG non disponibile.');
+    // Integer translation preserves every original antialiased pixel.
+    output.drawImage(canvas, -frame.x, -frame.y);
+    canvas.width = canvas.height = 0;
     return await new Promise<Blob>((resolve, reject) =>
-      canvas!.toBlob(
+      trimmed!.toBlob(
         (blob) => (blob ? resolve(blob) : reject(new Error('Impossibile creare il PNG.'))),
         'image/png',
       ),
@@ -115,6 +170,7 @@ export async function rasterizeSVG(svg: string, scale = PNG_SCALE): Promise<Blob
     URL.revokeObjectURL(url);
     // Release the large backing store as soon as the encoded blob is available.
     if (canvas) canvas.width = canvas.height = 0;
+    if (trimmed) trimmed.width = trimmed.height = 0;
   }
 }
 
@@ -142,7 +198,7 @@ export async function preparePNGFonts(doc: CircuitDocument): Promise<void> {
 
 export async function exportPNG(doc: CircuitDocument): Promise<Blob> {
   await preparePNGFonts(doc);
-  return rasterizeSVG(await embedSVGFonts(exportSVG(doc)));
+  return rasterizeSVG(await embedSVGFonts(exportSVG(doc, { transparent: true })));
 }
 
 /** Pass the promise immediately to preserve clipboard user activation on Safari. */

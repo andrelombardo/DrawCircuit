@@ -10,6 +10,17 @@ export function objectCenter(o: CircuitObject, doc: CircuitDocument): Point {
   const b = measurementBounds(o, doc);
   return { x: b.x + b.width / 2, y: b.y + b.height / 2 };
 }
+/** Attached wires and annotations follow their hosts; moving them independently
+ * in the same layout command would move a route/offset a second time. */
+export function layoutTargets(doc: CircuitDocument, ids: string[]) {
+  const selected = new Set(ids);
+  return doc.objects.filter(
+    (o) =>
+      selected.has(o.id) &&
+      !(o.kind === 'wire' && (o.startEndpoint.kind !== 'free' || o.endEndpoint.kind !== 'free')) &&
+      !(o.kind === 'electrical' && (o.componentId || o.wireId)),
+  );
+}
 function entries(doc: CircuitDocument, ids: string[]) {
   const selected = new Set(ids);
   return doc.objects
@@ -46,7 +57,10 @@ export function alignSelection(
   axis: Axis,
   alignment: Alignment,
 ) {
-  const selected = entries(doc, ids);
+  const selected = entries(
+    doc,
+    layoutTargets(doc, ids).map((o) => o.id),
+  );
   if (selected.length < 2 || !['start', 'center', 'end'].includes(alignment)) return doc;
   const size = axis === 'x' ? 'width' : 'height';
   const bounds = unionBounds(selected.map((e) => e.b));
@@ -74,24 +88,29 @@ export function alignSelection(
     ),
   );
 }
-/** Automatic distribution fixes outer centers/edges. Exact spacing fixes the first object. */
-export function distributeSelection(
+/** The plan is shared by disabled-state explanations and the actual store command. */
+export function distributionPlan(
   doc: CircuitDocument,
   ids: string[],
   axis: Axis,
   mode: DistributionMode = 'centers',
   spacing?: number,
-) {
-  const selected = entries(doc, ids).sort(
+): { moves: Map<string, Point>; reason?: string } {
+  const selected = entries(
+    doc,
+    layoutTargets(doc, ids).map((o) => o.id),
+  ).sort(
     (a, b) =>
       (mode === 'gaps' ? a.b[axis] - b.b[axis] : a.c[axis] - b.c[axis]) ||
       a.o.id.localeCompare(b.o.id),
   );
-  if (
-    selected.length < (spacing === undefined ? 3 : 2) ||
-    (spacing !== undefined && (!Number.isFinite(spacing) || spacing < 0))
-  )
-    return doc;
+  const blocked = (reason: string) => ({ moves: new Map<string, Point>(), reason });
+  if (selected.length < (spacing === undefined ? 3 : 2))
+    return blocked(
+      `Servono almeno ${spacing === undefined ? 'tre' : 'due'} elementi indipendenti.`,
+    );
+  if (spacing !== undefined && (!Number.isFinite(spacing) || spacing < 0 || spacing > 1e7))
+    return blocked('Inserisci una distanza da 0 a 10000000 u.');
   const size = axis === 'x' ? 'width' : 'height',
     first = selected[0],
     last = selected.at(-1)!;
@@ -105,14 +124,34 @@ export function distributeSelection(
           selected.reduce((sum, e) => sum + e.b[size], 0)) /
         (selected.length - 1));
   let cursor = mode === 'centers' ? first.c[axis] : first.b[axis];
+  let previousEnd = -Infinity;
   const moves = new Map<string, Point>();
-  selected.forEach((e, i) => {
+  for (const [i, e] of selected.entries()) {
     const delta =
       i === 0 || (spacing === undefined && i === selected.length - 1)
         ? 0
         : cursor - (mode === 'centers' ? e.c[axis] : e.b[axis]);
+    const start = e.b[axis] + delta;
+    if (start < previousEnd - 0.001)
+      return blocked(
+        spacing === undefined
+          ? 'Spazio insufficiente tra gli estremi. Aumenta la distanza o usa la spaziatura esatta.'
+          : 'Questa distanza sovrappone gli elementi. Aumentala o scegli lo spazio libero tra i bordi.',
+      );
+    previousEnd = start + e.b[size];
     moves.set(e.o.id, { x: axis === 'x' ? delta : 0, y: axis === 'y' ? delta : 0 });
     cursor += step + (mode === 'gaps' ? e.b[size] : 0);
-  });
-  return applyMoves(doc, moves);
+  }
+  return { moves };
+}
+/** Automatic distribution fixes outer centers/edges. Exact spacing fixes the first object. */
+export function distributeSelection(
+  doc: CircuitDocument,
+  ids: string[],
+  axis: Axis,
+  mode: DistributionMode = 'centers',
+  spacing?: number,
+) {
+  const plan = distributionPlan(doc, ids, axis, mode, spacing);
+  return plan.reason ? doc : applyMoves(doc, plan.moves);
 }
