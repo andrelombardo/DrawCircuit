@@ -87,22 +87,6 @@ svg {
   flex-direction: column;
   overflow: hidden;
 }
-/* Installed desktop apps keep system buttons clear and a draggable area on white. */
-@media (display-mode: window-controls-overlay) {
-  .app-shell {
-    padding-top: env(titlebar-area-height, 0px);
-  }
-  .app-shell::before {
-    content: '';
-    position: fixed;
-    left: env(titlebar-area-x, 0px);
-    top: env(titlebar-area-y, 0px);
-    width: env(titlebar-area-width, 100%);
-    height: env(titlebar-area-height, 0px);
-    -webkit-app-region: drag;
-    app-region: drag;
-  }
-}
 .main-tools {
   display: flex;
   align-items: center;
@@ -3327,5 +3311,57 @@ summary:focus-visible {
   }
   .inspector-note {
     font-size: 11px;
+  }
+}
+
+/* Paint the workspace through the title area; only native buttons need clearance. */
+@media (display-mode: window-controls-overlay) {
+  .app-shell {
+    --window-controls-left: env(titlebar-area-x, 0px);
+    --window-controls-right: calc(
+      100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw)
+    );
+  }
+  .app-shell::before {
+    content: '';
+    position: fixed;
+    left: env(titlebar-area-x, 0px);
+    top: env(titlebar-area-y, 0px);
+    width: env(titlebar-area-width, 100%);
+    height: min(8px, env(titlebar-area-height, 0px));
+    z-index: var(--layer-floating);
+    -webkit-app-region: drag;
+    app-region: drag;
+  }
+  .palette-heading,
+  .inspector-header {
+    -webkit-app-region: drag;
+    app-region: drag;
+  }
+  .palette-heading {
+    padding-left: max(18px, calc(var(--window-controls-left) + 10px));
+    flex-wrap: wrap;
+    gap: 4px 8px;
+  }
+  .inspector-header {
+    padding-right: max(var(--property-padding), calc(var(--window-controls-right) + 10px));
+    height: auto;
+    min-height: 48px;
+    padding-block: 8px;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+  }
+  .app-shell :is(button, input, select, textarea, [role='separator'], .main-tools) {
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+  }
+  .editor > .sidebar-reopen {
+    top: max(14px, calc(env(titlebar-area-height, 0px) + 8px));
+  }
+  @container (max-width: 320px) {
+    .inspector-header {
+      padding-right: var(--property-padding);
+      padding-top: calc(env(titlebar-area-height, 0px) + 8px);
+    }
   }
 }

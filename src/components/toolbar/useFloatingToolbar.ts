@@ -4,6 +4,11 @@ import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react';
 export const TOOLBAR_STORAGE_KEY = 'drawcircuit.toolbar.v1';
 const MARGIN = 14;
 type Position = { x: number; y: number };
+type TitleArea = { left: number; right: number; bottom: number };
+type WindowControlsOverlay = EventTarget & {
+  visible: boolean;
+  getTitlebarAreaRect: () => DOMRect;
+};
 const clamp = (value: number, maximum = 1) => Math.max(0, Math.min(maximum, value));
 
 function loadPosition(): Position {
@@ -31,7 +36,15 @@ export function useFloatingToolbar(sidebarVisible: boolean) {
   const ref = useRef<HTMLDivElement>(null);
   const preference = useRef<Position | null>(null);
   if (preference.current === null) preference.current = loadPosition();
-  const bounds = useRef({ width: 0, height: 0, travelX: 0, travelY: 0, toolbarHeight: 0 });
+  const bounds = useRef({
+    width: 0,
+    height: 0,
+    travelX: 0,
+    travelY: 0,
+    toolbarWidth: 0,
+    toolbarHeight: 0,
+    titleArea: null as TitleArea | null,
+  });
   const point = useRef<Position>({ x: 0, y: 0 });
   const drag = useRef<{
     pointerId: number;
@@ -54,9 +67,19 @@ export function useFloatingToolbar(sidebarVisible: boolean) {
         y: MARGIN + clamp(requested.y - MARGIN, b.travelY),
       };
       // Leave the collapsed library button reachable at the top left.
-      if (!sidebarVisible && position.y < 58 && position.x < 58) {
+      const reopenBottom = Math.max(MARGIN, (b.titleArea?.bottom ?? 0) + 8) + 44;
+      if (!sidebarVisible && position.y < reopenBottom && position.x < 58) {
         if (b.travelX >= 44) position.x = 58;
-        else position.y = Math.min(58, MARGIN + b.travelY);
+        else position.y = Math.min(reopenBottom, MARGIN + b.travelY);
+      }
+      // The canvas reaches the top edge in installed apps. Keep a toolbar dragged
+      // into that area inside the space between the browser's window buttons.
+      const title = b.titleArea;
+      if (title && position.y < title.bottom) {
+        const left = Math.max(MARGIN, title.left + MARGIN);
+        const right = Math.min(MARGIN + b.travelX, title.right - b.toolbarWidth - MARGIN);
+        if (left <= right) position.x = Math.max(left, Math.min(right, position.x));
+        else position.y = Math.min(title.bottom + 8, MARGIN + b.travelY);
       }
       point.current = position;
       setLayout({
@@ -85,6 +108,8 @@ export function useFloatingToolbar(sidebarVisible: boolean) {
     const toolbar = ref.current,
       editor = toolbar?.parentElement;
     if (!toolbar || !editor) return;
+    const overlay = (navigator as Navigator & { windowControlsOverlay?: WindowControlsOverlay })
+      .windowControlsOverlay;
     const measure = () => {
       const surface = editor.getBoundingClientRect(),
         size = toolbar.getBoundingClientRect();
@@ -96,13 +121,22 @@ export function useFloatingToolbar(sidebarVisible: boolean) {
         edge !== undefined && edge > surface.left && edge < surface.right
           ? edge - surface.left
           : surface.width;
+      const title = overlay?.visible ? overlay.getTitlebarAreaRect() : null;
       bounds.current = {
         width,
         height: surface.height,
         travelX: Math.max(0, width - size.width - MARGIN * 2),
         // Reserve the bottom utility controls, even while dragging near the edge.
         travelY: Math.max(0, surface.height - size.height - MARGIN - 64),
+        toolbarWidth: size.width,
         toolbarHeight: size.height,
+        titleArea: title
+          ? {
+              left: title.x - surface.left,
+              right: title.x + title.width - surface.left,
+              bottom: title.y + title.height - surface.top,
+            }
+          : null,
       };
       const saved = preference.current!;
       place({
@@ -117,9 +151,11 @@ export function useFloatingToolbar(sidebarVisible: boolean) {
     const inspector = editor.parentElement?.querySelector('.properties-inspector');
     if (inspector) observer.observe(inspector);
     window.addEventListener('resize', measure);
+    overlay?.addEventListener('geometrychange', measure);
     return () => {
       observer.disconnect();
       window.removeEventListener('resize', measure);
+      overlay?.removeEventListener('geometrychange', measure);
     };
   }, [place]);
 

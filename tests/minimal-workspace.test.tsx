@@ -187,3 +187,32 @@ it('keeps normalized UI preferences outside serialized circuit data', () => {
   expect(saved.has(TOOLBAR_STORAGE_KEY)).toBe(true);
   expect(serializeDocument(useEditorStore.getState().document)).not.toMatch(/toolbar|sidebar/);
 });
+
+it('keeps the top toolbar between native window controls and reacts when the overlay changes', () => {
+  const overlay = Object.assign(new EventTarget(), {
+    visible: true,
+    getTitlebarAreaRect: () => rect(80, 0, width - 240, 38),
+  });
+  Object.defineProperty(navigator, 'windowControlsOverlay', {
+    configurable: true,
+    get: () => undefined,
+  });
+  vi.spyOn(
+    navigator as Navigator & { windowControlsOverlay?: typeof overlay },
+    'windowControlsOverlay',
+    'get',
+  ).mockReturnValue(overlay);
+  render(<App />);
+  fireEvent.click(screen.getByRole('button', { name: 'Nascondi componenti' }));
+  dragTo(-1000, -1000);
+  expect(toolbar().getBoundingClientRect().left).toBe(94);
+  expect(toolbar().style.top).toBe('14px');
+  dragTo(10000, -1000);
+  expect(toolbar().getBoundingClientRect().right).toBe(width - 160 - 14);
+  width = 600;
+  act(() => overlay.dispatchEvent(new Event('geometrychange')));
+  expect(toolbar().style.top).toBe('46px');
+  overlay.visible = false;
+  act(() => overlay.dispatchEvent(new Event('geometrychange')));
+  expect(toolbar().style.top).toBe('14px');
+});
