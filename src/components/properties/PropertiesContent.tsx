@@ -17,19 +17,18 @@ import { useEditorStore } from '../../store/editorStore';
 import { componentRegistry } from '../../model/catalog';
 import { ROTATIONS } from '../../model/types';
 import type { CircuitObject, Rotation, WireRouting, LineStyle } from '../../model/types';
-import { rotatePoint } from '../../utils/geometry';
 import { unionBounds } from '../../utils/visualBounds';
 import { measurementBounds } from '../../utils/measurementGeometry';
 import { objectCenter } from '../../utils/selectionGeometry';
 import type { Axis } from '../../utils/selectionGeometry';
 import { arrowOrientation, rotateArrow } from '../../utils/arrows';
 import { inlineTextTarget, replaceInlineText } from '../../utils/labels';
-import { SelectionStyle, SelectionTypography } from './SelectionStyle';
+import { SelectionStyle } from './SelectionStyle';
+import { rotateObjects } from '../../utils/operations';
 import { ElectricalProperties } from './ElectricalProperties';
 import { SelectionGeometry } from './SelectionGeometry';
 import { ComponentPreview } from '../palette/ComponentPreview';
 import { reverseLoop } from '../../utils/loops';
-import { IconButton } from '../toolbar/IconButton';
 import { InspectorSection, PropertyField, PropertySelect, PropertyRow } from './PropertyControls';
 const names: Record<CircuitObject['kind'], string> = {
   component: 'Componente',
@@ -111,17 +110,21 @@ export function PropertiesContent() {
           )),
     ) && objects.some((item) => !['wire', 'junction'].includes(item.kind));
   const electricalOnly = o?.kind === 'electrical' && !labelTarget;
+  const absoluteRotation = !!labelTarget || (!!o && independentRotation);
   const rectangles = objects.filter((o) => o.kind === 'rectangle');
-  const setRotation = (value: number) =>
+  const setRotation = (value: number) => {
+    if (!labelTarget && o?.kind === 'component') {
+      if (value === o.rotation) return;
+      // Share the keyboard operation's routing preservation when setting an
+      // absolute component angle; a dropdown must not reroute distant branches.
+      state().commit(
+        rotateObjects(state().document, [o.id], ((value - o.rotation + 360) % 360) as Rotation),
+      );
+      return;
+    }
     apply((o) => {
       if (labelTarget && 'label' in o)
         return { ...o, label: { ...o.label, rotation: value as Rotation } };
-      if (o.kind === 'component')
-        return {
-          ...o,
-          rotation: value as Rotation,
-          label: { ...o.label, offset: rotatePoint(o.label.offset, value - o.rotation) },
-        };
       if (o.kind === 'text') return { ...o, rotation: value as Rotation };
       if (o.kind === 'arrow' || o.kind === 'loop-arrow')
         return rotateArrow(
@@ -130,6 +133,32 @@ export function PropertiesContent() {
         );
       return o;
     });
+  };
+  const rotationControl =
+    absoluteRotation &&
+    (labelTarget || rotatables.some((o) => o.kind === 'component' || o.kind === 'text') ? (
+      <PropertySelect
+        label="Rotazione"
+        caption="Rotazione"
+        value={rotation}
+        onChange={(v) => setRotation(Number(v))}
+      >
+        {ROTATIONS.map((r) => (
+          <option key={r} value={r}>
+            {r}°
+          </option>
+        ))}
+      </PropertySelect>
+    ) : (
+      <PropertyField
+        label="Rotazione"
+        caption="Rotazione"
+        numeric
+        unit="°"
+        value={rotation === undefined ? undefined : Number(rotation.toFixed(2))}
+        onCommit={(v) => setRotation(Number(v))}
+      />
+    ));
   if (!objects.length)
     return (
       <>
@@ -193,7 +222,7 @@ export function PropertiesContent() {
         ((o && ('label' in o || o.kind === 'text')) ||
           objects.every((o) => 'label' in o) ||
           objects.every((o) => o.kind === 'text')) && (
-          <InspectorSection title="Generale">
+          <div className="inspector-general">
             {o && ('label' in o || o.kind === 'text') && (
               <PropertyField
                 label={
@@ -235,7 +264,7 @@ export function PropertiesContent() {
                 }
               />
             )}
-          </InspectorSection>
+          </div>
         )}
       <InspectorSection title="Posizione">
         <div className="inspector-pair">
@@ -252,15 +281,24 @@ export function PropertiesContent() {
             />
           ))}
         </div>
+        {rotationControl}
         {objects.length > 1 && (
-          <p className="inspector-note">
-            X/Y: angolo superiore sinistro dei limiti geometrici della selezione, in unità canvas.
+          <p
+            className="inspector-note"
+            title="Angolo superiore sinistro dei limiti geometrici della selezione, in unità canvas indipendenti dallo zoom."
+          >
+            X/Y: angolo superiore sinistro · u
           </p>
         )}
       </InspectorSection>
       {!electricalOnly && (
         <InspectorSection title="Aspetto">
-          <SelectionStyle objects={objects} apply={apply} labelOnly={!!labelTarget} />
+          <SelectionStyle
+            objects={objects}
+            apply={apply}
+            labelOnly={!!labelTarget}
+            typography={objects.every((o) => 'label' in o || o.kind === 'text')}
+          />
           {!labelTarget && lineObjects.length === objects.length && (
             <PropertySelect
               label="Stile linea"
@@ -331,68 +369,44 @@ export function PropertiesContent() {
             )}
         </InspectorSection>
       )}
-      {!electricalOnly && objects.every((o) => 'label' in o || o.kind === 'text') && (
-        <InspectorSection title="Testo">
-          <SelectionTypography objects={objects} apply={apply} />
-        </InspectorSection>
-      )}
-      {(labelTarget || groupRotation) && (
+      {((groupRotation && !absoluteRotation) ||
+        objects.every((item) => item.kind === 'arrow' || item.kind === 'loop-arrow')) && (
         <InspectorSection title="Trasformazioni">
-          {(groupRotation || labelTarget) && (
+          {groupRotation && !absoluteRotation && (
             <div className="inspector-rotation">
-              {(independentRotation || !!labelTarget) &&
-                (labelTarget ||
-                rotatables.some((o) => o.kind === 'component' || o.kind === 'text') ? (
-                  <PropertySelect
-                    label="Rotazione"
-                    caption="Angolo"
-                    value={rotation}
-                    onChange={(v) => setRotation(Number(v))}
-                  >
-                    {ROTATIONS.map((r) => (
-                      <option key={r} value={r}>
-                        {r}°
-                      </option>
-                    ))}
-                  </PropertySelect>
-                ) : (
-                  <PropertyField
-                    label="Rotazione"
-                    caption="Angolo"
-                    numeric
-                    unit="°"
-                    value={rotation === undefined ? undefined : Number(rotation.toFixed(2))}
-                    onCommit={(v) => setRotation(Number(v))}
-                  />
-                ))}
-              {!labelTarget && (
-                <button
-                  className="inspector-property-action"
-                  aria-label={`Ruota ${rotatables.some((o) => o.kind === 'component') ? 45 : 90}° (R)`}
-                  title="Ruota la selezione attorno al suo centro (R)"
-                  onClick={() => state().rotate()}
-                >
-                  <RotateCw size={14} />
-                  Ruota {rotatables.some((o) => o.kind === 'component') ? 45 : 90}°
-                </button>
-              )}
+              <button
+                className="inspector-property-action"
+                aria-label={`Ruota ${objects.length > 1 ? 'gruppo ' : ''}di ${rotatables.some((o) => o.kind === 'component') ? 45 : 90}° (R)`}
+                title="Ruota la selezione attorno al suo centro (R)"
+                onClick={() => state().rotate()}
+              >
+                <RotateCw size={14} />
+                Ruota {objects.length > 1 ? 'gruppo ' : ''}di{' '}
+                {rotatables.some((o) => o.kind === 'component') ? 45 : 90}°
+              </button>
             </div>
           )}
           {objects.every((item) => item.kind === 'arrow' || item.kind === 'loop-arrow') && (
             <PropertyRow caption="Specchia">
               <div className="inspector-segmented">
-                <IconButton
-                  label="Specchia orizzontalmente"
+                <button
+                  className="inspector-property-action"
+                  aria-label="Specchia orizzontalmente"
+                  title="Specchia orizzontalmente"
                   onClick={() => state().mirror('horizontal')}
                 >
                   <FlipHorizontal size={14} />
-                </IconButton>
-                <IconButton
-                  label="Specchia verticalmente"
+                  Orizzontale
+                </button>
+                <button
+                  className="inspector-property-action"
+                  aria-label="Specchia verticalmente"
+                  title="Specchia verticalmente"
                   onClick={() => state().mirror('vertical')}
                 >
                   <FlipVertical size={14} />
-                </IconButton>
+                  Verticale
+                </button>
               </div>
             </PropertyRow>
           )}

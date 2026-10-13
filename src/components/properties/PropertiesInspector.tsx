@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { PropertiesContent } from './PropertiesContent';
+import { useEditorStore } from '../../store/editorStore';
 import { SidebarToggle } from '../toolbar/SidebarToggle';
 import {
   clampInspectorWidth,
@@ -23,6 +24,36 @@ export function PropertiesInspector({
       className="properties-inspector"
       role="region"
       aria-label="Proprietà"
+      onKeyDown={(event) => {
+        const target = event.target as HTMLElement;
+        const editingText = target.matches(
+          'textarea, input:not([type="checkbox"]):not([type="color"]), [contenteditable="true"]',
+        );
+        if ((event.ctrlKey || event.metaKey) && !event.altKey && !editingText) {
+          const key = event.key.toLowerCase();
+          if (key === 'z' || key === 'y') {
+            event.preventDefault();
+            event.stopPropagation();
+            const state = useEditorStore.getState();
+            const selection = state.selection,
+              activeLabel = state.activeLabel;
+            if (key === 'y' || event.shiftKey) state.redo();
+            else state.undo();
+            const next = useEditorStore.getState();
+            const remaining = selection.filter((id) =>
+              next.document.objects.some((object) => object.id === id),
+            );
+            if (remaining.length) {
+              next.select(remaining);
+              if (activeLabel && remaining.includes(activeLabel)) next.setActiveLabel(activeLabel);
+            }
+            return;
+          }
+        }
+        // Native controls own Enter, Space and letter keys. Canvas shortcuts
+        // must not rotate or enter label editing while using this inspector.
+        if (!event.ctrlKey && !event.metaKey) event.stopPropagation();
+      }}
       hidden={!preferences.visible}
       style={{ '--inspector-width': `${preferences.width}px` } as CSSProperties}
     >

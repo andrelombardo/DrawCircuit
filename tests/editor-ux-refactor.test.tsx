@@ -21,6 +21,7 @@ import {
 } from '../src/utils/selectionGeometry';
 import { measurementBounds } from '../src/utils/measurementGeometry';
 import { unionBounds } from '../src/utils/visualBounds';
+import { wirePoints } from '../src/utils/geometry';
 import { openSelectionMenu } from './helpers/selectionMenu';
 import { serializeDocument, deserializeDocument } from '../src/model/serialization';
 vi.mock('../src/png/exporter', () => ({ exportPNG: vi.fn(), copyPNG: vi.fn() }));
@@ -280,6 +281,110 @@ describe('electrical properties without navigation', () => {
   });
 });
 
+describe('coherent inspector controls', () => {
+  it('uses one absolute rotation field and preserves the distant wire branch in one undo', () => {
+    const host = component();
+    const wire = createWire(
+      { kind: 'terminal', componentId: host.id, terminalId: 'b' },
+      { kind: 'free', point: { x: 260, y: 120 } },
+    );
+    setup([host, wire], [host.id]);
+    const original = state().document;
+    const fixed = wirePoints(wire, original).at(-1);
+    expect(screen.getAllByLabelText('Rotazione')).toHaveLength(1);
+    expect(screen.queryByRole('button', { name: /^Ruota/ })).toBeNull();
+    fireEvent.change(screen.getByLabelText('Rotazione'), { target: { value: '90' } });
+    expect(state().document.objects[0]).toMatchObject({ x: host.x, y: host.y, rotation: 90 });
+    const routed = state().document.objects[1];
+    expect(routed.kind).toBe('wire');
+    if (routed.kind !== 'wire') throw new Error('Expected connected wire');
+    expect(routed.vertices.length).toBeGreaterThan(0);
+    expect(wirePoints(routed, state().document).at(-1)).toEqual(fixed);
+    expect(state().selection).toEqual([host.id]);
+    expect(state().past).toHaveLength(1);
+    fireEvent.change(screen.getByLabelText('Rotazione'), { target: { value: '90' } });
+    expect(state().past).toHaveLength(1);
+    act(() => state().undo());
+    expect(state().document).toEqual(original);
+  });
+
+  it('names collective rotation as a group increment and keeps its relative geometry', () => {
+    const a = component(),
+      b = component(200);
+    setup([a, b]);
+    expect(screen.queryByLabelText('Rotazione')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Ruota gruppo di 45° (R)' }));
+    const [afterA, afterB] = state().document.objects;
+    if (afterA.kind !== 'component' || afterB.kind !== 'component')
+      throw new Error('Expected components');
+    expect(afterA.rotation).toBe(45);
+    expect(afterB.rotation).toBe(45);
+    expect(Math.hypot(afterB.x - afterA.x, afterB.y - afterA.y)).toBeCloseTo(200);
+    expect(afterA.x).not.toBe(a.x);
+    expect(state().past).toHaveLength(1);
+    act(() => state().undo());
+    expect(state().document.objects).toEqual([a, b]);
+  });
+
+  it('keeps annotation styling in an accessible disclosure without losing its state or host context', () => {
+    const host = component(),
+      a = createPolarity(host)!;
+    setup([host, a], [host.id]);
+    const section = screen.getByRole('region', { name: 'Annotazioni elettriche' });
+    expect(within(section).getByText('Etichetta tensione', { exact: true })).toBeDefined();
+    const summary = within(section).getByText('Stile annotazione').closest('summary')!;
+    const details = summary.parentElement as HTMLDetailsElement;
+    expect(details.open).toBe(false);
+    fireEvent.click(summary);
+    expect(details.open).toBe(true);
+    edit('Opacità simbolo', '99', section);
+    expect(details.open).toBe(true);
+    expect(state().document.objects[0]).toEqual(host);
+    expect(state().past).toHaveLength(1);
+    expect(state().selection).toEqual([host.id]);
+    fireEvent.click(summary);
+    expect(details.open).toBe(false);
+    expect(state().past).toHaveLength(1);
+    act(() => state().undo());
+    expect(state().document.objects).toEqual([host, a]);
+  });
+
+  it('lets inspector controls own their keyboard keys without rotating or editing the canvas', () => {
+    const host = component(),
+      a = createPolarity(host)!;
+    setup([host, a], [host.id]);
+    const original = state().document;
+    const button = screen.getByRole('button', { name: 'Inverti polarità' });
+    button.focus();
+    fireEvent.keyDown(button, { key: 'r' });
+    fireEvent.keyDown(button, { key: 'Enter' });
+    fireEvent.keyDown(button, { key: ' ', code: 'Space' });
+    expect(state().document).toBe(original);
+    expect(state().activeLabel).toBeNull();
+    expect(state().past).toHaveLength(0);
+    const summary = screen.getByText('Stile annotazione').closest('summary')!;
+    summary.focus();
+    fireEvent.keyDown(summary, { key: 'r' });
+    expect(state().document).toBe(original);
+    expect(state().selection).toEqual([host.id]);
+  });
+
+  it('keeps undo and redo working while the absolute rotation selector has focus', () => {
+    const host = component();
+    setup([host]);
+    const control = screen.getByLabelText('Rotazione');
+    control.focus();
+    fireEvent.change(control, { target: { value: '45' } });
+    fireEvent.keyDown(control, { key: 'z', metaKey: true });
+    expect(state().document.objects[0]).toMatchObject({ rotation: 0 });
+    expect(state().future).toHaveLength(1);
+    fireEvent.keyDown(control, { key: 'z', metaKey: true, shiftKey: true });
+    expect(state().document.objects[0]).toMatchObject({ rotation: 45 });
+    expect(state().past).toHaveLength(1);
+    expect(state().selection).toEqual([host.id]);
+  });
+});
+
 describe('explicit selection geometry and common properties', () => {
   it('shows 19 elements, both spacing axes and distinct groups; distributes in one undo', () => {
     const objects = Array.from({ length: 19 }, (_, i) => component(i * i * 100, i * 140));
@@ -290,6 +395,13 @@ describe('explicit selection geometry and common properties', () => {
     expect(screen.queryByLabelText('Asse spaziatura')).toBeNull();
     expect(screen.getByLabelText('Spaziatura orizzontale (u)')).toBeDefined();
     expect(screen.getByLabelText('Spaziatura verticale (u)')).toBeDefined();
+    expect((screen.getByLabelText('Spaziatura orizzontale (u)') as HTMLInputElement).value).toBe(
+      '',
+    );
+    expect(
+      (screen.getByRole('button', { name: 'Applica spaziatura orizzontale' }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
     const bounds = unionBounds(objects.map((o) => measurementBounds(o, state().document)));
     expect((screen.getByLabelText('Posizione X') as HTMLInputElement).value).toBe(String(bounds.x));
     fireEvent.click(screen.getByRole('button', { name: 'Distribuisci orizzontalmente' }));
@@ -317,9 +429,7 @@ describe('explicit selection geometry and common properties', () => {
       (screen.getByRole('button', { name: 'Applica spaziatura orizzontale' }) as HTMLButtonElement)
         .disabled,
     ).toBe(true);
-    expect((screen.getByLabelText('Spaziatura verticale (u)') as HTMLInputElement).value).toBe(
-      '120',
-    );
+    expect((screen.getByLabelText('Spaziatura verticale (u)') as HTMLInputElement).value).toBe('');
     fireEvent.change(screen.getByLabelText('Misura spaziatura'), { target: { value: 'gaps' } });
     fireEvent.click(screen.getByRole('button', { name: 'Applica spaziatura orizzontale' }));
     const [first, second] = state().document.objects.map((o) =>

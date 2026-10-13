@@ -43,7 +43,7 @@ export function SelectionGeometry({ objects }: { objects: CircuitObject[] }) {
   const document = useEditorStore((s) => s.document);
   const [distribution, setDistribution] = useState<DistributionMode>('centers');
   const [spacingMode, setSpacingMode] = useState<DistributionMode>('centers');
-  const [spacing, setSpacing] = useState({ x: '120', y: '120' });
+  const [spacing, setSpacing] = useState({ x: '', y: '' });
   const state = () => useEditorStore.getState();
   const ids = objects.map((o) => o.id);
   const targets = layoutTargets(document, ids);
@@ -54,12 +54,22 @@ export function SelectionGeometry({ objects }: { objects: CircuitObject[] }) {
   const exact = (axis: Axis) => {
     if (!exactReason(axis)) state().distribute(axis, spacingMode, Number(spacing[axis]));
   };
+  if (targets.length < 2)
+    return (
+      <p className="inspector-note inspector-scope">
+        Seleziona almeno due elementi indipendenti da disporre. Fili e annotazioni seguono i loro
+        riferimenti.
+      </p>
+    );
   return (
     <>
       {targets.length !== objects.length && (
-        <p className="inspector-note inspector-scope">
+        <p
+          className="inspector-note inspector-scope"
+          title="Fili e annotazioni collegati seguono i loro riferimenti; non vengono spostati una seconda volta."
+        >
           {targets.length
-            ? `Agisce su ${targets.length} elementi indipendenti. Fili e annotazioni collegati seguono i loro riferimenti.`
+            ? `Disposizione: ${targets.length} elementi su ${objects.length}.`
             : 'Seleziona i componenti o i nodi da disporre: questi elementi sono vincolati ai collegamenti.'}
         </p>
       )}
@@ -92,12 +102,12 @@ export function SelectionGeometry({ objects }: { objects: CircuitObject[] }) {
         <h4>Distribuzione</h4>
         <PropertySelect
           label="Criterio distribuzione"
-          caption="Distanze"
+          caption="Misura"
           value={distribution}
           onChange={(v) => setDistribution(v as DistributionMode)}
         >
-          <option value="centers">Tra i centri</option>
-          <option value="gaps">Tra i bordi</option>
+          <option value="centers">Distanza tra i centri</option>
+          <option value="gaps">Spazio libero tra i bordi</option>
         </PropertySelect>
         <div className="inspector-axis-actions">
           {axes.map(({ axis, name, distribute, Icon }) => {
@@ -126,7 +136,7 @@ export function SelectionGeometry({ objects }: { objects: CircuitObject[] }) {
       </div>
       <div className="inspector-geometry-group" role="group" aria-label="Spaziatura">
         <h4>
-          Spaziatura{' '}
+          Spaziatura esatta{' '}
           <span
             className="inspector-field-caption"
             title="Unità del documento, indipendenti dallo zoom. La griglia misura 20 u."
@@ -162,6 +172,8 @@ export function SelectionGeometry({ objects }: { objects: CircuitObject[] }) {
                   max={1e7}
                   step="any"
                   value={spacing[axis]}
+                  placeholder="Distanza"
+                  title="Distanza da applicare, in unità canvas. Il campo non rappresenta una misura attuale della selezione."
                   onChange={(e) => setSpacing((p) => ({ ...p, [axis]: e.target.value }))}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {

@@ -121,5 +121,6 @@ Run `npm run test`. The suite covers component terminals and rotations, wire rou
 
 - [User manual and technical details](docs/manuale.md) — Usage, shortcuts, architecture, and export conventions.
 - [Personal blocks, annotations, SVG, and offline support](docs/nuove-feature.md) — Detailed behavior of the newer editing and PWA features.
+- [Sidebar consistency and design review](docs/sidebar-quality/audit.md) — Coherent controls, the selected design direction, and responsive verification.
 - [Editor UX refactoring and verification](docs/ux-editor-refactor/report.md) — Unified electrical properties, transparent PNG, selection geometry, and responsive checks.
 - [Properties inspector design and verification](docs/inspector-design/report.md) — Layout choices, preserved commands, regression checks, and browser screenshots.

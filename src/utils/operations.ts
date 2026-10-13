@@ -167,11 +167,15 @@ export function moveSelection(doc: CircuitDocument, ids: string[], delta: Point)
     }),
   };
 }
-export function rotateObjects(doc: CircuitDocument, ids: string[]): CircuitDocument {
+export function rotateObjects(
+  doc: CircuitDocument,
+  ids: string[],
+  increment?: Rotation,
+): CircuitDocument {
   const selected = new Set(ids),
     objects = doc.objects.filter((o) => selected.has(o.id));
-  if (!objects.length) return doc;
-  const angle: Rotation = objects.some((o) => o.kind === 'component') ? 45 : 90;
+  if (!objects.length || increment === 0) return doc;
+  const angle: Rotation = increment ?? (objects.some((o) => o.kind === 'component') ? 45 : 90);
   const boxes = objects.map((o) => objectBounds(o, doc));
   const minX = Math.min(...boxes.map((b) => b.x)),
     maxX = Math.max(...boxes.map((b) => b.x + b.width)),

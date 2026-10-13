@@ -66,7 +66,7 @@ function ColorControl({
     }
   };
   return (
-    <PropertyRow caption={label} secondary={children}>
+    <PropertyRow caption={label} secondary={children} secondaryCaption="Opacità">
       <div className="inspector-color">
         <ActionMenu
           label={'Colore ' + label.toLowerCase()}
@@ -78,7 +78,7 @@ function ColorControl({
                 style={{ backgroundColor: value }}
               />
               <span className="inspector-hex">
-                {value === undefined ? 'Misto' : value.replace('#', '').toUpperCase()}
+                {value === undefined ? 'Misto' : value.toUpperCase()}
               </span>
             </>
           }
@@ -173,10 +173,12 @@ export function SelectionStyle({
   objects,
   apply,
   labelOnly = false,
+  typography = false,
 }: {
   objects: CircuitObject[];
   apply: (fn: (o: CircuitObject) => CircuitObject) => void;
   labelOnly?: boolean;
+  typography?: boolean;
 }) {
   const o = objects.length === 1 ? objects[0] : null;
   const hasLabel = objects.every(labeled);
@@ -220,29 +222,34 @@ export function SelectionStyle({
           <OpacityControl objects={objects} apply={apply} label="Opacità etichetta" labelOpacity />
         </ColorControl>
       )}
-      {hasStroke && (
-        <PropertySelect
-          label="Spessore linea"
-          caption="Spessore"
-          value={width}
-          onChange={(v) =>
-            apply((o) =>
-              'strokeWidth' in o
-                ? { ...o, strokeWidth: Number(v) }
-                : 'width' in o
-                  ? { ...o, width: Number(v) }
-                  : o,
-            )
-          }
-        >
-          {[...new Set([1, 1.5, 1.8, 2, 3, 4, ...(width === undefined ? [] : [width])])]
-            .sort((a, b) => a - b)
-            .map((w) => (
-              <option key={w} value={w}>
-                {w} px
-              </option>
-            ))}
-        </PropertySelect>
+      {(hasStroke || typography) && (
+        <div className="inspector-style-fields">
+          {hasStroke && (
+            <PropertySelect
+              label="Spessore linea"
+              caption="Spessore"
+              value={width}
+              onChange={(v) =>
+                apply((o) =>
+                  'strokeWidth' in o
+                    ? { ...o, strokeWidth: Number(v) }
+                    : 'width' in o
+                      ? { ...o, width: Number(v) }
+                      : o,
+                )
+              }
+            >
+              {[...new Set([1, 1.5, 1.8, 2, 3, 4, ...(width === undefined ? [] : [width])])]
+                .sort((a, b) => a - b)
+                .map((w) => (
+                  <option key={w} value={w}>
+                    {w} px
+                  </option>
+                ))}
+            </PropertySelect>
+          )}
+          {typography && <SelectionTypography objects={objects} apply={apply} />}
+        </div>
       )}
       {rectangles && (
         <PropertySelect
@@ -294,7 +301,7 @@ export function SelectionTypography({
     <>
       <PropertySelect
         label="Dimensione testo"
-        caption="Dimensione"
+        caption="Dimensione testo"
         value={size}
         onChange={(v) =>
           apply((o) =>

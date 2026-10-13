@@ -2613,16 +2613,18 @@ summary:focus-visible {
 }
 /* A small shared scale keeps every property on the same axes at every width. */
 .properties-inspector {
-  --property-height: 30px;
+  --ui-accent: #2463cb;
+  --ui-focus: #2463cb;
+  --property-height: 32px;
   --property-gap: 8px;
-  --property-padding: 12px;
+  --property-padding: 16px;
   --property-label-width: clamp(56px, 22cqi, 72px);
-  --property-secondary-width: 70px;
-  --property-radius: 5px;
+  --property-secondary-width: 84px;
+  --property-radius: 6px;
   container-type: inline-size;
   --property-field-bg: #f0f2f5;
   --property-border: #e8ebef;
-  --property-muted: #77818e;
+  --property-muted: #687382;
   width: var(--inspector-width, 292px);
   flex: 0 0 var(--inspector-width, 292px);
   position: relative;
@@ -2632,7 +2634,12 @@ summary:focus-visible {
   background: var(--floating-surface-bg);
   border-left: 1px solid var(--property-border);
   color: var(--ui-text);
-  font-size: 12px;
+  font-size: 13px;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   z-index: var(--layer-floating);
 }
 .properties-inspector[hidden] {
@@ -2642,16 +2649,19 @@ summary:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 42px;
+  height: 40px;
   padding: 0 var(--property-padding);
   flex: none;
   border-bottom: 1px solid var(--property-border);
 }
 .inspector-header h2,
 .inspector-section h3 {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   margin: 0;
+}
+.inspector-header h2 {
+  font-size: 16px;
 }
 .inspector-scroll {
   flex: 1;
@@ -2664,24 +2674,24 @@ summary:focus-visible {
   display: flex;
   align-items: center;
   gap: var(--property-gap);
-  padding: var(--property-gap) var(--property-padding);
-  min-height: 42px;
-  border-bottom: 1px solid var(--property-border);
+  padding: 12px var(--property-padding);
+  min-height: 40px;
 }
 .inspector-object-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
+  width: 32px;
   height: 24px;
   flex: none;
   color: var(--property-muted);
 }
 .inspector-object-icon svg {
-  width: 24px;
+  width: 32px;
   height: 24px;
 }
 .inspector-type {
+  font-size: 14px;
   min-width: 0;
   font-weight: 500;
   line-height: 1.4;
@@ -2689,12 +2699,12 @@ summary:focus-visible {
 .inspector-type > small {
   display: block;
   font-weight: 400;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--property-muted);
 }
 .inspector-section {
   border-bottom: 1px solid var(--property-border);
-  padding: var(--property-padding);
+  padding: 12px var(--property-padding);
 }
 .inspector-section:last-child {
   border: 0;
@@ -2702,33 +2712,70 @@ summary:focus-visible {
 .inspector-section h3 {
   margin-bottom: var(--property-gap);
 }
+/* Captions always sit above controls, including at the minimum width. */
 .property-row {
   display: grid;
-  grid-template-columns: var(--property-label-width) minmax(82px, 1fr) var(
-      --property-secondary-width
-    );
-  align-items: center;
-  gap: var(--property-gap);
-  margin-top: var(--property-gap);
+  grid-template-columns: minmax(100px, 1fr) minmax(84px, 1fr);
+  align-items: start;
+  gap: 6px var(--property-gap);
+  margin-top: 8px;
   min-width: 0;
 }
-.inspector-section > .property-row:first-of-type {
+.inspector-section > .property-row:first-of-type,
+.inspector-general > .property-row:first-child {
   margin-top: 0;
 }
 .inspector-field-caption {
   color: var(--property-muted);
-  font-size: 11px;
+  font-size: 12px;
+  line-height: 1.35;
   overflow-wrap: anywhere;
 }
+.property-row > .inspector-field-caption {
+  grid-column: 1 / -1;
+}
+.property-row-secondary > .inspector-field-caption {
+  grid-column: 1;
+}
+.property-row-secondary > .property-secondary-caption {
+  grid-column: 2;
+}
 .inspector-control {
-  grid-column: 2 / -1;
+  grid-column: 1 / -1;
   min-width: 0;
 }
 .property-row-secondary > .inspector-control {
-  grid-column: 2;
+  grid-column: 1;
 }
 .property-secondary {
+  grid-column: 2;
   min-width: 0;
+}
+.inspector-general {
+  padding: 0 var(--property-padding) 12px;
+  border-bottom: 1px solid var(--property-border);
+}
+.inspector-style-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--property-gap);
+  margin-top: 8px;
+}
+.inspector-style-fields:has(> :only-child) {
+  grid-template-columns: 1fr;
+}
+.inspector-style-fields .property-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+.inspector-style-fields .inspector-control {
+  width: 100%;
+}
+.inspector-style > .property-row:first-child {
+  margin-top: 0;
 }
 .properties-inspector input:not([type='checkbox']):not([type='color']),
 .properties-inspector select,
@@ -2789,14 +2836,14 @@ summary:focus-visible {
   outline: 0;
 }
 .inspector-unit {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--property-muted);
   padding: 0 6px 0 2px;
   flex: none;
 }
 .inspector-pair {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 112px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 96px), 1fr));
   gap: var(--property-gap);
 }
 .inspector-pair .property-row {
@@ -2806,6 +2853,8 @@ summary:focus-visible {
   border-radius: var(--property-radius);
   height: var(--property-height);
   padding-left: var(--property-gap);
+  margin: 0;
+  align-items: center;
 }
 .inspector-pair .inspector-field-caption {
   flex: none;
@@ -2815,6 +2864,13 @@ summary:focus-visible {
 }
 .inspector-pair .inspector-input input {
   padding-left: 4px;
+}
+.inspector-pair .inspector-input {
+  border: 0;
+}
+.inspector-pair .property-row:focus-within {
+  outline: 2px solid var(--ui-focus);
+  outline-offset: 0;
 }
 .inspector-rotation {
   display: flex;
@@ -2855,19 +2911,19 @@ summary:focus-visible {
   display: flex;
   justify-content: flex-start;
   gap: 6px;
-  padding: 0 6px;
+  padding: 0 8px;
 }
 .inspector-color-trigger:hover {
   border-color: var(--ui-border);
 }
 .inspector-hex {
-  font-size: 10.5px;
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 .inspector-swatch {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   flex: none;
   border-radius: 3px;
   box-shadow: inset 0 0 0 1px #00000012;
@@ -2885,14 +2941,14 @@ summary:focus-visible {
 }
 .property-secondary .inspector-input input {
   padding: 4px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .inspector-property-action {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 6px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .inspector-segmented {
   display: flex;
@@ -2903,13 +2959,16 @@ summary:focus-visible {
   height: var(--property-height);
 }
 .inspector-geometry-group + .inspector-geometry-group {
-  margin-top: 16px;
-  padding-top: 12px;
+  margin-top: 12px;
+  padding-top: 8px;
   border-top: 1px solid var(--property-border);
+}
+.inspector-geometry-group > .property-row:first-of-type {
+  margin-top: 0;
 }
 .inspector-geometry-group h4,
 .inspector-offsets h4 {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   margin: 0 0 8px;
 }
@@ -2925,8 +2984,8 @@ summary:focus-visible {
 .inspector-alignment-buttons .inspector-property-action {
   flex-direction: column;
   justify-content: center;
-  height: 48px;
-  gap: 4px;
+  height: 40px;
+  gap: 3px;
   padding: 4px;
 }
 .inspector-axis-actions {
@@ -2947,16 +3006,24 @@ summary:focus-visible {
 }
 .inspector-exact-spacing {
   display: grid;
-  grid-template-columns: minmax(80px, 1fr) minmax(72px, 1fr) 30px;
-  gap: var(--property-gap);
+  grid-template-columns: minmax(0, 1fr) 32px;
+  gap: 6px var(--property-gap);
   align-items: center;
-  margin-top: var(--property-gap);
+  margin-top: 12px;
+}
+.inspector-exact-spacing > label {
+  grid-column: 1 / -1;
 }
 .inspector-exact-spacing .inspector-property-action {
   padding: 6px;
 }
 .inspector-offsets {
-  margin-top: 12px;
+  margin-top: 8px;
+}
+.inspector-offsets h4 {
+  color: var(--property-muted);
+  font-weight: 400;
+  margin-bottom: 6px;
 }
 .inspector-annotation + .inspector-annotation {
   margin-top: 16px;
@@ -2982,23 +3049,8 @@ summary:focus-visible {
   padding: 4px 6px;
   font-size: 12px;
 }
-@container (max-width: 280px) {
-  .property-row {
-    grid-template-columns: minmax(82px, 1fr) var(--property-secondary-width);
-    row-gap: 5px;
-  }
-  .property-row > .inspector-field-caption {
-    grid-column: 1 / -1;
-  }
-  .property-row > .inspector-control {
-    grid-column: 1 / -1;
-  }
-  .property-row-secondary > .inspector-control {
-    grid-column: 1;
-  }
-}
 .inspector-note {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--property-muted);
   line-height: 1.5;
   margin: var(--property-gap) 0 0;
@@ -3011,7 +3063,7 @@ summary:focus-visible {
   margin: 0 0 var(--property-gap);
 }
 .inspector-empty span {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--property-muted);
   line-height: 1.6;
 }
@@ -3019,11 +3071,11 @@ summary:focus-visible {
   display: flex;
   align-items: center;
   gap: var(--property-gap);
-  font-size: 11px;
+  font-size: 12px;
   margin: var(--property-gap) 0;
 }
 .personal-save-selection {
-  font-size: 11px;
+  font-size: 12px;
   padding: 6px;
   margin: 4px 0;
   color: var(--ui-accent);
@@ -3051,7 +3103,7 @@ summary:focus-visible {
   right: 14px;
 }
 .properties-inspector button:disabled {
-  opacity: 0.4;
+  opacity: 0.58;
   cursor: default;
 }
 @media (max-width: 1050px) {
@@ -3082,4 +3134,137 @@ summary:focus-visible {
 /* Native titles avoid tooltip pseudo-elements widening the scrolling column. */
 .properties-inspector [data-tooltip]::after {
   display: none;
+}
+
+/* Actions, editable fields, toggles, and disclosures have distinct affordances. */
+.inspector-inline-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: var(--property-height);
+  padding: 4px 6px;
+  border: 1px solid transparent;
+  border-radius: var(--property-radius);
+  background: transparent;
+  color: var(--ui-accent);
+  font: inherit;
+  cursor: pointer;
+}
+.inspector-inline-action:hover {
+  background: #2463cb0b;
+}
+.inspector-inline-action:focus-visible,
+.inspector-disclosure summary:focus-visible {
+  outline: 2px solid var(--ui-focus);
+  outline-offset: 2px;
+}
+.inspector-inline-action svg {
+  flex: none;
+}
+.inspector-annotation-label {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.inspector-annotation-label .property-row {
+  flex: 1 1 132px;
+  margin: 0;
+}
+.inspector-annotation-label .inspector-inline-action {
+  flex: 0 0 auto;
+  font-size: 12px;
+}
+.inspector-enable {
+  justify-content: space-between;
+  min-height: 28px;
+  margin: 0 0 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.inspector-enable input {
+  appearance: none;
+  position: relative;
+  width: 30px;
+  height: 18px;
+  border: 1px solid #c9cfd8;
+  border-radius: 10px;
+  background: #e7eaf0;
+  flex: none;
+  margin: 0;
+  cursor: pointer;
+}
+.inspector-enable input::after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px #0002;
+}
+.inspector-enable input:checked {
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+}
+.inspector-enable input:checked::after {
+  transform: translateX(12px);
+}
+.inspector-enable input:focus-visible {
+  outline: 2px solid var(--ui-focus);
+  outline-offset: 3px;
+}
+.inspector-disclosure {
+  margin-top: 12px;
+  padding-top: 4px;
+  border-top: 1px solid var(--property-border);
+}
+.inspector-disclosure summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  cursor: pointer;
+  min-height: 32px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.inspector-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+.inspector-disclosure summary > svg {
+  flex: none;
+}
+.inspector-disclosure[open] summary > svg {
+  transform: rotate(90deg);
+}
+.inspector-disclosure summary:hover {
+  background: var(--ui-hover);
+}
+.inspector-disclosure-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+.inspector-disclosure-content {
+  padding-top: 8px;
+}
+.inspector-disclosure-content .property-row:first-child {
+  margin-top: 0;
+}
+@container (max-width: 275px) {
+  .inspector-style-fields {
+    grid-template-columns: 1fr;
+  }
+  .inspector-annotation-label .property-row {
+    flex-basis: 100%;
+  }
+  .inspector-note {
+    font-size: 11px;
+  }
 }

@@ -1,5 +1,6 @@
 import { useId, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
+import { ChevronRight } from 'lucide-react';
 function DraftInput({
   value,
   label,
@@ -80,17 +81,24 @@ export function PropertyRow({
   children,
   secondary,
   htmlFor,
+  secondaryCaption,
 }: {
   caption: ReactNode;
   children: ReactNode;
   secondary?: ReactNode;
   htmlFor?: string;
+  secondaryCaption?: ReactNode;
 }) {
   return (
     <div className={`property-row${secondary ? ' property-row-secondary' : ''}`}>
       <label className="inspector-field-caption" htmlFor={htmlFor}>
         {caption}
       </label>
+      {secondaryCaption && (
+        <span className="inspector-field-caption property-secondary-caption" aria-hidden="true">
+          {secondaryCaption}
+        </span>
+      )}
       <div className="inspector-control">{children}</div>
       {secondary && <div className="property-secondary">{secondary}</div>}
     </div>
@@ -155,5 +163,32 @@ export function InspectorSection({ title, children }: { title: string; children:
       <h3>{title}</h3>
       {children}
     </section>
+  );
+}
+
+/** Advanced controls remain in the same inspector; native details keeps keyboard
+ * behavior and its open state when the selected object's properties change. */
+export function InspectorDisclosure({
+  title,
+  preview,
+  children,
+}: {
+  title: string;
+  preview?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <details className="inspector-disclosure">
+      <summary>
+        <ChevronRight size={15} aria-hidden="true" />
+        <span>{title}</span>
+        {preview && (
+          <span className="inspector-disclosure-preview" aria-hidden="true">
+            {preview}
+          </span>
+        )}
+      </summary>
+      <div className="inspector-disclosure-content">{children}</div>
+    </details>
   );
 }

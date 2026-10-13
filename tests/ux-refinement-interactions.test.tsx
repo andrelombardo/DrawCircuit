@@ -245,7 +245,8 @@ describe('adaptive accessible toolbar', () => {
     expect(screen.getByLabelText('Spessore linea')).toBeDefined();
     openSelectionMenu();
     expect(screen.getByRole('menuitem', { name: 'Duplica' })).toBeDefined();
-    expect(screen.getByRole('button', { name: 'Ruota 45° (R)' })).toBeDefined();
+    expect(screen.getByLabelText('Rotazione')).toBeDefined();
+    expect(screen.queryByRole('button', { name: 'Ruota 45° (R)' })).toBeNull();
     expect(screen.queryByLabelText('Ruota solo label')).toBeNull();
     expect(screen.getByText('Salva come blocco')).toBeDefined();
     expect(screen.queryByLabelText('Ruota selezione')).toBeNull();

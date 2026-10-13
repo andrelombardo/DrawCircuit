@@ -314,14 +314,7 @@ describe('contextual properties and selection commands', () => {
       within(inspector)
         .getAllByRole('heading', { level: 3 })
         .map((h) => h.textContent),
-    ).toEqual([
-      'Generale',
-      'Posizione',
-      'Aspetto',
-      'Testo',
-      'Trasformazioni',
-      'Annotazioni elettriche',
-    ]);
+    ).toEqual(['Posizione', 'Aspetto', 'Annotazioni elettriche']);
     expect(within(inspector).queryByRole('slider')).toBeNull();
     expect(within(inspector).queryByText('Azioni')).toBeNull();
     expect(

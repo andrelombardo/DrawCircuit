@@ -308,7 +308,7 @@ describe('annotation and placement cleanup', () => {
       render(<App />);
       const centre = midpoint(brace.start, brace.end);
       openSelectionMenu();
-      expect(screen.getByRole('button', { name: 'Ruota 90° (R)' })).toBeTruthy();
+      expect(screen.getByRole('button', { name: 'Ruota di 90° (R)' })).toBeTruthy();
       fireEvent.keyDown(window, { key: 'Escape' });
       for (let i = 1; i <= 4; i++) {
         key('r');
