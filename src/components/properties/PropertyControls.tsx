@@ -1,6 +1,7 @@
-import { useId, useRef, useState } from 'react';
+import { Children, isValidElement, useId, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ActionMenu } from '../toolbar/ActionMenu';
 function DraftInput({
   value,
   label,
@@ -139,21 +140,43 @@ export function PropertySelect({
   onChange: (value: string) => void;
 }) {
   const id = useId();
+  const options = Children.toArray(children).flatMap((child) => {
+    if (!isValidElement<{ value: string | number; children: ReactNode; disabled?: boolean }>(child))
+      return [];
+    return [
+      {
+        value: String(child.props.value),
+        label: Children.toArray(child.props.children).join(''),
+        disabled: child.props.disabled,
+      },
+    ];
+  });
+  const selected = options.find((option) => option.value === String(value));
+  const description = selected?.label ?? 'Valori misti';
   return (
     <PropertyRow caption={caption ?? label} htmlFor={id}>
-      <select
-        id={id}
-        aria-label={label}
-        value={value ?? ''}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        {value === undefined && (
-          <option value="" disabled>
-            Valori misti
-          </option>
-        )}
-        {children}
-      </select>
+      <ActionMenu
+        triggerId={id}
+        label={label}
+        description={description}
+        className="inspector-select-trigger"
+        variant="choices"
+        icon={
+          <>
+            <span className="inspector-select-value">{description}</span>
+            <ChevronDown size={14} aria-hidden="true" />
+          </>
+        }
+        items={options.map((option) => ({
+          id: option.value,
+          label: option.label,
+          disabled: option.disabled,
+          checked: value !== undefined && option.value === String(value),
+          onSelect: () => {
+            if (option.value !== String(value)) onChange(option.value);
+          },
+        }))}
+      />
     </PropertyRow>
   );
 }

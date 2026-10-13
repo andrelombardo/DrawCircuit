@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { choosePropertyOption } from './helpers/propertyMenu';
 import { chooseSelectionCommand, chooseSelectionColor } from './helpers/selectionMenu';
 import { chooseDrawingTool } from './helpers/drawingMenu';
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
@@ -141,8 +142,8 @@ describe('precision/annotation/export UI workflows', () => {
     act(() => state().select([o.id]));
 
     chooseSelectionColor('Simbolo', 'Viola');
-    fireEvent.change(screen.getByLabelText('Spessore linea'), { target: { value: '4' } });
-    fireEvent.change(screen.getByLabelText('Dimensione testo'), { target: { value: '32' } });
+    choosePropertyOption(screen.getByLabelText('Spessore linea'), '4 px');
+    choosePropertyOption(screen.getByLabelText('Dimensione testo'), '32 px');
     expect(brace()).toMatchObject({ color: '#8855c2', width: 4, label: { fontSize: 32 } });
     expect(canvas().querySelectorAll('[data-handle]')).toHaveLength(2);
   });

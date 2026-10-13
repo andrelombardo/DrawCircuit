@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { choosePropertyOption } from './helpers/propertyMenu';
 import {
   openSelectionMenu,
   chooseSelectionCommand,
@@ -110,6 +111,23 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 describe('persistent inspector and property transactions', () => {
+  it('starts at the selected object while preserving scroll during property edits', () => {
+    const a = createComponent('resistor', { x: 0, y: 0 }),
+      b = createComponent('capacitor', { x: 150, y: 0 });
+    renderSelection([a, b]);
+    act(() => state().select([a.id]));
+    const scroll = document.querySelector('.inspector-scroll') as HTMLElement;
+    scroll.scrollTop = 240;
+    edit('Etichetta componente', 'R_{edit}');
+    expect(scroll.scrollTop).toBe(240);
+    act(() => state().select([b.id]));
+    expect(scroll.scrollTop).toBe(0);
+    expect(
+      within(screen.getByRole('region', { name: 'Proprietà' })).getByText('Condensatore', {
+        exact: true,
+      }),
+    ).toBeDefined();
+  });
   it('opens, closes, persists width and visibility without changing document, view or history', () => {
     render(<App />);
     const original = serializeDocument(current()),
@@ -159,8 +177,8 @@ describe('persistent inspector and property transactions', () => {
       };
     renderSelection([a, b]);
     expect(screen.getByLabelText('Spessore linea').getAttribute('value')).toBeNull();
-    expect((screen.getByLabelText('Spessore linea') as HTMLSelectElement).value).toBe('');
-    expect((screen.getByLabelText('Dimensione testo') as HTMLSelectElement).value).toBe('');
+    expect(screen.getByLabelText('Spessore linea').textContent).toBe('Valori misti');
+    expect(screen.getByLabelText('Dimensione testo').textContent).toBe('Valori misti');
     expect(screen.getByLabelText('Opacità simbolo').getAttribute('aria-valuetext')).toBe(
       'Valori misti',
     );
@@ -224,7 +242,7 @@ describe('persistent inspector and property transactions', () => {
     renderSelection([c]);
     act(() => state().setActiveLabel(c.id));
     edit('Posizione X', '80');
-    fireEvent.change(screen.getByLabelText('Rotazione'), { target: { value: '90' } });
+    choosePropertyOption(screen.getByLabelText('Rotazione'), '90°');
     expect(current().objects[0]).toMatchObject({
       x: 0,
       y: 0,
@@ -297,8 +315,8 @@ describe('persistent inspector and property transactions', () => {
     ];
     wires[1].lineStyle = 'dashed';
     renderSelection(wires);
-    expect((screen.getByLabelText('Stile linea') as HTMLSelectElement).value).toBe('');
-    fireEvent.change(screen.getByLabelText('Stile linea'), { target: { value: 'dotted' } });
+    expect(screen.getByLabelText('Stile linea').textContent).toBe('Valori misti');
+    choosePropertyOption(screen.getByLabelText('Stile linea'), 'Puntinata');
     expect(current().objects.every((o) => o.kind === 'wire' && o.lineStyle === 'dotted')).toBe(
       true,
     );
@@ -409,7 +427,7 @@ describe('contextual properties and selection commands', () => {
     edit('Opacità riempimento', '35');
     expect(current().objects[0]).toMatchObject({ fillOpacity: 0.35 });
     expect(current().objects[0].opacity).toBeUndefined();
-    fireEvent.change(screen.getByLabelText('Riempimento'), { target: { value: 'none' } });
+    choosePropertyOption(screen.getByLabelText('Riempimento'), 'Nessuno');
     expect(screen.queryByLabelText('Opacità riempimento')).toBeNull();
     expect(screen.getByLabelText('Opacità simbolo')).toBeDefined();
     act(() => state().undo());
@@ -421,9 +439,9 @@ describe('contextual properties and selection commands', () => {
     const b = { ...createTextAnnotation({ x: 100, y: 0 }), text: 'Secondo', align: 'end' as const };
     renderSelection([a, b]);
     expect((screen.getByLabelText('Contenuto comune') as HTMLInputElement).value).toBe('');
-    expect((screen.getByLabelText('Allineamento testo') as HTMLSelectElement).value).toBe('');
+    expect(screen.getByLabelText('Allineamento testo').textContent).toBe('Valori misti');
     edit('Contenuto comune', 'V_{ab}');
-    fireEvent.change(screen.getByLabelText('Allineamento testo'), { target: { value: 'middle' } });
+    choosePropertyOption(screen.getByLabelText('Allineamento testo'), 'Centro');
     expect(
       current().objects.every(
         (o) => o.kind === 'text' && o.text === 'V_{ab}' && o.align === 'middle',
@@ -460,8 +478,8 @@ describe('graphic drawing and gestures', () => {
     expect(current().objects[0]).toMatchObject({ width: 160, height: 120 });
     expect(state().past).toHaveLength(2);
     edit('Larghezza', '200');
-    fireEvent.change(screen.getByLabelText('Stile linea'), { target: { value: 'dashed' } });
-    fireEvent.change(screen.getByLabelText('Riempimento'), { target: { value: 'color' } });
+    choosePropertyOption(screen.getByLabelText('Stile linea'), 'Tratteggiata');
+    choosePropertyOption(screen.getByLabelText('Riempimento'), 'Colore');
     chooseSelectionColor('Riempimento', 'Verde');
     expect(current().objects[0]).toMatchObject({
       width: 200,
@@ -513,7 +531,7 @@ describe('graphic drawing and gestures', () => {
     fireEvent.pointerUp(canvas(), client({ x: 200, y: 0 }));
     expect(current().objects).toHaveLength(1);
     expect(current().objects[0].kind).toBe('line');
-    fireEvent.change(screen.getByLabelText('Stile linea'), { target: { value: 'dashed' } });
+    choosePropertyOption(screen.getByLabelText('Stile linea'), 'Tratteggiata');
     const hit = canvas().querySelector('[data-layer="graphics"] path[stroke="transparent"]')!;
     expect(hit.getAttribute('stroke-dasharray')).toBeNull();
     fireEvent.pointerDown(hit, client({ x: 40, y: 0 }));
@@ -531,7 +549,7 @@ describe('graphic drawing and gestures', () => {
     fireEvent.pointerUp(canvas(), client({ x: 180, y: 0 }));
     expect(current().objects.filter((o) => o.kind === 'wire')).toHaveLength(2);
     expect(state().past).toHaveLength(1);
-    fireEvent.change(screen.getByLabelText('Stile linea'), { target: { value: 'dashed' } });
+    choosePropertyOption(screen.getByLabelText('Stile linea'), 'Tratteggiata');
     const wires = current().objects.filter((o) => o.kind === 'wire');
     expect(wires[0].lineStyle).toBeUndefined();
     expect(wires[1].lineStyle).toBe('dashed');

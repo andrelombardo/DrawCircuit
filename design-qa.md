@@ -4,6 +4,8 @@
 
 final result: passed
 
+Aggiornamento del 13 ottobre: [audit della coerenza dei controlli](docs/sidebar-consistency/report.md), con correzioni per menu, righe condizionali, campi stretti, scorrimento al cambio di selezione e riferimento della corrente. La sidebar attuale eredita il font di sistema dell’editor, usa testo da 12 px, padding laterale di 20 px e distanze tra i gruppi da 12 px. Il riferimento e i confronti riportati sotto documentano il primo passaggio; il nuovo audit copre anche gli stati della linea, del rettangolo e del testo.
+
 ## Riferimento e confronto
 
 - Fonte selezionata: `exec-8e45bd18-bc91-403e-8bc5-3079ebd276b4.png`, seconda immagine visualizzata nella chat.

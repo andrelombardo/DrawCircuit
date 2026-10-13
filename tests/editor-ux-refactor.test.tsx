@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { choosePropertyOption } from './helpers/propertyMenu';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest';
 import App from '../src/App';
@@ -178,9 +179,7 @@ describe('electrical properties without navigation', () => {
     edit('Offset etichetta Y', '-9', section);
     edit('Opacità simbolo', '99', section);
     edit('Opacità etichetta', '10', section);
-    fireEvent.change(within(section).getByLabelText('Dimensione testo'), {
-      target: { value: '28' },
-    });
+    choosePropertyOption(within(section).getByLabelText('Dimensione testo'), '28 px');
     expect(annotation()).toMatchObject({
       componentId: host.id,
       label: { text: 'V_{AB}', opacity: 0.1, fontSize: 28, offset: { y: -9 } },
@@ -210,7 +209,7 @@ describe('electrical properties without navigation', () => {
     const section = screen.getByRole('region', { name: 'Annotazioni elettriche' });
     edit('Etichetta corrente', 'I_R', section);
     fireEvent.click(within(section).getByRole('button', { name: 'Inverti verso corrente' }));
-    fireEvent.change(within(section).getByLabelText('Tratto del filo'), { target: { value: '1' } });
+    choosePropertyOption(within(section).getByLabelText('Riferimento corrente'), 'Tratto 2');
     edit('Posizione sul tratto', '75', section);
     edit('Offset etichetta X', '12', section);
     expect(annotation()).toMatchObject({
@@ -282,6 +281,33 @@ describe('electrical properties without navigation', () => {
 });
 
 describe('coherent inspector controls', () => {
+  it('lets a current return from a segment to the whole wire, with one reversible change', () => {
+    const wire = createWire(
+      { kind: 'free', point: { x: 0, y: 0 } },
+      { kind: 'free', point: { x: 300, y: 200 } },
+      [{ x: 300, y: 0 }],
+    );
+    const current = createCurrent(wire, { x: 150, y: 0 }, doc([wire]));
+    setup([wire, current], [wire.id]);
+    choosePropertyOption('Riferimento corrente', 'Tratto 2');
+    edit('Posizione sul tratto', '75');
+    const onSegment = state().document;
+    const history = state().past.length;
+    choosePropertyOption('Riferimento corrente', 'Lungo il filo');
+    expect(annotation().wireSegment).toBeUndefined();
+    expect(annotation().ratio).toBe(0.75);
+    expect((screen.getByLabelText('Posizione sul filo') as HTMLInputElement).value).toBe('75');
+    expect(state().selection).toEqual([wire.id]);
+    expect(state().past).toHaveLength(history + 1);
+    const wholeWire = state().document;
+    choosePropertyOption('Riferimento corrente', 'Tratto 1');
+    expect(annotation().wireSegment).toEqual({ index: 0, ratio: 0.75 });
+    expect((screen.getByLabelText('Posizione sul tratto') as HTMLInputElement).value).toBe('75');
+    act(() => state().undo());
+    expect(state().document).toEqual(wholeWire);
+    act(() => state().undo());
+    expect(state().document).toEqual(onSegment);
+  });
   it('uses one absolute rotation field and preserves the distant wire branch in one undo', () => {
     const host = component();
     const wire = createWire(
@@ -293,7 +319,7 @@ describe('coherent inspector controls', () => {
     const fixed = wirePoints(wire, original).at(-1);
     expect(screen.getAllByLabelText('Rotazione')).toHaveLength(1);
     expect(screen.queryByRole('button', { name: /^Ruota/ })).toBeNull();
-    fireEvent.change(screen.getByLabelText('Rotazione'), { target: { value: '90' } });
+    choosePropertyOption(screen.getByLabelText('Rotazione'), '90°');
     expect(state().document.objects[0]).toMatchObject({ x: host.x, y: host.y, rotation: 90 });
     const routed = state().document.objects[1];
     expect(routed.kind).toBe('wire');
@@ -302,7 +328,7 @@ describe('coherent inspector controls', () => {
     expect(wirePoints(routed, state().document).at(-1)).toEqual(fixed);
     expect(state().selection).toEqual([host.id]);
     expect(state().past).toHaveLength(1);
-    fireEvent.change(screen.getByLabelText('Rotazione'), { target: { value: '90' } });
+    choosePropertyOption(screen.getByLabelText('Rotazione'), '90°');
     expect(state().past).toHaveLength(1);
     act(() => state().undo());
     expect(state().document).toEqual(original);
@@ -374,7 +400,7 @@ describe('coherent inspector controls', () => {
     setup([host]);
     const control = screen.getByLabelText('Rotazione');
     control.focus();
-    fireEvent.change(control, { target: { value: '45' } });
+    choosePropertyOption(control, '45°');
     fireEvent.keyDown(control, { key: 'z', metaKey: true });
     expect(state().document.objects[0]).toMatchObject({ rotation: 0 });
     expect(state().future).toHaveLength(1);
@@ -430,7 +456,7 @@ describe('explicit selection geometry and common properties', () => {
         .disabled,
     ).toBe(true);
     expect((screen.getByLabelText('Spaziatura verticale (u)') as HTMLInputElement).value).toBe('');
-    fireEvent.change(screen.getByLabelText('Misura spaziatura'), { target: { value: 'gaps' } });
+    choosePropertyOption(screen.getByLabelText('Misura spaziatura'), 'Spazio libero tra i bordi');
     fireEvent.click(screen.getByRole('button', { name: 'Applica spaziatura orizzontale' }));
     const [first, second] = state().document.objects.map((o) =>
       measurementBounds(o, state().document),

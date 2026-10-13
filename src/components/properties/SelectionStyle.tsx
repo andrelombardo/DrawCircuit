@@ -254,6 +254,7 @@ export function SelectionStyle({
       {rectangles && (
         <PropertySelect
           label="Riempimento"
+          caption="Tipo riempimento"
           value={commonValue(
             objects.map((o) => (o.kind === 'rectangle' && o.fill !== 'none' ? 'color' : 'none')),
           )}

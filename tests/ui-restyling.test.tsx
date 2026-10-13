@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { choosePropertyOption, propertyOptions } from './helpers/propertyMenu';
 import { openSelectionMenu, chooseSelectionColor } from './helpers/selectionMenu';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
@@ -160,15 +161,13 @@ describe('native custom color workflow', () => {
   it('applies every offered line/text size and exposes only useful component menu actions', () => {
     render(<Canvas />);
     openStyle();
-    const width = screen.getByLabelText('Spessore linea') as HTMLSelectElement;
-    for (const option of Array.from(width.options)) {
-      fireEvent.change(width, { target: { value: option.value } });
-      expect(component().width).toBe(Number(option.value));
+    for (const option of propertyOptions('Spessore linea')) {
+      choosePropertyOption('Spessore linea', option);
+      expect(component().width).toBe(parseFloat(option));
     }
-    const size = screen.getByLabelText('Dimensione testo') as HTMLSelectElement;
-    for (const option of Array.from(size.options)) {
-      fireEvent.change(size, { target: { value: option.value } });
-      expect(component().label.fontSize).toBe(Number(option.value));
+    for (const option of propertyOptions('Dimensione testo')) {
+      choosePropertyOption('Dimensione testo', option);
+      expect(component().label.fontSize).toBe(parseFloat(option));
     }
 
     openSelectionMenu();

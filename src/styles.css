@@ -2493,6 +2493,21 @@ summary:focus-visible {
 .action-menu-label {
   flex: 1;
 }
+.action-menu-check {
+  flex: none;
+  color: var(--ui-accent);
+}
+.action-menu-options .action-menu-icon:empty {
+  display: none;
+}
+.action-menu-options .action-menu-label {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.action-menu-item[aria-checked='true'] {
+  background: var(--ui-accent-soft);
+}
 .action-menu-shortcut {
   background: none;
   border: 0;
@@ -2529,7 +2544,7 @@ summary:focus-visible {
 }
 .action-menu-item:focus-visible,
 .action-menu-trigger:focus-visible {
-  outline: 2px solid var(--ui-focus);
+  outline: 2px solid var(--ui-accent);
   outline-offset: -2px;
 }
 
@@ -2611,13 +2626,11 @@ summary:focus-visible {
   min-width: 0;
   flex: 1;
 }
-/* A small shared scale keeps every property on the same axes at every width. */
+/* Follow the editor's typography, with a little breathing room between fields. */
 .properties-inspector {
-  --ui-accent: #2463cb;
-  --ui-focus: #2463cb;
   --property-height: 32px;
-  --property-gap: 8px;
-  --property-padding: 16px;
+  --property-gap: 12px;
+  --property-padding: 20px;
   --property-label-width: clamp(56px, 22cqi, 72px);
   --property-secondary-width: 84px;
   --property-radius: 6px;
@@ -2634,12 +2647,9 @@ summary:focus-visible {
   background: var(--floating-surface-bg);
   border-left: 1px solid var(--property-border);
   color: var(--ui-text);
-  font-size: 13px;
-  font-family:
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    sans-serif;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.5;
   z-index: var(--layer-floating);
 }
 .properties-inspector[hidden] {
@@ -2649,19 +2659,19 @@ summary:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 40px;
+  height: 48px;
   padding: 0 var(--property-padding);
   flex: none;
   border-bottom: 1px solid var(--property-border);
 }
 .inspector-header h2,
 .inspector-section h3 {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 500;
   margin: 0;
 }
 .inspector-header h2 {
-  font-size: 16px;
+  font-weight: 600;
 }
 .inspector-scroll {
   flex: 1;
@@ -2674,7 +2684,7 @@ summary:focus-visible {
   display: flex;
   align-items: center;
   gap: var(--property-gap);
-  padding: 12px var(--property-padding);
+  padding: 16px var(--property-padding);
   min-height: 40px;
 }
 .inspector-object-icon {
@@ -2691,7 +2701,7 @@ summary:focus-visible {
   height: 24px;
 }
 .inspector-type {
-  font-size: 14px;
+  font-size: 12px;
   min-width: 0;
   font-weight: 500;
   line-height: 1.4;
@@ -2703,14 +2713,21 @@ summary:focus-visible {
   color: var(--property-muted);
 }
 .inspector-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--property-gap);
   border-bottom: 1px solid var(--property-border);
-  padding: 12px var(--property-padding);
+  padding: 16px var(--property-padding);
 }
 .inspector-section:last-child {
   border: 0;
 }
 .inspector-section h3 {
-  margin-bottom: var(--property-gap);
+  margin-bottom: 0;
+}
+.inspector-section
+  > :is(.property-row, .inspector-style-fields, .inspector-note, .inspector-check) {
+  margin: 0;
 }
 /* Captions always sit above controls, including at the minimum width. */
 .property-row {
@@ -2718,7 +2735,7 @@ summary:focus-visible {
   grid-template-columns: minmax(100px, 1fr) minmax(84px, 1fr);
   align-items: start;
   gap: 6px var(--property-gap);
-  margin-top: 8px;
+  margin-top: var(--property-gap);
   min-width: 0;
 }
 .inspector-section > .property-row:first-of-type,
@@ -2728,7 +2745,7 @@ summary:focus-visible {
 .inspector-field-caption {
   color: var(--property-muted);
   font-size: 12px;
-  line-height: 1.35;
+  line-height: 1.5;
   overflow-wrap: anywhere;
 }
 .property-row > .inspector-field-caption {
@@ -2752,7 +2769,7 @@ summary:focus-visible {
   min-width: 0;
 }
 .inspector-general {
-  padding: 0 var(--property-padding) 12px;
+  padding: 0 var(--property-padding) 16px;
   border-bottom: 1px solid var(--property-border);
 }
 .inspector-style-fields {
@@ -2760,7 +2777,7 @@ summary:focus-visible {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
   gap: var(--property-gap);
-  margin-top: 8px;
+  margin-top: var(--property-gap);
 }
 .inspector-style-fields:has(> :only-child) {
   grid-template-columns: 1fr;
@@ -2778,13 +2795,13 @@ summary:focus-visible {
   margin-top: 0;
 }
 .properties-inspector input:not([type='checkbox']):not([type='color']),
-.properties-inspector select,
+.properties-inspector .inspector-select-trigger,
 .inspector-property-action {
   background: var(--property-field-bg);
   border: 1px solid transparent;
   border-radius: var(--property-radius);
   color: inherit;
-  padding: 4px 7px;
+  padding: 4px 10px;
   height: var(--property-height);
   min-width: 0;
   width: 100%;
@@ -2801,14 +2818,14 @@ summary:focus-visible {
   -webkit-appearance: none;
   margin: 0;
 }
-.properties-inspector select:hover,
+.properties-inspector .inspector-select-trigger:hover,
 .inspector-input:hover,
 .inspector-property-action:hover {
   border-color: var(--ui-border);
 }
 .properties-inspector input:focus-visible,
-.properties-inspector select:focus-visible {
-  outline: 2px solid var(--ui-focus);
+.properties-inspector .inspector-select-trigger:focus-visible {
+  outline: 2px solid var(--ui-accent);
   outline-offset: 0;
 }
 .inspector-input {
@@ -2821,16 +2838,39 @@ summary:focus-visible {
   height: var(--property-height);
   overflow: hidden;
 }
+.properties-inspector .inspector-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+}
+.inspector-select-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.inspector-select-trigger > svg {
+  flex: none;
+  color: var(--property-muted);
+}
+.properties-inspector .inspector-select-trigger[aria-expanded='true'] {
+  border-color: var(--ui-border-strong);
+}
+.inspector-select-trigger[aria-expanded='true'] > svg {
+  transform: rotate(180deg);
+}
 .properties-inspector .inspector-input > input {
   flex: 1;
   width: 0;
   height: 100%;
   border: 0;
   background: transparent;
-  padding: 4px 7px;
+  padding: 4px 10px;
 }
 .inspector-input:focus-within {
-  border-color: var(--ui-focus);
+  border-color: var(--ui-accent);
 }
 .properties-inspector .inspector-input > input:focus-visible {
   outline: 0;
@@ -2843,7 +2883,7 @@ summary:focus-visible {
 }
 .inspector-pair {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 96px), 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--property-gap);
 }
 .inspector-pair .property-row {
@@ -2869,7 +2909,7 @@ summary:focus-visible {
   border: 0;
 }
 .inspector-pair .property-row:focus-within {
-  outline: 2px solid var(--ui-focus);
+  outline: 2px solid var(--ui-accent);
   outline-offset: 0;
 }
 .inspector-rotation {
@@ -2911,7 +2951,7 @@ summary:focus-visible {
   display: flex;
   justify-content: flex-start;
   gap: 6px;
-  padding: 0 8px;
+  padding: 0 10px;
 }
 .inspector-color-trigger:hover {
   border-color: var(--ui-border);
@@ -2959,8 +2999,8 @@ summary:focus-visible {
   height: var(--property-height);
 }
 .inspector-geometry-group + .inspector-geometry-group {
-  margin-top: 12px;
-  padding-top: 8px;
+  margin-top: 4px;
+  padding-top: 12px;
   border-top: 1px solid var(--property-border);
 }
 .inspector-geometry-group > .property-row:first-of-type {
@@ -2970,10 +3010,10 @@ summary:focus-visible {
 .inspector-offsets h4 {
   font-size: 12px;
   font-weight: 500;
-  margin: 0 0 8px;
+  margin: 0 0 var(--property-gap);
 }
 .inspector-axis-group + .inspector-axis-group {
-  margin-top: 10px;
+  margin-top: var(--property-gap);
 }
 .inspector-alignment-buttons {
   display: grid;
@@ -2998,7 +3038,7 @@ summary:focus-visible {
   flex: none;
 }
 .inspector-property-action:focus-visible {
-  outline: 2px solid var(--ui-focus);
+  outline: 2px solid var(--ui-accent);
   outline-offset: 1px;
 }
 .inspector-property-action:active:not(:disabled) {
@@ -3018,7 +3058,7 @@ summary:focus-visible {
   padding: 6px;
 }
 .inspector-offsets {
-  margin-top: 8px;
+  margin-top: var(--property-gap);
 }
 .inspector-offsets h4 {
   color: var(--property-muted);
@@ -3034,7 +3074,7 @@ summary:focus-visible {
   margin-top: 8px;
 }
 .inspector-note.inspector-scope {
-  margin-bottom: 12px;
+  margin-bottom: 0;
 }
 /* Reserve independent tracks for digits and unit, including at large UI zoom.
    At narrow widths the caption gets its own row, leaving HEX and % intact. */
@@ -3156,7 +3196,7 @@ summary:focus-visible {
 }
 .inspector-inline-action:focus-visible,
 .inspector-disclosure summary:focus-visible {
-  outline: 2px solid var(--ui-focus);
+  outline: 2px solid var(--ui-accent);
   outline-offset: 2px;
 }
 .inspector-inline-action svg {
@@ -3166,7 +3206,7 @@ summary:focus-visible {
   display: flex;
   align-items: flex-end;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--property-gap);
 }
 .inspector-annotation-label .property-row {
   flex: 1 1 132px;
@@ -3179,8 +3219,8 @@ summary:focus-visible {
 .inspector-enable {
   justify-content: space-between;
   min-height: 28px;
-  margin: 0 0 8px;
-  font-size: 13px;
+  margin: 0 0 var(--property-gap);
+  font-size: inherit;
   cursor: pointer;
 }
 .inspector-enable input {
@@ -3215,12 +3255,12 @@ summary:focus-visible {
   transform: translateX(12px);
 }
 .inspector-enable input:focus-visible {
-  outline: 2px solid var(--ui-focus);
+  outline: 2px solid var(--ui-accent);
   outline-offset: 3px;
 }
 .inspector-disclosure {
-  margin-top: 12px;
-  padding-top: 4px;
+  margin-top: 16px;
+  padding-top: 8px;
   border-top: 1px solid var(--property-border);
 }
 .inspector-disclosure summary {
@@ -3252,7 +3292,7 @@ summary:focus-visible {
   margin-left: auto;
 }
 .inspector-disclosure-content {
-  padding-top: 8px;
+  padding-top: var(--property-gap);
 }
 .inspector-disclosure-content .property-row:first-child {
   margin-top: 0;

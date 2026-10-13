@@ -319,7 +319,7 @@ export function PropertiesContent() {
           {!labelTarget &&
             lineObjects.length === objects.length &&
             lineObjects.every((o) => o.lineStyle === 'dashed') && (
-              <div className="inspector-pair">
+              <div className="inspector-style-fields">
                 <PropertyField
                   label="Lunghezza trattino"
                   caption="Trattino"
@@ -519,7 +519,7 @@ export function PropertiesContent() {
             )}
             {o?.kind === 'line' &&
               (['start', 'end'] as const).map((end) => (
-                <div className="inspector-pair" key={end}>
+                <div className="inspector-style-fields" key={end}>
                   {(['x', 'y'] as const).map((axis) => (
                     <PropertyField
                       key={axis}

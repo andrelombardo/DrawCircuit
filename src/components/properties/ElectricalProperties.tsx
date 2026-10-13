@@ -48,21 +48,20 @@ function AnnotationFields({ annotation }: { annotation: ElectricalAnnotation }) 
         <>
           {segments > 1 && (
             <PropertySelect
-              label="Tratto del filo"
+              label="Riferimento corrente"
               value={annotation.wireSegment?.index ?? ''}
               onChange={(v) =>
                 update((o) => ({
                   ...o,
-                  wireSegment: { index: Number(v), ratio: o.wireSegment?.ratio ?? 0.5 },
+                  wireSegment:
+                    v === ''
+                      ? undefined
+                      : { index: Number(v), ratio: o.wireSegment?.ratio ?? o.ratio },
                   offset: { x: 0, y: 0 },
                 }))
               }
             >
-              {!annotation.wireSegment && (
-                <option value="" disabled>
-                  Lungo il filo
-                </option>
-              )}
+              <option value="">Lungo il filo</option>
               {Array.from({ length: segments }, (_, i) => (
                 <option key={i} value={i}>
                   Tratto {i + 1}

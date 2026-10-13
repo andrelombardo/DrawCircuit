@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { choosePropertyOption } from './helpers/propertyMenu';
 import {
   openSelectionMenu,
   chooseSelectionCommand,
@@ -383,8 +384,8 @@ describe('compact Style and replacement controls', () => {
 
     chooseSelectionColor('Simbolo', 'Rosso');
     chooseSelectionColor('Etichetta', 'Verde');
-    fireEvent.change(screen.getByLabelText('Spessore linea'), { target: { value: '3' } });
-    fireEvent.change(screen.getByLabelText('Dimensione testo'), { target: { value: '28' } });
+    choosePropertyOption(screen.getByLabelText('Spessore linea'), '3 px');
+    choosePropertyOption(screen.getByLabelText('Dimensione testo'), '28 px');
     expect(useEditorStore.getState().document.objects[1]).toMatchObject({
       color: '#df4949',
       width: 3,

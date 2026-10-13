@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { choosePropertyOption } from './helpers/propertyMenu';
 import { chooseDrawingTool } from './helpers/drawingMenu';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -174,7 +175,7 @@ describe('audit UX/input evidence', () => {
     click(200, 0);
     click(0, 100);
     fireEvent.click(screen.getByRole('button', { name: 'Selezione (V)' }));
-    fireEvent.change(screen.getByLabelText('Rotazione'), { target: { value: '45' } });
+    choosePropertyOption(screen.getByLabelText('Rotazione'), '45°');
     expect(useEditorStore.getState().document.objects.at(-1)).toMatchObject({ rotation: 45 });
     chooseDrawingTool('Nodo');
     click(-100, -100);

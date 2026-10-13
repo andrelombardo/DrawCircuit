@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { PropertiesContent } from './PropertiesContent';
 import { useEditorStore } from '../../store/editorStore';
@@ -16,6 +16,11 @@ export function PropertiesInspector({
   toggle,
 }: ReturnType<typeof useInspectorPreferences>) {
   const drag = useRef<{ x: number; width: number; pointer: number } | null>(null);
+  const scroll = useRef<HTMLDivElement>(null);
+  const selectionKey = useEditorStore((s) => JSON.stringify([s.selection, s.activeLabel]));
+  useLayoutEffect(() => {
+    if (scroll.current) scroll.current.scrollTop = 0;
+  }, [selectionKey]);
   const setWidth = (width: number) =>
     setPreferences((p) => ({ ...p, width: clampInspectorWidth(width) }));
   return (
@@ -61,7 +66,7 @@ export function PropertiesInspector({
         <h2>Proprietà</h2>
         <SidebarToggle side="right" visible onToggle={toggle} />
       </div>
-      <div className="inspector-scroll">
+      <div ref={scroll} className="inspector-scroll">
         <PropertiesContent />
       </div>
       <div

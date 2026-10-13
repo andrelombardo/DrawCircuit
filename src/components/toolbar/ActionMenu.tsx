@@ -1,7 +1,7 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import type { KeyboardEvent, ReactNode, RefObject } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronRight } from 'lucide-react';
+import { Check, ChevronRight } from 'lucide-react';
 import { actionMenuPosition } from './actionMenuPosition';
 
 export type MenuAction = {
@@ -13,8 +13,10 @@ export type MenuAction = {
   children?: MenuAction[];
   separatorBefore?: boolean;
   disabled?: boolean;
+  checked?: boolean;
 };
-type FocusRequest = { level: number; edge: 'first' | 'last' };
+type FocusRequest = { level: number; edge: 'first' | 'last' | 'selected' };
+const enabledItems = '[role="menuitem"]:not(:disabled), [role="menuitemradio"]:not(:disabled)';
 
 function MenuPanel({
   id,
@@ -32,6 +34,7 @@ function MenuPanel({
   onLeave,
   cancelHover,
   rowRefs,
+  matchTriggerWidth,
 }: {
   id: string;
   label: string;
@@ -49,6 +52,7 @@ function MenuPanel({
   onLeave: () => void;
   cancelHover: () => void;
   rowRefs: Map<string, HTMLButtonElement>;
+  matchTriggerWidth?: boolean;
 }) {
   const panel = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
@@ -57,6 +61,8 @@ function MenuPanel({
     const point = trigger && 'x' in trigger ? trigger : null;
     if (!element || !trigger) return;
     const position = () => {
+      if (matchTriggerWidth && !point)
+        element.style.minWidth = `${Math.min((trigger as HTMLButtonElement).getBoundingClientRect().width, window.innerWidth - 16)}px`;
       const rect = element.getBoundingClientRect();
       const p = actionMenuPosition(
         point
@@ -81,23 +87,21 @@ function MenuPanel({
       window.removeEventListener('resize', position);
       window.removeEventListener('scroll', position, true);
     };
-  }, [anchor, level]);
+  }, [anchor, level, matchTriggerWidth]);
   useLayoutEffect(() => {
     if (focusRequest?.level !== level) return;
-    const buttons = [
-      ...(panel.current?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]:not(:disabled)') ??
-        []),
-    ];
-    (focusRequest.edge === 'last' ? buttons.at(-1) : buttons[0])?.focus();
+    const buttons = [...(panel.current?.querySelectorAll<HTMLButtonElement>(enabledItems) ?? [])];
+    (focusRequest.edge === 'last'
+      ? buttons.at(-1)
+      : focusRequest.edge === 'selected'
+        ? (buttons.find((button) => button.getAttribute('aria-checked') === 'true') ?? buttons[0])
+        : buttons[0]
+    )?.focus();
   }, [focusRequest, level]);
   const keydown = (event: KeyboardEvent<HTMLDivElement>) => {
     // Drawing shortcuts must never run while the keyboard is navigating a menu.
     event.stopPropagation();
-    const buttons = [
-      ...event.currentTarget.querySelectorAll<HTMLButtonElement>(
-        '[role="menuitem"]:not(:disabled)',
-      ),
-    ];
+    const buttons = [...event.currentTarget.querySelectorAll<HTMLButtonElement>(enabledItems)];
     const index = buttons.indexOf(document.activeElement as HTMLButtonElement);
     const focused = items.find(
       (item) => rowRefs.get(`${level}:${item.id}`) === document.activeElement,
@@ -138,7 +142,7 @@ function MenuPanel({
     <div
       ref={panel}
       id={id}
-      className="action-menu-panel"
+      className={`action-menu-panel${matchTriggerWidth ? ' action-menu-options' : ''}`}
       data-nested={level > 0 || undefined}
       role="menu"
       aria-label={label}
@@ -155,7 +159,8 @@ function MenuPanel({
               else rowRefs.delete(`${level}:${item.id}`);
             }}
             type="button"
-            role="menuitem"
+            role={item.checked === undefined ? 'menuitem' : 'menuitemradio'}
+            aria-checked={item.checked}
             aria-label={item.label}
             aria-description={item.shortcut}
             className="action-menu-item"
@@ -166,7 +171,7 @@ function MenuPanel({
             aria-controls={item.children && openItem === item.id ? `${id}-${item.id}` : undefined}
             onFocus={(event) => {
               for (const button of panel.current?.querySelectorAll<HTMLButtonElement>(
-                '[role="menuitem"]',
+                '[role="menuitem"], [role="menuitemradio"]',
               ) ?? [])
                 button.tabIndex = button === event.currentTarget ? 0 : -1;
             }}
@@ -175,6 +180,7 @@ function MenuPanel({
           >
             <span className="action-menu-icon">{item.icon}</span>
             <span className="action-menu-label">{item.label}</span>
+            {item.checked && <Check className="action-menu-check" size={14} aria-hidden="true" />}
             {item.shortcut && <kbd className="action-menu-shortcut">{item.shortcut}</kbd>}
             {item.children && (
               <ChevronRight className="action-menu-chevron" size={14} aria-hidden="true" />
@@ -191,12 +197,15 @@ export function ActionMenu({
   label,
   icon,
   items,
-  active = false,
+  active,
   showLabel = false,
   className = '',
   onOpenChange,
   onEscape,
   context,
+  variant = 'actions',
+  description,
+  triggerId,
 }: {
   label: string;
   icon?: ReactNode;
@@ -207,8 +216,12 @@ export function ActionMenu({
   onOpenChange?: (open: boolean) => void;
   onEscape?: () => void;
   context?: { x: number; y: number; onClose: () => void; returnFocus: () => void };
+  variant?: 'actions' | 'choices';
+  description?: string;
+  triggerId?: string;
 }) {
   const id = useId();
+  const choices = variant === 'choices';
   const root = useRef<HTMLDivElement>(null);
   const floating = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -271,7 +284,17 @@ export function ActionMenu({
     },
     [],
   );
-  const show = (edge?: 'first' | 'last') => {
+  useEffect(() => {
+    if (!open || !choices || !trigger.current || typeof IntersectionObserver === 'undefined')
+      return;
+    // A scrolled-out field must not leave a detached choice menu floating over the canvas.
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry && !entry.isIntersecting) close();
+    });
+    observer.observe(trigger.current);
+    return () => observer.disconnect();
+  });
+  const show = (edge?: FocusRequest['edge']) => {
     cancelHover();
     setPath([]);
     setOpen(true);
@@ -298,6 +321,7 @@ export function ActionMenu({
         openItem={selected?.id}
         focusRequest={focusRequest}
         rowRefs={rowRefs}
+        matchTriggerWidth={level === 0 && choices}
         cancelHover={cancelHover}
         onBranch={(item, keyboard) => {
           cancelHover();
@@ -313,7 +337,7 @@ export function ActionMenu({
           rowRefs.get(`${panelLevel - 1}:${path[panelLevel - 1]}`)?.focus();
           setPath(path.slice(0, panelLevel - 1));
         }}
-        onTab={() => close()}
+        onTab={() => close(true)}
         onHover={(item) => {
           cancelHover();
           // A short intent delay lets the pointer cross diagonally into the open submenu.
@@ -345,21 +369,25 @@ export function ActionMenu({
       {!context && (
         <button
           ref={trigger}
+          id={triggerId}
           type="button"
           className={`icon-button action-menu-trigger${active ? ' active' : ''}${showLabel ? ' action-menu-trigger-label' : ''}${className ? ` ${className}` : ''}`}
           aria-label={label}
           aria-pressed={active}
+          aria-description={description}
           aria-haspopup="menu"
           aria-expanded={open}
           aria-controls={open ? id : undefined}
           title={label}
           data-tooltip={label}
-          onClick={(event) => (open ? close() : show(event.detail === 0 ? 'first' : undefined))}
+          onClick={(event) =>
+            open ? close() : show(choices ? 'selected' : event.detail === 0 ? 'first' : undefined)
+          }
           onKeyDown={(event) => {
             if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
             event.preventDefault();
             event.stopPropagation();
-            show(event.key === 'ArrowDown' ? 'first' : 'last');
+            show(choices ? 'selected' : event.key === 'ArrowDown' ? 'first' : 'last');
           }}
         >
           {icon}
