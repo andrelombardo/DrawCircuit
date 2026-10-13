@@ -87,6 +87,22 @@ svg {
   flex-direction: column;
   overflow: hidden;
 }
+/* Installed desktop apps keep system buttons clear and a draggable area on white. */
+@media (display-mode: window-controls-overlay) {
+  .app-shell {
+    padding-top: env(titlebar-area-height, 0px);
+  }
+  .app-shell::before {
+    content: '';
+    position: fixed;
+    left: env(titlebar-area-x, 0px);
+    top: env(titlebar-area-y, 0px);
+    width: env(titlebar-area-width, 100%);
+    height: env(titlebar-area-height, 0px);
+    -webkit-app-region: drag;
+    app-region: drag;
+  }
+}
 .main-tools {
   display: flex;
   align-items: center;
@@ -192,6 +208,7 @@ svg {
 }
 .palette-scroll {
   overflow-y: auto;
+  scrollbar-gutter: stable;
   flex: 1;
   min-height: 0;
   padding: 0 var(--ui-space-2) var(--ui-space-4);
@@ -2678,6 +2695,7 @@ summary:focus-visible {
   min-height: 0;
   overflow: auto;
   overflow-x: hidden;
+  scrollbar-gutter: stable;
   overscroll-behavior: contain;
 }
 .inspector-selection {
@@ -2732,11 +2750,14 @@ summary:focus-visible {
 /* Captions always sit above controls, including at the minimum width. */
 .property-row {
   display: grid;
-  grid-template-columns: minmax(100px, 1fr) minmax(84px, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
   gap: 6px var(--property-gap);
   margin-top: var(--property-gap);
   min-width: 0;
+}
+.property-row-secondary {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .inspector-section > .property-row:first-of-type,
 .inspector-general > .property-row:first-child {

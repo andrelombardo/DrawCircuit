@@ -11,7 +11,8 @@ export const pwaOptions: Partial<VitePWAOptions> = {
     start_url: './',
     scope: './',
     display: 'standalone',
-    theme_color: '#2463e8',
+    display_override: ['window-controls-overlay'],
+    theme_color: '#ffffff',
     background_color: '#ffffff',
     lang: 'it',
     icons: [

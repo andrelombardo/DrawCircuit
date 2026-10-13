@@ -50,9 +50,7 @@ export function PropertiesContent() {
       return s.document.objects.filter((o) => ids.has(o.id));
     }),
   );
-  const activeLabel = useEditorStore((s) => s.activeLabel),
-    grid = useEditorStore((s) => s.grid),
-    snapEnabled = useEditorStore((s) => s.snapEnabled);
+  const activeLabel = useEditorStore((s) => s.activeLabel);
   const state = () => useEditorStore.getState();
   const apply = (fn: (o: CircuitObject) => CircuitObject) => state().updateSelection(fn);
   const doc = state().document;
@@ -161,26 +159,10 @@ export function PropertiesContent() {
     ));
   if (!objects.length)
     return (
-      <>
-        <div className="inspector-empty">
-          <p>Seleziona un elemento</p>
-          <span>Le proprietà del circuito appariranno qui.</span>
-        </div>
-        <InspectorSection title="Canvas">
-          <label className="inspector-check">
-            <input type="checkbox" checked={grid} onChange={() => state().toggleGrid()} />
-            Mostra griglia
-          </label>
-          <label className="inspector-check">
-            <input type="checkbox" checked={snapEnabled} onChange={() => state().toggleSnap()} />
-            Aggancia durante spostamento
-          </label>
-          <p className="inspector-note">
-            Quote in unità documento · griglia 20 u<br />
-            Durante uno spostamento: Shift mostra altre quote, Option/Alt libera lo snapping.
-          </p>
-        </InspectorSection>
-      </>
+      <div className="inspector-empty">
+        <p>Seleziona un elemento</p>
+        <span>Le proprietà del circuito appariranno qui.</span>
+      </div>
     );
   return (
     <div className="inspector-properties" key={objects.map((o) => o.id).join(',')}>
