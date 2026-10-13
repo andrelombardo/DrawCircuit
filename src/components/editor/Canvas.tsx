@@ -34,6 +34,8 @@ import { presetRegistry } from '../../presets/registry';
 import { inlineCompatible } from '../../smartPlacement/findCandidates';
 import { useTerminalProximity } from './useTerminalProximity';
 import { useCanvasFocus } from './useCanvasFocus';
+import { isDesktop } from '../../desktop/environment';
+import { DesktopFrame } from '../../desktop/DesktopFrame';
 type CanvasProps = {
   sidebarVisible?: boolean;
   onToggleSidebar?: () => void;
@@ -144,9 +146,17 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onExport, onHel
                                 : null;
   return (
     <div className="editor-shell">
+      {isDesktop() && (
+        <DesktopFrame
+          sidebarVisible={sidebarVisible}
+          inspectorVisible={inspector.preferences.visible}
+          toggleSidebar={onToggleSidebar}
+          toggleInspector={inspector.toggle}
+        />
+      )}
       <main className="editor" aria-label="Editor circuito">
         <DrawingToolbar onExport={onExport} sidebarVisible={sidebarVisible} />
-        {!sidebarVisible && (
+        {!isDesktop() && !sidebarVisible && (
           <SidebarToggle side="left" visible={false} onToggle={onToggleSidebar} />
         )}
         {storageError && (
@@ -155,7 +165,7 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onExport, onHel
             Salvataggio locale non disponibile. Mantieni aperta la pagina ed esporta il circuito.
           </div>
         )}
-        {!inspector.preferences.visible && (
+        {!isDesktop() && !inspector.preferences.visible && (
           <SidebarToggle side="right" visible={false} onToggle={inspector.toggle} />
         )}
         {tool === 'wire' && (

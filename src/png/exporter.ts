@@ -2,6 +2,7 @@ import type { CircuitDocument } from '../model/types';
 import { exportSVG } from '../svg/exporter';
 import { CIRCUIT_FONT } from '../model/fonts';
 import { isMathSource } from '../math/latex';
+import { isDesktop } from '../desktop/environment';
 
 export const PNG_SCALE = 4;
 export const PNG_MAX_DIMENSION = 16_384;
@@ -203,6 +204,17 @@ export async function exportPNG(doc: CircuitDocument): Promise<Blob> {
 
 /** Pass the promise immediately to preserve clipboard user activation on Safari. */
 export async function copyPNG(doc: CircuitDocument) {
+  if (isDesktop()) {
+    const { Image } = await import('@tauri-apps/api/image');
+    const { writeImage } = await import('@tauri-apps/plugin-clipboard-manager');
+    const image = await Image.fromBytes(await (await exportPNG(doc)).arrayBuffer());
+    try {
+      await writeImage(image);
+    } finally {
+      await image.close();
+    }
+    return;
+  }
   if (
     typeof ClipboardItem === 'undefined' ||
     !navigator.clipboard?.write ||

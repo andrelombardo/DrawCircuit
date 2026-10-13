@@ -3,9 +3,9 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { pwaOptions } from './src/pwa/config';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   base: './',
-  plugins: [react(), VitePWA(pwaOptions)],
+  plugins: [react(), VitePWA({ ...pwaOptions, disable: mode === 'desktop' })],
   build: {
     rollupOptions: {
       output: { manualChunks: (id) => (id.includes('/node_modules/katex/') ? 'latex' : undefined) },
@@ -20,4 +20,4 @@ export default defineConfig({
     setupFiles: ['tests/setup.ts'],
     include: ['tests/**/*.test.{ts,tsx}'],
   },
-});
+}));

@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { isMac, isStandalone, shortcut } from '../../utils/platform';
 import { X } from 'lucide-react';
 import { useDialogFocus } from './useDialogFocus';
+import { isDesktop } from '../../desktop/environment';
 export function HelpDialog({ onClose }: { onClose: () => void }) {
   const dialog = useRef<HTMLElement>(null);
   useDialogFocus(dialog, onClose);
@@ -72,7 +73,7 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
             ['H · V', 'Pan / selezione'],
             [shortcut('A'), 'Seleziona tutto'],
             ['Esc', 'Selezione / annulla filo'],
-            ...(isStandalone() && isMac() ? [['⌘T', 'Mostra / nascondi Componenti (PWA)']] : []),
+            ...(isStandalone() && isMac() ? [['⌘T', 'Mostra / nascondi Componenti']] : []),
           ].map(([key, description]) => (
             <div key={key}>
               <span>{description}</span>
@@ -108,7 +109,7 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
           personali. Trascina il grip per spostare la toolbar: la posizione viene ricordata. Export
           offre TikZ, Obsidian, File .tex, SVG e le azioni dirette “Copia PNG” e “Scarica PNG”,
           anche per la selezione. Il circuito e il livello di zoom vengono salvati automaticamente
-          in questo browser.
+          {isDesktop() ? 'su questo Mac, con una copia di sicurezza.' : 'in questo browser.'}
         </p>
       </section>
     </div>

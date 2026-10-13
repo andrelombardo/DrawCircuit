@@ -8,6 +8,8 @@ import { exportObsidian, exportStandalone, exportTikz } from '../../tikz/exporte
 import { getExportSelection } from '../../tikz/selection';
 import { download, fileName } from '../../utils/files';
 import { useDialogFocus } from './useDialogFocus';
+import { serializeArchive } from '../../desktop/archive';
+import { usePersonalBlocks } from '../../personalBlocks/library';
 export function ExportDialog({ onClose }: { onClose: () => void }) {
   const doc = useEditorStore((s) => s.document),
     selection = useEditorStore((s) => s.selection),
@@ -25,7 +27,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
       if (action === 'copy') {
         await copyPNG(exportDoc);
         setCopied('png');
-      } else download(await exportPNG(exportDoc), `${fileName(doc.title)}.png`, 'image/png');
+      } else await download(await exportPNG(exportDoc), `${fileName(doc.title)}.png`, 'image/png');
     } catch (error) {
       const message =
         action === 'copy'
@@ -195,6 +197,21 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
         {copyError && (
           <p className="copy-error">Codice selezionato: premi {shortcut('C')} per copiarlo.</p>
         )}
+        <div className="archive-export">
+          <span>Circuito completo e blocchi personali</span>
+          <button
+            className="secondary-button"
+            onClick={() =>
+              download(
+                serializeArchive(doc, usePersonalBlocks.getState().blocks),
+                `${fileName(doc.title)}-drawcircuit.json`,
+                'application/json',
+              )
+            }
+          >
+            Salva archivio DrawCircuit
+          </button>
+        </div>
         <div className="export-dialog-footer">
           <span>
             {tab === 'svg'

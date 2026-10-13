@@ -1,0 +1,40 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "DrawCircuit",
+  "version": "1.0.0",
+  "identifier": "it.drawcircuit.desktop",
+  "build": {
+    "beforeDevCommand": "npm run dev -- --port 51980 --strictPort",
+    "devUrl": "http://127.0.0.1:51980",
+    "beforeBuildCommand": "npm run build:desktop-ui",
+    "frontendDist": "../dist-desktop"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "DrawCircuit",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 800,
+        "minHeight": 500,
+        "visible": false,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "trafficLightPosition": { "x": 16, "y": 20 },
+        "backgroundColor": "#f7f7f9"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src ipc: http://ipc.localhost 'self'; object-src 'none'; frame-src 'none'; base-uri 'self'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app"],
+    "category": "Education",
+    "shortDescription": "Disegna circuiti ed esportali in TikZ, SVG e PNG.",
+    "icon": ["icons/icon.icns", "icons/icon.png"],
+    "macOS": { "minimumSystemVersion": "12.0", "signingIdentity": "-" }
+  }
+}

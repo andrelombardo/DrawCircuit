@@ -17,6 +17,25 @@ export default function App() {
     const timer = setTimeout(() => useEditorStore.getState().notify(''), 4500);
     return () => clearTimeout(timer);
   }, [notice]);
+  useEffect(() => {
+    const report = (event: Event) =>
+      useEditorStore.getState().notify((event as CustomEvent<string>).detail);
+    const menu = (event: Event) => {
+      const action = (event as CustomEvent<string>).detail;
+      if (action === 'export') setDialog('export');
+      if (action === 'open' || action === 'save') {
+        void import('./desktop/archiveActions')
+          .then((commands) => (action === 'open' ? commands.openArchive() : commands.saveArchive()))
+          .catch((error) => useEditorStore.getState().notify(String(error)));
+      }
+    };
+    window.addEventListener('drawcircuit:desktop-error', report);
+    window.addEventListener('drawcircuit:desktop-menu', menu);
+    return () => {
+      window.removeEventListener('drawcircuit:desktop-error', report);
+      window.removeEventListener('drawcircuit:desktop-menu', menu);
+    };
+  }, []);
   return (
     <SelectionActions>
       <div className="app-shell">

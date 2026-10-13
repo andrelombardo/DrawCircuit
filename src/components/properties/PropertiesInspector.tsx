@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react';
 import { PropertiesContent } from './PropertiesContent';
 import { useEditorStore } from '../../store/editorStore';
 import { SidebarToggle } from '../toolbar/SidebarToggle';
+import { isDesktop } from '../../desktop/environment';
 import {
   clampInspectorWidth,
   INSPECTOR_DEFAULT_WIDTH,
@@ -62,9 +63,9 @@ export function PropertiesInspector({
       hidden={!preferences.visible}
       style={{ '--inspector-width': `${preferences.width}px` } as CSSProperties}
     >
-      <div className="inspector-header">
-        <h2>Proprietà</h2>
-        <SidebarToggle side="right" visible onToggle={toggle} />
+      <div className="inspector-header" data-tauri-drag-region={isDesktop() ? true : undefined}>
+        <h2 data-tauri-drag-region={isDesktop() ? true : undefined}>Proprietà</h2>
+        {!isDesktop() && <SidebarToggle side="right" visible onToggle={toggle} />}
       </div>
       <div ref={scroll} className="inspector-scroll">
         <PropertiesContent />

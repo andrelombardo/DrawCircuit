@@ -12,7 +12,7 @@
   <a href="docs/manuale.md">Documentation</a>
 </p>
 
-DrawCircuit turns circuit sketches into editable vector diagrams. Place components, connect terminals, add annotations, and export the result for your notes or teaching material. Everything runs in the browser, with automatic local saving and offline support after the first completed visit. There are no accounts or backend services; the editor focuses on drawing rather than circuit simulation.
+DrawCircuit turns circuit sketches into editable vector diagrams. Place components, connect terminals, add annotations, and export the result for your notes or teaching material. Use the browser app with local saving and offline support, or build the standalone macOS app with native window controls, menus, file dialogs, and durable local backups. There are no accounts or backend services; the editor focuses on drawing rather than circuit simulation. See the [macOS instructions](docs/desktop.md) for building and transferring your work.
 
 ## Features
 
@@ -48,6 +48,7 @@ DrawCircuit turns circuit sketches into editable vector diagrams. Place componen
 - **SVG** — Copy or download a vector diagram with mathematical labels and no editor controls or grid.
 - **Selection export** — Export the whole circuit or only the selected elements, including their internal wires and attached annotations. Right-click a selection and choose **Salva come immagine** for a transparent PNG at 4× resolution.
 - **Local saving and PWA** — Keep your circuit in the current browser and work offline after the app is cached; available installation options depend on the browser.
+- **macOS app** — A lightweight Tauri window, fixed sidebar controls, native exports and clipboard, atomic disk saving with backup, and portable archives containing the circuit and personal blocks.
 
 ## Quick Start
 

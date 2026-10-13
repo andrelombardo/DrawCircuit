@@ -1,10 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { saveDocumentNow, useEditorStore } from '../store/editorStore';
+import { isDesktop } from '../desktop/environment';
 export function PwaStatus() {
   const [refresh, setRefresh] = useState(false);
   const update = useRef<((reload?: boolean) => Promise<void>) | null>(null);
   useEffect(() => {
-    if (!import.meta.env.PROD || !('serviceWorker' in navigator)) return;
+    if (
+      import.meta.env.MODE === 'desktop' ||
+      isDesktop() ||
+      !import.meta.env.PROD ||
+      !('serviceWorker' in navigator)
+    )
+      return;
     let disposed = false,
       registration: ServiceWorkerRegistration | undefined;
     const check = () => {

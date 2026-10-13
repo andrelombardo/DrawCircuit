@@ -6,6 +6,11 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc -b && vite build",
+    "build:desktop-ui": "tsc -b && vite build --mode desktop --outDir dist-desktop",
+    "desktop:dev": "tauri dev",
+    "desktop:build": "tauri build",
+    "desktop:package": "npm run desktop:build && node scripts/package-macos.mjs",
+    "desktop:test": "cargo test --manifest-path src-tauri/Cargo.toml",
     "preview": "vite preview --host 127.0.0.1",
     "lint": "eslint .",
     "test": "vitest run",
@@ -16,6 +21,10 @@
   },
   "dependencies": {
     "@fontsource/inter": "^5.2.8",
+    "@tauri-apps/api": "^2.12.3",
+    "@tauri-apps/plugin-clipboard-manager": "^2.4.2",
+    "@tauri-apps/plugin-dialog": "^2.8.2",
+    "@tauri-apps/plugin-fs": "^2.7.0",
     "katex": "^0.19.0",
     "lucide-react": "^0.468.0",
     "react": "^19.2.0",
@@ -25,6 +34,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.0",
     "@resvg/resvg-js": "^2.6.2",
+    "@tauri-apps/cli": "^2.12.2",
     "@testing-library/react": "^16.3.3",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",

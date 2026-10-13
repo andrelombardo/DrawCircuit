@@ -3,6 +3,7 @@ import { PersonalBlockPalette } from '../../personalBlocks/PersonalBlockPalette'
 import { useState } from 'react';
 import { ChevronDown, Search, X } from 'lucide-react';
 import { SidebarToggle } from '../toolbar/SidebarToggle';
+import { isDesktop } from '../../desktop/environment';
 import { categories, catalog, matchesComponent } from '../../model/catalog';
 import { useEditorStore } from '../../store/editorStore';
 import { ComponentPreview } from './ComponentPreview';
@@ -21,9 +22,9 @@ export function Palette({ onHide }: { onHide: () => void }) {
     selectPreset = useEditorStore((s) => s.selectPreset);
   return (
     <aside className="palette" aria-label="Libreria componenti">
-      <div className="palette-heading">
-        <span>Componenti</span>
-        <SidebarToggle side="left" visible onToggle={onHide} />
+      <div className="palette-heading" data-tauri-drag-region={isDesktop() ? true : undefined}>
+        <span data-tauri-drag-region={isDesktop() ? true : undefined}>Componenti</span>
+        {!isDesktop() && <SidebarToggle side="left" visible onToggle={onHide} />}
       </div>
       <div className="search-field">
         <Search size={15} />
