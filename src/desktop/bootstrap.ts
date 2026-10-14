@@ -8,6 +8,20 @@ import { trackWindowLayout } from './windowLayout';
 
 export async function bootstrapDesktop() {
   document.documentElement.dataset.desktop = /Mac/.test(navigator.platform) ? 'macos' : 'other';
+  if (document.documentElement.dataset.desktop === 'macos') {
+    try {
+      const height = await invoke<number>('window_header_height');
+      if (Number.isFinite(height) && height >= 40 && height <= 80) {
+        document.documentElement.style.setProperty('--desktop-titlebar-height', `${height}px`);
+        document.documentElement.style.setProperty(
+          '--desktop-header-height',
+          `${Math.max(60, height + 8)}px`,
+        );
+      }
+    } catch (error) {
+      console.warn('Impossibile leggere la geometria dei controlli macOS.', error);
+    }
+  }
   const loaded = await invoke<{ entries: Record<string, string>; recovered: boolean }>(
     'load_workspace',
   );

@@ -43,7 +43,7 @@ html[data-desktop] {
   --desktop-sidebar-left: 14px;
 }
 html[data-desktop='macos'] {
-  --desktop-titlebar-height: 32px;
+  --desktop-titlebar-height: 52px;
   --desktop-sidebar-left: 84px;
 }
 html[data-desktop='macos'][data-desktop-fullscreen='true'] {

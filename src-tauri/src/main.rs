@@ -1,5 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod window_chrome;
 mod workspace;
 
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -93,9 +94,14 @@ fn main() {
             workspace::save_workspace,
             finish_exit,
             frontend_ready,
-            native_file_dialog
+            native_file_dialog,
+            window_chrome::window_header_height
         ])
         .setup(|app| {
+            #[cfg(target_os = "macos")]
+            if let Some(window) = app.get_webview_window("main") {
+                window_chrome::configure(&window)?;
+            }
             let handle = app.handle();
             let item = |id, text, shortcut| MenuItem::with_id(handle, id, text, true, shortcut);
             let app_menu = Submenu::with_items(
