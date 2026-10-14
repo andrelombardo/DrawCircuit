@@ -181,8 +181,14 @@ describe('indexed guides, zoom and transient modifiers', () => {
     (zoom) => {
       const d = parallelSources([0, 150, 300]),
         feedback = computeMoveGuides(createMoveContext(d, ['source-2']), { x: 0, y: 0 }, zoom);
-      expect(feedback.distances.map((g) => g.value)).toEqual([150, 150]);
-      expect(feedback.distances.every((g) => g.equal && g.measurement === 'centers')).toBe(true);
+      expect(feedback.distances.map((g) => [g.axis, g.value])).toEqual([
+        ['x', 150],
+        ['x', 150],
+        ['y', 80],
+        ['y', 80],
+      ]);
+      expect(feedback.distances.every((g) => g.equal)).toBe(true);
+      expect(feedback.distances.filter((g) => g.measurement === 'centers')).toHaveLength(2);
     },
   );
   it.each([0.5, 1, 2])(

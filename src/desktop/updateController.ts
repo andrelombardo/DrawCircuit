@@ -57,10 +57,10 @@ export class DesktopUpdateController {
     this.listeners.forEach((listener) => listener());
   }
   async check(manual = false) {
-    if (this.busy || this.installed) return;
+    if (this.busy || this.installed || (!manual && this.state.phase !== 'idle')) return;
     this.busy = true;
     const previous = this.update;
-    this.set({ phase: 'checking' });
+    if (manual) this.set({ phase: 'checking' });
     try {
       const update = await this.dependencies.check();
       this.update = update;

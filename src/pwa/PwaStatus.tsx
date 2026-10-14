@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { saveDocumentNow, useEditorStore } from '../store/editorStore';
 import { isDesktop } from '../desktop/environment';
+import { UpdateDialog } from '../components/UpdateDialog';
 export function PwaStatus() {
   const [refresh, setRefresh] = useState(false);
+  const [applying, setApplying] = useState(false);
+  const [message, setMessage] = useState('Il circuito sarà salvato prima di ricaricare.');
   const update = useRef<((reload?: boolean) => Promise<void>) | null>(null);
   useEffect(() => {
     if (
@@ -48,30 +51,37 @@ export function PwaStatus() {
     };
   }, []);
   const applyUpdate = async () => {
+    if (applying) return;
+    const report = (message: string) => {
+      setMessage(message);
+      useEditorStore.getState().notify(message);
+    };
     if (useEditorStore.getState().gestureStart || document.querySelector('.inline-editor')) {
-      useEditorStore.getState().notify('Concludi la modifica sul foglio prima di aggiornare.');
+      report('Concludi la modifica sul foglio prima di aggiornare.');
       return;
     }
     if (!saveDocumentNow()) {
-      useEditorStore
-        .getState()
-        .notify('Salvataggio locale non disponibile. Esporta il circuito prima di aggiornare.');
+      report('Salvataggio locale non disponibile. Esporta il circuito prima di aggiornare.');
       return;
     }
     try {
+      setApplying(true);
       await update.current?.(true);
     } catch {
-      useEditorStore
-        .getState()
-        .notify('Aggiornamento non riuscito. Il circuito è salvato; riprova quando sei online.');
+      report('Aggiornamento non riuscito. Il circuito è salvato; riprova quando sei online.');
+    } finally {
+      setApplying(false);
     }
   };
   if (!refresh) return null;
   return (
-    <aside className="pwa-notice" role="status">
-      <span>È disponibile una nuova versione.</span>
-      <button onClick={() => void applyUpdate()}>Aggiorna</button>
-      <button onClick={() => setRefresh(false)}>Più tardi</button>
-    </aside>
+    <UpdateDialog
+      title={applying ? 'Aggiornamento in corso…' : 'Aggiornamento disponibile'}
+      message={message}
+      actionLabel="Aggiorna"
+      onAction={() => void applyUpdate()}
+      onClose={() => setRefresh(false)}
+      busy={applying}
+    />
   );
 }

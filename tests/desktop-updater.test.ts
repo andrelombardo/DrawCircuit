@@ -21,6 +21,22 @@ function fixture() {
 }
 
 describe('signed desktop update lifecycle', () => {
+  it('keeps automatic checks silent and shows progress only for a manual check', async () => {
+    const { update, dependencies, controller } = fixture();
+    let finish!: (candidate: typeof update) => void;
+    dependencies.check.mockImplementationOnce(() => new Promise((resolve) => (finish = resolve)));
+    const automatic = controller.check();
+    expect(controller.snapshot().phase).toBe('idle');
+    finish(update);
+    await automatic;
+    controller.dismiss();
+    dependencies.check.mockImplementationOnce(() => new Promise((resolve) => (finish = resolve)));
+    const manual = controller.check(true);
+    expect(controller.snapshot().phase).toBe('checking');
+    finish(update);
+    await manual;
+    expect(controller.snapshot().phase).toBe('available');
+  });
   it('offers an update without downloading, and honours refusal and postponement', async () => {
     const { update, dependencies, controller } = fixture();
     await controller.check();

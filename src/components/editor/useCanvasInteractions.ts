@@ -725,14 +725,29 @@ export function useCanvasInteractions(
               new Set(s.document.objects.filter((o) => o.id !== id).map((o) => o.id)),
             )?.segment
           : undefined;
+      const moveContext =
+        !handle && !labelId && segment === undefined
+          ? createMoveContext(s.document, ids)
+          : undefined;
       drag.current = {
         type: handle || segment !== undefined ? 'handle' : labelId ? 'label' : 'move',
         origin: p,
         doc: s.document,
         ids: handle || labelId ? [id] : ids,
         handle: segment !== undefined ? `segment:${segment}` : (handle ?? undefined),
-        moveContext: !handle && !labelId ? createMoveContext(s.document, ids) : undefined,
+        moveContext,
       };
+      if (moveContext)
+        setOverlay({
+          ...blank,
+          distances: computeMoveGuides(
+            moveContext,
+            { x: 0, y: 0 },
+            viewport.zoom,
+            e.altKey || !s.snapEnabled,
+            true,
+          ).distances,
+        });
     } else {
       svg.setPointerCapture(e.pointerId);
       setActiveLabel(null);

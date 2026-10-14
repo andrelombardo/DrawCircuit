@@ -25,7 +25,7 @@ import { useCanvasInteractions } from './useCanvasInteractions';
 import { PropertiesInspector } from '../properties/PropertiesInspector';
 import { useInspectorPreferences } from '../properties/useInspectorPreferences';
 import { IconButton } from '../toolbar/IconButton';
-import { Symbol } from '../../circuit/components/Symbol';
+import logoUrl from '../../../assets/brand/drawcircuit-logo.svg?url';
 import { LoopArrowView } from '../../circuit/annotations/LoopArrowView';
 import { ArrowView } from '../../circuit/annotations/ArrowView';
 import { PlacementLayer } from '../../smartPlacement/PlacementLayer';
@@ -391,11 +391,11 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onExport, onHel
         )}
         {!doc.objects.length && (
           <div className="empty-sheet">
-            <div className="empty-circuit">
-              <svg viewBox="-50 -30 100 60">
-                <Symbol type="resistor" color="#8092ae" />
-              </svg>
-            </div>
+            <div
+              className="empty-circuit"
+              aria-hidden="true"
+              style={{ maskImage: `url("${logoUrl}")` }}
+            />
             <h2>Le idee iniziano da un foglio.</h2>
             <p>
               Scegli un componente dalla palette.

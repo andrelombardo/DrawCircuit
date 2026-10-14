@@ -41,7 +41,8 @@ async function offer() {
 }
 it('registers the production worker and waits for explicit approval instead of reloading', async () => {
   await offer();
-  expect(screen.getByText('È disponibile una nuova versione.')).toBeTruthy();
+  expect(screen.getByText('Aggiornamento disponibile')).toBeTruthy();
+  expect(screen.getByRole('dialog').parentElement).toBe(document.body);
   expect(mocks.update).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole('button', { name: 'Più tardi' }));
   expect(screen.queryByRole('button', { name: 'Aggiorna' })).toBeNull();
@@ -91,7 +92,28 @@ it('reports a rejected worker activation and keeps the saved circuit and retry b
   );
   expect(useEditorStore.getState().document).toEqual(savedDocument);
   expect(screen.getByRole('button', { name: 'Aggiorna' })).toBeTruthy();
+  expect(screen.getByRole('dialog').textContent).toContain('Aggiornamento non riuscito');
   expect(localStorage.setItem).toHaveBeenCalled();
+});
+it('allows Escape to postpone an available update without reloading', async () => {
+  await offer();
+  fireEvent(screen.getByRole('dialog'), new Event('cancel', { cancelable: true }));
+  expect(screen.queryByRole('dialog')).toBeNull();
+  expect(mocks.update).not.toHaveBeenCalled();
+});
+it('prevents closing or reapplying while the waiting worker is activating', async () => {
+  let finish!: () => void;
+  mocks.update.mockImplementationOnce(() => new Promise<void>((resolve) => (finish = resolve)));
+  await offer();
+  fireEvent.click(screen.getByRole('button', { name: 'Aggiorna' }));
+  const dialog = screen.getByRole('dialog');
+  expect(dialog.getAttribute('aria-busy')).toBe('true');
+  expect(screen.queryByRole('button', { name: 'Più tardi' })).toBeNull();
+  fireEvent(dialog, new Event('cancel', { cancelable: true }));
+  expect(screen.getByRole('dialog')).toBe(dialog);
+  fireEvent.click(screen.getByRole('button', { name: 'Aggiorna' }));
+  expect(mocks.update).toHaveBeenCalledOnce();
+  await act(async () => finish());
 });
 it('leaves installation to the browser without an unsolicited workspace notice', async () => {
   render(<PwaStatus />);

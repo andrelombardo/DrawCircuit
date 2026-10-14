@@ -7,7 +7,7 @@ import { simplifyPolyline } from './wires';
 
 export interface GuideItem {
   id: string;
-  family: 'node' | 'annotation';
+  family: 'node' | 'annotation' | 'reference';
   spacingFamily: 'component' | 'junction' | 'annotation';
   bounds: Bounds;
   alignmentBounds?: Bounds;
@@ -16,6 +16,8 @@ export interface GuideItem {
   pins: Point[];
   baseline?: number;
   referenceKind?: DistanceGuide['referenceKind'];
+  /** Measuring axis perpendicular to an actual cardinal line segment. */
+  segmentAxis?: 'x' | 'y';
 }
 export interface DistanceGuide {
   axis: 'x' | 'y';
@@ -25,7 +27,7 @@ export interface DistanceGuide {
   value: number;
   equal: boolean;
   neighborId: string;
-  referenceKind?: 'component' | 'junction' | 'bend' | 'endpoint';
+  referenceKind?: 'component' | 'junction' | 'bend' | 'endpoint' | 'wire' | 'line';
   /** Dimension rail is offset from the measured branch; witnesses end at `at`. */
   displayAt?: number;
   measurement?: 'centers' | 'gaps';
@@ -38,6 +40,14 @@ export interface MoveGuides {
 }
 const CELL = 160,
   RANGE = 800;
+function segmentAxis(a: Point, b: Point): 'x' | 'y' | undefined {
+  if (a.x === b.x && a.y !== b.y) return 'x';
+  if (a.y === b.y && a.x !== b.x) return 'y';
+}
+const belongsTo = (ep: Endpoint, ids: Set<string>) =>
+  ep.kind === 'terminal'
+    ? ids.has(ep.componentId)
+    : ep.kind === 'junction' && ids.has(ep.junctionId);
 function pins(o: CircuitObject): Point[] {
   return o.kind === 'component'
     ? o.terminals.map((t) => localToWorld(o, { x: t.localX, y: t.localY }))
@@ -61,6 +71,9 @@ function item(o: CircuitObject, doc: CircuitDocument): GuideItem {
         : { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 },
     pins: pins(o),
     ...(o.kind === 'component' || o.kind === 'junction' ? { referenceKind: o.kind } : {}),
+    ...(o.kind === 'line'
+      ? { segmentAxis: segmentAxis(o.start, o.end), referenceKind: 'line' as const }
+      : {}),
     ...(o.kind === 'text' ? { baseline: o.y } : {}),
   };
 }
@@ -71,21 +84,52 @@ export class GuideIndex {
   private large: GuideItem[] = [];
   constructor(doc: CircuitDocument, excluded: Set<string>) {
     for (const o of doc.objects) {
-      if (excluded.has(o.id) || o.kind === 'wire') continue;
-      const entry = item(o, doc),
-        b = entry.displayBounds ?? entry.bounds;
-      if ((b.width / CELL + 2) * (b.height / CELL + 2) > 256) {
-        this.large.push(entry);
+      if (excluded.has(o.id)) continue;
+      if (o.kind === 'wire') {
+        // Incident routes change with the selection. Their immutable straight
+        // branch references are handled separately, never as static obstacles.
+        if (belongsTo(o.startEndpoint, excluded) || belongsTo(o.endEndpoint, excluded)) continue;
+        const points = simplifyPolyline(wirePoints(o, doc));
+        for (let i = 1; i < points.length; i++) {
+          const a = points[i - 1],
+            b = points[i],
+            axis = segmentAxis(a, b);
+          if (!axis) continue;
+          const bounds = {
+            x: Math.min(a.x, b.x),
+            y: Math.min(a.y, b.y),
+            width: Math.abs(b.x - a.x),
+            height: Math.abs(b.y - a.y),
+          };
+          this.add({
+            id: o.id,
+            family: 'reference',
+            spacingFamily: 'annotation',
+            bounds,
+            anchor: { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 },
+            pins: [],
+            segmentAxis: axis,
+            referenceKind: 'wire',
+          });
+        }
         continue;
       }
-      for (let x = Math.floor(b.x / CELL); x <= Math.floor((b.x + b.width) / CELL); x++)
-        for (let y = Math.floor(b.y / CELL); y <= Math.floor((b.y + b.height) / CELL); y++) {
-          const key = `${x}:${y}`,
-            list = this.cells.get(key);
-          if (list) list.push(entry);
-          else this.cells.set(key, [entry]);
-        }
+      this.add(item(o, doc));
     }
+  }
+  private add(entry: GuideItem) {
+    const b = entry.displayBounds ?? entry.bounds;
+    if ((b.width / CELL + 2) * (b.height / CELL + 2) > 256) {
+      this.large.push(entry);
+      return;
+    }
+    for (let x = Math.floor(b.x / CELL); x <= Math.floor((b.x + b.width) / CELL); x++)
+      for (let y = Math.floor(b.y / CELL); y <= Math.floor((b.y + b.height) / CELL); y++) {
+        const key = `${x}:${y}`,
+          list = this.cells.get(key);
+        if (list) list.push(entry);
+        else this.cells.set(key, [entry]);
+      }
   }
   nearby(b: Bounds): GuideItem[] {
     const found = new Set<GuideItem>();
@@ -183,15 +227,11 @@ function connectedBranches(
   index: GuideIndex,
 ): BranchReference[] {
   const objects = new Map(doc.objects.map((o) => [o.id, o]));
-  const belongs = (ep: Endpoint) =>
-    ep.kind === 'terminal'
-      ? selected.has(ep.componentId)
-      : ep.kind === 'junction' && selected.has(ep.junctionId);
   const references: BranchReference[] = [];
   for (const wire of doc.objects) {
     if (wire.kind !== 'wire' || selected.has(wire.id)) continue;
-    const fromStart = belongs(wire.startEndpoint),
-      fromEnd = belongs(wire.endEndpoint);
+    const fromStart = belongsTo(wire.startEndpoint, selected),
+      fromEnd = belongsTo(wire.endEndpoint, selected);
     if (fromStart === fromEnd) continue;
     const route = simplifyPolyline(wirePoints(wire, doc));
     if (!fromStart) route.reverse();
@@ -326,6 +366,47 @@ function moveNeighbors(
   return result;
 }
 
+/** Line clearances are feedback only: they never introduce a snap or a node.
+ * A connected straight run keeps its semantic endpoint ahead of crossings. */
+function distanceNeighbors(
+  context: MoveContext,
+  b: Bounds,
+  candidates: GuideItem[],
+  segments: GuideItem[],
+  axis: 'x' | 'y',
+  tolerance: number,
+  delta: Point,
+) {
+  const result = moveNeighbors(context, b, candidates, axis, tolerance, delta);
+  const cross = axis === 'x' ? 'y' : 'x',
+    at = context.moving.anchor[cross] + delta[cross];
+  if (
+    Math.abs(delta[cross]) <= tolerance &&
+    context.branches.some((branch) => branch.axis === axis)
+  )
+    return result;
+  for (const segment of segments) {
+    const box = segment.bounds;
+    // Test the real segment span, not its midpoint or a polyline's union box.
+    if (segment.segmentAxis !== axis || at < box[cross] - 0.001 || at > end(box, cross) + 0.001)
+      continue;
+    const boundary = box[axis];
+    if (
+      boundary <= b[axis] + 0.001 &&
+      b[axis] - boundary <= RANGE &&
+      (!result.before || boundary > end(result.before.bounds, axis))
+    )
+      result.before = segment;
+    if (
+      boundary >= end(b, axis) - 0.001 &&
+      boundary - end(b, axis) <= RANGE &&
+      (!result.after || boundary < result.after.bounds[axis])
+    )
+      result.after = segment;
+  }
+  return result;
+}
+
 function chipBounds(guide: DistanceGuide, rail: number, zoom: number): Bounds {
   const value =
     Math.abs(guide.value - Math.round(guide.value)) < 0.01
@@ -363,42 +444,49 @@ function placeDistanceChips(
     guides.flatMap((guide) => context.index.nearby(chipBounds(guide, guide.at, zoom))),
   );
   const obstacles = [movingBox, ...[...local].map((entry) => entry.displayBounds ?? entry.bounds)];
-  let chosen = 22 / zoom,
-    best = Infinity;
-  for (const screenOffset of [22, -22, 40, -40, 58, -58, 76, -76, 94, -94, 112, -112]) {
-    const boxes: Bounds[] = [];
-    let collisions = 0;
-    for (const guide of guides) {
-      const box = chipBounds(guide, guide.at + screenOffset / zoom, zoom);
-      collisions += obstacles.filter((obstacle) => overlaps(box, obstacle, 3 / zoom)).length;
-      collisions += boxes.filter((other) => overlaps(box, other, 4 / zoom)).length;
-      boxes.push(box);
-    }
-    if (collisions < best) {
-      chosen = screenOffset / zoom;
-      best = collisions;
-    }
-    if (!collisions) break;
-  }
   const reserved: Bounds[] = [];
-  return guides.map((guide) => {
-    let rail = guide.at + chosen;
-    // Very short opposing gaps can have overlapping chips even on an empty
-    // common rail. Stagger only that chip while keeping the normal pair level.
-    for (const extra of [0, 22, -22, 44, -44, 66, -66]) {
-      const candidate = guide.at + chosen + extra / zoom;
-      const box = chipBounds(guide, candidate, zoom);
-      if (
-        reserved.some((other) => overlaps(box, other, 4 / zoom)) ||
-        obstacles.some((obstacle) => overlaps(box, obstacle, 3 / zoom))
-      )
-        continue;
-      rail = candidate;
-      break;
+  const placed = new Map<DistanceGuide, DistanceGuide>();
+  for (const axis of ['x', 'y'] as const) {
+    const pair = guides.filter((guide) => guide.axis === axis);
+    if (!pair.length) continue;
+    let chosen = 22 / zoom,
+      best = Infinity;
+    for (const screenOffset of [22, -22, 40, -40, 58, -58, 76, -76, 94, -94, 112, -112]) {
+      const boxes: Bounds[] = [];
+      let collisions = 0;
+      for (const guide of pair) {
+        const box = chipBounds(guide, guide.at + screenOffset / zoom, zoom);
+        collisions += obstacles.filter((obstacle) => overlaps(box, obstacle, 3 / zoom)).length;
+        collisions += [...reserved, ...boxes].filter((other) =>
+          overlaps(box, other, 4 / zoom),
+        ).length;
+        boxes.push(box);
+      }
+      if (collisions < best) {
+        chosen = screenOffset / zoom;
+        best = collisions;
+      }
+      if (!collisions) break;
     }
-    reserved.push(chipBounds(guide, rail, zoom));
-    return { ...guide, displayAt: rail };
-  });
+    for (const guide of pair) {
+      let rail = guide.at + chosen;
+      // Short opposing gaps can overlap even on an empty common rail.
+      for (const extra of [0, 22, -22, 44, -44, 66, -66]) {
+        const candidate = guide.at + chosen + extra / zoom;
+        const box = chipBounds(guide, candidate, zoom);
+        if (
+          reserved.some((other) => overlaps(box, other, 4 / zoom)) ||
+          obstacles.some((obstacle) => overlaps(box, obstacle, 3 / zoom))
+        )
+          continue;
+        rail = candidate;
+        break;
+      }
+      reserved.push(chipBounds(guide, rail, zoom));
+      placed.set(guide, { ...guide, displayAt: rail });
+    }
+  }
+  return guides.map((guide) => placed.get(guide)!);
 }
 function centerNeighbors(
   context: MoveContext,
@@ -560,11 +648,18 @@ export function computeMoveGuides(
     }
   }
   const b = translate(original, delta),
+    segments = context.index.nearby(b).filter((entry) => entry.segmentAxis !== undefined),
     distances: DistanceGuide[] = [];
   for (const axis of ['x', 'y'] as const) {
-    if (context.branches.length && !context.branches.some((branch) => branch.axis === axis))
-      continue;
-    const { before, after } = moveNeighbors(context, b, spacingCandidates, axis, threshold, delta);
+    const { before, after } = distanceNeighbors(
+      context,
+      b,
+      spacingCandidates,
+      segments,
+      axis,
+      threshold,
+      delta,
+    );
     const gaps = [
       before ? freeGap(before.bounds, b, axis) : undefined,
       after ? freeGap(b, after.bounds, axis) : undefined,
@@ -595,7 +690,13 @@ export function computeMoveGuides(
         referenceKind: after.referenceKind,
       });
     // Matching a neighboring gap displays that reference too (local distribution).
-    if (!equal && (before || after) && !context.branches.some((branch) => branch.axis === axis)) {
+    if (
+      !equal &&
+      (before || after) &&
+      (!before || !after) &&
+      !context.branches.some((branch) => branch.axis === axis) &&
+      !(before ?? after)!.segmentAxis
+    ) {
       const neighbor = (before ?? after)!;
       const adjacent = nearestNeighbors(
         neighbor.bounds,
@@ -665,42 +766,19 @@ export function computeMoveGuides(
         measurement: 'centers',
       });
   }
-  const parallelDistances = centerDistances.filter((g) => parallelAxis(context, g.axis));
-  if (parallelDistances.length && !target)
-    return {
-      delta,
-      alignment,
-      target,
-      distances: placeDistanceChips(
-        context,
-        (detailed ? [...parallelDistances, ...distances] : parallelDistances).slice(
-          0,
-          detailed ? 4 : 2,
-        ),
-        delta,
-        zoom,
-      ),
-    };
-  // One useful axis, at most two measurements; terminal feedback has priority.
-  const preferred =
-    distances.find((d) => d.equal)?.axis ??
-    (distances.filter((d) => d.axis === 'x').length >=
-    distances.filter((d) => d.axis === 'y').length
-      ? 'x'
-      : 'y');
+  // Each axis contributes its own pair. Parallel branch centers replace only
+  // that axis's body gaps, leaving perpendicular line/branch clearances visible.
+  const measurements = (['x', 'y'] as const).flatMap((axis) => {
+    const gaps = distances.filter((guide) => guide.axis === axis),
+      centers = centerDistances.filter((guide) => guide.axis === axis);
+    if (parallelAxis(context, axis) && centers.length)
+      return detailed ? [...centers, ...gaps] : centers;
+    return detailed ? [...gaps, ...centers] : gaps;
+  });
   return {
     delta,
     alignment,
     target,
-    distances: target
-      ? []
-      : placeDistanceChips(
-          context,
-          detailed
-            ? [...centerDistances, ...distances].slice(0, 4)
-            : distances.filter((d) => d.axis === preferred).slice(0, 2),
-          delta,
-          zoom,
-        ),
+    distances: target ? [] : placeDistanceChips(context, measurements, delta, zoom),
   };
 }

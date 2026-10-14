@@ -31,7 +31,7 @@ Tauri crea gli archivi `.app.tar.gz` e le firme `.sig`. Il job di pubblicazione 
 
 ## Comportamento dell’app
 
-Il controllo avviene all’apertura, ogni ora online e quando ritorna la connessione. È disponibile anche **DrawCircuit → Controlla aggiornamenti…**. Una versione disponibile viene proposta con **Aggiorna** e **Più tardi**, senza installazioni automatiche. Il pulsante Aggiorna apre una conferma nativa **Salva e aggiorna**.
+Il controllo avviene all’apertura, ogni ora online e quando ritorna la connessione. È disponibile anche **DrawCircuit → Controlla aggiornamenti…**. Una versione disponibile viene proposta in una finestra compatta con **Aggiorna** e **Più tardi**, senza installazioni automatiche. Il clic su **Aggiorna** conferma l’installazione.
 
 Dopo la conferma, l’app impedisce nuove modifiche e la chiusura, salva il circuito e attende la scrittura atomica di tutto il workspace, inclusi blocchi e preferenze. Scarica e verifica il pacchetto, attende nuovamente eventuali scritture pendenti, installa e riavvia. Una gesture o un’etichetta ancora in modifica richiedono di concludere l’operazione prima di procedere. Errori di salvataggio, download, firma o installazione lasciano l’app aperta con il lavoro disponibile e consentono di riprovare. Se fallisce solo il riavvio, **Riavvia** non reinstalla il pacchetto.
 
@@ -39,7 +39,7 @@ Le app `1.0.0` precedenti all’introduzione dell’updater richiedono una prima
 
 ## PWA e offline
 
-Scope, URL di avvio, icone, cache di font e asset e worker su richiesta rimangono invariati. Il numero di versione inserito nell’HTML cambia la revisione precache anche per release senza cambiamenti agli asset. Il worker in attesa si attiva solo con **Aggiorna**, dopo il salvataggio e fuori dalle gesture; **Più tardi** lascia aperta la versione corrente. Nessun aggiornamento cancella LocalStorage, librerie personali o dati di recupero.
+Scope, URL di avvio, cache di font e asset e worker su richiesta mantengono il comportamento esistente. Le icone del nuovo logo usano URL distinti per aggiornare anche le installazioni precedenti. Il numero di versione inserito nell’HTML cambia la revisione precache anche per release senza cambiamenti agli asset. Il worker in attesa si attiva solo con **Aggiorna**, dopo il salvataggio e fuori dalle gesture; **Più tardi** lascia aperta la versione corrente. Nessun aggiornamento cancella LocalStorage, librerie personali o dati di recupero.
 
 ## Verifica prima della pubblicazione
 

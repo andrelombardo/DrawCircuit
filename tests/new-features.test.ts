@@ -479,13 +479,15 @@ describe('pure SVG and PWA contracts', () => {
     expect(m).toMatchObject({
       name: 'DrawCircuit',
       display: 'standalone',
+      theme_color: '#2463e8',
       start_url: './',
       scope: './',
     });
+    expect(m && typeof m === 'object' && m.display_override).toBeUndefined();
     expect(m && typeof m === 'object' && m.icons?.map((icon) => icon.src)).toEqual([
-      'icons/xnor-large-192.png',
-      'icons/xnor-large-512.png',
-      'icons/maskable-xnor-large-512.png',
+      'icons/drawcircuit-blue-192.png',
+      'icons/drawcircuit-blue-512.png',
+      'icons/maskable-drawcircuit-blue-512.png',
     ]);
     expect(pwaOptions.registerType).toBe('prompt');
     expect(pwaOptions.workbox?.skipWaiting).toBe(false);

@@ -1,10 +1,10 @@
 import { useEffect, useSyncExternalStore } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import { confirm } from '@tauri-apps/plugin-dialog';
 import { check } from '@tauri-apps/plugin-updater';
 import { saveDocumentNow, useEditorStore } from '../store/editorStore';
 import { DesktopUpdateController } from './updateController';
-import './updater.css';
+import { UpdateDialog } from '../components/UpdateDialog';
+import appIcon from '../../src-tauri/icons/icon.png';
 
 const stopEditing = (event: KeyboardEvent) => {
   event.preventDefault();
@@ -13,16 +13,8 @@ const stopEditing = (event: KeyboardEvent) => {
 
 const controller = new DesktopUpdateController({
   check: () => check({ timeout: 15000 }),
-  confirm: (version) =>
-    confirm(
-      `Installare DrawCircuit ${version}? Il circuito, i blocchi personali e le preferenze saranno salvati. L’app si riavvierà al termine.`,
-      {
-        title: 'Aggiornamento DrawCircuit',
-        kind: 'info',
-        okLabel: 'Salva e aggiorna',
-        cancelLabel: 'Più tardi',
-      },
-    ),
+  // The update dialog's explicit action is the installation confirmation.
+  confirm: async () => true,
   assertReady: () => {
     if (useEditorStore.getState().gestureStart || document.querySelector('.inline-editor'))
       throw new Error('Concludi la modifica sul foglio prima di aggiornare');
@@ -67,37 +59,43 @@ export function DesktopUpdater() {
   if (!visible) return null;
   const labels = {
     saving: 'Salvataggio del lavoro…',
-    downloading: `Download aggiornamento${state.progress === undefined ? '' : `: ${state.progress}%`}…`,
+    downloading: 'Download dell’aggiornamento…',
     installing: 'Installazione aggiornamento…',
     restarting: 'Riavvio di DrawCircuit…',
     checking: 'Controllo aggiornamenti…',
     confirming: 'In attesa di conferma…',
   };
+  const canApply = ['available', 'error', 'installed'].includes(state.phase);
   return (
-    <div className={busy ? 'desktop-update-overlay' : undefined}>
-      <aside className="pwa-notice desktop-update-notice" role="status" aria-live="polite">
-        <span>
-          {state.message ??
-            (state.phase in labels
-              ? labels[state.phase as keyof typeof labels]
-              : `È disponibile DrawCircuit ${state.version}.`)}
-        </span>
-        {['available', 'error', 'installed'].includes(state.phase) && (
-          <button onClick={() => void controller.apply()}>
-            {state.phase === 'installed'
-              ? 'Riavvia'
-              : state.phase === 'error'
-                ? 'Riprova'
-                : 'Aggiorna'}
-          </button>
-        )}
-        {!busy &&
-          state.phase !== 'confirming' &&
-          state.phase !== 'checking' &&
-          state.phase !== 'installed' && (
-            <button onClick={() => controller.dismiss()}>Più tardi</button>
-          )}
-      </aside>
-    </div>
+    <UpdateDialog
+      icon={appIcon}
+      title={
+        state.phase in labels
+          ? labels[state.phase as keyof typeof labels]
+          : state.phase === 'installed'
+            ? 'Aggiornamento installato'
+            : state.phase === 'error'
+              ? 'Aggiornamento non riuscito'
+              : state.version
+                ? 'Aggiornamento disponibile'
+                : 'Controllo aggiornamenti'
+      }
+      message={
+        state.message ??
+        (state.phase === 'checking'
+          ? 'Cerco una nuova versione di DrawCircuit.'
+          : 'Il lavoro sarà salvato e l’app si riavvierà.')
+      }
+      version={state.version}
+      busy={busy || state.phase === 'confirming' || state.phase === 'checking'}
+      dismissible={state.phase !== 'installed'}
+      closeLabel={state.phase === 'idle' ? 'Chiudi' : 'Più tardi'}
+      progress={state.phase === 'downloading' ? state.progress : undefined}
+      actionLabel={
+        state.phase === 'installed' ? 'Riavvia' : state.phase === 'error' ? 'Riprova' : 'Aggiorna'
+      }
+      onAction={canApply ? () => void controller.apply() : undefined}
+      onClose={() => controller.dismiss()}
+    />
   );
 }

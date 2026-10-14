@@ -1,11 +1,9 @@
 # Official DrawCircuit logo
 
-`drawcircuit-logo.svg` is the single editable master: a faithful vector reconstruction of the supplied downward XNOR, with two top inputs, the double XOR input curve, an OR body, the output negation bubble and a downward output. Its strokes are black, with round caps and joins, and its background and bubble interior are transparent.
+`drawcircuit-logo.svg` is the single editable master: a vector reconstruction of the supplied blue symbol, with its rounded corners and connected diagonal silhouette. The solid blue fill (`#0062fd`) removes the reference image's raster noise. The background is transparent and the 768×448 viewBox preserves the original proportions.
 
-The 192×192 master viewBox centres the symmetry axis at x=96. Its visible geometry spans approximately x=38–154 and y=18–183. The short lower output is visually lighter than the gate body; the placement allows slightly more space above than below to balance that weight. The master and brand PNG remain transparent, with no shadow or badge. Installation artwork has its own compact framing described below.
+Run `node scripts/create-pwa-icons.mjs` to regenerate the transparent 2048px brand PNGs, browser/PWA artwork and macOS PNG/ICNS icons. Installation icons centre the mark on an opaque white square, covering approximately 78% of its width. The maskable artwork stays inside the central safe circle. Vector favicons remain blue on a transparent background.
 
-Run `node scripts/create-pwa-icons.mjs` to regenerate the transparent brand PNGs and the installation artwork. App icons use an opaque white background, shorter input/output leads and a larger gate body with 7-unit strokes (9 at 16–24 px, 8 at 32 px). The main 192/512 px icon occupies approximately 77% of the square's width and 88% of its height. The maskable version keeps every stroke inside the standard central safe circle, also on white. The SVG favicon stays transparent: black strokes in light browser themes and white strokes under `prefers-color-scheme: dark`.
+The empty sheet uses the master SVG as a CSS mask, coloured light grey (`#c5ccd6`) at the same size and position as the former resistor. The mark disappears when the document contains any object and remains outside the circuit's exported artwork.
 
-The README uses the master SVG. The browser title and manifest names remain `DrawCircuit`. The editor has no branding header, logo or app name.
-
-The manifest uses `xnor-large-192.png`, `xnor-large-512.png` and `maskable-xnor-large-512.png`; Apple uses `apple-touch-icon-large.png`. Distinct URLs expose the larger artwork to installations as well as new ones. A browser or operating system may still defer refreshing an already installed desktop icon.
+The manifest uses `drawcircuit-blue-192.png`, `drawcircuit-blue-512.png` and `maskable-drawcircuit-blue-512.png`; Apple uses `apple-touch-icon-blue.png`. Distinct URLs expose the new artwork to existing installations as well as new ones. The README uses the same master SVG.

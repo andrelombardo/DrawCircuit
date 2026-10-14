@@ -1,10 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" fill="none">
-  <title>DrawCircuit — XNOR</title>
-  <g transform="translate(24 0)" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M32 20V63 M112 20V63" />
-    <path d="M16 41C52 62 92 62 128 41" />
-    <path d="M16 53C52 74 92 74 128 53 C126 89 104 124 72 148 C40 124 18 89 16 53Z" />
-    <circle cx="72" cy="156" r="8" />
-    <path d="M72 164V181" />
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="448" viewBox="0 0 768 448">
+  <title>DrawCircuit</title>
+  <path fill="#0062fd" d="M218 18C238-2 272 14 272 43V196C272 219 298 230 315 213L515 20C534 0 568 14 568 43V171C568 184 578 194 593 194H717C748 194 766 220 744 242L539 430C520 449 486 438 486 408V257C486 233 463 224 446 240L246 428C227 447 196 434 196 405V278C196 264 186 253 171 253H48C16 253 2 228 23 207Z" />
 </svg>

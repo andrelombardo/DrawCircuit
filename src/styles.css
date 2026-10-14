@@ -44,7 +44,7 @@ html[data-desktop] {
 }
 html[data-desktop='macos'] {
   --desktop-titlebar-height: 52px;
-  --desktop-sidebar-left: 84px;
+  --desktop-sidebar-left: 88px;
 }
 html[data-desktop='macos'][data-desktop-fullscreen='true'] {
   --desktop-sidebar-left: 14px;
@@ -65,7 +65,7 @@ html[data-desktop='macos'][data-desktop-fullscreen='true'] {
 .desktop-sidebar-control,
 .desktop-inspector-control {
   position: absolute;
-  top: calc((var(--desktop-titlebar-height) - var(--desktop-control-size)) / 2);
+  top: calc((var(--desktop-header-height) - var(--desktop-control-size)) / 2);
   pointer-events: auto;
 }
 .desktop-sidebar-control {
@@ -92,29 +92,20 @@ html[data-desktop='macos'][data-desktop-fullscreen='true'] {
 html[data-desktop] .inspector-header {
   height: var(--desktop-header-height);
   padding-right: 58px;
-  align-items: flex-start;
-}
-html[data-desktop] .inspector-header h2,
-html[data-desktop] .palette-heading > span:first-child {
-  display: flex;
   align-items: center;
-  height: var(--desktop-titlebar-height);
-  line-height: 16px;
 }
 html[data-desktop] .inspector-header h2 {
-  transform: translateY(1px);
+  line-height: 20px;
 }
 html[data-desktop] .component-sidebar .palette {
   padding-top: 0;
 }
 html[data-desktop] .palette-heading {
-  height: var(--desktop-header-height);
-  min-height: var(--desktop-header-height);
+  min-height: calc(var(--desktop-header-height) + 32px);
   flex-shrink: 0;
   margin-bottom: 0;
-  align-items: flex-start;
-  padding-left: calc(var(--desktop-sidebar-left) + var(--desktop-control-size) + 8px);
-  padding-right: 6px;
+  align-items: center;
+  padding: calc(var(--desktop-header-height) - 8px) 18px 10px;
 }
 html[data-desktop] .palette-heading > span:first-child {
   min-width: 0;
@@ -636,10 +627,10 @@ svg {
   width: 86px;
   height: 54px;
   margin: 0 auto 15px;
-}
-.empty-circuit svg {
-  width: 100%;
-  height: 100%;
+  background-color: #c5ccd6;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
 }
 .empty-sheet h2 {
   font-size: 16px;
@@ -1337,7 +1328,7 @@ kbd {
 /* Temporary selection and drag feedback, never part of circuit data. */
 .drawing-surface.tool-select .circuit-object,
 .drawing-surface.tool-select [data-label] {
-  cursor: grab;
+  cursor: default;
 }
 .drawing-surface.tool-select [data-terminal],
 .drawing-surface [data-handle] {
@@ -2001,7 +1992,7 @@ summary:focus-visible {
   min-height: 30px;
 }
 .palette-heading > span:first-child {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.1px;
 }
@@ -2770,7 +2761,9 @@ summary:focus-visible {
   margin: 0;
 }
 .inspector-header h2 {
+  font-size: 15px;
   font-weight: 600;
+  letter-spacing: -0.1px;
 }
 .inspector-scroll {
   flex: 1;
@@ -3121,15 +3114,19 @@ summary:focus-visible {
 .inspector-alignment-buttons {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 4px;
-  margin-top: 4px;
+  gap: 6px;
+  margin-top: 6px;
 }
 .inspector-alignment-buttons .inspector-property-action {
   flex-direction: column;
   justify-content: center;
-  height: 40px;
-  gap: 3px;
-  padding: 4px;
+  align-items: center;
+  min-height: 52px;
+  height: auto;
+  gap: 5px;
+  padding: 8px 4px;
+  line-height: 1.2;
+  text-align: center;
 }
 .inspector-axis-actions {
   display: grid;

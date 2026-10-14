@@ -25,6 +25,7 @@ import {
   electricalGeometry,
 } from '../src/annotations/electrical';
 import { distance, projectOnSegment } from '../src/utils/geometry';
+import { parallelSources } from './helpers/parallelSources';
 let clipboard = '';
 const r = (id: string, x: number, y = 0) => ({ ...createComponent('resistor', { x, y }), id });
 const documentWith = (objects: CircuitObject[]): CircuitDocument => ({
@@ -174,6 +175,49 @@ describe('polished selection and independent label interaction', () => {
   });
 });
 describe('Golden spacing and group workflow in the canvas', () => {
+  it('shows lateral centers and vertical rail gaps on press without moving or adding history', () => {
+    const d = parallelSources([0, 138, 278]);
+    useEditorStore.setState({ document: d, snapEnabled: true });
+    const before = serializeDocument(d);
+    render(<Canvas />);
+    fireEvent.pointerDown(body('source-2'), client(138, 0));
+    const guides = [...canvas().querySelectorAll('[data-distance]')];
+    expect(
+      guides.map((g) => [g.getAttribute('data-axis'), g.getAttribute('data-distance')]),
+    ).toEqual([
+      ['x', '138'],
+      ['x', '140'],
+      ['y', '80'],
+      ['y', '80'],
+    ]);
+    expect(serializeDocument(useEditorStore.getState().document)).toBe(before);
+    fireEvent.pointerUp(canvas(), client(138, 0));
+    expect(canvas().querySelectorAll('[data-distance]')).toHaveLength(0);
+    expect(useEditorStore.getState().past).toHaveLength(0);
+
+    fireEvent.pointerDown(body('source-2'), client(138, 0));
+    fireEvent.pointerMove(canvas(), client(138, 20));
+    expect(
+      [...canvas().querySelectorAll('[data-axis="y"][data-distance]')].map((g) =>
+        g.getAttribute('data-distance'),
+      ),
+    ).toEqual(['100', '60']);
+    fireEvent.pointerCancel(canvas(), client(138, 20));
+    expect(canvas().querySelectorAll('[data-distance]')).toHaveLength(0);
+    expect(serializeDocument(useEditorStore.getState().document)).toBe(before);
+    expect(useEditorStore.getState().past).toHaveLength(0);
+  });
+  it('hides immediate measurements when Alt or disabled snapping suppresses assistance', () => {
+    render(<Canvas />);
+    fireEvent.pointerDown(body('R3'), client(200, 0, { altKey: true }));
+    expect(canvas().querySelectorAll('[data-distance]')).toHaveLength(0);
+    fireEvent.pointerUp(canvas(), client(200, 0));
+    act(() => useEditorStore.setState({ snapEnabled: false }));
+    fireEvent.pointerDown(body('R3'), client(200, 0));
+    expect(canvas().querySelectorAll('[data-distance]')).toHaveLength(0);
+    fireEvent.pointerUp(canvas(), client(200, 0));
+    act(() => useEditorStore.setState({ snapEnabled: true }));
+  });
   for (const vertical of [false, true])
     it(`shows and clears ${vertical ? 'vertical' : 'horizontal'} guides, snaps and undoes in one gesture`, () => {
       const d = row();
