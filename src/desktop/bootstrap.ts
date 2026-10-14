@@ -4,6 +4,7 @@ import { getCurrentWindow } from '@tauri-apps/api/window';
 import { readText, writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { message } from '@tauri-apps/plugin-dialog';
 import { DesktopStorage } from './storage';
+import { trackWindowLayout } from './windowLayout';
 
 export async function bootstrapDesktop() {
   document.documentElement.dataset.desktop = /Mac/.test(navigator.platform) ? 'macos' : 'other';
@@ -26,6 +27,8 @@ export async function bootstrapDesktop() {
   });
   const { useEditorStore, saveDocumentNow } = await import('../store/editorStore');
   const windowHandle = getCurrentWindow();
+  const stopWindowLayout = await trackWindowLayout(windowHandle);
+  window.addEventListener('pagehide', stopWindowLayout, { once: true });
   let closing = false;
   const close = async () => {
     if (closing) return;

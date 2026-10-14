@@ -43,8 +43,11 @@ html[data-desktop] {
   --desktop-sidebar-left: 14px;
 }
 html[data-desktop='macos'] {
-  --desktop-titlebar-height: 44px;
+  --desktop-titlebar-height: 32px;
   --desktop-sidebar-left: 84px;
+}
+html[data-desktop='macos'][data-desktop-fullscreen='true'] {
+  --desktop-sidebar-left: 14px;
 }
 .desktop-frame {
   position: fixed;
@@ -89,7 +92,17 @@ html[data-desktop='macos'] {
 html[data-desktop] .inspector-header {
   height: var(--desktop-header-height);
   padding-right: 58px;
-  padding-bottom: calc(var(--desktop-header-height) - var(--desktop-titlebar-height));
+  align-items: flex-start;
+}
+html[data-desktop] .inspector-header h2,
+html[data-desktop] .palette-heading > span:first-child {
+  display: flex;
+  align-items: center;
+  height: var(--desktop-titlebar-height);
+  line-height: 16px;
+}
+html[data-desktop] .inspector-header h2 {
+  transform: translateY(1px);
 }
 html[data-desktop] .component-sidebar .palette {
   padding-top: 0;
@@ -99,9 +112,9 @@ html[data-desktop] .palette-heading {
   min-height: var(--desktop-header-height);
   flex-shrink: 0;
   margin-bottom: 0;
+  align-items: flex-start;
   padding-left: calc(var(--desktop-sidebar-left) + var(--desktop-control-size) + 8px);
   padding-right: 6px;
-  padding-bottom: calc(var(--desktop-header-height) - var(--desktop-titlebar-height));
 }
 html[data-desktop] .palette-heading > span:first-child {
   min-width: 0;

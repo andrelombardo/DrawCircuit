@@ -11,10 +11,6 @@ struct ExitAllowed(AtomicBool);
 fn show_editor(window: &tauri::WebviewWindow) -> tauri::Result<()> {
     window.show()?;
     window.set_focus()?;
-    // AppKit can reset the controls when showing a hidden window. Setting the
-    // existing title lets Tao reapply the configured traffic-light inset.
-    #[cfg(target_os = "macos")]
-    window.set_title(&window.title()?)?;
     Ok(())
 }
 
