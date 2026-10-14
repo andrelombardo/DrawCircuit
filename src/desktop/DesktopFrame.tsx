@@ -1,4 +1,5 @@
 import { SidebarToggle } from '../components/toolbar/SidebarToggle';
+import './DesktopFrame.css';
 
 export function DesktopFrame({
   sidebarVisible,

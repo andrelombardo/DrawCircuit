@@ -1,0 +1,4 @@
+/* In windowed macOS, follow the measured traffic-light axis. */
+html[data-desktop='macos']:not([data-desktop-fullscreen='true']) .desktop-sidebar-control {
+  top: calc((var(--desktop-titlebar-height) - var(--desktop-control-size)) / 2);
+}
