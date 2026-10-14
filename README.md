@@ -77,7 +77,7 @@ Open [http://127.0.0.1:5173](http://127.0.0.1:5173). To use the hosted editor, o
 | `npm run lint`         | Check the source with ESLint.                                |
 | `npm run format:check` | Check formatting with Prettier.                              |
 
-Pushes to `main` run lint, tests, and the production build before GitHub Pages deployment. See the [deployment workflow](.github/workflows/deploy-pages.yml).
+Pushes to `main` run the relevant checks and publish only the affected products: macOS/Tauri changes update the app, web/PWA changes update Pages, and shared editor changes update both. Each product has an independent version. The desktop updater offers signed updates and saves the workspace before installing after confirmation. See [release configuration](docs/releases.md) and the [deployment workflow](.github/workflows/deploy-pages.yml).
 
 ## Architecture
 

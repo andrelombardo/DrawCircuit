@@ -1,4 +1,3 @@
-// @ts-expect-error The app TS target intentionally excludes Node ambient types.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { Resvg } from '@resvg/resvg-js';

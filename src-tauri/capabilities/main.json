@@ -10,6 +10,8 @@
     "dialog:allow-open",
     "dialog:allow-save",
     "dialog:allow-message",
+    "dialog:allow-confirm",
+    "updater:default",
     "fs:allow-read-text-file",
     "fs:allow-write-file",
     "clipboard-manager:allow-write-text",

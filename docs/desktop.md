@@ -46,9 +46,14 @@ npm run desktop:dev
 Per creare l’app e il DMG per l’architettura del Mac corrente:
 
 ```sh
-npm run desktop:package
+npm run desktop:build -- --config '{"bundle":{"createUpdaterArtifacts":false}}'
+node scripts/package-macos.mjs
 ```
 
 I risultati sono in `src-tauri/target/release/bundle/macos/` e `src-tauri/target/release/bundle/dmg/`. Il DMG viene creato con `hdiutil`, senza controllare Finder o modificare impostazioni del sistema. Tutti i file generati sono esclusi da Git. `dist-desktop/` non include il service worker della PWA; `npm run build` continua a produrre la versione web in `dist/`.
 
 L’app autorizza il filesystem per i file scelti nelle finestre native. Non abilita comandi di shell, contenuti remoti o un server esterno.
+
+## Aggiornamenti
+
+Le nuove release macOS sono disponibili nei [download GitHub](https://github.com/andrelombardo/drawcircuit/releases/latest). L’app propone aggiornamenti firmati e permette il controllo manuale dal menu DrawCircuit. Dopo **Salva e aggiorna** salva tutto il workspace, verifica il pacchetto, installa e riavvia; un errore di salvataggio impedisce l’installazione. Le versioni precedenti senza updater richiedono la prima installazione manuale del nuovo DMG. Vedi [pubblicazioni e firma](releases.md) per versioni indipendenti, Secrets e build locali firmate.

@@ -30,6 +30,12 @@ fn finish_exit(app: tauri::AppHandle, allowed: tauri::State<ExitAllowed>) {
     app.exit(0);
 }
 
+#[tauri::command]
+fn restart_after_update(app: tauri::AppHandle, allowed: tauri::State<ExitAllowed>) {
+    allowed.0.store(true, Ordering::SeqCst);
+    app.restart();
+}
+
 fn edit_menu(handle: &tauri::AppHandle, native: bool) -> tauri::Result<Submenu<tauri::Wry>> {
     if native {
         return Submenu::with_id_and_items(
@@ -89,10 +95,12 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
             workspace::load_workspace,
             workspace::save_workspace,
             finish_exit,
+            restart_after_update,
             frontend_ready,
             native_file_dialog,
             window_chrome::window_header_height
@@ -110,6 +118,7 @@ fn main() {
                 true,
                 &[
                     &PredefinedMenuItem::about(handle, Some("Informazioni su DrawCircuit"), None)?,
+                    &item("check_updates", "Controlla aggiornamenti…", None::<&str>)?,
                     &PredefinedMenuItem::separator(handle)?,
                     &PredefinedMenuItem::hide(handle, Some("Nascondi DrawCircuit"))?,
                     &PredefinedMenuItem::hide_others(handle, Some("Nascondi altre"))?,

@@ -5,6 +5,7 @@ import { readText, writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { message } from '@tauri-apps/plugin-dialog';
 import { DesktopStorage } from './storage';
 import { trackWindowLayout } from './windowLayout';
+import { isDesktopUpdateBusy } from './updateController';
 
 export async function bootstrapDesktop() {
   document.documentElement.dataset.desktop = /Mac/.test(navigator.platform) ? 'macos' : 'other';
@@ -45,7 +46,7 @@ export async function bootstrapDesktop() {
   window.addEventListener('pagehide', stopWindowLayout, { once: true });
   let closing = false;
   const close = async () => {
-    if (closing) return;
+    if (closing || isDesktopUpdateBusy()) return;
     closing = true;
     try {
       (document.activeElement as HTMLElement | null)?.blur();
@@ -70,6 +71,11 @@ export async function bootstrapDesktop() {
     void close();
   });
   await listen<string>('desktop-menu', ({ payload }) => {
+    if (isDesktopUpdateBusy()) return;
+    if (payload === 'check_updates') {
+      window.dispatchEvent(new Event('drawcircuit:check-updates'));
+      return;
+    }
     if (payload === 'quit') {
       void close();
       return;
@@ -116,5 +122,14 @@ export async function bootstrapDesktop() {
       .notify('Ripristinata la copia di sicurezza. Il salvataggio originale è stato conservato.');
   return async () => {
     await invoke('frontend_ready');
+    const [{ createRoot }, { createElement }, { DesktopUpdater }] = await Promise.all([
+      import('react-dom/client'),
+      import('react'),
+      import('./DesktopUpdater'),
+    ]);
+    const updates = document.createElement('div');
+    updates.id = 'desktop-update-root';
+    document.body.append(updates);
+    createRoot(updates).render(createElement(DesktopUpdater));
   };
 }

@@ -13,6 +13,11 @@ coverage/
 .vite/
 *.tsbuildinfo
 
+# Updater keys belong outside the checkout. Only the public key is tracked in Tauri config.
+*.key
+*.key.pub
+release-artifacts/
+
 # Local editor and temporary files
 .idea/
 .vscode/

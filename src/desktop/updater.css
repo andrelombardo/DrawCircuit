@@ -1,0 +1,13 @@
+.desktop-update-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgb(255 255 255 / 45%);
+  cursor: wait;
+}
+.desktop-update-notice {
+  z-index: 10001;
+  top: calc(var(--desktop-header-height, 60px) + 12px);
+  bottom: auto;
+  max-width: min(640px, calc(100vw - 32px));
+}

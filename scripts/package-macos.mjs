@@ -5,7 +5,10 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
 if (process.platform !== 'darwin') throw new Error('Il pacchetto macOS richiede un Mac.');
-const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+const { version: configuredVersion } = JSON.parse(
+  readFileSync(new URL('../src-tauri/tauri.conf.json', import.meta.url), 'utf8'),
+);
+const version = process.env.DRAWCIRCUIT_VERSION ?? configuredVersion;
 const app = resolve('src-tauri/target/release/bundle/macos/DrawCircuit.app');
 const output = resolve('src-tauri/target/release/bundle/dmg');
 const staging = await mkdtemp(join(tmpdir(), 'drawcircuit-dmg-'));
