@@ -38,10 +38,12 @@
 /* Desktop controls stay attached to the window while the workspace panels resize. */
 html[data-desktop] {
   --desktop-header-height: 60px;
+  --desktop-titlebar-height: var(--desktop-header-height);
   --desktop-control-size: 32px;
   --desktop-sidebar-left: 14px;
 }
 html[data-desktop='macos'] {
+  --desktop-titlebar-height: 44px;
   --desktop-sidebar-left: 84px;
 }
 .desktop-frame {
@@ -60,7 +62,7 @@ html[data-desktop='macos'] {
 .desktop-sidebar-control,
 .desktop-inspector-control {
   position: absolute;
-  top: calc((var(--desktop-header-height) - var(--desktop-control-size)) / 2);
+  top: calc((var(--desktop-titlebar-height) - var(--desktop-control-size)) / 2);
   pointer-events: auto;
 }
 .desktop-sidebar-control {
@@ -87,6 +89,7 @@ html[data-desktop='macos'] {
 html[data-desktop] .inspector-header {
   height: var(--desktop-header-height);
   padding-right: 58px;
+  padding-bottom: calc(var(--desktop-header-height) - var(--desktop-titlebar-height));
 }
 html[data-desktop] .component-sidebar .palette {
   padding-top: 0;
@@ -98,6 +101,7 @@ html[data-desktop] .palette-heading {
   margin-bottom: 0;
   padding-left: calc(var(--desktop-sidebar-left) + var(--desktop-control-size) + 8px);
   padding-right: 6px;
+  padding-bottom: calc(var(--desktop-header-height) - var(--desktop-titlebar-height));
 }
 html[data-desktop] .palette-heading > span:first-child {
   min-width: 0;

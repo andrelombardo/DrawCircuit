@@ -8,9 +8,23 @@ use tauri::{Emitter, Manager};
 
 struct ExitAllowed(AtomicBool);
 
+fn show_editor(window: &tauri::WebviewWindow) -> tauri::Result<()> {
+    window.show()?;
+    window.set_focus()?;
+    // AppKit can reset the controls when showing a hidden window. Setting the
+    // existing title lets Tao reapply the configured traffic-light inset.
+    #[cfg(target_os = "macos")]
+    window.set_title(&window.title()?)?;
+    Ok(())
+}
+
 #[tauri::command]
-fn frontend_ready(allowed: tauri::State<ExitAllowed>) {
+fn frontend_ready(
+    window: tauri::WebviewWindow,
+    allowed: tauri::State<ExitAllowed>,
+) -> tauri::Result<()> {
     allowed.0.store(false, Ordering::SeqCst);
+    show_editor(&window)
 }
 
 #[tauri::command]
@@ -72,8 +86,7 @@ fn main() {
         .manage(workspace::DiskLock::default())
         .plugin(tauri_plugin_single_instance::init(|app, _, _| {
             if let Some(window) = app.get_webview_window("main") {
-                let _ = window.show();
-                let _ = window.set_focus();
+                let _ = show_editor(&window);
             }
         }))
         .plugin(tauri_plugin_dialog::init())

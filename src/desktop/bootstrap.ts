@@ -99,6 +99,5 @@ export async function bootstrapDesktop() {
       .notify('Ripristinata la copia di sicurezza. Il salvataggio originale è stato conservato.');
   return async () => {
     await invoke('frontend_ready');
-    await windowHandle.show();
   };
 }
