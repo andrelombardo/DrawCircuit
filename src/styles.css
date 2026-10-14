@@ -36,10 +36,18 @@
 }
 
 /* Desktop controls stay attached to the window while the workspace panels resize. */
+html[data-desktop] {
+  --desktop-header-height: 60px;
+  --desktop-control-size: 32px;
+  --desktop-sidebar-left: 14px;
+}
+html[data-desktop='macos'] {
+  --desktop-sidebar-left: 84px;
+}
 .desktop-frame {
   position: fixed;
   inset: 0 0 auto;
-  height: 54px;
+  height: var(--desktop-header-height);
   z-index: var(--layer-menu-backdrop);
   pointer-events: none;
 }
@@ -52,21 +60,18 @@
 .desktop-sidebar-control,
 .desktop-inspector-control {
   position: absolute;
-  top: 14px;
+  top: calc((var(--desktop-header-height) - var(--desktop-control-size)) / 2);
   pointer-events: auto;
 }
 .desktop-sidebar-control {
-  left: 14px;
-}
-html[data-desktop='macos'] .desktop-sidebar-control {
-  left: 88px;
+  left: var(--desktop-sidebar-left);
 }
 .desktop-inspector-control {
   right: 14px;
 }
 .desktop-frame .sidebar-toggle {
-  width: 32px;
-  height: 32px;
+  width: var(--desktop-control-size);
+  height: var(--desktop-control-size);
   border: 0;
   box-shadow: none;
   background: transparent;
@@ -80,15 +85,22 @@ html[data-desktop='macos'] .desktop-sidebar-control {
   transform: none;
 }
 html[data-desktop] .inspector-header {
+  height: var(--desktop-header-height);
   padding-right: 58px;
 }
-html[data-desktop] .palette-heading {
-  padding-left: 58px;
+html[data-desktop] .component-sidebar .palette {
+  padding-top: 0;
 }
-html[data-desktop='macos'] .palette-heading {
-  padding-left: 134px;
+html[data-desktop] .palette-heading {
+  height: var(--desktop-header-height);
+  min-height: var(--desktop-header-height);
+  flex-shrink: 0;
+  margin-bottom: 0;
+  padding-left: calc(var(--desktop-sidebar-left) + var(--desktop-control-size) + 8px);
+  padding-right: 6px;
 }
 html[data-desktop] .palette-heading > span:first-child {
+  min-width: 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

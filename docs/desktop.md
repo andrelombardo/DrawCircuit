@@ -2,6 +2,8 @@
 
 La versione desktop usa Tauri 2 e il WebKit di macOS. Il circuito si apre in una finestra autonoma, senza Brave, estensioni, menu del browser o barra del titolo separata. I semafori di macOS sono reali; i pulsanti Componenti e Proprietà restano nelle stesse posizioni quando i pannelli vengono nascosti. Il trascinamento della finestra è disponibile nelle intestazioni e sul bordo superiore.
 
+Le intestazioni condividono una fascia alta 60 punti. Il pulsante Componenti segue i semafori, precedendo il titolo con un intervallo di 8 punti; Proprietà e il suo pulsante sono centrati sullo stesso asse. Il separatore dell’inspector termina questa fascia. La disposizione segue i controlli laterali di [Xcode](https://developer.apple.com/documentation/xcode/configuring-the-xcode-project-window) e i raggruppamenti descritti nelle [linee guida Apple per le toolbar](https://developer.apple.com/design/human-interface-guidelines/toolbars).
+
 Il modello, gli strumenti, la cronologia e gli esportatori sono condivisi con la versione web. L’app include tutti i file e i font necessari per lavorare offline. Le etichette matematiche usano il layout vettoriale dell’esportatore SVG, per evitare un problema di WebKit con HTML dentro SVG durante zoom e rotazione. Le misurazioni sono riutilizzate durante il trascinamento.
 
 ## Installazione e trasferimento
