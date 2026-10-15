@@ -1,3 +1,5 @@
+import { tmpdir } from 'node:os';
+import { join as joinTempPath } from 'node:path';
 // @vitest-environment jsdom
 import { chooseSelectionCommand, chooseSelectionColor } from './helpers/selectionMenu';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -180,8 +182,11 @@ async function fixture(name: string) {
   const fs = await vi.importActual<{ writeFileSync: (path: string, data: string) => void }>(
     'node:fs',
   );
-  fs.writeFileSync(`/private/tmp/drawcircuit-audit-${name}.json`, serializeDocument(doc));
-  fs.writeFileSync(`/private/tmp/drawcircuit-audit-${name}.tex`, tex);
+  fs.writeFileSync(
+    joinTempPath(tmpdir(), `drawcircuit-audit-${name}.json`),
+    serializeDocument(doc),
+  );
+  fs.writeFileSync(joinTempPath(tmpdir(), `drawcircuit-audit-${name}.tex`), tex);
 }
 function restoreSerialized(raw: string) {
   act(() => useEditorStore.getState().replace(deserializeDocument(raw)));

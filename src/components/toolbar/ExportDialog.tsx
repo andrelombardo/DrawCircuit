@@ -8,7 +8,7 @@ import { exportObsidian, exportStandalone, exportTikz } from '../../tikz/exporte
 import { getExportSelection } from '../../tikz/selection';
 import { download, fileName } from '../../utils/files';
 import { useDialogFocus } from './useDialogFocus';
-import { serializeArchive } from '../../desktop/archive';
+import { serializeArchive } from '../../model/archive';
 import { usePersonalBlocks } from '../../personalBlocks/library';
 export function ExportDialog({ onClose }: { onClose: () => void }) {
   const doc = useEditorStore((s) => s.document),

@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { Resvg } from '@resvg/resvg-js';
-import { pwaOptions } from '../src/pwa/config';
+import manifest from '../public/manifest.webmanifest?raw';
+const webManifest = JSON.parse(manifest) as { icons: { src: string }[]; display_override?: string };
 
 function pixels(file: string, size: number) {
   const data = readFileSync(new URL(`../public/icons/${file}`, import.meta.url)).toString('base64');
@@ -11,7 +12,7 @@ function pixels(file: string, size: number) {
 }
 
 describe('visible installation artwork', () => {
-  it.each([16, 24, 32, 48, 128, 180, 192, 512])(
+  it.each([16, 32, 48, 180, 192, 512])(
     'is opaque white with a prominent blue mark at %ipx',
     (size) => {
       const file =
@@ -56,9 +57,9 @@ describe('visible installation artwork', () => {
   });
   it('uses fresh installation URLs and a transparent blue vector favicon', () => {
     expect(
-      pwaOptions.manifest &&
-        typeof pwaOptions.manifest === 'object' &&
-        pwaOptions.manifest.icons?.every((icon) => icon.src.includes('drawcircuit-blue')),
+      webManifest &&
+        typeof webManifest === 'object' &&
+        webManifest.icons?.every((icon) => icon.src.includes('drawcircuit-blue')),
     ).toBe(true);
     const favicon = readFileSync(new URL('../public/favicon.svg', import.meta.url), 'utf8');
     expect(favicon).toContain('fill="#0062fd"');

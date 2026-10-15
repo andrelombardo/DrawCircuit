@@ -35,84 +35,6 @@
   --border: var(--ui-border);
 }
 
-/* Desktop controls stay attached to the window while the workspace panels resize. */
-html[data-desktop] {
-  --desktop-header-height: 60px;
-  --desktop-titlebar-height: var(--desktop-header-height);
-  --desktop-control-size: 32px;
-  --desktop-sidebar-left: 14px;
-}
-html[data-desktop='macos'] {
-  --desktop-titlebar-height: 52px;
-  --desktop-sidebar-left: 88px;
-}
-html[data-desktop='macos'][data-desktop-fullscreen='true'] {
-  --desktop-sidebar-left: 14px;
-}
-.desktop-frame {
-  position: fixed;
-  inset: 0 0 auto;
-  height: var(--desktop-header-height);
-  z-index: var(--layer-menu-backdrop);
-  pointer-events: none;
-}
-.desktop-drag-region {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 8px;
-  pointer-events: auto;
-}
-.desktop-sidebar-control,
-.desktop-inspector-control {
-  position: absolute;
-  top: calc((var(--desktop-header-height) - var(--desktop-control-size)) / 2);
-  pointer-events: auto;
-}
-.desktop-sidebar-control {
-  left: var(--desktop-sidebar-left);
-}
-.desktop-inspector-control {
-  right: 14px;
-}
-.desktop-frame .sidebar-toggle {
-  width: var(--desktop-control-size);
-  height: var(--desktop-control-size);
-  border: 0;
-  box-shadow: none;
-  background: transparent;
-}
-.desktop-frame .sidebar-toggle:hover {
-  background: var(--ui-hover);
-}
-.app-shell .desktop-inspector-control [data-tooltip]::after {
-  left: auto;
-  right: 0;
-  transform: none;
-}
-html[data-desktop] .inspector-header {
-  height: var(--desktop-header-height);
-  padding-right: 58px;
-  align-items: center;
-}
-html[data-desktop] .inspector-header h2 {
-  line-height: 20px;
-}
-html[data-desktop] .component-sidebar .palette {
-  padding-top: 0;
-}
-html[data-desktop] .palette-heading {
-  min-height: calc(var(--desktop-header-height) + 32px);
-  flex-shrink: 0;
-  margin-bottom: 0;
-  align-items: center;
-  padding: calc(var(--desktop-header-height) - 8px) 18px 10px;
-}
-html[data-desktop] .palette-heading > span:first-child {
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
 .archive-export {
   display: flex;
   align-items: center;
@@ -1579,23 +1501,6 @@ kbd {
   right: 0;
   min-width: 235px;
 }
-.pwa-notice {
-  position: fixed;
-  bottom: 45px;
-  right: 16px;
-  z-index: var(--layer-notice);
-  padding: var(--ui-space-3);
-  border: 1px solid var(--ui-border);
-  border-radius: var(--ui-radius-md);
-  background: var(--ui-surface);
-  box-shadow: var(--ui-shadow-floating);
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--ui-space-2);
-  align-items: center;
-  font-size: 12px;
-  max-width: calc(100vw - 32px);
-}
 
 .component-card svg {
   height: 28px;
@@ -1672,15 +1577,6 @@ summary:focus-visible {
 .zoom-controls [data-tooltip]::after {
   top: auto;
   bottom: calc(100% + 8px);
-}
-.pwa-notice button {
-  min-height: 32px;
-  padding: 0 8px;
-  border-radius: var(--ui-radius-sm);
-  color: var(--ui-accent);
-}
-.pwa-notice button:hover {
-  background: var(--ui-hover);
 }
 @media (max-width: 950px) {
   .main-tools .icon-button {
@@ -2436,12 +2332,8 @@ summary:focus-visible {
 .modal-backdrop {
   z-index: var(--layer-modal);
 }
-.toast,
-.pwa-notice {
+.toast {
   z-index: var(--layer-notice);
-}
-.pwa-notice {
-  bottom: 68px;
 }
 .persistence-error {
   position: absolute;

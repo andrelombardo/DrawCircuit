@@ -1,18 +1,4 @@
-import { isDesktop } from '../desktop/environment';
-export function download(
-  contents: string | Blob,
-  filename: string,
-  mime: string,
-): void | Promise<void> {
-  if (isDesktop()) {
-    return import('../desktop/files')
-      .then(({ saveNativeFile }) => saveNativeFile(contents, filename))
-      .catch((error) => {
-        window.dispatchEvent(
-          new CustomEvent('drawcircuit:desktop-error', { detail: String(error) }),
-        );
-      });
-  }
+export function download(contents: string | Blob, filename: string, mime: string): void {
   const blob = contents instanceof Blob ? contents : new Blob([contents], { type: mime }),
     url = URL.createObjectURL(blob),
     a = document.createElement('a');

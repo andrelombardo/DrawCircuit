@@ -1,3 +1,5 @@
+import { tmpdir } from 'node:os';
+import { join as joinTempPath } from 'node:path';
 // @vitest-environment jsdom
 import { choosePropertyOption } from './helpers/propertyMenu';
 import { chooseDrawingTool } from './helpers/drawingMenu';
@@ -509,11 +511,11 @@ describe('audit UX/input evidence', () => {
       'node:fs',
     );
     fs.writeFileSync(
-      '/private/tmp/drawcircuit-audit-stress-dom.json',
+      joinTempPath(tmpdir(), 'drawcircuit-audit-stress-dom.json'),
       JSON.stringify(evidence, null, 2),
     );
     fs.writeFileSync(
-      '/private/tmp/drawcircuit-audit-stress-100-200-100.json',
+      joinTempPath(tmpdir(), 'drawcircuit-audit-stress-100-200-100.json'),
       serializeDocument(stressDocument()),
     );
   });

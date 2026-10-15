@@ -34,7 +34,8 @@ import { exportObsidian, exportTikz } from '../src/tikz/exporter';
 import { selectionDocument } from '../src/tikz/selection';
 import { exportSVG } from '../src/svg/exporter';
 import { saveDocumentNow, useEditorStore } from '../src/store/editorStore';
-import { pwaOptions } from '../src/pwa/config';
+import manifest from '../public/manifest.webmanifest?raw';
+const webManifest = JSON.parse(manifest) as { icons: { src: string }[]; display_override?: string };
 const documentFor = (objects: CircuitObject[]): CircuitDocument => ({
   ...emptyDocument(),
   objects,
@@ -474,8 +475,8 @@ describe('pure SVG and PWA contracts', () => {
     expect(selected.length).toBeLessThan(svg.length);
     expect(exportSVG(emptyDocument())).toContain('viewBox="-12 -12 24 24"');
   });
-  it('uses relative manifest URLs, standard icons, static-only precache and explicit activation', () => {
-    const m = pwaOptions.manifest;
+  it('uses relative manifest URLs and standard standalone installation icons', () => {
+    const m = webManifest;
     expect(m).toMatchObject({
       name: 'DrawCircuit',
       display: 'standalone',
@@ -489,10 +490,6 @@ describe('pure SVG and PWA contracts', () => {
       'icons/drawcircuit-blue-512.png',
       'icons/maskable-drawcircuit-blue-512.png',
     ]);
-    expect(pwaOptions.registerType).toBe('prompt');
-    expect(pwaOptions.workbox?.skipWaiting).toBe(false);
-    expect(pwaOptions.workbox?.runtimeCaching).toBeUndefined();
-    expect(pwaOptions.workbox?.globPatterns?.[0]).toContain('woff2');
   });
   it('flushes committed work before update, rejects active gestures and handles storage failure', () => {
     const setItem = vi.fn();

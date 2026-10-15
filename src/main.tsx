@@ -6,20 +6,19 @@ import '@fontsource/inter/latin-600.css';
 import '@fontsource/inter/latin-700.css';
 import 'katex/dist/katex.min.css';
 import './styles.css';
-import { isDesktop } from './desktop/environment';
+import { retireLegacyOffline } from './pwa/retireLegacyOffline';
 
 async function start() {
-  const ready = isDesktop() ? await (await import('./desktop/bootstrap')).bootstrapDesktop() : null;
+  if (import.meta.env.PROD)
+    void retireLegacyOffline(new URL(import.meta.env.BASE_URL, document.baseURI).href);
   const { default: App } = await import('./App');
   ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
       <App />
     </React.StrictMode>,
   );
-  await ready?.();
 }
-void start().catch(async (error) => {
+void start().catch((error) => {
   const root = document.getElementById('root')!;
   root.textContent = `Impossibile aprire DrawCircuit. ${String(error)}`;
-  if (isDesktop()) await (await import('@tauri-apps/api/window')).getCurrentWindow().show();
 });

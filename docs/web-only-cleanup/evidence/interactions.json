@@ -1,0 +1,5 @@
+{
+  "rotated": "translate(-120 0) rotate(45)",
+  "undone": "translate(-120 0) rotate(0)",
+  "redone": "translate(-120 0) rotate(45)"
+}

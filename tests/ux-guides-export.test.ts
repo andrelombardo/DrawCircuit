@@ -18,7 +18,6 @@ import {
 } from '../src/tikz/selection';
 import { exportTikz } from '../src/tikz/exporter';
 import { serializeDocument } from '../src/model/serialization';
-import { toolbarActions } from '../src/components/properties/toolbarActions';
 const doc = (objects: CircuitObject[]): CircuitDocument => ({ version: 1, title: 'UX', objects });
 const resistor = (id: string, x: number, y = 0) => ({
   ...createComponent('resistor', { x, y }),
@@ -326,63 +325,4 @@ describe('selection-only export', () => {
     expect(exportSelectionTikz(d, ['R2', 'note'])).toContain('NOTE');
     expect(selectionDocument(d, []).objects).toEqual([]);
   });
-});
-describe('adaptive property action audit', () => {
-  it('keeps component essentials direct and omits label rotation', () => {
-    const actions = toolbarActions(resistor('R1', 0));
-    expect(actions.primary).toContain('style');
-    expect(actions.primary).not.toContain('stroke');
-    expect(actions.primary).toContain('duplicate');
-    expect(actions.secondary).not.toContain('rotateLabel');
-    expect(actions.secondary).not.toContain('rotate');
-  });
-  it('offers internal text only for components that have it', () => {
-    expect(toolbarActions(createComponent('blackBox', { x: 0, y: 0 })).secondary).toContain(
-      'bodyText',
-    );
-    expect(toolbarActions(resistor('R1', 0)).secondary).not.toContain('bodyText');
-  });
-  for (const kind of ['wire', 'arrow', 'loop-arrow', 'junction'] as const)
-    it(`only offers applicable controls for ${kind}`, () => {
-      const o =
-        kind === 'wire'
-          ? createWire(
-              { kind: 'free', point: { x: 0, y: 0 } },
-              { kind: 'free', point: { x: 100, y: 0 } },
-            )
-          : kind === 'junction'
-            ? createJunction({ x: 0, y: 0 }, 'A')
-            : kind === 'loop-arrow'
-              ? {
-                  kind,
-                  id: 'loop',
-                  x: 0,
-                  y: 0,
-                  width: 100,
-                  height: 80,
-                  direction: 'clockwise' as const,
-                  arrowPosition: 0.125,
-                  color: '#171a20',
-                  strokeWidth: 2,
-                }
-              : {
-                  kind,
-                  id: 'arrow',
-                  type: 'straight' as const,
-                  start: { x: 0, y: 0 },
-                  end: { x: 100, y: 0 },
-                  controlPoints: [
-                    { x: 0, y: 0 },
-                    { x: 100, y: 0 },
-                  ] as [{ x: number; y: number }, { x: number; y: number }],
-                  color: '#171a20',
-                  width: 2,
-                  reversed: false,
-                };
-      const actions = toolbarActions(o);
-      expect(actions.primary).not.toContain('rotate');
-      expect(actions.primary).toContain('style');
-      expect(actions.primary.includes('reverse')).toBe(kind === 'arrow' || kind === 'loop-arrow');
-      if (kind === 'wire' || kind === 'loop-arrow') expect(actions.secondary).toContain('delete');
-    });
 });

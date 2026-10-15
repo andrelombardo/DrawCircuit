@@ -19,10 +19,12 @@ import { isMac, shortcut } from '../../utils/platform';
 
 /** Menus and keyboard shortcuts dispatch the same store operations. */
 export function useEditActions(canvasOnly = false) {
-  const s = useEditorStore();
+  const document = useEditorStore((s) => s.document),
+    selection = useEditorStore((s) => s.selection),
+    activeLabel = useEditorStore((s) => s.activeLabel);
   const commands = useEditorCommands();
   const state = () => useEditorStore.getState();
-  const objects = canvasOnly ? [] : s.document.objects.filter((o) => s.selection.includes(o.id));
+  const objects = canvasOnly ? [] : document.objects.filter((o) => selection.includes(o.id));
   const selected = !!objects.length;
   const replaceable = commonReplacements(objects.filter((o) => o.kind === 'component')).length > 0;
   const selectionItems: MenuAction[] = [
@@ -62,7 +64,7 @@ export function useEditActions(canvasOnly = false) {
   ];
   const remove: MenuAction = {
     id: 'delete',
-    label: s.activeLabel && selected ? 'Elimina etichetta' : 'Elimina',
+    label: activeLabel && selected ? 'Elimina etichetta' : 'Elimina',
     shortcut: isMac() ? '⌫' : 'Delete',
     icon: <Trash2 size={15} />,
     disabled: !selected,
@@ -74,7 +76,7 @@ export function useEditActions(canvasOnly = false) {
     label: 'Seleziona tutto',
     shortcut: shortcut('A'),
     icon: <Scan size={15} />,
-    disabled: !s.document.objects.length,
+    disabled: !document.objects.length,
     onSelect: () => state().select(state().document.objects.map((o) => o.id)),
   };
   const contextItems: MenuAction[] = selected
@@ -93,7 +95,7 @@ export function useEditActions(canvasOnly = false) {
       });
     const wire = objects.length === 1 && objects[0].kind === 'wire' ? objects[0] : null;
     if (wire) {
-      const hasCurrent = annotationsForHost(wire, s.document).length > 0;
+      const hasCurrent = annotationsForHost(wire, document).length > 0;
       if (!hasCurrent)
         contextItems.push({
           id: 'current',

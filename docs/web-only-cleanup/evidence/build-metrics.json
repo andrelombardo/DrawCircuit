@@ -1,0 +1,18 @@
+{
+  "before": {
+    "files": 107,
+    "bytes": 2314391,
+    "javascriptBytes": 856686,
+    "javascriptGzipBytes": 274603,
+    "cssBytes": 91505,
+    "packages": 607
+  },
+  "after": {
+    "files": 85,
+    "bytes": 2222103,
+    "javascriptBytes": 783956,
+    "javascriptGzipBytes": 247786,
+    "cssBytes": 86971,
+    "packages": 323
+  }
+}

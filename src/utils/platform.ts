@@ -1,7 +1,5 @@
-import { isDesktop } from '../desktop/environment';
 export const isMac = () => /Mac|iPhone|iPad/.test(navigator.platform);
 export const isStandalone = () =>
-  isDesktop() ||
   window.matchMedia?.('(display-mode: standalone)').matches === true ||
   ('standalone' in navigator && navigator.standalone === true);
 

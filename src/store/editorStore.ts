@@ -349,7 +349,7 @@ useEditorStore.subscribe((state, previous) => {
   }, 400);
 });
 
-/** Flush the committed document before a user-requested PWA update; never reload a gesture. */
+/** Flush the committed document synchronously without saving an active gesture. */
 export function saveDocumentNow(): boolean {
   const state = useEditorStore.getState();
   if (state.gestureStart) return false;

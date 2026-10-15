@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import { componentRegistry, createComponent } from '../src/model/catalog';
 import { componentTypes } from '../src/model/types';
 import { demoDocument } from '../src/model/demo';
-import { componentMappings } from '../src/tikz/componentMappings';
 import { escapeTex, exportStandalone, exportTikz, svgToTikz, texText } from '../src/tikz/exporter';
 import { resolveEndpoint } from '../src/utils/geometry';
 describe('TikZ exporter', () => {
@@ -25,7 +24,7 @@ describe('TikZ exporter', () => {
   it('supports a consistent custom coordinate scale', () =>
     expect(svgToTikz({ x: 100, y: 100 }, 50)).toEqual({ x: 2, y: -2 }));
   it('has an explicit mapping or geometry fallback for every catalog type', () => {
-    expect(Object.keys(componentMappings)).toHaveLength(componentTypes.length);
+    expect(Object.keys(componentRegistry)).toHaveLength(componentTypes.length);
     componentTypes.forEach((type) => {
       const c = createComponent(type, { x: 0, y: 0 }),
         code = exportTikz({ version: 1, title: 'x', objects: [c] });

@@ -1,8 +1,5 @@
 node_modules/
 dist/
-dist-desktop/
-src-tauri/target/
-src-tauri/gen/
 
 .env
 .env.*
@@ -13,10 +10,9 @@ coverage/
 .vite/
 *.tsbuildinfo
 
-# Updater keys belong outside the checkout. Only the public key is tracked in Tauri config.
+# Private keys must never be tracked.
 *.key
 *.key.pub
-release-artifacts/
 
 # Local editor and temporary files
 .idea/

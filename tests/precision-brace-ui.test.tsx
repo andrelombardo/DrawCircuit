@@ -193,7 +193,7 @@ describe('precision/annotation/export UI workflows', () => {
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 450));
     });
-    const saved = setItem.mock.calls.findLast(([name]) => name === STORAGE_KEY)!;
+    const saved = [...setItem.mock.calls].reverse().find(([name]) => name === STORAGE_KEY)!;
     expect(deserializeDocument(saved[1])).toEqual(state().document);
   });
   it('adds PNG only inside Export and explains clipboard fallback while keeping download available', async () => {

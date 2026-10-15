@@ -2,9 +2,6 @@ import { memo, useLayoutEffect, useRef, useState } from 'react';
 import { CIRCUIT_FONT } from '../../model/fonts';
 import type { Rotation } from '../../model/types';
 import { renderLatex } from '../../math/latex';
-import { vectorMathLayout } from '../../math/vectorLayout';
-import type { CanvasTextLayout } from '../../tikz/canvasText';
-import { isDesktop } from '../../desktop/environment';
 
 export function LatexPreview({ text }: { text: string }) {
   const result = renderLatex(text);
@@ -47,20 +44,7 @@ export const MathText = memo(function MathText({
   const result = renderLatex(text);
   const content = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 1, height: 1 });
-  const [vector, setVector] = useState<CanvasTextLayout | null>(null);
-  const native = isDesktop();
   useLayoutEffect(() => {
-    if (native && result.kind === 'math') {
-      let active = true;
-      const measure = () => {
-        if (active) setVector(vectorMathLayout(text, fontSize));
-      };
-      measure();
-      void document.fonts?.ready.then(measure);
-      return () => {
-        active = false;
-      };
-    }
     const el = content.current;
     if (!el) return;
     let active = true;
@@ -80,7 +64,7 @@ export const MathText = memo(function MathText({
       active = false;
       observer.disconnect();
     };
-  }, [text, fontSize, result.kind, native]);
+  }, [text, fontSize, result.kind]);
   if (result.kind === 'math') {
     return (
       <g
@@ -92,32 +76,20 @@ export const MathText = memo(function MathText({
         className={`math-label${selected ? ' selected-label' : ''}`}
         data-active-label={selected || undefined}
       >
-        {native ? (
-          vector && (
-            <g
-              fill={color}
-              transform={`translate(${align === 'start' ? vector.alignWidth / 2 : align === 'end' ? -vector.alignWidth / 2 : 0} 0)`}
-            >
-              <rect {...vector.bounds} fill="transparent" pointerEvents="all" />
-              <g dangerouslySetInnerHTML={{ __html: vector.svg }} />
-            </g>
-          )
-        ) : (
-          <foreignObject
-            x={align === 'start' ? 0 : align === 'end' ? -size.width : -size.width / 2}
-            y={-size.height / 2}
-            width={size.width}
-            height={size.height}
-            overflow="visible"
-          >
-            <div
-              ref={content}
-              className="math-label-content"
-              style={{ fontSize, color }}
-              dangerouslySetInnerHTML={{ __html: result.html }}
-            />
-          </foreignObject>
-        )}
+        <foreignObject
+          x={align === 'start' ? 0 : align === 'end' ? -size.width : -size.width / 2}
+          y={-size.height / 2}
+          width={size.width}
+          height={size.height}
+          overflow="visible"
+        >
+          <div
+            ref={content}
+            className="math-label-content"
+            style={{ fontSize, color }}
+            dangerouslySetInnerHTML={{ __html: result.html }}
+          />
+        </foreignObject>
       </g>
     );
   }

@@ -1,3 +1,5 @@
+import { tmpdir } from 'node:os';
+import { join as joinTempPath } from 'node:path';
 // @vitest-environment jsdom
 import { chooseSelectionCommand } from './helpers/selectionMenu';
 import { chooseDrawingTool } from './helpers/drawingMenu';
@@ -618,8 +620,8 @@ describe('fast drawing interactions', () => {
     const { writeFileSync } = await vi.importActual<{
       writeFileSync: (path: string, data: string) => void;
     }>('node:fs');
-    writeFileSync('/private/tmp/drawcircuit-pass2.tex', code);
-    writeFileSync('/private/tmp/drawcircuit-pass2.json', serializeDocument(complete));
+    writeFileSync(joinTempPath(tmpdir(), 'drawcircuit-pass2.tex'), code);
+    writeFileSync(joinTempPath(tmpdir(), 'drawcircuit-pass2.json'), serializeDocument(complete));
   });
   it('places repeatedly, rotates the preview, then rotates selection after Esc', () => {
     useEditorStore.setState({ document: emptyDocument() });
@@ -897,9 +899,9 @@ describe('expanded library and annotation fonts in the rendered interface', () =
     const fs = await vi.importActual<{ writeFileSync: (path: string, data: string) => void }>(
       'node:fs',
     );
-    fs.writeFileSync('/private/tmp/drawcircuit-font-labels.json', saved);
+    fs.writeFileSync(joinTempPath(tmpdir(), 'drawcircuit-font-labels.json'), saved);
     fs.writeFileSync(
-      '/private/tmp/drawcircuit-font-labels.tex',
+      joinTempPath(tmpdir(), 'drawcircuit-font-labels.tex'),
       exportStandalone(useEditorStore.getState().document),
     );
     fireEvent.click(screen.getByRole('button', { name: /^Esporta$/ }));
@@ -1044,8 +1046,8 @@ describe('expanded library and annotation fonts in the rendered interface', () =
     const fs = await vi.importActual<{ writeFileSync: (path: string, data: string) => void }>(
       'node:fs',
     );
-    fs.writeFileSync('/private/tmp/drawcircuit-mixed-library.json', saved);
-    fs.writeFileSync('/private/tmp/drawcircuit-mixed-library.tex', code);
+    fs.writeFileSync(joinTempPath(tmpdir(), 'drawcircuit-mixed-library.json'), saved);
+    fs.writeFileSync(joinTempPath(tmpdir(), 'drawcircuit-mixed-library.tex'), code);
     expect(consoleError).not.toHaveBeenCalled();
     // This full schematic workflow can exceed the unit-test timeout under load.
   }, 10000);

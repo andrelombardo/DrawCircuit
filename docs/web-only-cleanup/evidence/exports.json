@@ -1,0 +1,18 @@
+{
+  "tikz": {
+    "identical": true,
+    "bytes": 3725
+  },
+  "obsidian": {
+    "identical": true,
+    "bytes": 17223
+  },
+  "tex": {
+    "identical": true,
+    "bytes": 4104
+  },
+  "svg": {
+    "identical": true,
+    "bytes": 9874
+  }
+}
