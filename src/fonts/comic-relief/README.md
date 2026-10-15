@@ -11,4 +11,6 @@ not to DrawCircuit or documents created with it.
 The app serves these fonts itself; it does not request Google Fonts or use an
 installed copy. Both faces load before the editor mounts. SVG exports embed the
 same files and their license, so PNG rasterization also uses Comic Relief.
+Obsidian TikZ exports embed them once inside the picture, retaining the OFL
+notice through Inline TikZ’s CSS optimization.
 `public/fonts/comic-relief/OFL.txt` preserves the license in the deployed build.

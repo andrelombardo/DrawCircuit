@@ -1154,7 +1154,7 @@ kbd {
 .latex-preview .katex {
   font-size: 1em;
 }
-/* KaTeX supplies the math layout; circuit glyphs use the same system font as plain labels. */
+/* KaTeX supplies the math layout; circuit glyphs use the same bundled font as plain labels. */
 .math-label-content .katex-html,
 .math-label-content .katex-html *,
 .latex-preview .katex-html,

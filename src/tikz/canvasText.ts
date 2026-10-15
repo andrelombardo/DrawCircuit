@@ -182,7 +182,7 @@ export function canvasTextTikz(
   ];
 }
 
-export const CANVAS_TEXT_PREAMBLE = String.raw`% TikZJax/Inline TikZ SVG uses Comic Relief when installed; other drivers use upright sans.
+export const CANVAS_TEXT_PREAMBLE = String.raw`% TikZJax/Inline TikZ SVG embeds Comic Relief; other drivers use upright sans.
 \makeatletter
 \newif\ifdcSvg
 \edef\dcDriver{\pgfsysdriver}

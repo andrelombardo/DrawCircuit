@@ -15,6 +15,7 @@ import { geometryTikz, svgPathToTikz } from './symbolGeometry';
 import { finitePoint, isExportableObject, normalizeHex } from './validation';
 import { canvasArrowHead } from './arrowheads';
 import { canvasTextLayout, canvasTextTikz, CANVAS_TEXT_PREAMBLE } from './canvasText';
+import { OBSIDIAN_FONT_DEFINITIONS } from './fonts';
 import { CANVAS_UNITS_PER_CM, NATIVE_UNITS_PER_CM, editorToPt, formatNumber } from './units';
 export const PIXELS_PER_CM = NATIVE_UNITS_PER_CM;
 const fmt = formatNumber;
@@ -93,6 +94,7 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
     '\\begin{circuitikz}[european resistors, american inductors, american ports, line cap=round, line join=round]',
     ...(canvas ? [] : ['\\ctikzset{bipoles/length=1.4cm}']),
   ];
+  let usesCanvasText = false;
   const node = (
     text: string,
     p: Point,
@@ -124,6 +126,7 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
       const position = { x: p.x - offset * Math.sin(angle), y: p.y + offset * Math.cos(angle) };
       const layout = canvas ? canvasTextLayout(line, size, formula, plain) : null;
       if (layout) {
+        usesCanvasText = true;
         col(color);
         lines.push(
           ...canvasTextTikz(
@@ -374,6 +377,7 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
     if (translucent) lines.push('\\end{scope}');
   }
   labels.forEach((draw) => draw());
+  if (usesCanvasText) lines.splice(1, 0, OBSIDIAN_FONT_DEFINITIONS);
   lines.push('\\end{circuitikz}');
   return [
     canvas
