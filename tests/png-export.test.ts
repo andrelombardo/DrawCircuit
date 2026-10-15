@@ -168,7 +168,7 @@ describe('SVG-driven PNG export', () => {
       expect(rasterSource).toContain(braceGeometry(o).d);
     expect(rasterSource).toContain('&#82;&#95;&#123;&#101;&#113;&#125;');
     expect(rasterSource).toContain('&#92;&#102;&#114;&#97;&#99;');
-    expect(rasterSource).toContain('Comic Sans');
+    expect(rasterSource).toContain('Comic Relief');
     expect(rasterSource).toContain('<circle');
     expect(rasterSource).toContain(' C ');
     for (const color of ['#8855c2', '#2463cb', '#269978']) expect(rasterSource).toContain(color);
@@ -290,7 +290,7 @@ describe('SVG-driven PNG export', () => {
     try {
       await preparePNGFonts(fixture());
       expect(load).toHaveBeenCalledWith(
-        expect.stringContaining('Comic Sans MS'),
+        expect.stringContaining('Comic Relief'),
         expect.stringContaining('R_{eq}'),
       );
       expect(load).toHaveBeenCalledWith(expect.stringContaining('KaTeX_Main'), expect.any(String));

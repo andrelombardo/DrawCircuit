@@ -61,10 +61,10 @@ describe('shared genuine LaTeX rendering', () => {
       expect(texText(source)).toBe(escapeTex(source));
     },
   );
-  it.each(['maglia 1', 'A', '5 mA', '12 V'])('keeps plain text in Comic Sans: %s', (source) => {
+  it.each(['maglia 1', 'A', '5 mA', '12 V'])('keeps plain text in Comic Relief: %s', (source) => {
     expect(renderLatex(source).kind).toBe('plain');
     expect(renderToStaticMarkup(<MathText text={source} color={COLORS.red} />)).toContain(
-      'data-font="Comic Sans MS"',
+      'data-font="Comic Relief"',
     );
   });
   it('normalizes only the complete electrical alias command', () => {

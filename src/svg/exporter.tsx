@@ -15,6 +15,7 @@ import { visualBounds, unionBounds } from '../utils/visualBounds';
 import type { Bounds } from '../utils/visualBounds';
 import { electricalDrawingGeometry, wireDrawingPaths } from '../annotations/electrical';
 import { CIRCUIT_FONT } from '../model/fonts';
+import { EMBEDDED_CIRCUIT_FONTS } from '../fonts/embedded';
 import { formatNumber as f } from '../tikz/units';
 const attr = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -267,5 +268,7 @@ export function exportSVG(
   const background = options.transparent
     ? ''
     : `<rect x="${f(x)}" y="${f(y)}" width="${f(width)}" height="${f(height)}" fill="white"/>`;
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="${f(x)} ${f(y)} ${f(width)} ${f(height)}" width="${f(width)}" height="${f(height)}"><title>${xmlText(doc.title)}</title>${background}${parts.join('')}${labels.join('')}</svg>`;
+  const content = parts.join('') + labels.join('');
+  const fonts = content.includes('Comic Relief') ? EMBEDDED_CIRCUIT_FONTS : '';
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="${f(x)} ${f(y)} ${f(width)} ${f(height)}" width="${f(width)}" height="${f(height)}"><title>${xmlText(doc.title)}</title>${fonts}${background}${content}</svg>`;
 }

@@ -16,7 +16,7 @@ export const xmlText = (value: string) =>
 const attribute = (value: string) =>
   value.replace(/[&<>"'{}%#\\^_~]/g, (c) => `&#${c.codePointAt(0)};`);
 
-/** Measure an isolated copy, using the existing canvas CSS and its actual system font. */
+/** Measure an isolated copy using the canvas CSS and its bundled circuit font. */
 export function canvasTextLayout(
   source: string,
   size: number,
@@ -182,7 +182,7 @@ export function canvasTextTikz(
   ];
 }
 
-export const CANVAS_TEXT_PREAMBLE = String.raw`% TikZJax/Inline TikZ SVG uses the system font; other drivers use upright sans.
+export const CANVAS_TEXT_PREAMBLE = String.raw`% TikZJax/Inline TikZ SVG uses Comic Relief when installed; other drivers use upright sans.
 \makeatletter
 \newif\ifdcSvg
 \edef\dcDriver{\pgfsysdriver}

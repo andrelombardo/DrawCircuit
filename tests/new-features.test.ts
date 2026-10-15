@@ -466,7 +466,7 @@ describe('pure SVG and PWA contracts', () => {
       svg = exportSVG(doc);
     expect(svg).toContain('<svg xmlns=');
     expect(svg).toContain('viewBox=');
-    expect(svg).toContain('Comic Sans MS');
+    expect(svg).toContain('Comic Relief');
     expect(svg).toContain('<circle');
     expect(svg).toContain('<path');
     expect(svg).not.toMatch(/foreignObject|data-layer|selection|grid|handle|undefined|NaN/);

@@ -16,6 +16,8 @@ Place components, connect them, and add mathematical labels and electrical annot
 
 DrawCircuit is a web editor that saves your work in your browser and requires no account. It loads from the network and can be installed as a standalone web app in supporting browsers. Local circuits, personal blocks, and preferences remain in the browser between visits.
 
+Circuit labels and formulas use **Comic Relief**, bundled with the app so visitors see the same font without installing it. SVG and PNG exports include the font too. The interface keeps Inter. See the font's [source and SIL Open Font License](src/fonts/comic-relief/README.md).
+
 ## Get started
 
 1. Open the [browser app](https://andrelombardo.github.io/DrawCircuit/).

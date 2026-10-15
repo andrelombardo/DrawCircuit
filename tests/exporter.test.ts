@@ -82,7 +82,7 @@ describe('TikZ exporter', () => {
     expect(code).toContain('\\documentclass[tikz,border=5pt]{standalone}');
     expect(code).toContain('\\usepackage{circuitikz}');
     expect(code).toContain('\\ifPDFTeX');
-    expect(code).toContain('\\IfFontExistsTF{Comic Sans MS}');
+    expect(code).toContain('\\IfFontExistsTF{Comic Relief}');
     expect(code.trim().endsWith('\\end{document}')).toBe(true);
   });
   it('exports without font choices or bundled handwritten fonts', () => {

@@ -182,7 +182,10 @@ export async function preparePNGFonts(doc: CircuitDocument): Promise<void> {
     o.kind === 'text' ? [o.text] : 'label' in o ? [o.label.text] : [],
   );
   const text = sources.join(' ');
-  const requests = [document.fonts.load(`22px ${CIRCUIT_FONT}`, text || 'DrawCircuit')];
+  const requests = [
+    document.fonts.load(`400 22px ${CIRCUIT_FONT}`, text || 'DrawCircuit'),
+    document.fonts.load(`700 22px ${CIRCUIT_FONT}`, text || 'DrawCircuit'),
+  ];
   if (sources.some((source) => isMathSource(source))) {
     for (const path of Object.keys(fontURLs)) {
       const match = /\/(KaTeX_[^-]+)-(Regular|Bold|Italic|BoldItalic)\.woff2$/.exec(path);

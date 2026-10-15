@@ -1,4 +1,5 @@
 :root {
+  --circuit-font: 'Comic Relief', cursive;
   font-family: -apple-system, BlinkMacSystemFont, Inter, 'Segoe UI', sans-serif;
   color: var(--ui-text);
   background: var(--ui-bg);
@@ -405,7 +406,7 @@ svg {
   color: var(--ui-accent);
 }
 .handwriting {
-  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  font-family: var(--circuit-font);
   cursor: move;
   paint-order: stroke fill;
   stroke: #fafbf8;
@@ -1158,7 +1159,7 @@ kbd {
 .math-label-content .katex-html *,
 .latex-preview .katex-html,
 .latex-preview .katex-html * {
-  font-family: 'Comic Sans MS', 'Comic Sans', cursive !important;
+  font-family: var(--circuit-font) !important;
 }
 .math-label-content .katex-html .mathnormal,
 .latex-preview .katex-html .mathnormal {
@@ -2411,7 +2412,7 @@ summary:focus-visible {
 }
 
 /* Mathematical prime needs the glyph whose metrics KaTeX uses for its script
-   position. Comic Sans and script sizing remain unchanged for every other glyph. */
+   position. Comic Relief and script sizing remain unchanged for every other glyph. */
 .math-label-content .katex-html .math-prime,
 .latex-preview .katex-html .math-prime {
   font-family: KaTeX_Main !important;

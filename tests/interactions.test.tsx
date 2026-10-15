@@ -850,13 +850,13 @@ describe('expanded library and annotation fonts in the rendered interface', () =
       canvas().querySelector(`[data-layer="annotations"] [data-object="${text.id}"]`)!,
     );
     expect(screen.getByLabelText('Modifica testo sul foglio').style.fontFamily).toContain(
-      'Comic Sans',
+      'Comic Relief',
     );
     fireEvent.submit(screen.getByLabelText('Modifica testo sul foglio').closest('form')!);
     expect(serializeDocument(useEditorStore.getState().document)).not.toContain('fontFamily');
     expect(useEditorStore.getState().document.objects.at(-1)).toMatchObject({ kind: 'text' });
   });
-  it('renders A and B in Comic Sans and r_AB with KaTeX, saves and imports source and exports', async () => {
+  it('renders A and B in Comic Relief and r_AB with KaTeX, saves and imports source and exports', async () => {
     useEditorStore.setState({ document: emptyDocument() });
     render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Inserisci resistenza' }));

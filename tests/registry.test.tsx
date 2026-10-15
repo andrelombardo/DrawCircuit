@@ -186,7 +186,7 @@ describe('expanded component registry', () => {
 });
 
 describe('circuit font and compatible JSON', () => {
-  it('preserves generic block internal text and uses Comic Sans for ordinary circuit content', () => {
+  it('preserves generic block internal text and uses Comic Relief for ordinary circuit content', () => {
     const c = createComponent('blackBox', { x: 0, y: 0 });
     c.bodyText = 'H(s)';
     const free: TextAnnotation = {
@@ -203,13 +203,13 @@ describe('circuit font and compatible JSON', () => {
     const doc: CircuitDocument = { version: 1, title: 'Font', objects: [c, free] };
     expect(deserializeDocument(serializeDocument(doc))).toEqual(doc);
     expect(renderToStaticMarkup(<MathText text="A" color={COLORS.blue} />)).toContain(
-      'data-font="Comic Sans MS"',
+      'data-font="Comic Relief"',
     );
     expect(renderToStaticMarkup(<Symbol type="blackBox" bodyText="H(s)" />)).toContain(
-      'Comic Sans',
+      'Comic Relief',
     );
     expect(exportStandalone(doc)).not.toContain('Kalam');
-    expect(CIRCUIT_FONT).toBe('"Comic Sans MS", "Comic Sans", cursive');
+    expect(CIRCUIT_FONT).toBe('"Comic Relief", cursive');
   });
   it('discards legacy font choices while preserving layout and pins', () => {
     const c = createComponent('resistor', { x: 0, y: 0 });

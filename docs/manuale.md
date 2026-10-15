@@ -1,6 +1,6 @@
 # DrawCircuit
 
-Un editor di circuiti elettrici per appunti e materiale didattico. React, TypeScript, Vite, Zustand e SVG: componenti, fili e annotazioni sono oggetti vettoriali modificabili. Funziona interamente nel browser, con font Inter per la UI e KaTeX per la matematica inclusi nel bundle. La libreria comprende **72 simboli generici** in 12 categorie. Comic Sans MS è disponibile tramite il font di sistema, senza file proprietari nel progetto.
+Un editor di circuiti elettrici per appunti e materiale didattico. React, TypeScript, Vite, Zustand e SVG: componenti, fili e annotazioni sono oggetti vettoriali modificabili. Funziona interamente nel browser, con font Inter per la UI e KaTeX per la matematica inclusi nel bundle. La libreria comprende **72 simboli generici** in 12 categorie. Comic Relief 1.210 è incluso nel sito nei pesi normale e grassetto: tutti i visitatori scaricano gli stessi file WOFF2, senza dipendere dai font di sistema. La licenza SIL OFL 1.1 e la fonte sono conservate in `src/fonts/comic-relief/`.
 
 ## Avvio
 
@@ -85,9 +85,9 @@ Il [report WYSIWYG](../docs/obsidian-wysiwyg/report.md) contiene il confronto ca
 
 Scala standard: **40 px = 1 cm**, con inversione dell'asse Y. Le label sono nodi indipendenti. 63 simboli usano componenti nativi CircuitikZ; nove usano geometria condivisa con SVG: i due trasformatori con geometria vincolata, DPST, DPDT, galvanometro, connettori 2/3 pin, porta generica e buzzer. I nomi nativi sono verificati nella [documentazione ufficiale CircuitikZ](https://rmano.github.io/circuitikz/node-The-components-list.html).
 
-Scala Obsidian: **1 unità canvas = 0,75 pt TeX = 0,0263595 cm**, quindi 1 CSS px nell'SVG del renderer verificato. La stessa conversione si applica a geometria, stroke e font. Il testo usa Comic Sans di sistema tramite SVG vettoriale, mantenendo il layout KaTeX dei pedici e delle formule. In un ambiente senza DOM o con un driver TeX diverso viene usato un fallback sans serif diritto; su dispositivi senza Comic Sans il browser sceglie il font disponibile nella famiglia `cursive`. Il preambolo non richiede `fontspec`.
+Scala Obsidian: **1 unità canvas = 0,75 pt TeX = 0,0263595 cm**, quindi 1 CSS px nell'SVG del renderer verificato. La stessa conversione si applica a geometria, stroke e font. Il testo usa Comic Relief tramite SVG vettoriale, mantenendo il layout KaTeX dei pedici e delle formule. Per riprodurre il font in Obsidian occorre installare Comic Relief sul dispositivo che visualizza il blocco. In un ambiente senza DOM o con un driver TeX diverso viene usato un fallback sans serif diritto. Il preambolo non richiede `fontspec`.
 
-Non ci sono scelte font. Lo standalone funziona con pdfLaTeX e i pacchetti standard `standalone`, `amsmath`, `amssymb` e `circuitikz`. Con XeLaTeX o LuaLaTeX usa automaticamente Comic Sans di sistema quando presente, altrimenti il font LaTeX disponibile; non include font proprietari.
+Non ci sono scelte font. Lo standalone funziona con pdfLaTeX e i pacchetti standard `standalone`, `amsmath`, `amssymb` e `circuitikz`. Con XeLaTeX o LuaLaTeX usa automaticamente Comic Relief quando installato, altrimenti il font LaTeX disponibile.
 
 Il documento di verifica con **72 simboli × 4 rotazioni = 288 componenti** compila con successo. Anche `examples/schema-libreria-mista.tex` e `examples/label-kalam-comic.tex` sono stati compilati.
 
@@ -111,7 +111,7 @@ Il fixture di carico viene scritto in `/private/tmp/drawcircuit-stress.json` ed 
 
 - Il routing può essere ortogonale, a 45° o libero; non cerca di evitare automaticamente ostacoli o incroci. Gli incroci sono scollegati finché non inserisci una junction.
 - Le nuove maglie sono ellissi di 324° con apertura di 36°; quelle circolari della prima versione rimangono compatibili. L’export usa archi ellittici vettoriali secondo la [documentazione TikZ](https://tikz.dev/tikz-paths#sec-14.7).
-- Il testo matematico usa KaTeX: pedici, apici, frazioni, radici e i comandi supportati dall’engine. Il source rimane nel JSON; il LaTeX non valido appare letterale e resta modificabile. `\ohm` è l’unico alias dell’editor e diventa `\Omega` durante rendering ed export. Il testo normale usa `"Comic Sans MS", "Comic Sans", cursive`, anche i caratteri delle formule e della preview usano Comic Sans; la UI mantiene Inter.
+- Il testo matematico usa KaTeX: pedici, apici, frazioni, radici e i comandi supportati dall’engine. Il source rimane nel JSON; il LaTeX non valido appare letterale e resta modificabile. `\ohm` è l’unico alias dell’editor e diventa `\Omega` durante rendering ed export. Il testo normale, i caratteri delle formule e la preview usano Comic Relief incluso nel sito; la UI mantiene Inter. Il canvas viene montato dopo il caricamento dei due pesi, così le misure iniziali usano il font corretto. SVG e PNG incorporano gli stessi font: non richiedono Comic Relief installato. I glifi matematici speciali mantengono le metriche e i tracciati KaTeX.
 - I simboli nativi CircuitikZ possono differire leggermente nelle proporzioni rispetto agli SVG; terminali, orientamento, colori e posizioni delle annotazioni rimangono coerenti.
 - Clipboard e download dipendono dai permessi del browser. Copia/incolla ha un fallback interno durante la sessione; il dialogo TikZ seleziona il codice se la copia negli appunti non è disponibile. Il browser integrato può limitare i test automatici di clipboard e download; questi percorsi sono verificati anche tramite test DOM.
 - Il salvataggio locale appartiene a quel browser e a quell'origine. Per utilizzare il disegno in altri strumenti esporta TikZ, Obsidian o SVG dalla toolbar. Nessun backend, account, simulazione o servizio cloud.
@@ -131,7 +131,7 @@ Il fixture di carico viene scritto in `/private/tmp/drawcircuit-stress.json` ed 
 
 In **Passivi** trovi anche **Resistenza statunitense**, il simbolo a zig zag, ricercabile con `zig zag` o `americana`.
 
-La palette usa categorie collassabili, anteprime del vero simbolo, tooltip e alias italiani/inglesi (ad esempio `res`, `mos`, `ground`). Ora si può nascondere, riaprire e ridimensionare. Comic Sans è il font unico del circuito; KaTeX compone le formule; i loro caratteri usano Comic Sans anche nella preview inline.
+La palette usa categorie collassabili, anteprime del vero simbolo, tooltip e alias italiani/inglesi (ad esempio `res`, `mos`, `ground`). Ora si può nascondere, riaprire e ridimensionare. Comic Relief è il font unico del circuito; KaTeX compone le formule; i loro caratteri usano Comic Relief anche nella preview inline.
 
 Il JSON rimane alla versione 1. Al caricamento una label non vuota prevale sul vecchio `value`; una label vuota o mancante usa il valore legacy. Il campo `value` e le scelte `fontFamily` vengono rimossi dal modello interno. Nei nuovi dati rimane il source originale, con posizione, colore e dimensione della label. Le preferenze sidebar sono separate, sotto `drawcircuit.sidebar.v1`.
 
@@ -140,7 +140,7 @@ Il registry centrale in `src/model/catalog.ts` raccoglie nomi, categorie, alias,
 - Riepilogo completo: [docs/terzo-passaggio.md](../docs/terzo-passaggio.md).
 - Catalogo visuale SVG: [docs/libreria-componenti.svg](../docs/libreria-componenti.svg), rigenerabile con `node scripts/create-library-preview.mjs`.
 - Schema misto riapribile: [examples/schema-libreria-mista.json](../examples/schema-libreria-mista.json), con [TikZ](../examples/schema-libreria-mista.tex).
-- Label A/B/r_AB in Comic Sans: [examples/label-kalam-comic.json](../examples/label-kalam-comic.json), con [TikZ portabile](../examples/label-kalam-comic.tex).
+- Esempio con label A/B/r_AB: [examples/label-kalam-comic.json](../examples/label-kalam-comic.json), con [TikZ portabile](../examples/label-kalam-comic.tex).
 
 ### Smart Placement
 
@@ -156,7 +156,7 @@ La sezione **Blocchi rapidi** aggiunge 23 configurazioni nella palette, separate
 
 Sono disponibili serie/parallelo di 2 o 3 resistenze, stella, delta, partitori V/I, Wheatstone, generatori reali V/I, Thévenin, Norton, RC/RL/RLC serie e parallelo, generatore + R, due maglie, tre rami e generatore + resistenza serie + carico.
 
-Il registro dichiarativo in `src/presets/registry.ts` genera normali componenti, fili e junction con factory condivise, nuovi UUID e label senza collisioni. Tutti gli oggetti vengono selezionati dopo l’inserimento e costituiscono una sola operazione Undo. Puoi poi modificarli individualmente usando gli strumenti esistenti. JSON v1, LaTeX, Comic Sans e TikZ seguono i percorsi normali dell’editor.
+Il registro dichiarativo in `src/presets/registry.ts` genera normali componenti, fili e junction con factory condivise, nuovi UUID e label senza collisioni. Tutti gli oggetti vengono selezionati dopo l’inserimento e costituiscono una sola operazione Undo. Puoi poi modificarli individualmente usando gli strumenti esistenti. JSON v1, LaTeX, Comic Relief e TikZ seguono i percorsi normali dell’editor.
 
 **478 test passano**, inclusi 77 nuovi test sui preset. Il [report completo](../docs/presets/report.md) descrive i 23 blocchi e il Golden Test nel browser, con JSON riapribili ed export TikZ compilati.
 

@@ -120,7 +120,7 @@ export type LatexResult =
   | { kind: 'math'; source: string; html: string };
 const cache = new Map<string, LatexResult>();
 
-/** The Comic Sans override cannot use KaTeX's prime metrics. Restore only the
+/** The Comic Relief override cannot use KaTeX's prime metrics. Restore only the
  * mathematical prime glyph; text-command contents and every other glyph remain
  * untouched. The same HTML is measured by editor and vector export. */
 function markMathPrimes(html: string): string {

@@ -1,0 +1,16 @@
+/* Comic Relief 1.210, Jeff Davis. SIL OFL 1.1: comic-relief/OFL.txt. */
+@font-face {
+  font-family: 'Comic Relief';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('./comic-relief/ComicRelief-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Comic Relief';
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url('./comic-relief/ComicRelief-Bold.woff2') format('woff2');
+}
