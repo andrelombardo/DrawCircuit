@@ -12,6 +12,13 @@ nel solo preambolo non è sufficiente. I dati sono divisi in righe corte con `%`
 alla fine, così TeX non aggiunge spazi ai data URL. La licenza OFL usa un commento
 CSS `/*! ... */`, preservato anche dall’ottimizzatore SVG del renderer.
 
+La stessa suddivisione si applica ai frammenti SVG delle etichette, comprese
+formule con molti apici. Nel circuito pubblico di verifica una riga di 5.981
+caratteri superava il buffer di input del compilatore: con le continuazioni la
+riga massima misura 1.256 caratteri e lo stesso circuito compila correttamente.
+`src/tikz/svgSpecial.ts` divide lo SVG prima di aggiungere gli escape TeX, così
+non spezza il comando `\string` usato nelle entità XML.
+
 Verifica del 15 ottobre 2026 con il bundle ufficiale
 [Inline TikZ 0.2.1](https://github.com/lachlanharrisdev/obsidian-inline-tikz/releases/tag/0.2.1),
 eseguito in un processo isolato tramite `scripts/verify-obsidian-bundle.mjs`,

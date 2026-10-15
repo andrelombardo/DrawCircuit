@@ -3,6 +3,7 @@ import { primeGlyphPaths } from '../math/primeGlyph';
 import { CIRCUIT_FONT } from '../model/fonts';
 import type { Point, Rotation } from '../model/types';
 import { editorToPt, editorFontSizeToTikz, formatNumber as fmt } from './units';
+import { svgSpecialPayload } from './svgSpecial';
 
 export interface CanvasTextLayout {
   svg: string;
@@ -159,11 +160,9 @@ export function canvasTextTikz(
     align === 'start' ? layout.alignWidth / 2 : align === 'end' ? -layout.alignWidth / 2 : 0;
   const anchor =
     align === 'start' ? '\\dcStartAnchor' : align === 'end' ? '\\dcEndAnchor' : '\\dcCenterAnchor';
-  const fragment =
-    `<g transform="translate({?x},{?y}) scale(${editorToPt(1)})" fill="${color}" stroke="none"><g transform="translate(${fmt(shift)},0)">${layout.svg}</g></g>`.replace(
-      /#/g,
-      '\\string#',
-    );
+  const fragment = svgSpecialPayload(
+    `<g transform="translate({?x},{?y}) scale(${editorToPt(1)})" fill="${color}" stroke="none"><g transform="translate(${fmt(shift)},0)">${layout.svg}</g></g>`,
+  );
   const angle = (rotation * Math.PI) / 180;
   const world = (x: number, y: number) => ({
     x: point.x + x * Math.cos(angle) - y * Math.sin(angle),

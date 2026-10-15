@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as canvasText from '../src/tikz/canvasText';
 import { exportObsidian, exportStandalone, exportTikz } from '../src/tikz/exporter';
 import { createTextAnnotation } from '../src/model/factories';
+import { svgSpecialPayload } from '../src/tikz/svgSpecial';
 
 const doc = {
   version: 1 as const,
@@ -48,5 +49,30 @@ describe('portable Obsidian circuit font', () => {
     expect(exportObsidian({ ...doc, objects: [] })).not.toContain('@font-face');
     expect(exportObsidian(doc)).not.toContain('@font-face');
     expect(exportObsidian(doc)).toContain('\\sffamily');
+  });
+
+  it('splits long formula SVG without corrupting XML entities or TeX control sequences', () => {
+    const svg = `<text font-family="&#34;Comic Relief&#34;">${'&#65;&#937;'.repeat(3000)}</text>`;
+    const payload = svgSpecialPayload(svg);
+    expect(payload.split('\n').every((line) => line.length < 3000)).toBe(true);
+    expect(payload.replace(/%\n/g, '').replace(/\\string#/g, '#')).toBe(svg);
+    expect(payload).not.toMatch(/\\(?:s|st|str|stri|strin)%\n/);
+    const lines = canvasText.canvasTextTikz(
+      { svg, alignWidth: 100, bounds: { x: -50, y: -10, width: 100, height: 20 } },
+      '$A^{\\prime\\prime}$',
+      { x: 0, y: 0 },
+      '#2463CB',
+      'dcColor0',
+      22,
+      0,
+      'middle',
+      () => '(0,0)',
+    );
+    expect(
+      lines
+        .join('\n')
+        .split('\n')
+        .every((line) => line.length < 3000),
+    ).toBe(true);
   });
 });
