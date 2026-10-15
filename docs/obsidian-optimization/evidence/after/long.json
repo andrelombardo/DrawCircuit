@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "title": "Buffer e sicurezza",
+  "objects": [
+    {
+      "kind": "text",
+      "id": "object-0",
+      "x": 0,
+      "y": 0,
+      "text": "A^{\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime\\prime}",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 270
+    },
+    {
+      "kind": "text",
+      "id": "object-1",
+      "x": 580,
+      "y": 0,
+      "text": "Testo: %#{}\\$& <xml> \"citazione\" _ ^ ~",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 270
+    },
+    {
+      "kind": "text",
+      "id": "object-2",
+      "x": 0,
+      "y": 110,
+      "text": "prima\n\nterza",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 270
+    }
+  ]
+}

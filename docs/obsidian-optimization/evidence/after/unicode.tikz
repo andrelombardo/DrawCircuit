@@ -1,0 +1,13 @@
+% DrawCircuit — coordinates in cm; SVG Y axis inverted.
+\definecolor{dcColor0}{HTML}{DF4949}
+\begin{circuitikz}[european resistors, american inductors, american ports, line cap=round, line join=round]
+\ctikzset{bipoles/length=1.4cm}
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{17.0717}{22.1931}\selectfont] at (0,0) {$Rete elettrica: più capacità, già è così — 50 Ω$};
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{17.0717}{22.1931}\selectfont] at (14.5,0) {ÀÁÂÃÄÅ ÆÇÈÉÊË ÌÍÎÏ ÐÑÒÓÔÕÖ ØÙÚÛÜ ÝÞß};
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{17.0717}{22.1931}\selectfont] at (0,-2.75) {àáâãäå æçèéêë ìíîï ðñòóôõö øùúûü ýþÿ};
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{17.0717}{22.1931}\selectfont] at (14.5,-2.75) {$ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ αβγδεζηθικλμνξοπρστυφχψω$};
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{17.0717}{22.1931}\selectfont] at (0,-5.5) {Кириллица: АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ};
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{17.0717}{22.1931}\selectfont] at (14.5,-5.5) {āăąćĉċčďđēĕėęěĝğġģĥħĩīĭįİı Őő Űű Șș Țț};
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{17.0717}{22.1931}\selectfont] at (0,-8.25) {Decomposti: é ä Å í; ﬁ ﬂ; العربية 日本語 中文};
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{17.0717}{22.1931}\selectfont] at (14.5,-8.25) {$\mathbf{ÀÉΩЖ}_{123}+\text{caffè più}$};
+\end{circuitikz}

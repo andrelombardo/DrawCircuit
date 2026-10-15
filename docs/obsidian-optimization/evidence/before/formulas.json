@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "title": "Formule",
+  "objects": [
+    {
+      "kind": "text",
+      "id": "object-0",
+      "x": 0,
+      "y": 0,
+      "text": "\\frac{R_1 R_2}{R_1+R_2}=\\sqrt{L/C}",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    },
+    {
+      "kind": "text",
+      "id": "object-1",
+      "x": 580,
+      "y": 0,
+      "text": "\\mathbf{V}_{out}=\\sum_{k=1}^{10}\\frac{a_k}{1+s\\tau_k}",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    },
+    {
+      "kind": "text",
+      "id": "object-2",
+      "x": 0,
+      "y": 110,
+      "text": "\\int_0^{\\infty} e^{-st} f(t)\\,dt",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    },
+    {
+      "kind": "text",
+      "id": "object-3",
+      "x": 580,
+      "y": 110,
+      "text": "\\begin{pmatrix}R_1 & -R_2\\\\-R_2 & R_3\\end{pmatrix}",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    },
+    {
+      "kind": "text",
+      "id": "object-4",
+      "x": 0,
+      "y": 220,
+      "text": "\\overline{V}_{AB}^{\\prime\\prime}=\\hat{I} Z",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    },
+    {
+      "kind": "text",
+      "id": "object-5",
+      "x": 580,
+      "y": 220,
+      "text": "\\left(\\frac{a+b}{c+d}\\right)^2+\\sqrt[3]{x^2+1}",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    },
+    {
+      "kind": "text",
+      "id": "object-6",
+      "x": 0,
+      "y": 330,
+      "text": "\\color{red}{R_1}+\\color{blue}{R_2}=\\text{totale}",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    },
+    {
+      "kind": "text",
+      "id": "object-7",
+      "x": 580,
+      "y": 330,
+      "text": "\\underbrace{R_1+R_2+R_3}_{R_{eq}}",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    },
+    {
+      "kind": "text",
+      "id": "object-8",
+      "x": 0,
+      "y": 440,
+      "text": "\\mathbb{R}\\ni x\\quad\\therefore x\\geq 0",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    },
+    {
+      "kind": "text",
+      "id": "object-9",
+      "x": 580,
+      "y": 440,
+      "text": "\\frac{d^2v}{dt^2}+2\\zeta\\omega_0\\frac{dv}{dt}+\\omega_0^2v=0",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    },
+    {
+      "kind": "text",
+      "id": "object-10",
+      "x": 0,
+      "y": 550,
+      "text": "V''+I^{\\prime}=\\textbf{Ingresso}",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    },
+    {
+      "kind": "text",
+      "id": "object-11",
+      "x": 580,
+      "y": 550,
+      "text": "\\begin{cases}x^2&x>0\\\\-x&x\\leq0\\end{cases}",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    }
+  ]
+}

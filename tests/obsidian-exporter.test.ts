@@ -1,3 +1,4 @@
+import { exportObsidian } from './helpers/unoptimizedObsidian';
 import { describe, expect, it } from 'vitest';
 import { componentRegistry, createComponent } from '../src/model/catalog';
 import { demoDocument } from '../src/model/demo';
@@ -12,13 +13,7 @@ import type {
   TextAnnotation,
   Wire,
 } from '../src/model/types';
-import {
-  escapeTex,
-  exportObsidian,
-  exportStandalone,
-  exportTikz,
-  tikzCoordinate,
-} from '../src/tikz/exporter';
+import { escapeTex, exportStandalone, exportTikz, tikzCoordinate } from '../src/tikz/exporter';
 import { svgPathToTikz } from '../src/tikz/symbolGeometry';
 import { normalizeHex } from '../src/tikz/validation';
 import { loopGeometry } from '../src/utils/loops';

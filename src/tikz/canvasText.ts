@@ -4,6 +4,7 @@ import { CIRCUIT_FONT } from '../model/fonts';
 import type { Point, Rotation } from '../model/types';
 import { editorToPt, editorFontSizeToTikz, formatNumber as fmt } from './units';
 import { svgSpecialPayload } from './svgSpecial';
+import { compactCanvasSvg } from './compactSvg';
 
 export interface CanvasTextLayout {
   svg: string;
@@ -154,15 +155,28 @@ export function canvasTextTikz(
   rotation: Rotation,
   align: 'start' | 'middle' | 'end',
   coordinate: (p: Point) => string,
+  compact = false,
 ): string[] {
   const b = layout.bounds;
   const shift =
     align === 'start' ? layout.alignWidth / 2 : align === 'end' ? -layout.alignWidth / 2 : 0;
   const anchor =
     align === 'start' ? '\\dcStartAnchor' : align === 'end' ? '\\dcEndAnchor' : '\\dcCenterAnchor';
-  const fragment = svgSpecialPayload(
-    `<g transform="translate({?x},{?y}) scale(${editorToPt(1)})" fill="${color}" stroke="none"><g transform="translate(${fmt(shift)},0)">${layout.svg}</g></g>`,
+  const wrap = (svg: string) =>
+    `<g transform="translate({?x},{?y}) scale(${editorToPt(1)})" fill="${color}" stroke="none">${svg}</g>`;
+  const original = wrap(`<g transform="translate(${fmt(shift)},0)">${layout.svg}</g>`);
+  // TeX discards leading whitespace on continued input lines. Legacy payloads
+  // with such a split must retain their serialization: relocating a space could
+  // change the font selected by an already exported fragment (ComicRelief).
+  const preserveLegacy = (original.replace(/\r?\n/g, ' ').match(/.{1,1000}/g) ?? []).some(
+    (chunk, i) => i > 0 && /^\s/.test(chunk),
   );
+  const svg = compact && !preserveLegacy ? compactCanvasSvg(layout.svg) : layout.svg;
+  const content =
+    compact && !preserveLegacy && shift === 0
+      ? svg
+      : `<g transform="translate(${fmt(shift)},0)">${svg}</g>`;
+  const fragment = svgSpecialPayload(wrap(content), compact && !preserveLegacy);
   const angle = (rotation * Math.PI) / 180;
   const world = (x: number, y: number) => ({
     x: point.x + x * Math.cos(angle) - y * Math.sin(angle),
@@ -174,9 +188,13 @@ export function canvasTextTikz(
     world(b.x + shift, b.y + b.height),
     world(b.x + b.width + shift, b.y + b.height),
   ];
+  const originalBounds = `\\path ${corners.map(coordinate).join(' -- ')} -- cycle;`;
+  const rectangularBounds = `\\path ${coordinate({ x: Math.min(...corners.map((p) => p.x)), y: Math.min(...corners.map((p) => p.y)) })} rectangle ${coordinate({ x: Math.max(...corners.map((p) => p.x)), y: Math.max(...corners.map((p) => p.y)) })};`;
   return [
     // PGF cannot infer a raw SVG text box, so explicitly include its measured corners.
-    `\\path ${corners.map(coordinate).join(' -- ')} -- cycle;`,
+    compact && rectangularBounds.length < originalBounds.length
+      ? rectangularBounds
+      : originalBounds,
     `\\node[text=${tikzColor}, font=\\fontsize{${fmt(editorFontSizeToTikz(size))}}{${fmt(editorFontSizeToTikz(size * 1.3))}}\\selectfont\\sffamily, anchor=${anchor}, minimum size=0pt, inner sep=0pt, outer sep=0pt, rotate=${-rotation}] at ${coordinate(point)} {\\dcCanvasText{${fragment}}{${source}}};`,
   ];
 }
@@ -200,3 +218,10 @@ export const CANVAS_TEXT_PREAMBLE = String.raw`% TikZJax/Inline TikZ SVG embeds 
 \DeclareSymbolFontAlphabet{\mathrm}{dcLetters}
 ${Array.from('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789', (c) => `\\DeclareMathSymbol{${c}}{\\mathalpha}{dcLetters}{${c.charCodeAt(0)}}`).join('\n')}
 \makeatother`;
+
+/** Same fallback declarations, with a TeX token loop instead of 62 repetitions. */
+export const COMPACT_CANVAS_TEXT_PREAMBLE = CANVAS_TEXT_PREAMBLE.replace(/^%[^\n]*\n/, '').replace(
+  /\\DeclareMathSymbol\{A\}[\s\S]*?(?=\\makeatother)/,
+  '\\def\\dcM#1{\\DeclareMathSymbol{#1}{\\mathalpha}{dcLetters}{`#1}}\n' +
+    '\\@tfor\\dcChar:=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\\do{\\expandafter\\dcM\\dcChar}\n',
+);

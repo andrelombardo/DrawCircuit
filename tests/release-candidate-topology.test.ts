@@ -1,3 +1,4 @@
+import { exportObsidian } from './helpers/unoptimizedObsidian';
 import { describe, expect, it } from 'vitest';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -12,7 +13,7 @@ import { localToWorld, wirePoints } from '../src/utils/geometry';
 import { bridgeGeometry, bridgePaths, wireCrossings } from '../src/utils/crossings';
 import { WireBridges } from '../src/circuit/wires/WireBridges';
 import { insertJunction } from '../src/utils/wires';
-import { exportObsidian, exportTikz } from '../src/tikz/exporter';
+import { exportTikz } from '../src/tikz/exporter';
 import {
   CANVAS_UNITS_PER_CM,
   NATIVE_UNITS_PER_CM,

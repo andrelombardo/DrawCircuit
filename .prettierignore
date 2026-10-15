@@ -5,3 +5,5 @@ package-lock.json
 docs/**/evidence/
 # Generated comparison page embeds captured exports.
 docs/release-candidate/export-comparison.html
+# Machine-generated font inputs (regenerate with prepare-obsidian-fonts.py).
+src/tikz/font-data/

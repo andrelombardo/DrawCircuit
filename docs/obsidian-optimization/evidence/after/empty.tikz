@@ -1,0 +1,4 @@
+% DrawCircuit — coordinates in cm; SVG Y axis inverted.
+\begin{circuitikz}[european resistors, american inductors, american ports, line cap=round, line join=round]
+\ctikzset{bipoles/length=1.4cm}
+\end{circuitikz}

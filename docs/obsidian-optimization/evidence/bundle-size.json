@@ -1,0 +1,52 @@
+{
+  "rows": [
+    {
+      "variant": "before",
+      "file": "App-qCMWxt65.js",
+      "bytes": 376664,
+      "gzip": 160856
+    },
+    {
+      "variant": "before",
+      "file": "index-3IU_nHgl.js",
+      "bytes": 225202,
+      "gzip": 70476
+    },
+    {
+      "variant": "before",
+      "file": "latex-CVDiN9Pd.js",
+      "bytes": 268022,
+      "gzip": 81687
+    },
+    {
+      "variant": "after",
+      "file": "App-K_fviFiB.js",
+      "bytes": 394831,
+      "gzip": 169003
+    },
+    {
+      "variant": "after",
+      "file": "index-BgV0Nk6n.js",
+      "bytes": 225235,
+      "gzip": 70498
+    },
+    {
+      "variant": "after",
+      "file": "latex-CVDiN9Pd.js",
+      "bytes": 268022,
+      "gzip": 81687
+    },
+    {
+      "variant": "after",
+      "file": "obsidian-fonts-Cx-Kk6aG.js",
+      "bytes": 162231,
+      "gzip": 115441
+    }
+  ],
+  "fflate": {
+    "minifiedBytes": 8996,
+    "gzipBytes": 4499
+  },
+  "note": "Measured production JS only; identical CSS/fonts excluded. Font inputs are in a separate immutable chunk.",
+  "extraProductionJsGzipBytes": 123610
+}

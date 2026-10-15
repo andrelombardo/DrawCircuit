@@ -1,3 +1,4 @@
+import { exportObsidian } from './helpers/unoptimizedObsidian';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createComponent } from '../src/model/catalog';
 import { createJunction, createTextAnnotation, createWire } from '../src/model/factories';
@@ -30,7 +31,7 @@ import { wireCrossings } from '../src/utils/crossings';
 import { extractSelection, removeObjects, rotateObjects } from '../src/utils/operations';
 import { insertJunction } from '../src/utils/wires';
 import { moveObject, resolveEndpoint } from '../src/utils/geometry';
-import { exportObsidian, exportTikz } from '../src/tikz/exporter';
+import { exportTikz } from '../src/tikz/exporter';
 import { selectionDocument } from '../src/tikz/selection';
 import { exportSVG } from '../src/svg/exporter';
 import { saveDocumentNow, useEditorStore } from '../src/store/editorStore';

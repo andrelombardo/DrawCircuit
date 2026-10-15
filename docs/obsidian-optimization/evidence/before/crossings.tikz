@@ -1,0 +1,16 @@
+% DrawCircuit — coordinates in cm; SVG Y axis inverted.
+\definecolor{dcColor0}{HTML}{171A20}
+\begin{circuitikz}[european resistors, american inductors, american ports, line cap=round, line join=round]
+\ctikzset{bipoles/length=1.4cm}
+\draw[draw=dcColor0, opacity=0.35, line width=1.4226pt, dash pattern=on 5.6906pt off 2.8453pt] (-1.25,0) -- (1.075,0);
+\draw[draw=dcColor0, opacity=0.35, line width=1.4226pt, dash pattern=on 5.6906pt off 2.8453pt] (1.425,0) -- (3.75,0);
+\draw[draw=dcColor0, opacity=0.35, line width=2.8453pt] (1.25,2) -- (1.25,-2);
+\draw[draw=dcColor0, opacity=1, line width=1.4226pt, dash pattern=on 5.6906pt off 2.8453pt] (-1.25,-5) -- (3.75,-5);
+\draw[draw=dcColor0, opacity=1, line width=2.8453pt] (1.25,-3) -- (1.25,-7);
+\draw[draw=dcColor0,opacity=0.35,line width=1.4226pt, dash pattern=on 5.6906pt off 2.8453pt] (1.075,0) .. controls (1.145,0.175) and (1.355,0.175) .. (1.425,0);
+% Unconnected wire crossing: horizontal bridge
+\draw[draw=white,line width=5.6906pt] (1.075,-5) -- (1.425,-5);
+\draw[draw=dcColor0,line width=2.8453pt] (1.25,-4.825) -- (1.25,-5.175);
+\draw[draw=white,line width=5.6906pt] (1.075,-5) .. controls (1.145,-4.825) and (1.355,-4.825) .. (1.425,-5);
+\draw[draw=dcColor0,line width=1.4226pt, dash pattern=on 5.6906pt off 2.8453pt] (1.075,-5) .. controls (1.145,-4.825) and (1.355,-4.825) .. (1.425,-5);
+\end{circuitikz}

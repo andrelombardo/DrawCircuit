@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { exportObsidian } from './helpers/unoptimizedObsidian';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { componentRegistry, createComponent } from '../src/model/catalog';
 import { createWire } from '../src/model/factories';
@@ -25,7 +26,7 @@ import {
 import { saveDocumentNow, STORAGE_KEY, useEditorStore } from '../src/store/editorStore';
 import { exportSVG } from '../src/svg/exporter';
 import { pngDimensions } from '../src/png/exporter';
-import { exportObsidian, exportTikz, tikzCoordinate } from '../src/tikz/exporter';
+import { exportTikz, tikzCoordinate } from '../src/tikz/exporter';
 import { isExportableObject } from '../src/tikz/validation';
 import { CANVAS_UNITS_PER_CM, formatNumber } from '../src/tikz/units';
 import { symbolMeasurementBounds } from '../src/model/symbolBounds';

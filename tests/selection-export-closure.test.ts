@@ -1,9 +1,10 @@
+import { exportObsidian } from './helpers/unoptimizedObsidian';
 import { describe, expect, it } from 'vitest';
 import { createComponent } from '../src/model/catalog';
 import { createJunction, createTextAnnotation, createWire } from '../src/model/factories';
 import type { CircuitDocument, CircuitObject, Wire } from '../src/model/types';
 import { getExportSelection } from '../src/tikz/selection';
-import { exportObsidian, exportTikz } from '../src/tikz/exporter';
+import { exportTikz } from '../src/tikz/exporter';
 import { exportSVG } from '../src/svg/exporter';
 import {
   createCurrent,

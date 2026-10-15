@@ -1,0 +1,749 @@
+{
+  "baseline": "b4598cc529ea03ff7c91635297a5e31b0fb1181d",
+  "protectedSourcesUnchanged": true,
+  "protectedFileCount": 74,
+  "modified": [
+    "src/tikz/canvasText.ts",
+    "src/tikz/exporter.ts",
+    "src/tikz/fonts.ts",
+    "src/tikz/svgSpecial.ts"
+  ],
+  "added": [
+    "src/tikz/compact.ts",
+    "src/tikz/compactSvg.ts",
+    "src/tikz/font-data/README.md",
+    "src/tikz/font-data/bold-ascii.woff2",
+    "src/tikz/font-data/bold.json",
+    "src/tikz/font-data/regular-ascii.woff2",
+    "src/tikz/font-data/regular.json",
+    "src/tikz/fontSubset.ts"
+  ],
+  "files": [
+    {
+      "file": "src/App.tsx",
+      "unchanged": true,
+      "beforeSha256": "58f920b690cba0ac2fa4111a4f23a3753a662df97d25401b9e8f9155f47c96cf",
+      "afterSha256": "58f920b690cba0ac2fa4111a4f23a3753a662df97d25401b9e8f9155f47c96cf"
+    },
+    {
+      "file": "src/annotations/brace.ts",
+      "unchanged": true,
+      "beforeSha256": "91061aa01ef4b1643e2f8e1ea71c63bacf697ce80093f62caddb22a1faa6d2ea",
+      "afterSha256": "91061aa01ef4b1643e2f8e1ea71c63bacf697ce80093f62caddb22a1faa6d2ea"
+    },
+    {
+      "file": "src/annotations/electrical.ts",
+      "unchanged": true,
+      "beforeSha256": "b18a544d460067b49632265aac0e6a0d84bafec6cf73c0ba3d5ee359c8c6a8d0",
+      "afterSha256": "b18a544d460067b49632265aac0e6a0d84bafec6cf73c0ba3d5ee359c8c6a8d0"
+    },
+    {
+      "file": "src/circuit/annotations/ArrowView.tsx",
+      "unchanged": true,
+      "beforeSha256": "48df91e6b806ca363b7077c779e9bdbdb49983b62834f75ded3c8875c8e78a85",
+      "afterSha256": "48df91e6b806ca363b7077c779e9bdbdb49983b62834f75ded3c8875c8e78a85"
+    },
+    {
+      "file": "src/circuit/annotations/BraceView.tsx",
+      "unchanged": true,
+      "beforeSha256": "ef3b360a6fde644c4c131367fcece55ee5b61ad06279af4f48c09c4fc26fe2dc",
+      "afterSha256": "ef3b360a6fde644c4c131367fcece55ee5b61ad06279af4f48c09c4fc26fe2dc"
+    },
+    {
+      "file": "src/circuit/annotations/ElectricalView.tsx",
+      "unchanged": true,
+      "beforeSha256": "214f5c599e83cc19fa6dbe02bd807cd6af22da9df249b8e2134c41dc8f57c3b8",
+      "afterSha256": "214f5c599e83cc19fa6dbe02bd807cd6af22da9df249b8e2134c41dc8f57c3b8"
+    },
+    {
+      "file": "src/circuit/annotations/GraphicView.tsx",
+      "unchanged": true,
+      "beforeSha256": "f9136cab99af9842d4eeef03c7fde653a660ce1a0c30f88dc0277e365323df68",
+      "afterSha256": "f9136cab99af9842d4eeef03c7fde653a660ce1a0c30f88dc0277e365323df68"
+    },
+    {
+      "file": "src/circuit/annotations/LoopArrowView.tsx",
+      "unchanged": true,
+      "beforeSha256": "36ebea9f81e28f2a46c0fa210f7c784a6b953292daadd889d54be6c1dad5399f",
+      "afterSha256": "36ebea9f81e28f2a46c0fa210f7c784a6b953292daadd889d54be6c1dad5399f"
+    },
+    {
+      "file": "src/circuit/annotations/MathText.tsx",
+      "unchanged": true,
+      "beforeSha256": "d47ad2566e11812ff9f94283f0630c2bd70d0c29ab663db74f496ffcf7ccc5a9",
+      "afterSha256": "d47ad2566e11812ff9f94283f0630c2bd70d0c29ab663db74f496ffcf7ccc5a9"
+    },
+    {
+      "file": "src/circuit/components/ComponentView.tsx",
+      "unchanged": true,
+      "beforeSha256": "be3b6a2604af3959d6ec65c3bd249ec6f3fc95311ce0ef6b3e3e51b609a23b1f",
+      "afterSha256": "be3b6a2604af3959d6ec65c3bd249ec6f3fc95311ce0ef6b3e3e51b609a23b1f"
+    },
+    {
+      "file": "src/circuit/components/Symbol.tsx",
+      "unchanged": true,
+      "beforeSha256": "fea2f7eab9b16c5743ccdd10d468d2794dbcaefebdff9d7b5faadcc4007bf95b",
+      "afterSha256": "fea2f7eab9b16c5743ccdd10d468d2794dbcaefebdff9d7b5faadcc4007bf95b"
+    },
+    {
+      "file": "src/circuit/junctions/JunctionView.tsx",
+      "unchanged": true,
+      "beforeSha256": "6ea3188133ea8eca78cf9353329b0501db1164ece095358f493928b7c4c4ff86",
+      "afterSha256": "6ea3188133ea8eca78cf9353329b0501db1164ece095358f493928b7c4c4ff86"
+    },
+    {
+      "file": "src/circuit/wires/WireBridges.tsx",
+      "unchanged": true,
+      "beforeSha256": "68d4d10c482e9ee99ff58d97d3c2b0f48897e56163b434d888d4060f2f314542",
+      "afterSha256": "68d4d10c482e9ee99ff58d97d3c2b0f48897e56163b434d888d4060f2f314542"
+    },
+    {
+      "file": "src/circuit/wires/WireView.tsx",
+      "unchanged": true,
+      "beforeSha256": "f29c51e0536b798ffbf9232c7592d7130c09f73f74d2b2ae07579bb621782dde",
+      "afterSha256": "f29c51e0536b798ffbf9232c7592d7130c09f73f74d2b2ae07579bb621782dde"
+    },
+    {
+      "file": "src/components/editor/Canvas.tsx",
+      "unchanged": true,
+      "beforeSha256": "ef9aef002fed8e965465c21f2ccb34705fac5bc67ff2700332d5f66822366e6b",
+      "afterSha256": "ef9aef002fed8e965465c21f2ccb34705fac5bc67ff2700332d5f66822366e6b"
+    },
+    {
+      "file": "src/components/editor/CircuitLayer.tsx",
+      "unchanged": true,
+      "beforeSha256": "9252e7239b666af5a9a32851048bf3749ad29f641ee784ca158511ccbd7bf9c5",
+      "afterSha256": "9252e7239b666af5a9a32851048bf3749ad29f641ee784ca158511ccbd7bf9c5"
+    },
+    {
+      "file": "src/components/editor/DistanceGuideLayer.tsx",
+      "unchanged": true,
+      "beforeSha256": "b552b8b71c5c56b16bf8b4a8a20f32cb1a07f56f27c693a26f1d0732e7ed4e2b",
+      "afterSha256": "b552b8b71c5c56b16bf8b4a8a20f32cb1a07f56f27c693a26f1d0732e7ed4e2b"
+    },
+    {
+      "file": "src/components/editor/InlineTextEditor.tsx",
+      "unchanged": true,
+      "beforeSha256": "9112cff895f6c4b694db68855167bc7fe78c025a757651608ced90bce2ca1be4",
+      "afterSha256": "9112cff895f6c4b694db68855167bc7fe78c025a757651608ced90bce2ca1be4"
+    },
+    {
+      "file": "src/components/editor/SelectionLayer.tsx",
+      "unchanged": true,
+      "beforeSha256": "5d729189a2945bf9f568c48aac5ce8e0af86fc4589b2ba25c390fa20da79a785",
+      "afterSha256": "5d729189a2945bf9f568c48aac5ce8e0af86fc4589b2ba25c390fa20da79a785"
+    },
+    {
+      "file": "src/components/editor/TargetFeedbackLayer.tsx",
+      "unchanged": true,
+      "beforeSha256": "7de2dc81e3a1b4bd5a6f95230f6ac3cccbfbcbae38f98adde147e1d5e566a70d",
+      "afterSha256": "7de2dc81e3a1b4bd5a6f95230f6ac3cccbfbcbae38f98adde147e1d5e566a70d"
+    },
+    {
+      "file": "src/components/editor/useCanvasFocus.ts",
+      "unchanged": true,
+      "beforeSha256": "012d1747f40f1afd97981d087e36f95cee2d245c866f42f6d71c68ad9058bea1",
+      "afterSha256": "012d1747f40f1afd97981d087e36f95cee2d245c866f42f6d71c68ad9058bea1"
+    },
+    {
+      "file": "src/components/editor/useCanvasInteractions.ts",
+      "unchanged": true,
+      "beforeSha256": "7724641704a8f5447ac1f773de8f870c685801ac36f12348bf20ebeeca317dec",
+      "afterSha256": "7724641704a8f5447ac1f773de8f870c685801ac36f12348bf20ebeeca317dec"
+    },
+    {
+      "file": "src/components/editor/useKeyboardNudge.ts",
+      "unchanged": true,
+      "beforeSha256": "382f89eeaab7192a7176a26636c72af4bff4f82a6b131bf257886abc624051aa",
+      "afterSha256": "382f89eeaab7192a7176a26636c72af4bff4f82a6b131bf257886abc624051aa"
+    },
+    {
+      "file": "src/components/editor/useTerminalProximity.ts",
+      "unchanged": true,
+      "beforeSha256": "7cde1f9ac892939c3c509921c21672ea19a99d63432bdcce3400c2344c911d0a",
+      "afterSha256": "7cde1f9ac892939c3c509921c21672ea19a99d63432bdcce3400c2344c911d0a"
+    },
+    {
+      "file": "src/components/editor/zoomPreferences.ts",
+      "unchanged": true,
+      "beforeSha256": "eec4903baaad7322345db428bf3f744abdd80796dbd8b65b0f64c17558b42f6e",
+      "afterSha256": "eec4903baaad7322345db428bf3f744abdd80796dbd8b65b0f64c17558b42f6e"
+    },
+    {
+      "file": "src/components/palette/ComponentPreview.tsx",
+      "unchanged": true,
+      "beforeSha256": "9ec95659e04a8af5d7c7f10bdf8a34ee9e14e2268dd4916241bcab1ca2c6ba75",
+      "afterSha256": "9ec95659e04a8af5d7c7f10bdf8a34ee9e14e2268dd4916241bcab1ca2c6ba75"
+    },
+    {
+      "file": "src/components/palette/ComponentSidebar.tsx",
+      "unchanged": true,
+      "beforeSha256": "e01e1c61e3109436b849ad70497718bf8afa4bee0e848674dde1b302b14167ff",
+      "afterSha256": "e01e1c61e3109436b849ad70497718bf8afa4bee0e848674dde1b302b14167ff"
+    },
+    {
+      "file": "src/components/palette/Palette.tsx",
+      "unchanged": true,
+      "beforeSha256": "56b7e625d8917156fd313f499fe25281b87ca1de04705025864330c9bbe9e7c0",
+      "afterSha256": "56b7e625d8917156fd313f499fe25281b87ca1de04705025864330c9bbe9e7c0"
+    },
+    {
+      "file": "src/components/palette/useSidebarPreferences.ts",
+      "unchanged": true,
+      "beforeSha256": "5f75e665b1dead8cf37d08319fa470060aa599fb9ff69fd5ef2dd5af4d66fc5f",
+      "afterSha256": "5f75e665b1dead8cf37d08319fa470060aa599fb9ff69fd5ef2dd5af4d66fc5f"
+    },
+    {
+      "file": "src/components/properties/EditorCommandContext.ts",
+      "unchanged": true,
+      "beforeSha256": "3daccaca8c458707a24285a0f234a2c47681670fcf17e4ec27fa1288a1d285ed",
+      "afterSha256": "3daccaca8c458707a24285a0f234a2c47681670fcf17e4ec27fa1288a1d285ed"
+    },
+    {
+      "file": "src/components/properties/ElectricalProperties.tsx",
+      "unchanged": true,
+      "beforeSha256": "18ed3894927ec36440bbbfd0cc48c278bd9a44f259b329ab9e7c6988b277429e",
+      "afterSha256": "18ed3894927ec36440bbbfd0cc48c278bd9a44f259b329ab9e7c6988b277429e"
+    },
+    {
+      "file": "src/components/properties/PropertiesContent.tsx",
+      "unchanged": true,
+      "beforeSha256": "75361dd53961cce348855908d79bde63d02bccb3a4da44d172755943cbc4060d",
+      "afterSha256": "75361dd53961cce348855908d79bde63d02bccb3a4da44d172755943cbc4060d"
+    },
+    {
+      "file": "src/components/properties/PropertiesInspector.tsx",
+      "unchanged": true,
+      "beforeSha256": "13c50ec5db39b811430a8209963e22e361c757cdebebce543979ab28681c1e0f",
+      "afterSha256": "13c50ec5db39b811430a8209963e22e361c757cdebebce543979ab28681c1e0f"
+    },
+    {
+      "file": "src/components/properties/PropertyControls.tsx",
+      "unchanged": true,
+      "beforeSha256": "aebe7d2045fd3a48ac0343862730c4c23ce02cce683f25eb72093f37ac96e8dc",
+      "afterSha256": "aebe7d2045fd3a48ac0343862730c4c23ce02cce683f25eb72093f37ac96e8dc"
+    },
+    {
+      "file": "src/components/properties/ReplaceDialog.tsx",
+      "unchanged": true,
+      "beforeSha256": "8295c9fa5b26e7c6d8c941662259e288786c3bfdc58c2b2235f31cd24b25091a",
+      "afterSha256": "8295c9fa5b26e7c6d8c941662259e288786c3bfdc58c2b2235f31cd24b25091a"
+    },
+    {
+      "file": "src/components/properties/SelectionActions.tsx",
+      "unchanged": true,
+      "beforeSha256": "855c8c48d612820ff67b378f66c553f0a14baf4baa29f170436ba12473a83b54",
+      "afterSha256": "855c8c48d612820ff67b378f66c553f0a14baf4baa29f170436ba12473a83b54"
+    },
+    {
+      "file": "src/components/properties/SelectionGeometry.tsx",
+      "unchanged": true,
+      "beforeSha256": "ca2a8b13b05f8d9000c1d2e3c98b413976efc5c6d17e854bc30ed05fd2abb17e",
+      "afterSha256": "ca2a8b13b05f8d9000c1d2e3c98b413976efc5c6d17e854bc30ed05fd2abb17e"
+    },
+    {
+      "file": "src/components/properties/SelectionStyle.tsx",
+      "unchanged": true,
+      "beforeSha256": "68bde09e78a6f5df68722eae89aac49dc29144c43eae6c7d3fb40311eab87be0",
+      "afterSha256": "68bde09e78a6f5df68722eae89aac49dc29144c43eae6c7d3fb40311eab87be0"
+    },
+    {
+      "file": "src/components/properties/annotationActions.ts",
+      "unchanged": true,
+      "beforeSha256": "935055bb837503fcd3387d528098d0c298c2dd10b5b3b76fa1742ce07c21e5c7",
+      "afterSha256": "935055bb837503fcd3387d528098d0c298c2dd10b5b3b76fa1742ce07c21e5c7"
+    },
+    {
+      "file": "src/components/properties/commonValue.ts",
+      "unchanged": true,
+      "beforeSha256": "1aaf809f97b8542aa727547f19faec2ba7067d946a54432112c06539960091d7",
+      "afterSha256": "1aaf809f97b8542aa727547f19faec2ba7067d946a54432112c06539960091d7"
+    },
+    {
+      "file": "src/components/properties/useInspectorPreferences.ts",
+      "unchanged": true,
+      "beforeSha256": "275f1000d7ae8c10ba78b3c19dfb029c58476221e25280c3fd1fb1f55d7bd5a8",
+      "afterSha256": "275f1000d7ae8c10ba78b3c19dfb029c58476221e25280c3fd1fb1f55d7bd5a8"
+    },
+    {
+      "file": "src/components/toolbar/ActionMenu.tsx",
+      "unchanged": true,
+      "beforeSha256": "d981482736a0a0f8c19fdf8f97847809d715f1aa0cbd31c9189b7c401afbbafb",
+      "afterSha256": "d981482736a0a0f8c19fdf8f97847809d715f1aa0cbd31c9189b7c401afbbafb"
+    },
+    {
+      "file": "src/components/toolbar/BlockNameDialog.tsx",
+      "unchanged": true,
+      "beforeSha256": "96c1acb84375b1305eee0d22aafa0cb7b0b7c0ba9a8a47aec748a6334fe64526",
+      "afterSha256": "96c1acb84375b1305eee0d22aafa0cb7b0b7c0ba9a8a47aec748a6334fe64526"
+    },
+    {
+      "file": "src/components/toolbar/DrawingIcons.tsx",
+      "unchanged": true,
+      "beforeSha256": "488da012dd8faba1a465a6b4fa922a6c2b3e4cdea7f522c93c670bfc5cb17793",
+      "afterSha256": "488da012dd8faba1a465a6b4fa922a6c2b3e4cdea7f522c93c670bfc5cb17793"
+    },
+    {
+      "file": "src/components/toolbar/ExportDialog.tsx",
+      "unchanged": true,
+      "beforeSha256": "35a297fcf74abee96b34ba012ce20d777a977828d9c120c73feddf643755d756",
+      "afterSha256": "35a297fcf74abee96b34ba012ce20d777a977828d9c120c73feddf643755d756"
+    },
+    {
+      "file": "src/components/toolbar/HelpDialog.tsx",
+      "unchanged": true,
+      "beforeSha256": "f61042a98f1777045fc2dac185c5eca258f1a9ac900b6189927c72364a42c0c1",
+      "afterSha256": "f61042a98f1777045fc2dac185c5eca258f1a9ac900b6189927c72364a42c0c1"
+    },
+    {
+      "file": "src/components/toolbar/IconButton.tsx",
+      "unchanged": true,
+      "beforeSha256": "31b5c6d7e17f783efc22c03c79c0add85628d563c9961b1e12500ead2639e4ac",
+      "afterSha256": "31b5c6d7e17f783efc22c03c79c0add85628d563c9961b1e12500ead2639e4ac"
+    },
+    {
+      "file": "src/components/toolbar/SidebarIcon.tsx",
+      "unchanged": true,
+      "beforeSha256": "e187dcba5b7ce7dc7e90eac81664c5e2c1973281ee28a96470b0ddbb350a34f5",
+      "afterSha256": "e187dcba5b7ce7dc7e90eac81664c5e2c1973281ee28a96470b0ddbb350a34f5"
+    },
+    {
+      "file": "src/components/toolbar/SidebarToggle.tsx",
+      "unchanged": true,
+      "beforeSha256": "5887e0cfe7dbac508cb5fb1c6f98aafe26cb242df70dafc2271288036eed007f",
+      "afterSha256": "5887e0cfe7dbac508cb5fb1c6f98aafe26cb242df70dafc2271288036eed007f"
+    },
+    {
+      "file": "src/components/toolbar/Toolbar.tsx",
+      "unchanged": true,
+      "beforeSha256": "6c5ffc26360d349498e5b3ba512b8b0ae67a0f36c9631b8cb4bb0645d689f64f",
+      "afterSha256": "6c5ffc26360d349498e5b3ba512b8b0ae67a0f36c9631b8cb4bb0645d689f64f"
+    },
+    {
+      "file": "src/components/toolbar/actionMenuPosition.ts",
+      "unchanged": true,
+      "beforeSha256": "23048e7685d3241ba9f158ded7ba7399a9bf4233165ca14d7891e173ed62ab6b",
+      "afterSha256": "23048e7685d3241ba9f158ded7ba7399a9bf4233165ca14d7891e173ed62ab6b"
+    },
+    {
+      "file": "src/components/toolbar/useDialogFocus.ts",
+      "unchanged": true,
+      "beforeSha256": "43ccfdc3f0318352629c0092380df694e12ee3ea7ae3e4df469120ba258e45ce",
+      "afterSha256": "43ccfdc3f0318352629c0092380df694e12ee3ea7ae3e4df469120ba258e45ce"
+    },
+    {
+      "file": "src/components/toolbar/useEditActions.tsx",
+      "unchanged": true,
+      "beforeSha256": "3ce6a7c5b327834c701cab1804df6eadd02b12c458152b36a223d74802668fdf",
+      "afterSha256": "3ce6a7c5b327834c701cab1804df6eadd02b12c458152b36a223d74802668fdf"
+    },
+    {
+      "file": "src/components/toolbar/useFloatingToolbar.ts",
+      "unchanged": true,
+      "beforeSha256": "6776d83878a5206b6c5e5f6c46bdcfc80bda1c326ce8adf5ef25893155867406",
+      "afterSha256": "6776d83878a5206b6c5e5f6c46bdcfc80bda1c326ce8adf5ef25893155867406"
+    },
+    {
+      "file": "src/fonts/comic-relief.css",
+      "unchanged": true,
+      "beforeSha256": "18a0a2061eb827b306086ae4ab200984aa966b44e771e20f18ad57600c8388c0",
+      "afterSha256": "18a0a2061eb827b306086ae4ab200984aa966b44e771e20f18ad57600c8388c0"
+    },
+    {
+      "file": "src/fonts/comic-relief/ComicRelief-Bold.woff2",
+      "unchanged": true,
+      "beforeSha256": "baa413b355f3c9ca2c58475905dbf1603331d6da209c75d68563adced185e488",
+      "afterSha256": "baa413b355f3c9ca2c58475905dbf1603331d6da209c75d68563adced185e488"
+    },
+    {
+      "file": "src/fonts/comic-relief/ComicRelief-Regular.woff2",
+      "unchanged": true,
+      "beforeSha256": "4d8dd5462d355f734ac9a79726c66a70c13b5823613c47ad2f7d66125f73f13e",
+      "afterSha256": "4d8dd5462d355f734ac9a79726c66a70c13b5823613c47ad2f7d66125f73f13e"
+    },
+    {
+      "file": "src/fonts/comic-relief/OFL.txt",
+      "unchanged": true,
+      "beforeSha256": "1acec120d128cd0c445f6f11a94a0e1deab9c886faf47c15efc304bc025f4a0e",
+      "afterSha256": "1acec120d128cd0c445f6f11a94a0e1deab9c886faf47c15efc304bc025f4a0e"
+    },
+    {
+      "file": "src/fonts/comic-relief/README.md",
+      "unchanged": true,
+      "beforeSha256": "b402612a5f6ca855e37547cc2629c84a3aee32f5a66463285cb6098859a7ade8",
+      "afterSha256": "b402612a5f6ca855e37547cc2629c84a3aee32f5a66463285cb6098859a7ade8"
+    },
+    {
+      "file": "src/fonts/embedded.ts",
+      "unchanged": true,
+      "beforeSha256": "369fd4b473a9053dda22c06894748850c12bf64001977312e73f7ea650a17252",
+      "afterSha256": "369fd4b473a9053dda22c06894748850c12bf64001977312e73f7ea650a17252"
+    },
+    {
+      "file": "src/main.tsx",
+      "unchanged": true,
+      "beforeSha256": "c1daf70fe827337fd146693290c82d4cd58efe0ee044f3450cba19e319853891",
+      "afterSha256": "c1daf70fe827337fd146693290c82d4cd58efe0ee044f3450cba19e319853891"
+    },
+    {
+      "file": "src/math/latex.ts",
+      "unchanged": true,
+      "beforeSha256": "de669bb3721f2641148f8474ada6e60b0fc59311d2d734c20145270dec9da251",
+      "afterSha256": "de669bb3721f2641148f8474ada6e60b0fc59311d2d734c20145270dec9da251"
+    },
+    {
+      "file": "src/math/primeGlyph.ts",
+      "unchanged": true,
+      "beforeSha256": "0b0ff295c8a953a113e5d7cc5d945a05260d18bdc1919273361e4a97c4f6b74f",
+      "afterSha256": "0b0ff295c8a953a113e5d7cc5d945a05260d18bdc1919273361e4a97c4f6b74f"
+    },
+    {
+      "file": "src/model/archive.ts",
+      "unchanged": true,
+      "beforeSha256": "05aed30f60b47c9504befdb65cbc18861debb07603f5570c0e41c5c7cee9ae6a",
+      "afterSha256": "05aed30f60b47c9504befdb65cbc18861debb07603f5570c0e41c5c7cee9ae6a"
+    },
+    {
+      "file": "src/model/capabilities.ts",
+      "unchanged": true,
+      "beforeSha256": "7c189d32c033c2343ccc7d0e4163b1ce829dde9f67fc2cfb91102784cbae2bb8",
+      "afterSha256": "7c189d32c033c2343ccc7d0e4163b1ce829dde9f67fc2cfb91102784cbae2bb8"
+    },
+    {
+      "file": "src/model/catalog.ts",
+      "unchanged": true,
+      "beforeSha256": "06dc2ba97ab50d6c37fad0b8ec754763bbefd5d4bb4f56bc858ad49d92536da6",
+      "afterSha256": "06dc2ba97ab50d6c37fad0b8ec754763bbefd5d4bb4f56bc858ad49d92536da6"
+    },
+    {
+      "file": "src/model/demo.ts",
+      "unchanged": true,
+      "beforeSha256": "e44d780e842bbf66c6ab3fd5c20fda5f39f3a93faed32f75c027fe678d623520",
+      "afterSha256": "e44d780e842bbf66c6ab3fd5c20fda5f39f3a93faed32f75c027fe678d623520"
+    },
+    {
+      "file": "src/model/factories.ts",
+      "unchanged": true,
+      "beforeSha256": "5e7aeb246626f02dca4e06e8cb9beeef0dcd5aaa250fda616c5295a06eace0cf",
+      "afterSha256": "5e7aeb246626f02dca4e06e8cb9beeef0dcd5aaa250fda616c5295a06eace0cf"
+    },
+    {
+      "file": "src/model/fonts.ts",
+      "unchanged": true,
+      "beforeSha256": "a07b5c4f5c5d5e75051c7a7e179934fbf8d6c16c177dc1e275ac4858f45c0025",
+      "afterSha256": "a07b5c4f5c5d5e75051c7a7e179934fbf8d6c16c177dc1e275ac4858f45c0025"
+    },
+    {
+      "file": "src/model/replacement.ts",
+      "unchanged": true,
+      "beforeSha256": "6998cda1e151ab13d5d338bd7fe07c763956545394414399558b13fe0c73799d",
+      "afterSha256": "6998cda1e151ab13d5d338bd7fe07c763956545394414399558b13fe0c73799d"
+    },
+    {
+      "file": "src/model/serialization.ts",
+      "unchanged": true,
+      "beforeSha256": "2b13cd66ea2032ff6e49ba867fcadb7780a9e4db8239e8063c32eb53676aa17e",
+      "afterSha256": "2b13cd66ea2032ff6e49ba867fcadb7780a9e4db8239e8063c32eb53676aa17e"
+    },
+    {
+      "file": "src/model/symbolBounds.ts",
+      "unchanged": true,
+      "beforeSha256": "2f1ee2df327d75dbe7c684c100018a677eed91ffaa248f709ae8821919f46bc3",
+      "afterSha256": "2f1ee2df327d75dbe7c684c100018a677eed91ffaa248f709ae8821919f46bc3"
+    },
+    {
+      "file": "src/model/symbolGeometry.ts",
+      "unchanged": true,
+      "beforeSha256": "c7581a924ffecf707ab27bba2a8fb543233981d33932547e5a085f39d341dcf9",
+      "afterSha256": "c7581a924ffecf707ab27bba2a8fb543233981d33932547e5a085f39d341dcf9"
+    },
+    {
+      "file": "src/model/types.ts",
+      "unchanged": true,
+      "beforeSha256": "f9f7a456fdf5f933ca5223dd7585184a123fd3d99af7d767e3a1019f1bbbb78a",
+      "afterSha256": "f9f7a456fdf5f933ca5223dd7585184a123fd3d99af7d767e3a1019f1bbbb78a"
+    },
+    {
+      "file": "src/personalBlocks/PersonalBlockPalette.tsx",
+      "unchanged": true,
+      "beforeSha256": "c97be5633629b3c43ca74d236b94f761c84560097fce5a56d5765e4b829bbb31",
+      "afterSha256": "c97be5633629b3c43ca74d236b94f761c84560097fce5a56d5765e4b829bbb31"
+    },
+    {
+      "file": "src/personalBlocks/library.ts",
+      "unchanged": true,
+      "beforeSha256": "5b13ac69050a5fc52328e2c4ed7f0b90ff0600a03e635bf14515fb61ed12fc76",
+      "afterSha256": "5b13ac69050a5fc52328e2c4ed7f0b90ff0600a03e635bf14515fb61ed12fc76"
+    },
+    {
+      "file": "src/png/exporter.ts",
+      "unchanged": true,
+      "beforeSha256": "4da5c078d22c8b88d40eedb16df35df10312c3fd594414d0b9a6a14bcf62b361",
+      "afterSha256": "4da5c078d22c8b88d40eedb16df35df10312c3fd594414d0b9a6a14bcf62b361"
+    },
+    {
+      "file": "src/presets/PresetPlacementLayer.tsx",
+      "unchanged": true,
+      "beforeSha256": "2266d26d51b0479f99f44ec37d945fbda0c88d21130510925a7c2e224726f108",
+      "afterSha256": "2266d26d51b0479f99f44ec37d945fbda0c88d21130510925a7c2e224726f108"
+    },
+    {
+      "file": "src/presets/PresetThumbnail.tsx",
+      "unchanged": true,
+      "beforeSha256": "95c5ad63a39f54262a6872098330a7304787b4af044f63fb5977547b006d6ea1",
+      "afterSha256": "95c5ad63a39f54262a6872098330a7304787b4af044f63fb5977547b006d6ea1"
+    },
+    {
+      "file": "src/presets/instantiate.ts",
+      "unchanged": true,
+      "beforeSha256": "26868182de21809b1105ae6136329109884eff4e5a885ab4f5d79c370b180eb8",
+      "afterSha256": "26868182de21809b1105ae6136329109884eff4e5a885ab4f5d79c370b180eb8"
+    },
+    {
+      "file": "src/presets/registry.ts",
+      "unchanged": true,
+      "beforeSha256": "6a3dcd069ca303cf7feeec523884e822bf4165e757a8b6aded2f713e5e199ded",
+      "afterSha256": "6a3dcd069ca303cf7feeec523884e822bf4165e757a8b6aded2f713e5e199ded"
+    },
+    {
+      "file": "src/presets/types.ts",
+      "unchanged": true,
+      "beforeSha256": "d2a074892b96de4241752242ef5a424ffce40173e09ae7253d6ed08f64b9fa16",
+      "afterSha256": "d2a074892b96de4241752242ef5a424ffce40173e09ae7253d6ed08f64b9fa16"
+    },
+    {
+      "file": "src/pwa/retireLegacyOffline.ts",
+      "unchanged": true,
+      "beforeSha256": "2be5396ae8efb26ac7b6a6704893a7a3cdc3824a850bf72f93cd4be50218c366",
+      "afterSha256": "2be5396ae8efb26ac7b6a6704893a7a3cdc3824a850bf72f93cd4be50218c366"
+    },
+    {
+      "file": "src/smartPlacement/PlacementLayer.tsx",
+      "unchanged": true,
+      "beforeSha256": "986bc860343dae0347d0aacbccfa29b78271cbe35561267df3f0aa0beb1bd402",
+      "afterSha256": "986bc860343dae0347d0aacbccfa29b78271cbe35561267df3f0aa0beb1bd402"
+    },
+    {
+      "file": "src/smartPlacement/findCandidates.ts",
+      "unchanged": true,
+      "beforeSha256": "02eef962840d4dd5fe2bf90f985873a433bf9a01bf126eb2ba0b076efaa8fa10",
+      "afterSha256": "02eef962840d4dd5fe2bf90f985873a433bf9a01bf126eb2ba0b076efaa8fa10"
+    },
+    {
+      "file": "src/smartPlacement/smartConnection.ts",
+      "unchanged": true,
+      "beforeSha256": "fc60df9e51fe281d8395d1c2e5a68ea0a845add47c68adf9ee2ed3feeba27f7a",
+      "afterSha256": "fc60df9e51fe281d8395d1c2e5a68ea0a845add47c68adf9ee2ed3feeba27f7a"
+    },
+    {
+      "file": "src/smartPlacement/spatialIndex.ts",
+      "unchanged": true,
+      "beforeSha256": "a4738846bf7b170b29d5a35ccb2f198beb3ed9e280ad694e1fda58d82b9d57c4",
+      "afterSha256": "a4738846bf7b170b29d5a35ccb2f198beb3ed9e280ad694e1fda58d82b9d57c4"
+    },
+    {
+      "file": "src/smartPlacement/types.ts",
+      "unchanged": true,
+      "beforeSha256": "39395ed562d2cc7dc3f3a3d7d091b35850787772462dc11c812b5524c9b7cabe",
+      "afterSha256": "39395ed562d2cc7dc3f3a3d7d091b35850787772462dc11c812b5524c9b7cabe"
+    },
+    {
+      "file": "src/smartPlacement/useSmartPlacement.ts",
+      "unchanged": true,
+      "beforeSha256": "412fd6e88ae559a701a54faf7c1564767cd88d7a06837ed03f9b86318beaf70e",
+      "afterSha256": "412fd6e88ae559a701a54faf7c1564767cd88d7a06837ed03f9b86318beaf70e"
+    },
+    {
+      "file": "src/store/editorStore.ts",
+      "unchanged": true,
+      "beforeSha256": "4ecf47275bacd1cb6f6f5f7bbc1f23a6afb8bc04a7d03732fa430e2dccf07dcd",
+      "afterSha256": "4ecf47275bacd1cb6f6f5f7bbc1f23a6afb8bc04a7d03732fa430e2dccf07dcd"
+    },
+    {
+      "file": "src/styles.css",
+      "unchanged": true,
+      "beforeSha256": "c132764a8c86ddd913a9a90b63d2404b37b758ccfff47cd73c1579399e59294b",
+      "afterSha256": "c132764a8c86ddd913a9a90b63d2404b37b758ccfff47cd73c1579399e59294b"
+    },
+    {
+      "file": "src/svg/exporter.tsx",
+      "unchanged": true,
+      "beforeSha256": "529794386687787a0a7cc8b54c31f8f20e573bd8881ea42e2d64a555b4dbbc11",
+      "afterSha256": "529794386687787a0a7cc8b54c31f8f20e573bd8881ea42e2d64a555b4dbbc11"
+    },
+    {
+      "file": "src/tikz/arrowheads.ts",
+      "unchanged": true,
+      "beforeSha256": "6ca8d5810588845432b9962cee9daed11a2c8f225cb9d53cdecbc7b109a6f8f5",
+      "afterSha256": "6ca8d5810588845432b9962cee9daed11a2c8f225cb9d53cdecbc7b109a6f8f5"
+    },
+    {
+      "file": "src/tikz/canvasText.ts",
+      "unchanged": false,
+      "beforeSha256": "b57be5567dff0057d4eb2e4ff2e82325546ee91f7f7293cc0db47da95be73267",
+      "afterSha256": "e9643befb2e8c07f40ddfc73eaaf6d7febd5097230f4ee227218f902a9f04191"
+    },
+    {
+      "file": "src/tikz/exporter.ts",
+      "unchanged": false,
+      "beforeSha256": "18af3eee96167492ab25c815151d546e5a9519884ce357bd7041e18c3fc1d43c",
+      "afterSha256": "6cb38cd3b94db9ab7b0fc7a6516edad2292155edc53bbbb3b29c0c21a4053eb0"
+    },
+    {
+      "file": "src/tikz/fonts.ts",
+      "unchanged": false,
+      "beforeSha256": "fb3c118ade0b37a9fd1bf829be59bf851ba49738fc9b46861c3ae51bb0031fc8",
+      "afterSha256": "5a0c9c3b96e99b6351328e4d65ab9d01cb8111232a9a51b8eeecd6637a0df5e4"
+    },
+    {
+      "file": "src/tikz/selection.ts",
+      "unchanged": true,
+      "beforeSha256": "0e0839998f7697a426f3a0e4c5fa4c1a74a74e4d5f9018d224a049a013f76514",
+      "afterSha256": "0e0839998f7697a426f3a0e4c5fa4c1a74a74e4d5f9018d224a049a013f76514"
+    },
+    {
+      "file": "src/tikz/svgSpecial.ts",
+      "unchanged": false,
+      "beforeSha256": "2dd1219c4b6e5d9553dedb8daed56374b78ad990f86d9116b6de34d139a2e140",
+      "afterSha256": "e4a92c580511b980f47f3dfd4508e33e3829e347989bf47a6768399fd944d0f2"
+    },
+    {
+      "file": "src/tikz/symbolGeometry.ts",
+      "unchanged": true,
+      "beforeSha256": "56256016e745ed49662ecc956f9d0a51e3cb4d82ca70f08723528733228a6384",
+      "afterSha256": "56256016e745ed49662ecc956f9d0a51e3cb4d82ca70f08723528733228a6384"
+    },
+    {
+      "file": "src/tikz/units.ts",
+      "unchanged": true,
+      "beforeSha256": "1c920aff4e2407084e1fb4ff71f36e48f6f9190a31010eb83f5f9f00ea1d1d56",
+      "afterSha256": "1c920aff4e2407084e1fb4ff71f36e48f6f9190a31010eb83f5f9f00ea1d1d56"
+    },
+    {
+      "file": "src/tikz/validation.ts",
+      "unchanged": true,
+      "beforeSha256": "e54d94601cdf272ef31693ee4d0661d451770ea0819c2fe3438c5734ba2234db",
+      "afterSha256": "e54d94601cdf272ef31693ee4d0661d451770ea0819c2fe3438c5734ba2234db"
+    },
+    {
+      "file": "src/utils/arrows.ts",
+      "unchanged": true,
+      "beforeSha256": "3f2f1c7ce5517c81ae80f7886c91f5b6096fb5c79560fa5975337275a50d8709",
+      "afterSha256": "3f2f1c7ce5517c81ae80f7886c91f5b6096fb5c79560fa5975337275a50d8709"
+    },
+    {
+      "file": "src/utils/clipboard.ts",
+      "unchanged": true,
+      "beforeSha256": "f94fda4bd6e3f089444856b921d5f6781ced5f1443d4cc0f797e95c6b49c3138",
+      "afterSha256": "f94fda4bd6e3f089444856b921d5f6781ced5f1443d4cc0f797e95c6b49c3138"
+    },
+    {
+      "file": "src/utils/crossings.ts",
+      "unchanged": true,
+      "beforeSha256": "bfa729ee6e8cfec1dfded295939c698b40d531a94e2ee6edc6613ab00d651fe3",
+      "afterSha256": "bfa729ee6e8cfec1dfded295939c698b40d531a94e2ee6edc6613ab00d651fe3"
+    },
+    {
+      "file": "src/utils/files.ts",
+      "unchanged": true,
+      "beforeSha256": "cd31c667e1d2bbae0cdd33172e56082487b04ee6418256e4794181a41b68d16a",
+      "afterSha256": "cd31c667e1d2bbae0cdd33172e56082487b04ee6418256e4794181a41b68d16a"
+    },
+    {
+      "file": "src/utils/geometry.ts",
+      "unchanged": true,
+      "beforeSha256": "28cb81a549831e2b247d18b0255aefcd8516f8ba59eb456aec166448bbe5aa73",
+      "afterSha256": "28cb81a549831e2b247d18b0255aefcd8516f8ba59eb456aec166448bbe5aa73"
+    },
+    {
+      "file": "src/utils/labels.ts",
+      "unchanged": true,
+      "beforeSha256": "365f8e122cb4f06c1ff199eca9156ec967aeeda3adef8fa90bdc85c729ae71a3",
+      "afterSha256": "365f8e122cb4f06c1ff199eca9156ec967aeeda3adef8fa90bdc85c729ae71a3"
+    },
+    {
+      "file": "src/utils/localPersistence.ts",
+      "unchanged": true,
+      "beforeSha256": "16435f179b7f188d0170a4db5d28ef0bf9906cf08e393c1c3c16b2e912e1f5c0",
+      "afterSha256": "16435f179b7f188d0170a4db5d28ef0bf9906cf08e393c1c3c16b2e912e1f5c0"
+    },
+    {
+      "file": "src/utils/loops.ts",
+      "unchanged": true,
+      "beforeSha256": "094f6b99f483572ea4c5c9c547c33a1af84e25910f09d5314fab400a6c691e8c",
+      "afterSha256": "094f6b99f483572ea4c5c9c547c33a1af84e25910f09d5314fab400a6c691e8c"
+    },
+    {
+      "file": "src/utils/measurementGeometry.ts",
+      "unchanged": true,
+      "beforeSha256": "3960270ee65e336528d7fbda328b1aeba70c28b49f8c3d5706a0e8f79bebf371",
+      "afterSha256": "3960270ee65e336528d7fbda328b1aeba70c28b49f8c3d5706a0e8f79bebf371"
+    },
+    {
+      "file": "src/utils/nodeLabels.ts",
+      "unchanged": true,
+      "beforeSha256": "330deb4d8f101a719ce09cce81f70b4b2145ac1cec3dc88354c890e32560e816",
+      "afterSha256": "330deb4d8f101a719ce09cce81f70b4b2145ac1cec3dc88354c890e32560e816"
+    },
+    {
+      "file": "src/utils/operations.ts",
+      "unchanged": true,
+      "beforeSha256": "a1b74e137ddfb044ac92bb7837aaf3eb29a72dd8849ad7674b3ffc1afdf73130",
+      "afterSha256": "a1b74e137ddfb044ac92bb7837aaf3eb29a72dd8849ad7674b3ffc1afdf73130"
+    },
+    {
+      "file": "src/utils/platform.ts",
+      "unchanged": true,
+      "beforeSha256": "b54f8d7fda265910e55c9d42a9ce18da6780ca8137e0c4339d176d28231b7ca1",
+      "afterSha256": "b54f8d7fda265910e55c9d42a9ce18da6780ca8137e0c4339d176d28231b7ca1"
+    },
+    {
+      "file": "src/utils/rectangles.ts",
+      "unchanged": true,
+      "beforeSha256": "557e89d39a457f1074f856841e210ddedf0d0bed1efd881d66517b6f7ba6716a",
+      "afterSha256": "557e89d39a457f1074f856841e210ddedf0d0bed1efd881d66517b6f7ba6716a"
+    },
+    {
+      "file": "src/utils/selectionGeometry.ts",
+      "unchanged": true,
+      "beforeSha256": "864ad7196e8080c244e7e9f062953972e3f3a089611aa277f8d91388e204271f",
+      "afterSha256": "864ad7196e8080c244e7e9f062953972e3f3a089611aa277f8d91388e204271f"
+    },
+    {
+      "file": "src/utils/smartGuides.ts",
+      "unchanged": true,
+      "beforeSha256": "31c5fbeabfe4a0990f44a5cb72d6b8b8181cf0e3ab88dc0c66370470976a1c56",
+      "afterSha256": "31c5fbeabfe4a0990f44a5cb72d6b8b8181cf0e3ab88dc0c66370470976a1c56"
+    },
+    {
+      "file": "src/utils/strokeStyle.ts",
+      "unchanged": true,
+      "beforeSha256": "ec810dad6112be46c18810caef2e1842639ef387a60b8b20d73a46731d66d764",
+      "afterSha256": "ec810dad6112be46c18810caef2e1842639ef387a60b8b20d73a46731d66d764"
+    },
+    {
+      "file": "src/utils/visualBounds.ts",
+      "unchanged": true,
+      "beforeSha256": "c95dfdb7904fc5e8a83a1481846f00fcbdd7ed7f0655fbf08a068f5b545e93e2",
+      "afterSha256": "c95dfdb7904fc5e8a83a1481846f00fcbdd7ed7f0655fbf08a068f5b545e93e2"
+    },
+    {
+      "file": "src/utils/wireRendering.ts",
+      "unchanged": true,
+      "beforeSha256": "936b9581afa240804312bafcaeae58b0e7094af646dd3846190968abe27b18ca",
+      "afterSha256": "936b9581afa240804312bafcaeae58b0e7094af646dd3846190968abe27b18ca"
+    },
+    {
+      "file": "src/utils/wires.ts",
+      "unchanged": true,
+      "beforeSha256": "ea20fe12823b193f12078ca736017bf1b8454f73036b3baaaa891ab5d28c7cc8",
+      "afterSha256": "ea20fe12823b193f12078ca736017bf1b8454f73036b3baaaa891ab5d28c7cc8"
+    },
+    {
+      "file": "src/vite-env.d.ts",
+      "unchanged": true,
+      "beforeSha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5",
+      "afterSha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+    }
+  ]
+}

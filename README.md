@@ -16,7 +16,7 @@ Place components, connect them, and add mathematical labels and electrical annot
 
 DrawCircuit is a web editor that saves your work in your browser and requires no account. It loads from the network and can be installed as a standalone web app in supporting browsers. Local circuits, personal blocks, and preferences remain in the browser between visits.
 
-Circuit labels and formulas use **Comic Relief**, bundled with the app so visitors see the same font without installing it. SVG, PNG, and copied Obsidian TikZ exports preserve the font too, without requiring it to be installed. The interface keeps Inter. See the font's [source and SIL Open Font License](src/fonts/comic-relief/README.md).
+Circuit labels and formulas use **Comic Relief**, bundled with the app so visitors see the same font without installing it. SVG, PNG, and copied Obsidian TikZ exports preserve the font too, without requiring it to be installed. The interface keeps Inter. Obsidian exports select embedded font subsets and compact shared drawing instructions; see the [measured TikZ/PNG comparison](docs/obsidian-optimization/report.md). See the font's [source and SIL Open Font License](src/fonts/comic-relief/README.md).
 
 ## Get started
 

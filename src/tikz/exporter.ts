@@ -14,8 +14,14 @@ import { componentRegistry } from '../model/catalog';
 import { geometryTikz, svgPathToTikz } from './symbolGeometry';
 import { finitePoint, isExportableObject, normalizeHex } from './validation';
 import { canvasArrowHead } from './arrowheads';
-import { canvasTextLayout, canvasTextTikz, CANVAS_TEXT_PREAMBLE } from './canvasText';
-import { OBSIDIAN_FONT_DEFINITIONS } from './fonts';
+import {
+  canvasTextLayout,
+  canvasTextTikz,
+  CANVAS_TEXT_PREAMBLE,
+  COMPACT_CANVAS_TEXT_PREAMBLE,
+} from './canvasText';
+import { OBSIDIAN_FONT_DEFINITIONS, obsidianFontDefinitions } from './fonts';
+import { compactTikzLines } from './compact';
 import { CANVAS_UNITS_PER_CM, NATIVE_UNITS_PER_CM, editorToPt, formatNumber } from './units';
 export const PIXELS_PER_CM = NATIVE_UNITS_PER_CM;
 const fmt = formatNumber;
@@ -61,7 +67,7 @@ export function exportTikz(source: CircuitDocument): string {
   return generateTikz(source, false);
 }
 /** One traversal owns validation, colors, wires, labels and object order for both modes. */
-function generateTikz(source: CircuitDocument, canvas: boolean): string {
+function generateTikz(source: CircuitDocument, canvas: boolean, compact = false): string {
   const unitsPerCm = canvas ? CANVAS_UNITS_PER_CM : PIXELS_PER_CM;
   const pixelsToPt = (value: number) => fmt(editorToPt(value, unitsPerCm));
   const tikzCoordinate = (point: Point) => {
@@ -95,6 +101,7 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
     ...(canvas ? [] : ['\\ctikzset{bipoles/length=1.4cm}']),
   ];
   let usesCanvasText = false;
+  const textFragments: string[] = [];
   const node = (
     text: string,
     p: Point,
@@ -127,6 +134,7 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
       const layout = canvas ? canvasTextLayout(line, size, formula, plain) : null;
       if (layout) {
         usesCanvasText = true;
+        textFragments.push(layout.svg);
         col(color);
         lines.push(
           ...canvasTextTikz(
@@ -139,6 +147,7 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
             rotation,
             align,
             tikzCoordinate,
+            compact,
           ),
         );
         return;
@@ -377,19 +386,29 @@ function generateTikz(source: CircuitDocument, canvas: boolean): string {
     if (translucent) lines.push('\\end{scope}');
   }
   labels.forEach((draw) => draw());
-  if (usesCanvasText) lines.splice(1, 0, OBSIDIAN_FONT_DEFINITIONS);
+  if (usesCanvasText)
+    lines.splice(
+      1,
+      0,
+      compact ? obsidianFontDefinitions(textFragments) : OBSIDIAN_FONT_DEFINITIONS,
+    );
   lines.push('\\end{circuitikz}');
   return [
-    canvas
-      ? '% DrawCircuit WYSIWYG — 1 editor unit = 0.75 TeX pt; SVG Y axis inverted.'
-      : '% DrawCircuit — coordinates in cm; SVG Y axis inverted.',
+    ...(compact
+      ? []
+      : [
+          canvas
+            ? '% DrawCircuit WYSIWYG — 1 editor unit = 0.75 TeX pt; SVG Y axis inverted.'
+            : '% DrawCircuit — coordinates in cm; SVG Y axis inverted.',
+        ]),
     ...Array.from(colorNames).map(([hex, name]) => `\\definecolor{${name}}{HTML}{${hex}}`),
-    ...lines,
+    ...(compact ? compactTikzLines(lines) : lines),
   ].join('\n');
 }
 /** Inline TikZ/TikZJax supply the document class and render editable SVG geometry. */
-export function exportObsidian(doc: CircuitDocument): string {
-  const tikz = generateTikz(doc, true);
+export function exportObsidian(doc: CircuitDocument, options: { compact?: boolean } = {}): string {
+  const compact = options.compact !== false;
+  const tikz = generateTikz(doc, true, compact);
   const packages = ['circuitikz'];
   if (
     /\\(?:text|operatorname|dfrac|tfrac|[dt]?binom|boxed|overset|underset|substack|xleftarrow|xrightarrow|mod|dots[bcimo]|i{2,3}nt|sideset|tag|eqref|implies|impliedby)\b|\\begin\{(?:[pbBvV]?matrix|smallmatrix|aligned|alignedat|gathered|cases|split)\}/.test(
@@ -407,7 +426,9 @@ export function exportObsidian(doc: CircuitDocument): string {
   return [
     '```tikz',
     ...packages.map((name) => `\\usepackage{${name}}`),
-    ...(tikz.includes('\\node[') ? [CANVAS_TEXT_PREAMBLE] : []),
+    ...(tikz.includes('\\node[')
+      ? [compact ? COMPACT_CANVAS_TEXT_PREAMBLE : CANVAS_TEXT_PREAMBLE]
+      : []),
     '\\begin{document}',
     '',
     tikz,

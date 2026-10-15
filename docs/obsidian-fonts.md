@@ -1,4 +1,6 @@
-# Comic Relief negli export Obsidian
+# Comic Relief negli export Obsidian — baseline storica
+
+Questa verifica descrive la versione precedente all’ottimizzazione dei subset. Per il comportamento attuale, le dimensioni e il confronto PNG vedere il [report successivo](obsidian-optimization/report.md).
 
 “Copia per Obsidian” include i file WOFF2 normale e grassetto di Comic Relief
 1.210. Il renderer SVG può quindi visualizzare il circuito senza avere il font

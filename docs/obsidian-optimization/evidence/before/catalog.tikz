@@ -1,0 +1,2038 @@
+% DrawCircuit — coordinates in cm; SVG Y axis inverted.
+\definecolor{dcColor0}{HTML}{171A20}
+\definecolor{dcColor1}{HTML}{2463CB}
+\begin{circuitikz}[european resistors, american inductors, american ports, line cap=round, line join=round]
+\ctikzset{bipoles/length=1.4cm}
+% Component: resistor
+\draw[draw=dcColor0, line width=1.4226pt] (-1,0) to[R, fill=white, name=dcComponent0] (1,0);
+% Component: resistor
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,0.7071) to[R, fill=white, name=dcComponent1] (4.7071,-0.7071);
+% Component: resistor
+\draw[draw=dcColor0, line width=1.4226pt] (8,1) to[R, fill=white, name=dcComponent2] (8,-1);
+% Component: resistor
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,0.7071) to[R, fill=white, name=dcComponent3] (11.2929,-0.7071);
+% Component: resistor
+\draw[draw=dcColor0, line width=1.4226pt] (17,0) to[R, fill=white, name=dcComponent4] (15,0);
+% Component: resistor
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-0.7071) to[R, fill=white, name=dcComponent5] (19.2929,0.7071);
+% Component: resistor
+\draw[draw=dcColor0, line width=1.4226pt] (24,-1) to[R, fill=white, name=dcComponent6] (24,1);
+% Component: resistor
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-0.7071) to[R, fill=white, name=dcComponent7] (28.7071,0.7071);
+% Component: capacitor
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-3.25) to[C, fill=white, name=dcComponent8] (1,-3.25);
+% Component: capacitor
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-2.5429) to[C, fill=white, name=dcComponent9] (4.7071,-3.9571);
+% Component: capacitor
+\draw[draw=dcColor0, line width=1.4226pt] (8,-2.25) to[C, fill=white, name=dcComponent10] (8,-4.25);
+% Component: capacitor
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-2.5429) to[C, fill=white, name=dcComponent11] (11.2929,-3.9571);
+% Component: capacitor
+\draw[draw=dcColor0, line width=1.4226pt] (17,-3.25) to[C, fill=white, name=dcComponent12] (15,-3.25);
+% Component: capacitor
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-3.9571) to[C, fill=white, name=dcComponent13] (19.2929,-2.5429);
+% Component: capacitor
+\draw[draw=dcColor0, line width=1.4226pt] (24,-4.25) to[C, fill=white, name=dcComponent14] (24,-2.25);
+% Component: capacitor
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-3.9571) to[C, fill=white, name=dcComponent15] (28.7071,-2.5429);
+% Component: polarizedCapacitor
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-6.5) to[elko, fill=white, name=dcComponent16] (1,-6.5);
+% Component: polarizedCapacitor
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-5.7929) to[elko, fill=white, name=dcComponent17] (4.7071,-7.2071);
+% Component: polarizedCapacitor
+\draw[draw=dcColor0, line width=1.4226pt] (8,-5.5) to[elko, fill=white, name=dcComponent18] (8,-7.5);
+% Component: polarizedCapacitor
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-5.7929) to[elko, fill=white, name=dcComponent19] (11.2929,-7.2071);
+% Component: polarizedCapacitor
+\draw[draw=dcColor0, line width=1.4226pt] (17,-6.5) to[elko, fill=white, name=dcComponent20] (15,-6.5);
+% Component: polarizedCapacitor
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-7.2071) to[elko, fill=white, name=dcComponent21] (19.2929,-5.7929);
+% Component: polarizedCapacitor
+\draw[draw=dcColor0, line width=1.4226pt] (24,-7.5) to[elko, fill=white, name=dcComponent22] (24,-5.5);
+% Component: polarizedCapacitor
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-7.2071) to[elko, fill=white, name=dcComponent23] (28.7071,-5.7929);
+% Component: inductor
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-9.75) to[L, fill=white, name=dcComponent24] (1,-9.75);
+% Component: inductor
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-9.0429) to[L, fill=white, name=dcComponent25] (4.7071,-10.4571);
+% Component: inductor
+\draw[draw=dcColor0, line width=1.4226pt] (8,-8.75) to[L, fill=white, name=dcComponent26] (8,-10.75);
+% Component: inductor
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-9.0429) to[L, fill=white, name=dcComponent27] (11.2929,-10.4571);
+% Component: inductor
+\draw[draw=dcColor0, line width=1.4226pt] (17,-9.75) to[L, fill=white, name=dcComponent28] (15,-9.75);
+% Component: inductor
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-10.4571) to[L, fill=white, name=dcComponent29] (19.2929,-9.0429);
+% Component: inductor
+\draw[draw=dcColor0, line width=1.4226pt] (24,-10.75) to[L, fill=white, name=dcComponent30] (24,-8.75);
+% Component: inductor
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-10.4571) to[L, fill=white, name=dcComponent31] (28.7071,-9.0429);
+% Component: variableResistor
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-13) to[vR, fill=white, name=dcComponent32] (1,-13);
+% Component: variableResistor
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-12.2929) to[vR, fill=white, name=dcComponent33] (4.7071,-13.7071);
+% Component: variableResistor
+\draw[draw=dcColor0, line width=1.4226pt] (8,-12) to[vR, fill=white, name=dcComponent34] (8,-14);
+% Component: variableResistor
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-12.2929) to[vR, fill=white, name=dcComponent35] (11.2929,-13.7071);
+% Component: variableResistor
+\draw[draw=dcColor0, line width=1.4226pt] (17,-13) to[vR, fill=white, name=dcComponent36] (15,-13);
+% Component: variableResistor
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-13.7071) to[vR, fill=white, name=dcComponent37] (19.2929,-12.2929);
+% Component: variableResistor
+\draw[draw=dcColor0, line width=1.4226pt] (24,-14) to[vR, fill=white, name=dcComponent38] (24,-12);
+% Component: variableResistor
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-13.7071) to[vR, fill=white, name=dcComponent39] (28.7071,-12.2929);
+% Component: potentiometer
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-16.25) to[pR, fill=white, name=dcComponent40] (1,-16.25);
+\draw[draw=dcColor0, line width=1.4226pt] (0,-15.25) -- (dcComponent40.wiper);
+% Component: potentiometer
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-15.5429) to[pR, fill=white, name=dcComponent41] (4.7071,-16.9571);
+\draw[draw=dcColor0, line width=1.4226pt] (4.7071,-15.5429) -- (dcComponent41.wiper);
+% Component: potentiometer
+\draw[draw=dcColor0, line width=1.4226pt] (8,-15.25) to[pR, fill=white, name=dcComponent42] (8,-17.25);
+\draw[draw=dcColor0, line width=1.4226pt] (9,-16.25) -- (dcComponent42.wiper);
+% Component: potentiometer
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-15.5429) to[pR, fill=white, name=dcComponent43] (11.2929,-16.9571);
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-16.9571) -- (dcComponent43.wiper);
+% Component: potentiometer
+\draw[draw=dcColor0, line width=1.4226pt] (17,-16.25) to[pR, fill=white, name=dcComponent44] (15,-16.25);
+\draw[draw=dcColor0, line width=1.4226pt] (16,-17.25) -- (dcComponent44.wiper);
+% Component: potentiometer
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-16.9571) to[pR, fill=white, name=dcComponent45] (19.2929,-15.5429);
+\draw[draw=dcColor0, line width=1.4226pt] (19.2929,-16.9571) -- (dcComponent45.wiper);
+% Component: potentiometer
+\draw[draw=dcColor0, line width=1.4226pt] (24,-17.25) to[pR, fill=white, name=dcComponent46] (24,-15.25);
+\draw[draw=dcColor0, line width=1.4226pt] (23,-16.25) -- (dcComponent46.wiper);
+% Component: potentiometer
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-16.9571) to[pR, fill=white, name=dcComponent47] (28.7071,-15.5429);
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-15.5429) -- (dcComponent47.wiper);
+% Component: voltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-19.5) to[american voltage source, fill=white, name=dcComponent48] (1,-19.5);
+% Component: voltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-18.7929) to[american voltage source, fill=white, name=dcComponent49] (4.7071,-20.2071);
+% Component: voltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (8,-18.5) to[american voltage source, fill=white, name=dcComponent50] (8,-20.5);
+% Component: voltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-18.7929) to[american voltage source, fill=white, name=dcComponent51] (11.2929,-20.2071);
+% Component: voltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (17,-19.5) to[american voltage source, fill=white, name=dcComponent52] (15,-19.5);
+% Component: voltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-20.2071) to[american voltage source, fill=white, name=dcComponent53] (19.2929,-18.7929);
+% Component: voltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (24,-20.5) to[american voltage source, fill=white, name=dcComponent54] (24,-18.5);
+% Component: voltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-20.2071) to[american voltage source, fill=white, name=dcComponent55] (28.7071,-18.7929);
+% Component: currentSource
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-22.75) to[american current source, fill=white, name=dcComponent56] (1,-22.75);
+% Component: currentSource
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-22.0429) to[american current source, fill=white, name=dcComponent57] (4.7071,-23.4571);
+% Component: currentSource
+\draw[draw=dcColor0, line width=1.4226pt] (8,-21.75) to[american current source, fill=white, name=dcComponent58] (8,-23.75);
+% Component: currentSource
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-22.0429) to[american current source, fill=white, name=dcComponent59] (11.2929,-23.4571);
+% Component: currentSource
+\draw[draw=dcColor0, line width=1.4226pt] (17,-22.75) to[american current source, fill=white, name=dcComponent60] (15,-22.75);
+% Component: currentSource
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-23.4571) to[american current source, fill=white, name=dcComponent61] (19.2929,-22.0429);
+% Component: currentSource
+\draw[draw=dcColor0, line width=1.4226pt] (24,-23.75) to[american current source, fill=white, name=dcComponent62] (24,-21.75);
+% Component: currentSource
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-23.4571) to[american current source, fill=white, name=dcComponent63] (28.7071,-22.0429);
+% Component: battery
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-26) to[battery, fill=white, name=dcComponent64] (1,-26);
+% Component: battery
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-25.2929) to[battery, fill=white, name=dcComponent65] (4.7071,-26.7071);
+% Component: battery
+\draw[draw=dcColor0, line width=1.4226pt] (8,-25) to[battery, fill=white, name=dcComponent66] (8,-27);
+% Component: battery
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-25.2929) to[battery, fill=white, name=dcComponent67] (11.2929,-26.7071);
+% Component: battery
+\draw[draw=dcColor0, line width=1.4226pt] (17,-26) to[battery, fill=white, name=dcComponent68] (15,-26);
+% Component: battery
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-26.7071) to[battery, fill=white, name=dcComponent69] (19.2929,-25.2929);
+% Component: battery
+\draw[draw=dcColor0, line width=1.4226pt] (24,-27) to[battery, fill=white, name=dcComponent70] (24,-25);
+% Component: battery
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-26.7071) to[battery, fill=white, name=dcComponent71] (28.7071,-25.2929);
+% Component: dependentVoltage
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-29.25) to[american controlled voltage source, fill=white, name=dcComponent72] (1,-29.25);
+% Component: dependentVoltage
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-28.5429) to[american controlled voltage source, fill=white, name=dcComponent73] (4.7071,-29.9571);
+% Component: dependentVoltage
+\draw[draw=dcColor0, line width=1.4226pt] (8,-28.25) to[american controlled voltage source, fill=white, name=dcComponent74] (8,-30.25);
+% Component: dependentVoltage
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-28.5429) to[american controlled voltage source, fill=white, name=dcComponent75] (11.2929,-29.9571);
+% Component: dependentVoltage
+\draw[draw=dcColor0, line width=1.4226pt] (17,-29.25) to[american controlled voltage source, fill=white, name=dcComponent76] (15,-29.25);
+% Component: dependentVoltage
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-29.9571) to[american controlled voltage source, fill=white, name=dcComponent77] (19.2929,-28.5429);
+% Component: dependentVoltage
+\draw[draw=dcColor0, line width=1.4226pt] (24,-30.25) to[american controlled voltage source, fill=white, name=dcComponent78] (24,-28.25);
+% Component: dependentVoltage
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-29.9571) to[american controlled voltage source, fill=white, name=dcComponent79] (28.7071,-28.5429);
+% Component: dependentCurrent
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-32.5) to[american controlled current source, fill=white, name=dcComponent80] (1,-32.5);
+% Component: dependentCurrent
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-31.7929) to[american controlled current source, fill=white, name=dcComponent81] (4.7071,-33.2071);
+% Component: dependentCurrent
+\draw[draw=dcColor0, line width=1.4226pt] (8,-31.5) to[american controlled current source, fill=white, name=dcComponent82] (8,-33.5);
+% Component: dependentCurrent
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-31.7929) to[american controlled current source, fill=white, name=dcComponent83] (11.2929,-33.2071);
+% Component: dependentCurrent
+\draw[draw=dcColor0, line width=1.4226pt] (17,-32.5) to[american controlled current source, fill=white, name=dcComponent84] (15,-32.5);
+% Component: dependentCurrent
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-33.2071) to[american controlled current source, fill=white, name=dcComponent85] (19.2929,-31.7929);
+% Component: dependentCurrent
+\draw[draw=dcColor0, line width=1.4226pt] (24,-33.5) to[american controlled current source, fill=white, name=dcComponent86] (24,-31.5);
+% Component: dependentCurrent
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-33.2071) to[american controlled current source, fill=white, name=dcComponent87] (28.7071,-31.7929);
+% Component: diode
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-35.75) to[D, fill=white, name=dcComponent88] (1,-35.75);
+% Component: diode
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-35.0429) to[D, fill=white, name=dcComponent89] (4.7071,-36.4571);
+% Component: diode
+\draw[draw=dcColor0, line width=1.4226pt] (8,-34.75) to[D, fill=white, name=dcComponent90] (8,-36.75);
+% Component: diode
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-35.0429) to[D, fill=white, name=dcComponent91] (11.2929,-36.4571);
+% Component: diode
+\draw[draw=dcColor0, line width=1.4226pt] (17,-35.75) to[D, fill=white, name=dcComponent92] (15,-35.75);
+% Component: diode
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-36.4571) to[D, fill=white, name=dcComponent93] (19.2929,-35.0429);
+% Component: diode
+\draw[draw=dcColor0, line width=1.4226pt] (24,-36.75) to[D, fill=white, name=dcComponent94] (24,-34.75);
+% Component: diode
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-36.4571) to[D, fill=white, name=dcComponent95] (28.7071,-35.0429);
+% Component: led
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-39) to[leD, fill=white, name=dcComponent96] (1,-39);
+% Component: led
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-38.2929) to[leD, fill=white, name=dcComponent97] (4.7071,-39.7071);
+% Component: led
+\draw[draw=dcColor0, line width=1.4226pt] (8,-38) to[leD, fill=white, name=dcComponent98] (8,-40);
+% Component: led
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-38.2929) to[leD, fill=white, name=dcComponent99] (11.2929,-39.7071);
+% Component: led
+\draw[draw=dcColor0, line width=1.4226pt] (17,-39) to[leD, fill=white, name=dcComponent100] (15,-39);
+% Component: led
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-39.7071) to[leD, fill=white, name=dcComponent101] (19.2929,-38.2929);
+% Component: led
+\draw[draw=dcColor0, line width=1.4226pt] (24,-40) to[leD, fill=white, name=dcComponent102] (24,-38);
+% Component: led
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-39.7071) to[leD, fill=white, name=dcComponent103] (28.7071,-38.2929);
+% Component: zener
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-42.25) to[zD, fill=white, name=dcComponent104] (1,-42.25);
+% Component: zener
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-41.5429) to[zD, fill=white, name=dcComponent105] (4.7071,-42.9571);
+% Component: zener
+\draw[draw=dcColor0, line width=1.4226pt] (8,-41.25) to[zD, fill=white, name=dcComponent106] (8,-43.25);
+% Component: zener
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-41.5429) to[zD, fill=white, name=dcComponent107] (11.2929,-42.9571);
+% Component: zener
+\draw[draw=dcColor0, line width=1.4226pt] (17,-42.25) to[zD, fill=white, name=dcComponent108] (15,-42.25);
+% Component: zener
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-42.9571) to[zD, fill=white, name=dcComponent109] (19.2929,-41.5429);
+% Component: zener
+\draw[draw=dcColor0, line width=1.4226pt] (24,-43.25) to[zD, fill=white, name=dcComponent110] (24,-41.25);
+% Component: zener
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-42.9571) to[zD, fill=white, name=dcComponent111] (28.7071,-41.5429);
+% Component: openSwitch
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-45.5) to[nos, fill=white, name=dcComponent112] (1,-45.5);
+% Component: openSwitch
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-44.7929) to[nos, fill=white, name=dcComponent113] (4.7071,-46.2071);
+% Component: openSwitch
+\draw[draw=dcColor0, line width=1.4226pt] (8,-44.5) to[nos, fill=white, name=dcComponent114] (8,-46.5);
+% Component: openSwitch
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-44.7929) to[nos, fill=white, name=dcComponent115] (11.2929,-46.2071);
+% Component: openSwitch
+\draw[draw=dcColor0, line width=1.4226pt] (17,-45.5) to[nos, fill=white, name=dcComponent116] (15,-45.5);
+% Component: openSwitch
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-46.2071) to[nos, fill=white, name=dcComponent117] (19.2929,-44.7929);
+% Component: openSwitch
+\draw[draw=dcColor0, line width=1.4226pt] (24,-46.5) to[nos, fill=white, name=dcComponent118] (24,-44.5);
+% Component: openSwitch
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-46.2071) to[nos, fill=white, name=dcComponent119] (28.7071,-44.7929);
+% Component: closedSwitch
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-48.75) to[ncs, fill=white, name=dcComponent120] (1,-48.75);
+% Component: closedSwitch
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-48.0429) to[ncs, fill=white, name=dcComponent121] (4.7071,-49.4571);
+% Component: closedSwitch
+\draw[draw=dcColor0, line width=1.4226pt] (8,-47.75) to[ncs, fill=white, name=dcComponent122] (8,-49.75);
+% Component: closedSwitch
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-48.0429) to[ncs, fill=white, name=dcComponent123] (11.2929,-49.4571);
+% Component: closedSwitch
+\draw[draw=dcColor0, line width=1.4226pt] (17,-48.75) to[ncs, fill=white, name=dcComponent124] (15,-48.75);
+% Component: closedSwitch
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-49.4571) to[ncs, fill=white, name=dcComponent125] (19.2929,-48.0429);
+% Component: closedSwitch
+\draw[draw=dcColor0, line width=1.4226pt] (24,-49.75) to[ncs, fill=white, name=dcComponent126] (24,-47.75);
+% Component: closedSwitch
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-49.4571) to[ncs, fill=white, name=dcComponent127] (28.7071,-48.0429);
+% Component: ground
+\draw[draw=dcColor0, line width=1.4226pt] (0,-51) -- (0,-52) node[ground, rotate=0, fill=white] {};
+% Component: ground
+\draw[draw=dcColor0, line width=1.4226pt] (4.7071,-51.2929) -- (4,-52) node[ground, rotate=-45, fill=white] {};
+% Component: ground
+\draw[draw=dcColor0, line width=1.4226pt] (9,-52) -- (8,-52) node[ground, rotate=-90, fill=white] {};
+% Component: ground
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-52.7071) -- (12,-52) node[ground, rotate=-135, fill=white] {};
+% Component: ground
+\draw[draw=dcColor0, line width=1.4226pt] (16,-53) -- (16,-52) node[ground, rotate=-180, fill=white] {};
+% Component: ground
+\draw[draw=dcColor0, line width=1.4226pt] (19.2929,-52.7071) -- (20,-52) node[ground, rotate=-225, fill=white] {};
+% Component: ground
+\draw[draw=dcColor0, line width=1.4226pt] (23,-52) -- (24,-52) node[ground, rotate=-270, fill=white] {};
+% Component: ground
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-51.2929) -- (28,-52) node[ground, rotate=-315, fill=white] {};
+% Component: ammeter
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-55.25) to[ammeter, fill=white, name=dcComponent136] (1,-55.25);
+% Component: ammeter
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-54.5429) to[ammeter, fill=white, name=dcComponent137] (4.7071,-55.9571);
+% Component: ammeter
+\draw[draw=dcColor0, line width=1.4226pt] (8,-54.25) to[ammeter, fill=white, name=dcComponent138] (8,-56.25);
+% Component: ammeter
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-54.5429) to[ammeter, fill=white, name=dcComponent139] (11.2929,-55.9571);
+% Component: ammeter
+\draw[draw=dcColor0, line width=1.4226pt] (17,-55.25) to[ammeter, fill=white, name=dcComponent140] (15,-55.25);
+% Component: ammeter
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-55.9571) to[ammeter, fill=white, name=dcComponent141] (19.2929,-54.5429);
+% Component: ammeter
+\draw[draw=dcColor0, line width=1.4226pt] (24,-56.25) to[ammeter, fill=white, name=dcComponent142] (24,-54.25);
+% Component: ammeter
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-55.9571) to[ammeter, fill=white, name=dcComponent143] (28.7071,-54.5429);
+% Component: voltmeter
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-58.5) to[voltmeter, fill=white, name=dcComponent144] (1,-58.5);
+% Component: voltmeter
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-57.7929) to[voltmeter, fill=white, name=dcComponent145] (4.7071,-59.2071);
+% Component: voltmeter
+\draw[draw=dcColor0, line width=1.4226pt] (8,-57.5) to[voltmeter, fill=white, name=dcComponent146] (8,-59.5);
+% Component: voltmeter
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-57.7929) to[voltmeter, fill=white, name=dcComponent147] (11.2929,-59.2071);
+% Component: voltmeter
+\draw[draw=dcColor0, line width=1.4226pt] (17,-58.5) to[voltmeter, fill=white, name=dcComponent148] (15,-58.5);
+% Component: voltmeter
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-59.2071) to[voltmeter, fill=white, name=dcComponent149] (19.2929,-57.7929);
+% Component: voltmeter
+\draw[draw=dcColor0, line width=1.4226pt] (24,-59.5) to[voltmeter, fill=white, name=dcComponent150] (24,-57.5);
+% Component: voltmeter
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-59.2071) to[voltmeter, fill=white, name=dcComponent151] (28.7071,-57.7929);
+% Component: transformer
+% Transformer: explicit four-terminal TikZ symbol; retains legacy terminal geometry.
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-60.75) -- (-0.5,-60.75) -- (-0.5,-61.15) .. controls (-0.05,-61.15) and (-0.05,-61.45) .. (-0.5,-61.45) .. controls (-0.05,-61.45) and (-0.05,-61.75) .. (-0.5,-61.75) .. controls (-0.05,-61.75) and (-0.05,-62.05) .. (-0.5,-62.05) .. controls (-0.05,-62.05) and (-0.05,-62.35) .. (-0.5,-62.35) -- (-0.5,-62.75) -- (-1,-62.75) (1,-60.75) -- (0.5,-60.75) -- (0.5,-61.15) .. controls (0.05,-61.15) and (0.05,-61.45) .. (0.5,-61.45) .. controls (0.05,-61.45) and (0.05,-61.75) .. (0.5,-61.75) .. controls (0.05,-61.75) and (0.05,-62.05) .. (0.5,-62.05) .. controls (0.05,-62.05) and (0.05,-62.35) .. (0.5,-62.35) -- (0.5,-62.75) -- (1,-62.75);
+\draw[draw=dcColor0, line width=1.4226pt] (-0.075,-61.125) -- (-0.075,-62.375) (0.075,-61.125) -- (0.075,-62.375);
+% Component: transformer
+% Transformer: explicit four-terminal TikZ symbol; retains legacy terminal geometry.
+\draw[draw=dcColor0, line width=1.4226pt] (4,-60.3358) -- (4.3536,-60.6893) -- (4.0707,-60.9722) .. controls (4.3889,-61.2904) and (4.1768,-61.5025) .. (3.8586,-61.1843) .. controls (4.1768,-61.5025) and (3.9646,-61.7146) .. (3.6464,-61.3964) .. controls (3.9646,-61.7146) and (3.7525,-61.9268) .. (3.4343,-61.6086) .. controls (3.7525,-61.9268) and (3.5404,-62.1389) .. (3.2222,-61.8207) -- (2.9393,-62.1036) -- (2.5858,-61.75) (5.4142,-61.75) -- (5.0607,-61.3964) -- (4.7778,-61.6793) .. controls (4.4596,-61.3611) and (4.2475,-61.5732) .. (4.5657,-61.8914) .. controls (4.2475,-61.5732) and (4.0354,-61.7854) .. (4.3536,-62.1036) .. controls (4.0354,-61.7854) and (3.8232,-61.9975) .. (4.1414,-62.3157) .. controls (3.8232,-61.9975) and (3.6111,-62.2096) .. (3.9293,-62.5278) -- (3.6464,-62.8107) -- (4,-63.1642);
+\draw[draw=dcColor0, line width=1.4226pt] (4.3889,-61.255) -- (3.505,-62.1389) (4.495,-61.3611) -- (3.6111,-62.245);
+% Component: transformer
+% Transformer: explicit four-terminal TikZ symbol; retains legacy terminal geometry.
+\draw[draw=dcColor0, line width=1.4226pt] (9,-60.75) -- (9,-61.25) -- (8.6,-61.25) .. controls (8.6,-61.7) and (8.3,-61.7) .. (8.3,-61.25) .. controls (8.3,-61.7) and (8,-61.7) .. (8,-61.25) .. controls (8,-61.7) and (7.7,-61.7) .. (7.7,-61.25) .. controls (7.7,-61.7) and (7.4,-61.7) .. (7.4,-61.25) -- (7,-61.25) -- (7,-60.75) (9,-62.75) -- (9,-62.25) -- (8.6,-62.25) .. controls (8.6,-61.8) and (8.3,-61.8) .. (8.3,-62.25) .. controls (8.3,-61.8) and (8,-61.8) .. (8,-62.25) .. controls (8,-61.8) and (7.7,-61.8) .. (7.7,-62.25) .. controls (7.7,-61.8) and (7.4,-61.8) .. (7.4,-62.25) -- (7,-62.25) -- (7,-62.75);
+\draw[draw=dcColor0, line width=1.4226pt] (8.625,-61.675) -- (7.375,-61.675) (8.625,-61.825) -- (7.375,-61.825);
+% Component: transformer
+% Transformer: explicit four-terminal TikZ symbol; retains legacy terminal geometry.
+\draw[draw=dcColor0, line width=1.4226pt] (13.4142,-61.75) -- (13.0607,-62.1036) -- (12.7778,-61.8207) .. controls (12.4596,-62.1389) and (12.2475,-61.9268) .. (12.5657,-61.6086) .. controls (12.2475,-61.9268) and (12.0354,-61.7146) .. (12.3536,-61.3964) .. controls (12.0354,-61.7146) and (11.8232,-61.5025) .. (12.1414,-61.1843) .. controls (11.8232,-61.5025) and (11.6111,-61.2904) .. (11.9293,-60.9722) -- (11.6464,-60.6893) -- (12,-60.3358) (12,-63.1642) -- (12.3536,-62.8107) -- (12.0707,-62.5278) .. controls (12.3889,-62.2096) and (12.1768,-61.9975) .. (11.8586,-62.3157) .. controls (12.1768,-61.9975) and (11.9646,-61.7854) .. (11.6464,-62.1036) .. controls (11.9646,-61.7854) and (11.7525,-61.5732) .. (11.4343,-61.8914) .. controls (11.7525,-61.5732) and (11.5404,-61.3611) .. (11.2222,-61.6793) -- (10.9393,-61.3964) -- (10.5858,-61.75);
+\draw[draw=dcColor0, line width=1.4226pt] (12.495,-62.1389) -- (11.6111,-61.255) (12.3889,-62.245) -- (11.505,-61.3611);
+% Component: transformer
+% Transformer: explicit four-terminal TikZ symbol; retains legacy terminal geometry.
+\draw[draw=dcColor0, line width=1.4226pt] (17,-62.75) -- (16.5,-62.75) -- (16.5,-62.35) .. controls (16.05,-62.35) and (16.05,-62.05) .. (16.5,-62.05) .. controls (16.05,-62.05) and (16.05,-61.75) .. (16.5,-61.75) .. controls (16.05,-61.75) and (16.05,-61.45) .. (16.5,-61.45) .. controls (16.05,-61.45) and (16.05,-61.15) .. (16.5,-61.15) -- (16.5,-60.75) -- (17,-60.75) (15,-62.75) -- (15.5,-62.75) -- (15.5,-62.35) .. controls (15.95,-62.35) and (15.95,-62.05) .. (15.5,-62.05) .. controls (15.95,-62.05) and (15.95,-61.75) .. (15.5,-61.75) .. controls (15.95,-61.75) and (15.95,-61.45) .. (15.5,-61.45) .. controls (15.95,-61.45) and (15.95,-61.15) .. (15.5,-61.15) -- (15.5,-60.75) -- (15,-60.75);
+\draw[draw=dcColor0, line width=1.4226pt] (16.075,-62.375) -- (16.075,-61.125) (15.925,-62.375) -- (15.925,-61.125);
+% Component: transformer
+% Transformer: explicit four-terminal TikZ symbol; retains legacy terminal geometry.
+\draw[draw=dcColor0, line width=1.4226pt] (20,-63.1642) -- (19.6464,-62.8107) -- (19.9293,-62.5278) .. controls (19.6111,-62.2096) and (19.8232,-61.9975) .. (20.1414,-62.3157) .. controls (19.8232,-61.9975) and (20.0354,-61.7854) .. (20.3536,-62.1036) .. controls (20.0354,-61.7854) and (20.2475,-61.5732) .. (20.5657,-61.8914) .. controls (20.2475,-61.5732) and (20.4596,-61.3611) .. (20.7778,-61.6793) -- (21.0607,-61.3964) -- (21.4142,-61.75) (18.5858,-61.75) -- (18.9393,-62.1036) -- (19.2222,-61.8207) .. controls (19.5404,-62.1389) and (19.7525,-61.9268) .. (19.4343,-61.6086) .. controls (19.7525,-61.9268) and (19.9646,-61.7146) .. (19.6464,-61.3964) .. controls (19.9646,-61.7146) and (20.1768,-61.5025) .. (19.8586,-61.1843) .. controls (20.1768,-61.5025) and (20.3889,-61.2904) .. (20.0707,-60.9722) -- (20.3536,-60.6893) -- (20,-60.3358);
+\draw[draw=dcColor0, line width=1.4226pt] (19.6111,-62.245) -- (20.495,-61.3611) (19.505,-62.1389) -- (20.3889,-61.255);
+% Component: transformer
+% Transformer: explicit four-terminal TikZ symbol; retains legacy terminal geometry.
+\draw[draw=dcColor0, line width=1.4226pt] (23,-62.75) -- (23,-62.25) -- (23.4,-62.25) .. controls (23.4,-61.8) and (23.7,-61.8) .. (23.7,-62.25) .. controls (23.7,-61.8) and (24,-61.8) .. (24,-62.25) .. controls (24,-61.8) and (24.3,-61.8) .. (24.3,-62.25) .. controls (24.3,-61.8) and (24.6,-61.8) .. (24.6,-62.25) -- (25,-62.25) -- (25,-62.75) (23,-60.75) -- (23,-61.25) -- (23.4,-61.25) .. controls (23.4,-61.7) and (23.7,-61.7) .. (23.7,-61.25) .. controls (23.7,-61.7) and (24,-61.7) .. (24,-61.25) .. controls (24,-61.7) and (24.3,-61.7) .. (24.3,-61.25) .. controls (24.3,-61.7) and (24.6,-61.7) .. (24.6,-61.25) -- (25,-61.25) -- (25,-60.75);
+\draw[draw=dcColor0, line width=1.4226pt] (23.375,-61.825) -- (24.625,-61.825) (23.375,-61.675) -- (24.625,-61.675);
+% Component: transformer
+% Transformer: explicit four-terminal TikZ symbol; retains legacy terminal geometry.
+\draw[draw=dcColor0, line width=1.4226pt] (26.5858,-61.75) -- (26.9393,-61.3964) -- (27.2222,-61.6793) .. controls (27.5404,-61.3611) and (27.7525,-61.5732) .. (27.4343,-61.8914) .. controls (27.7525,-61.5732) and (27.9646,-61.7854) .. (27.6464,-62.1036) .. controls (27.9646,-61.7854) and (28.1768,-61.9975) .. (27.8586,-62.3157) .. controls (28.1768,-61.9975) and (28.3889,-62.2096) .. (28.0707,-62.5278) -- (28.3536,-62.8107) -- (28,-63.1642) (28,-60.3358) -- (27.6464,-60.6893) -- (27.9293,-60.9722) .. controls (27.6111,-61.2904) and (27.8232,-61.5025) .. (28.1414,-61.1843) .. controls (27.8232,-61.5025) and (28.0354,-61.7146) .. (28.3536,-61.3964) .. controls (28.0354,-61.7146) and (28.2475,-61.9268) .. (28.5657,-61.6086) .. controls (28.2475,-61.9268) and (28.4596,-62.1389) .. (28.7778,-61.8207) -- (29.0607,-62.1036) -- (29.4142,-61.75);
+\draw[draw=dcColor0, line width=1.4226pt] (27.505,-61.3611) -- (28.3889,-62.245) (27.6111,-61.255) -- (28.495,-62.1389);
+% Component: blackBox
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-65) to[generic, fill=white, name=dcComponent160] (1,-65);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{5.3744}{6.9867}\selectfont] at (0,-65) {BLACK BOX};
+% Component: blackBox
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-64.2929) to[generic, fill=white, name=dcComponent161] (4.7071,-65.7071);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-45, font=\fontsize{5.3744}{6.9867}\selectfont] at (4,-65) {BLACK BOX};
+% Component: blackBox
+\draw[draw=dcColor0, line width=1.4226pt] (8,-64) to[generic, fill=white, name=dcComponent162] (8,-66);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-90, font=\fontsize{5.3744}{6.9867}\selectfont] at (8,-65) {BLACK BOX};
+% Component: blackBox
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-64.2929) to[generic, fill=white, name=dcComponent163] (11.2929,-65.7071);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-135, font=\fontsize{5.3744}{6.9867}\selectfont] at (12,-65) {BLACK BOX};
+% Component: blackBox
+\draw[draw=dcColor0, line width=1.4226pt] (17,-65) to[generic, fill=white, name=dcComponent164] (15,-65);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-180, font=\fontsize{5.3744}{6.9867}\selectfont] at (16,-65) {BLACK BOX};
+% Component: blackBox
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-65.7071) to[generic, fill=white, name=dcComponent165] (19.2929,-64.2929);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-225, font=\fontsize{5.3744}{6.9867}\selectfont] at (20,-65) {BLACK BOX};
+% Component: blackBox
+\draw[draw=dcColor0, line width=1.4226pt] (24,-66) to[generic, fill=white, name=dcComponent166] (24,-64);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-270, font=\fontsize{5.3744}{6.9867}\selectfont] at (24,-65) {BLACK BOX};
+% Component: blackBox
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-65.7071) to[generic, fill=white, name=dcComponent167] (28.7071,-64.2929);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-315, font=\fontsize{5.3744}{6.9867}\selectfont] at (28,-65) {BLACK BOX};
+% Component: thermistor
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-68.25) to[thR, fill=white, name=dcComponent168] (1,-68.25);
+% Component: thermistor
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-67.5429) to[thR, fill=white, name=dcComponent169] (4.7071,-68.9571);
+% Component: thermistor
+\draw[draw=dcColor0, line width=1.4226pt] (8,-67.25) to[thR, fill=white, name=dcComponent170] (8,-69.25);
+% Component: thermistor
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-67.5429) to[thR, fill=white, name=dcComponent171] (11.2929,-68.9571);
+% Component: thermistor
+\draw[draw=dcColor0, line width=1.4226pt] (17,-68.25) to[thR, fill=white, name=dcComponent172] (15,-68.25);
+% Component: thermistor
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-68.9571) to[thR, fill=white, name=dcComponent173] (19.2929,-67.5429);
+% Component: thermistor
+\draw[draw=dcColor0, line width=1.4226pt] (24,-69.25) to[thR, fill=white, name=dcComponent174] (24,-67.25);
+% Component: thermistor
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-68.9571) to[thR, fill=white, name=dcComponent175] (28.7071,-67.5429);
+% Component: photoresistor
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-71.5) to[phR, fill=white, name=dcComponent176] (1,-71.5);
+% Component: photoresistor
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-70.7929) to[phR, fill=white, name=dcComponent177] (4.7071,-72.2071);
+% Component: photoresistor
+\draw[draw=dcColor0, line width=1.4226pt] (8,-70.5) to[phR, fill=white, name=dcComponent178] (8,-72.5);
+% Component: photoresistor
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-70.7929) to[phR, fill=white, name=dcComponent179] (11.2929,-72.2071);
+% Component: photoresistor
+\draw[draw=dcColor0, line width=1.4226pt] (17,-71.5) to[phR, fill=white, name=dcComponent180] (15,-71.5);
+% Component: photoresistor
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-72.2071) to[phR, fill=white, name=dcComponent181] (19.2929,-70.7929);
+% Component: photoresistor
+\draw[draw=dcColor0, line width=1.4226pt] (24,-72.5) to[phR, fill=white, name=dcComponent182] (24,-70.5);
+% Component: photoresistor
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-72.2071) to[phR, fill=white, name=dcComponent183] (28.7071,-70.7929);
+% Component: variableCapacitor
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-74.75) to[vC, fill=white, name=dcComponent184] (1,-74.75);
+% Component: variableCapacitor
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-74.0429) to[vC, fill=white, name=dcComponent185] (4.7071,-75.4571);
+% Component: variableCapacitor
+\draw[draw=dcColor0, line width=1.4226pt] (8,-73.75) to[vC, fill=white, name=dcComponent186] (8,-75.75);
+% Component: variableCapacitor
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-74.0429) to[vC, fill=white, name=dcComponent187] (11.2929,-75.4571);
+% Component: variableCapacitor
+\draw[draw=dcColor0, line width=1.4226pt] (17,-74.75) to[vC, fill=white, name=dcComponent188] (15,-74.75);
+% Component: variableCapacitor
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-75.4571) to[vC, fill=white, name=dcComponent189] (19.2929,-74.0429);
+% Component: variableCapacitor
+\draw[draw=dcColor0, line width=1.4226pt] (24,-75.75) to[vC, fill=white, name=dcComponent190] (24,-73.75);
+% Component: variableCapacitor
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-75.4571) to[vC, fill=white, name=dcComponent191] (28.7071,-74.0429);
+% Component: variableInductor
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-78) to[vL, fill=white, name=dcComponent192] (1,-78);
+% Component: variableInductor
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-77.2929) to[vL, fill=white, name=dcComponent193] (4.7071,-78.7071);
+% Component: variableInductor
+\draw[draw=dcColor0, line width=1.4226pt] (8,-77) to[vL, fill=white, name=dcComponent194] (8,-79);
+% Component: variableInductor
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-77.2929) to[vL, fill=white, name=dcComponent195] (11.2929,-78.7071);
+% Component: variableInductor
+\draw[draw=dcColor0, line width=1.4226pt] (17,-78) to[vL, fill=white, name=dcComponent196] (15,-78);
+% Component: variableInductor
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-78.7071) to[vL, fill=white, name=dcComponent197] (19.2929,-77.2929);
+% Component: variableInductor
+\draw[draw=dcColor0, line width=1.4226pt] (24,-79) to[vL, fill=white, name=dcComponent198] (24,-77);
+% Component: variableInductor
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-78.7071) to[vL, fill=white, name=dcComponent199] (28.7071,-77.2929);
+% Component: acVoltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-81.25) to[sV, fill=white, name=dcComponent200] (1,-81.25);
+% Component: acVoltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-80.5429) to[sV, fill=white, name=dcComponent201] (4.7071,-81.9571);
+% Component: acVoltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (8,-80.25) to[sV, fill=white, name=dcComponent202] (8,-82.25);
+% Component: acVoltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-80.5429) to[sV, fill=white, name=dcComponent203] (11.2929,-81.9571);
+% Component: acVoltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (17,-81.25) to[sV, fill=white, name=dcComponent204] (15,-81.25);
+% Component: acVoltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-81.9571) to[sV, fill=white, name=dcComponent205] (19.2929,-80.5429);
+% Component: acVoltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (24,-82.25) to[sV, fill=white, name=dcComponent206] (24,-80.25);
+% Component: acVoltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-81.9571) to[sV, fill=white, name=dcComponent207] (28.7071,-80.5429);
+% Component: acCurrentSource
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-84.5) to[sI, fill=white, name=dcComponent208] (1,-84.5);
+% Component: acCurrentSource
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-83.7929) to[sI, fill=white, name=dcComponent209] (4.7071,-85.2071);
+% Component: acCurrentSource
+\draw[draw=dcColor0, line width=1.4226pt] (8,-83.5) to[sI, fill=white, name=dcComponent210] (8,-85.5);
+% Component: acCurrentSource
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-83.7929) to[sI, fill=white, name=dcComponent211] (11.2929,-85.2071);
+% Component: acCurrentSource
+\draw[draw=dcColor0, line width=1.4226pt] (17,-84.5) to[sI, fill=white, name=dcComponent212] (15,-84.5);
+% Component: acCurrentSource
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-85.2071) to[sI, fill=white, name=dcComponent213] (19.2929,-83.7929);
+% Component: acCurrentSource
+\draw[draw=dcColor0, line width=1.4226pt] (24,-85.5) to[sI, fill=white, name=dcComponent214] (24,-83.5);
+% Component: acCurrentSource
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-85.2071) to[sI, fill=white, name=dcComponent215] (28.7071,-83.7929);
+% Component: genericVoltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-87.75) to[esource, fill=white, name=dcComponent216] (1,-87.75);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{14.2264}{18.4943}\selectfont] at (0,-87.775) {V};
+% Component: genericVoltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-87.0429) to[esource, fill=white, name=dcComponent217] (4.7071,-88.4571);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-45, font=\fontsize{14.2264}{18.4943}\selectfont] at (3.9823,-87.7677) {V};
+% Component: genericVoltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (8,-86.75) to[esource, fill=white, name=dcComponent218] (8,-88.75);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-90, font=\fontsize{14.2264}{18.4943}\selectfont] at (7.975,-87.75) {V};
+% Component: genericVoltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-87.0429) to[esource, fill=white, name=dcComponent219] (11.2929,-88.4571);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-135, font=\fontsize{14.2264}{18.4943}\selectfont] at (11.9823,-87.7323) {V};
+% Component: genericVoltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (17,-87.75) to[esource, fill=white, name=dcComponent220] (15,-87.75);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-180, font=\fontsize{14.2264}{18.4943}\selectfont] at (16,-87.725) {V};
+% Component: genericVoltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-88.4571) to[esource, fill=white, name=dcComponent221] (19.2929,-87.0429);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-225, font=\fontsize{14.2264}{18.4943}\selectfont] at (20.0177,-87.7323) {V};
+% Component: genericVoltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (24,-88.75) to[esource, fill=white, name=dcComponent222] (24,-86.75);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-270, font=\fontsize{14.2264}{18.4943}\selectfont] at (24.025,-87.75) {V};
+% Component: genericVoltageSource
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-88.4571) to[esource, fill=white, name=dcComponent223] (28.7071,-87.0429);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-315, font=\fontsize{14.2264}{18.4943}\selectfont] at (28.0177,-87.7677) {V};
+% Component: genericCurrentSource
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-91) to[esource, fill=white, name=dcComponent224] (1,-91);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{14.2264}{18.4943}\selectfont] at (0,-91.025) {I};
+% Component: genericCurrentSource
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-90.2929) to[esource, fill=white, name=dcComponent225] (4.7071,-91.7071);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-45, font=\fontsize{14.2264}{18.4943}\selectfont] at (3.9823,-91.0177) {I};
+% Component: genericCurrentSource
+\draw[draw=dcColor0, line width=1.4226pt] (8,-90) to[esource, fill=white, name=dcComponent226] (8,-92);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-90, font=\fontsize{14.2264}{18.4943}\selectfont] at (7.975,-91) {I};
+% Component: genericCurrentSource
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-90.2929) to[esource, fill=white, name=dcComponent227] (11.2929,-91.7071);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-135, font=\fontsize{14.2264}{18.4943}\selectfont] at (11.9823,-90.9823) {I};
+% Component: genericCurrentSource
+\draw[draw=dcColor0, line width=1.4226pt] (17,-91) to[esource, fill=white, name=dcComponent228] (15,-91);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-180, font=\fontsize{14.2264}{18.4943}\selectfont] at (16,-90.975) {I};
+% Component: genericCurrentSource
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-91.7071) to[esource, fill=white, name=dcComponent229] (19.2929,-90.2929);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-225, font=\fontsize{14.2264}{18.4943}\selectfont] at (20.0177,-90.9823) {I};
+% Component: genericCurrentSource
+\draw[draw=dcColor0, line width=1.4226pt] (24,-92) to[esource, fill=white, name=dcComponent230] (24,-90);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-270, font=\fontsize{14.2264}{18.4943}\selectfont] at (24.025,-91) {I};
+% Component: genericCurrentSource
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-91.7071) to[esource, fill=white, name=dcComponent231] (28.7071,-90.2929);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-315, font=\fontsize{14.2264}{18.4943}\selectfont] at (28.0177,-91.0177) {I};
+% Component: singleCellBattery
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-94.25) to[battery1, fill=white, name=dcComponent232] (1,-94.25);
+% Component: singleCellBattery
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-93.5429) to[battery1, fill=white, name=dcComponent233] (4.7071,-94.9571);
+% Component: singleCellBattery
+\draw[draw=dcColor0, line width=1.4226pt] (8,-93.25) to[battery1, fill=white, name=dcComponent234] (8,-95.25);
+% Component: singleCellBattery
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-93.5429) to[battery1, fill=white, name=dcComponent235] (11.2929,-94.9571);
+% Component: singleCellBattery
+\draw[draw=dcColor0, line width=1.4226pt] (17,-94.25) to[battery1, fill=white, name=dcComponent236] (15,-94.25);
+% Component: singleCellBattery
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-94.9571) to[battery1, fill=white, name=dcComponent237] (19.2929,-93.5429);
+% Component: singleCellBattery
+\draw[draw=dcColor0, line width=1.4226pt] (24,-95.25) to[battery1, fill=white, name=dcComponent238] (24,-93.25);
+% Component: singleCellBattery
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-94.9571) to[battery1, fill=white, name=dcComponent239] (28.7071,-93.5429);
+% Component: photodiode
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-97.5) to[pD, fill=white, name=dcComponent240] (1,-97.5);
+% Component: photodiode
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-96.7929) to[pD, fill=white, name=dcComponent241] (4.7071,-98.2071);
+% Component: photodiode
+\draw[draw=dcColor0, line width=1.4226pt] (8,-96.5) to[pD, fill=white, name=dcComponent242] (8,-98.5);
+% Component: photodiode
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-96.7929) to[pD, fill=white, name=dcComponent243] (11.2929,-98.2071);
+% Component: photodiode
+\draw[draw=dcColor0, line width=1.4226pt] (17,-97.5) to[pD, fill=white, name=dcComponent244] (15,-97.5);
+% Component: photodiode
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-98.2071) to[pD, fill=white, name=dcComponent245] (19.2929,-96.7929);
+% Component: photodiode
+\draw[draw=dcColor0, line width=1.4226pt] (24,-98.5) to[pD, fill=white, name=dcComponent246] (24,-96.5);
+% Component: photodiode
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-98.2071) to[pD, fill=white, name=dcComponent247] (28.7071,-96.7929);
+% Component: schottky
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-100.75) to[sD, fill=white, name=dcComponent248] (1,-100.75);
+% Component: schottky
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-100.0429) to[sD, fill=white, name=dcComponent249] (4.7071,-101.4571);
+% Component: schottky
+\draw[draw=dcColor0, line width=1.4226pt] (8,-99.75) to[sD, fill=white, name=dcComponent250] (8,-101.75);
+% Component: schottky
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-100.0429) to[sD, fill=white, name=dcComponent251] (11.2929,-101.4571);
+% Component: schottky
+\draw[draw=dcColor0, line width=1.4226pt] (17,-100.75) to[sD, fill=white, name=dcComponent252] (15,-100.75);
+% Component: schottky
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-101.4571) to[sD, fill=white, name=dcComponent253] (19.2929,-100.0429);
+% Component: schottky
+\draw[draw=dcColor0, line width=1.4226pt] (24,-101.75) to[sD, fill=white, name=dcComponent254] (24,-99.75);
+% Component: schottky
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-101.4571) to[sD, fill=white, name=dcComponent255] (28.7071,-100.0429);
+% Component: varactor
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-104) to[VC, fill=white, name=dcComponent256] (1,-104);
+% Component: varactor
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-103.2929) to[VC, fill=white, name=dcComponent257] (4.7071,-104.7071);
+% Component: varactor
+\draw[draw=dcColor0, line width=1.4226pt] (8,-103) to[VC, fill=white, name=dcComponent258] (8,-105);
+% Component: varactor
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-103.2929) to[VC, fill=white, name=dcComponent259] (11.2929,-104.7071);
+% Component: varactor
+\draw[draw=dcColor0, line width=1.4226pt] (17,-104) to[VC, fill=white, name=dcComponent260] (15,-104);
+% Component: varactor
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-104.7071) to[VC, fill=white, name=dcComponent261] (19.2929,-103.2929);
+% Component: varactor
+\draw[draw=dcColor0, line width=1.4226pt] (24,-105) to[VC, fill=white, name=dcComponent262] (24,-103);
+% Component: varactor
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-104.7071) to[VC, fill=white, name=dcComponent263] (28.7071,-103.2929);
+% Component: npn
+\node[npn, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.7, transform shape] (dcComponent264) at (0,-107.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-107.25) -- (dcComponent264.B);
+\draw[draw=dcColor0, line width=1.4226pt] (0.5,-106.25) -- (dcComponent264.C);
+\draw[draw=dcColor0, line width=1.4226pt] (0.5,-108.25) -- (dcComponent264.E);
+% Component: npn
+\node[npn, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.7, transform shape] (dcComponent265) at (4,-107.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-106.5429) -- (dcComponent265.B);
+\draw[draw=dcColor0, line width=1.4226pt] (5.0607,-106.8964) -- (dcComponent265.C);
+\draw[draw=dcColor0, line width=1.4226pt] (3.6464,-108.3107) -- (dcComponent265.E);
+% Component: npn
+\node[npn, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.7, transform shape] (dcComponent266) at (8,-107.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (8,-106.25) -- (dcComponent266.B);
+\draw[draw=dcColor0, line width=1.4226pt] (9,-107.75) -- (dcComponent266.C);
+\draw[draw=dcColor0, line width=1.4226pt] (7,-107.75) -- (dcComponent266.E);
+% Component: npn
+\node[npn, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.7, transform shape] (dcComponent267) at (12,-107.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-106.5429) -- (dcComponent267.B);
+\draw[draw=dcColor0, line width=1.4226pt] (12.3536,-108.3107) -- (dcComponent267.C);
+\draw[draw=dcColor0, line width=1.4226pt] (10.9393,-106.8964) -- (dcComponent267.E);
+% Component: npn
+\node[npn, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.7, transform shape] (dcComponent268) at (16,-107.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-107.25) -- (dcComponent268.B);
+\draw[draw=dcColor0, line width=1.4226pt] (15.5,-108.25) -- (dcComponent268.C);
+\draw[draw=dcColor0, line width=1.4226pt] (15.5,-106.25) -- (dcComponent268.E);
+% Component: npn
+\node[npn, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.7, transform shape] (dcComponent269) at (20,-107.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-107.9571) -- (dcComponent269.B);
+\draw[draw=dcColor0, line width=1.4226pt] (18.9393,-107.6036) -- (dcComponent269.C);
+\draw[draw=dcColor0, line width=1.4226pt] (20.3536,-106.1893) -- (dcComponent269.E);
+% Component: npn
+\node[npn, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.7, transform shape] (dcComponent270) at (24,-107.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (24,-108.25) -- (dcComponent270.B);
+\draw[draw=dcColor0, line width=1.4226pt] (23,-106.75) -- (dcComponent270.C);
+\draw[draw=dcColor0, line width=1.4226pt] (25,-106.75) -- (dcComponent270.E);
+% Component: npn
+\node[npn, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.7, transform shape] (dcComponent271) at (28,-107.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-107.9571) -- (dcComponent271.B);
+\draw[draw=dcColor0, line width=1.4226pt] (27.6464,-106.1893) -- (dcComponent271.C);
+\draw[draw=dcColor0, line width=1.4226pt] (29.0607,-107.6036) -- (dcComponent271.E);
+% Component: pnp
+\node[pnp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.7, yscale=-1, transform shape] (dcComponent272) at (0,-110.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-110.5) -- (dcComponent272.B);
+\draw[draw=dcColor0, line width=1.4226pt] (0.5,-109.5) -- (dcComponent272.C);
+\draw[draw=dcColor0, line width=1.4226pt] (0.5,-111.5) -- (dcComponent272.E);
+% Component: pnp
+\node[pnp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.7, yscale=-1, transform shape] (dcComponent273) at (4,-110.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-109.7929) -- (dcComponent273.B);
+\draw[draw=dcColor0, line width=1.4226pt] (5.0607,-110.1464) -- (dcComponent273.C);
+\draw[draw=dcColor0, line width=1.4226pt] (3.6464,-111.5607) -- (dcComponent273.E);
+% Component: pnp
+\node[pnp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.7, yscale=-1, transform shape] (dcComponent274) at (8,-110.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (8,-109.5) -- (dcComponent274.B);
+\draw[draw=dcColor0, line width=1.4226pt] (9,-111) -- (dcComponent274.C);
+\draw[draw=dcColor0, line width=1.4226pt] (7,-111) -- (dcComponent274.E);
+% Component: pnp
+\node[pnp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.7, yscale=-1, transform shape] (dcComponent275) at (12,-110.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-109.7929) -- (dcComponent275.B);
+\draw[draw=dcColor0, line width=1.4226pt] (12.3536,-111.5607) -- (dcComponent275.C);
+\draw[draw=dcColor0, line width=1.4226pt] (10.9393,-110.1464) -- (dcComponent275.E);
+% Component: pnp
+\node[pnp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.7, yscale=-1, transform shape] (dcComponent276) at (16,-110.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-110.5) -- (dcComponent276.B);
+\draw[draw=dcColor0, line width=1.4226pt] (15.5,-111.5) -- (dcComponent276.C);
+\draw[draw=dcColor0, line width=1.4226pt] (15.5,-109.5) -- (dcComponent276.E);
+% Component: pnp
+\node[pnp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.7, yscale=-1, transform shape] (dcComponent277) at (20,-110.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-111.2071) -- (dcComponent277.B);
+\draw[draw=dcColor0, line width=1.4226pt] (18.9393,-110.8536) -- (dcComponent277.C);
+\draw[draw=dcColor0, line width=1.4226pt] (20.3536,-109.4393) -- (dcComponent277.E);
+% Component: pnp
+\node[pnp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.7, yscale=-1, transform shape] (dcComponent278) at (24,-110.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (24,-111.5) -- (dcComponent278.B);
+\draw[draw=dcColor0, line width=1.4226pt] (23,-110) -- (dcComponent278.C);
+\draw[draw=dcColor0, line width=1.4226pt] (25,-110) -- (dcComponent278.E);
+% Component: pnp
+\node[pnp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.7, yscale=-1, transform shape] (dcComponent279) at (28,-110.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-111.2071) -- (dcComponent279.B);
+\draw[draw=dcColor0, line width=1.4226pt] (27.6464,-109.4393) -- (dcComponent279.C);
+\draw[draw=dcColor0, line width=1.4226pt] (29.0607,-110.8536) -- (dcComponent279.E);
+% Component: nmos
+\node[nmos, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.7, transform shape] (dcComponent280) at (0,-113.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-113.75) -- (dcComponent280.G);
+\draw[draw=dcColor0, line width=1.4226pt] (0.5,-112.75) -- (dcComponent280.D);
+\draw[draw=dcColor0, line width=1.4226pt] (0.5,-114.75) -- (dcComponent280.S);
+% Component: nmos
+\node[nmos, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.7, transform shape] (dcComponent281) at (4,-113.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-113.0429) -- (dcComponent281.G);
+\draw[draw=dcColor0, line width=1.4226pt] (5.0607,-113.3964) -- (dcComponent281.D);
+\draw[draw=dcColor0, line width=1.4226pt] (3.6464,-114.8107) -- (dcComponent281.S);
+% Component: nmos
+\node[nmos, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.7, transform shape] (dcComponent282) at (8,-113.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (8,-112.75) -- (dcComponent282.G);
+\draw[draw=dcColor0, line width=1.4226pt] (9,-114.25) -- (dcComponent282.D);
+\draw[draw=dcColor0, line width=1.4226pt] (7,-114.25) -- (dcComponent282.S);
+% Component: nmos
+\node[nmos, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.7, transform shape] (dcComponent283) at (12,-113.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-113.0429) -- (dcComponent283.G);
+\draw[draw=dcColor0, line width=1.4226pt] (12.3536,-114.8107) -- (dcComponent283.D);
+\draw[draw=dcColor0, line width=1.4226pt] (10.9393,-113.3964) -- (dcComponent283.S);
+% Component: nmos
+\node[nmos, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.7, transform shape] (dcComponent284) at (16,-113.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-113.75) -- (dcComponent284.G);
+\draw[draw=dcColor0, line width=1.4226pt] (15.5,-114.75) -- (dcComponent284.D);
+\draw[draw=dcColor0, line width=1.4226pt] (15.5,-112.75) -- (dcComponent284.S);
+% Component: nmos
+\node[nmos, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.7, transform shape] (dcComponent285) at (20,-113.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-114.4571) -- (dcComponent285.G);
+\draw[draw=dcColor0, line width=1.4226pt] (18.9393,-114.1036) -- (dcComponent285.D);
+\draw[draw=dcColor0, line width=1.4226pt] (20.3536,-112.6893) -- (dcComponent285.S);
+% Component: nmos
+\node[nmos, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.7, transform shape] (dcComponent286) at (24,-113.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (24,-114.75) -- (dcComponent286.G);
+\draw[draw=dcColor0, line width=1.4226pt] (23,-113.25) -- (dcComponent286.D);
+\draw[draw=dcColor0, line width=1.4226pt] (25,-113.25) -- (dcComponent286.S);
+% Component: nmos
+\node[nmos, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.7, transform shape] (dcComponent287) at (28,-113.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-114.4571) -- (dcComponent287.G);
+\draw[draw=dcColor0, line width=1.4226pt] (27.6464,-112.6893) -- (dcComponent287.D);
+\draw[draw=dcColor0, line width=1.4226pt] (29.0607,-114.1036) -- (dcComponent287.S);
+% Component: pmos
+\node[pmos, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.7, yscale=-1, transform shape] (dcComponent288) at (0,-117) {};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-117) -- (dcComponent288.G);
+\draw[draw=dcColor0, line width=1.4226pt] (0.5,-116) -- (dcComponent288.D);
+\draw[draw=dcColor0, line width=1.4226pt] (0.5,-118) -- (dcComponent288.S);
+% Component: pmos
+\node[pmos, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.7, yscale=-1, transform shape] (dcComponent289) at (4,-117) {};
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-116.2929) -- (dcComponent289.G);
+\draw[draw=dcColor0, line width=1.4226pt] (5.0607,-116.6464) -- (dcComponent289.D);
+\draw[draw=dcColor0, line width=1.4226pt] (3.6464,-118.0607) -- (dcComponent289.S);
+% Component: pmos
+\node[pmos, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.7, yscale=-1, transform shape] (dcComponent290) at (8,-117) {};
+\draw[draw=dcColor0, line width=1.4226pt] (8,-116) -- (dcComponent290.G);
+\draw[draw=dcColor0, line width=1.4226pt] (9,-117.5) -- (dcComponent290.D);
+\draw[draw=dcColor0, line width=1.4226pt] (7,-117.5) -- (dcComponent290.S);
+% Component: pmos
+\node[pmos, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.7, yscale=-1, transform shape] (dcComponent291) at (12,-117) {};
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-116.2929) -- (dcComponent291.G);
+\draw[draw=dcColor0, line width=1.4226pt] (12.3536,-118.0607) -- (dcComponent291.D);
+\draw[draw=dcColor0, line width=1.4226pt] (10.9393,-116.6464) -- (dcComponent291.S);
+% Component: pmos
+\node[pmos, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.7, yscale=-1, transform shape] (dcComponent292) at (16,-117) {};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-117) -- (dcComponent292.G);
+\draw[draw=dcColor0, line width=1.4226pt] (15.5,-118) -- (dcComponent292.D);
+\draw[draw=dcColor0, line width=1.4226pt] (15.5,-116) -- (dcComponent292.S);
+% Component: pmos
+\node[pmos, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.7, yscale=-1, transform shape] (dcComponent293) at (20,-117) {};
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-117.7071) -- (dcComponent293.G);
+\draw[draw=dcColor0, line width=1.4226pt] (18.9393,-117.3536) -- (dcComponent293.D);
+\draw[draw=dcColor0, line width=1.4226pt] (20.3536,-115.9393) -- (dcComponent293.S);
+% Component: pmos
+\node[pmos, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.7, yscale=-1, transform shape] (dcComponent294) at (24,-117) {};
+\draw[draw=dcColor0, line width=1.4226pt] (24,-118) -- (dcComponent294.G);
+\draw[draw=dcColor0, line width=1.4226pt] (23,-116.5) -- (dcComponent294.D);
+\draw[draw=dcColor0, line width=1.4226pt] (25,-116.5) -- (dcComponent294.S);
+% Component: pmos
+\node[pmos, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.7, yscale=-1, transform shape] (dcComponent295) at (28,-117) {};
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-117.7071) -- (dcComponent295.G);
+\draw[draw=dcColor0, line width=1.4226pt] (27.6464,-115.9393) -- (dcComponent295.D);
+\draw[draw=dcColor0, line width=1.4226pt] (29.0607,-117.3536) -- (dcComponent295.S);
+% Component: njfet
+\node[njfet, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.7, transform shape] (dcComponent296) at (0,-120.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-120.25) -- (dcComponent296.G);
+\draw[draw=dcColor0, line width=1.4226pt] (0.5,-119.25) -- (dcComponent296.D);
+\draw[draw=dcColor0, line width=1.4226pt] (0.5,-121.25) -- (dcComponent296.S);
+% Component: njfet
+\node[njfet, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.7, transform shape] (dcComponent297) at (4,-120.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-119.5429) -- (dcComponent297.G);
+\draw[draw=dcColor0, line width=1.4226pt] (5.0607,-119.8964) -- (dcComponent297.D);
+\draw[draw=dcColor0, line width=1.4226pt] (3.6464,-121.3107) -- (dcComponent297.S);
+% Component: njfet
+\node[njfet, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.7, transform shape] (dcComponent298) at (8,-120.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (8,-119.25) -- (dcComponent298.G);
+\draw[draw=dcColor0, line width=1.4226pt] (9,-120.75) -- (dcComponent298.D);
+\draw[draw=dcColor0, line width=1.4226pt] (7,-120.75) -- (dcComponent298.S);
+% Component: njfet
+\node[njfet, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.7, transform shape] (dcComponent299) at (12,-120.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-119.5429) -- (dcComponent299.G);
+\draw[draw=dcColor0, line width=1.4226pt] (12.3536,-121.3107) -- (dcComponent299.D);
+\draw[draw=dcColor0, line width=1.4226pt] (10.9393,-119.8964) -- (dcComponent299.S);
+% Component: njfet
+\node[njfet, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.7, transform shape] (dcComponent300) at (16,-120.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-120.25) -- (dcComponent300.G);
+\draw[draw=dcColor0, line width=1.4226pt] (15.5,-121.25) -- (dcComponent300.D);
+\draw[draw=dcColor0, line width=1.4226pt] (15.5,-119.25) -- (dcComponent300.S);
+% Component: njfet
+\node[njfet, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.7, transform shape] (dcComponent301) at (20,-120.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-120.9571) -- (dcComponent301.G);
+\draw[draw=dcColor0, line width=1.4226pt] (18.9393,-120.6036) -- (dcComponent301.D);
+\draw[draw=dcColor0, line width=1.4226pt] (20.3536,-119.1893) -- (dcComponent301.S);
+% Component: njfet
+\node[njfet, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.7, transform shape] (dcComponent302) at (24,-120.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (24,-121.25) -- (dcComponent302.G);
+\draw[draw=dcColor0, line width=1.4226pt] (23,-119.75) -- (dcComponent302.D);
+\draw[draw=dcColor0, line width=1.4226pt] (25,-119.75) -- (dcComponent302.S);
+% Component: njfet
+\node[njfet, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.7, transform shape] (dcComponent303) at (28,-120.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-120.9571) -- (dcComponent303.G);
+\draw[draw=dcColor0, line width=1.4226pt] (27.6464,-119.1893) -- (dcComponent303.D);
+\draw[draw=dcColor0, line width=1.4226pt] (29.0607,-120.6036) -- (dcComponent303.S);
+% Component: pjfet
+\node[pjfet, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.7, yscale=-1, transform shape] (dcComponent304) at (0,-123.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-123.5) -- (dcComponent304.G);
+\draw[draw=dcColor0, line width=1.4226pt] (0.5,-122.5) -- (dcComponent304.D);
+\draw[draw=dcColor0, line width=1.4226pt] (0.5,-124.5) -- (dcComponent304.S);
+% Component: pjfet
+\node[pjfet, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.7, yscale=-1, transform shape] (dcComponent305) at (4,-123.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-122.7929) -- (dcComponent305.G);
+\draw[draw=dcColor0, line width=1.4226pt] (5.0607,-123.1464) -- (dcComponent305.D);
+\draw[draw=dcColor0, line width=1.4226pt] (3.6464,-124.5607) -- (dcComponent305.S);
+% Component: pjfet
+\node[pjfet, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.7, yscale=-1, transform shape] (dcComponent306) at (8,-123.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (8,-122.5) -- (dcComponent306.G);
+\draw[draw=dcColor0, line width=1.4226pt] (9,-124) -- (dcComponent306.D);
+\draw[draw=dcColor0, line width=1.4226pt] (7,-124) -- (dcComponent306.S);
+% Component: pjfet
+\node[pjfet, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.7, yscale=-1, transform shape] (dcComponent307) at (12,-123.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-122.7929) -- (dcComponent307.G);
+\draw[draw=dcColor0, line width=1.4226pt] (12.3536,-124.5607) -- (dcComponent307.D);
+\draw[draw=dcColor0, line width=1.4226pt] (10.9393,-123.1464) -- (dcComponent307.S);
+% Component: pjfet
+\node[pjfet, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.7, yscale=-1, transform shape] (dcComponent308) at (16,-123.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-123.5) -- (dcComponent308.G);
+\draw[draw=dcColor0, line width=1.4226pt] (15.5,-124.5) -- (dcComponent308.D);
+\draw[draw=dcColor0, line width=1.4226pt] (15.5,-122.5) -- (dcComponent308.S);
+% Component: pjfet
+\node[pjfet, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.7, yscale=-1, transform shape] (dcComponent309) at (20,-123.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-124.2071) -- (dcComponent309.G);
+\draw[draw=dcColor0, line width=1.4226pt] (18.9393,-123.8536) -- (dcComponent309.D);
+\draw[draw=dcColor0, line width=1.4226pt] (20.3536,-122.4393) -- (dcComponent309.S);
+% Component: pjfet
+\node[pjfet, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.7, yscale=-1, transform shape] (dcComponent310) at (24,-123.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (24,-124.5) -- (dcComponent310.G);
+\draw[draw=dcColor0, line width=1.4226pt] (23,-123) -- (dcComponent310.D);
+\draw[draw=dcColor0, line width=1.4226pt] (25,-123) -- (dcComponent310.S);
+% Component: pjfet
+\node[pjfet, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.7, yscale=-1, transform shape] (dcComponent311) at (28,-123.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-124.2071) -- (dcComponent311.G);
+\draw[draw=dcColor0, line width=1.4226pt] (27.6464,-122.4393) -- (dcComponent311.D);
+\draw[draw=dcColor0, line width=1.4226pt] (29.0607,-123.8536) -- (dcComponent311.S);
+% Component: spdt
+\node[cute spdt up, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.8, transform shape] (dcComponent312) at (0,-126.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-126.75) -- (dcComponent312.in);
+\draw[draw=dcColor0, line width=1.4226pt] (1,-126.25) -- (dcComponent312.out 1);
+\draw[draw=dcColor0, line width=1.4226pt] (1,-127.25) -- (dcComponent312.out 2);
+% Component: spdt
+\node[cute spdt up, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.8, transform shape] (dcComponent313) at (4,-126.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-126.0429) -- (dcComponent313.in);
+\draw[draw=dcColor0, line width=1.4226pt] (5.0607,-127.1036) -- (dcComponent313.out 1);
+\draw[draw=dcColor0, line width=1.4226pt] (4.3536,-127.8107) -- (dcComponent313.out 2);
+% Component: spdt
+\node[cute spdt up, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.8, transform shape] (dcComponent314) at (8,-126.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (8,-125.75) -- (dcComponent314.in);
+\draw[draw=dcColor0, line width=1.4226pt] (8.5,-127.75) -- (dcComponent314.out 1);
+\draw[draw=dcColor0, line width=1.4226pt] (7.5,-127.75) -- (dcComponent314.out 2);
+% Component: spdt
+\node[cute spdt up, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.8, transform shape] (dcComponent315) at (12,-126.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-126.0429) -- (dcComponent315.in);
+\draw[draw=dcColor0, line width=1.4226pt] (11.6464,-127.8107) -- (dcComponent315.out 1);
+\draw[draw=dcColor0, line width=1.4226pt] (10.9393,-127.1036) -- (dcComponent315.out 2);
+% Component: spdt
+\node[cute spdt up, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.8, transform shape] (dcComponent316) at (16,-126.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-126.75) -- (dcComponent316.in);
+\draw[draw=dcColor0, line width=1.4226pt] (15,-127.25) -- (dcComponent316.out 1);
+\draw[draw=dcColor0, line width=1.4226pt] (15,-126.25) -- (dcComponent316.out 2);
+% Component: spdt
+\node[cute spdt up, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.8, transform shape] (dcComponent317) at (20,-126.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-127.4571) -- (dcComponent317.in);
+\draw[draw=dcColor0, line width=1.4226pt] (18.9393,-126.3964) -- (dcComponent317.out 1);
+\draw[draw=dcColor0, line width=1.4226pt] (19.6464,-125.6893) -- (dcComponent317.out 2);
+% Component: spdt
+\node[cute spdt up, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.8, transform shape] (dcComponent318) at (24,-126.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (24,-127.75) -- (dcComponent318.in);
+\draw[draw=dcColor0, line width=1.4226pt] (23.5,-125.75) -- (dcComponent318.out 1);
+\draw[draw=dcColor0, line width=1.4226pt] (24.5,-125.75) -- (dcComponent318.out 2);
+% Component: spdt
+\node[cute spdt up, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.8, transform shape] (dcComponent319) at (28,-126.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-127.4571) -- (dcComponent319.in);
+\draw[draw=dcColor0, line width=1.4226pt] (28.3536,-125.6893) -- (dcComponent319.out 1);
+\draw[draw=dcColor0, line width=1.4226pt] (29.0607,-126.3964) -- (dcComponent319.out 2);
+% Component: pushButtonNO
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-130) to[nopb, fill=white, name=dcComponent320] (1,-130);
+% Component: pushButtonNO
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-129.2929) to[nopb, fill=white, name=dcComponent321] (4.7071,-130.7071);
+% Component: pushButtonNO
+\draw[draw=dcColor0, line width=1.4226pt] (8,-129) to[nopb, fill=white, name=dcComponent322] (8,-131);
+% Component: pushButtonNO
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-129.2929) to[nopb, fill=white, name=dcComponent323] (11.2929,-130.7071);
+% Component: pushButtonNO
+\draw[draw=dcColor0, line width=1.4226pt] (17,-130) to[nopb, fill=white, name=dcComponent324] (15,-130);
+% Component: pushButtonNO
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-130.7071) to[nopb, fill=white, name=dcComponent325] (19.2929,-129.2929);
+% Component: pushButtonNO
+\draw[draw=dcColor0, line width=1.4226pt] (24,-131) to[nopb, fill=white, name=dcComponent326] (24,-129);
+% Component: pushButtonNO
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-130.7071) to[nopb, fill=white, name=dcComponent327] (28.7071,-129.2929);
+% Component: pushButtonNC
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-133.25) to[ncpb, fill=white, name=dcComponent328] (1,-133.25);
+% Component: pushButtonNC
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-132.5429) to[ncpb, fill=white, name=dcComponent329] (4.7071,-133.9571);
+% Component: pushButtonNC
+\draw[draw=dcColor0, line width=1.4226pt] (8,-132.25) to[ncpb, fill=white, name=dcComponent330] (8,-134.25);
+% Component: pushButtonNC
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-132.5429) to[ncpb, fill=white, name=dcComponent331] (11.2929,-133.9571);
+% Component: pushButtonNC
+\draw[draw=dcColor0, line width=1.4226pt] (17,-133.25) to[ncpb, fill=white, name=dcComponent332] (15,-133.25);
+% Component: pushButtonNC
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-133.9571) to[ncpb, fill=white, name=dcComponent333] (19.2929,-132.5429);
+% Component: pushButtonNC
+\draw[draw=dcColor0, line width=1.4226pt] (24,-134.25) to[ncpb, fill=white, name=dcComponent334] (24,-132.25);
+% Component: pushButtonNC
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-133.9571) to[ncpb, fill=white, name=dcComponent335] (28.7071,-132.5429);
+% Component: dpst
+% Mechanically linked DPST contacts: no reliable native equivalent.
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-136) -- (-0.425,-136) (0.425,-136) -- (1,-136) (-0.375,-136) -- (0.325,-135.525);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (-0.4,-136) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (0.4,-136) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-137) -- (-0.425,-137) (0.425,-137) -- (1,-137) (-0.375,-137) -- (0.325,-136.525);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (-0.4,-137) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (0.4,-137) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, densely dashed] (0,-135.825) -- (0,-136.825);
+% Component: dpst
+% Mechanically linked DPST contacts: no reliable native equivalent.
+\draw[draw=dcColor0, line width=1.4226pt] (3.6464,-135.4393) -- (4.053,-135.8459) (4.6541,-136.447) -- (5.0607,-136.8536) (4.0884,-135.8813) -- (4.9192,-136.0404);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (4.0707,-135.8636) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (4.6364,-136.4293) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt] (2.9393,-136.1464) -- (3.3459,-136.553) (3.947,-137.1541) -- (4.3536,-137.5607) (3.3813,-136.5884) -- (4.2121,-136.7475);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (3.3636,-136.5707) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (3.9293,-137.1364) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, densely dashed] (4.4773,-136.0227) -- (3.7702,-136.7298);
+% Component: dpst
+% Mechanically linked DPST contacts: no reliable native equivalent.
+\draw[draw=dcColor0, line width=1.4226pt] (8.5,-135.5) -- (8.5,-136.075) (8.5,-136.925) -- (8.5,-137.5) (8.5,-136.125) -- (8.975,-136.825);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (8.5,-136.1) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (8.5,-136.9) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt] (7.5,-135.5) -- (7.5,-136.075) (7.5,-136.925) -- (7.5,-137.5) (7.5,-136.125) -- (7.975,-136.825);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (7.5,-136.1) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (7.5,-136.9) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, densely dashed] (8.675,-136.5) -- (7.675,-136.5);
+% Component: dpst
+% Mechanically linked DPST contacts: no reliable native equivalent.
+\draw[draw=dcColor0, line width=1.4226pt] (13.0607,-136.1464) -- (12.6541,-136.553) (12.053,-137.1541) -- (11.6464,-137.5607) (12.6187,-136.5884) -- (12.4596,-137.4192);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (12.6364,-136.5707) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (12.0707,-137.1364) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt] (12.3536,-135.4393) -- (11.947,-135.8459) (11.3459,-136.447) -- (10.9393,-136.8536) (11.9116,-135.8813) -- (11.7525,-136.7121);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (11.9293,-135.8636) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (11.3636,-136.4293) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, densely dashed] (12.4773,-136.9773) -- (11.7702,-136.2702);
+% Component: dpst
+% Mechanically linked DPST contacts: no reliable native equivalent.
+\draw[draw=dcColor0, line width=1.4226pt] (17,-137) -- (16.425,-137) (15.575,-137) -- (15,-137) (16.375,-137) -- (15.675,-137.475);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (16.4,-137) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (15.6,-137) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt] (17,-136) -- (16.425,-136) (15.575,-136) -- (15,-136) (16.375,-136) -- (15.675,-136.475);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (16.4,-136) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (15.6,-136) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, densely dashed] (16,-137.175) -- (16,-136.175);
+% Component: dpst
+% Mechanically linked DPST contacts: no reliable native equivalent.
+\draw[draw=dcColor0, line width=1.4226pt] (20.3536,-137.5607) -- (19.947,-137.1541) (19.3459,-136.553) -- (18.9393,-136.1464) (19.9116,-137.1187) -- (19.0808,-136.9596);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (19.9293,-137.1364) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (19.3636,-136.5707) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt] (21.0607,-136.8536) -- (20.6541,-136.447) (20.053,-135.8459) -- (19.6464,-135.4393) (20.6187,-136.4116) -- (19.7879,-136.2525);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (20.6364,-136.4293) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (20.0707,-135.8636) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, densely dashed] (19.5227,-136.9773) -- (20.2298,-136.2702);
+% Component: dpst
+% Mechanically linked DPST contacts: no reliable native equivalent.
+\draw[draw=dcColor0, line width=1.4226pt] (23.5,-137.5) -- (23.5,-136.925) (23.5,-136.075) -- (23.5,-135.5) (23.5,-136.875) -- (23.025,-136.175);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (23.5,-136.9) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (23.5,-136.1) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt] (24.5,-137.5) -- (24.5,-136.925) (24.5,-136.075) -- (24.5,-135.5) (24.5,-136.875) -- (24.025,-136.175);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (24.5,-136.9) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (24.5,-136.1) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, densely dashed] (23.325,-136.5) -- (24.325,-136.5);
+% Component: dpst
+% Mechanically linked DPST contacts: no reliable native equivalent.
+\draw[draw=dcColor0, line width=1.4226pt] (26.9393,-136.8536) -- (27.3459,-136.447) (27.947,-135.8459) -- (28.3536,-135.4393) (27.3813,-136.4116) -- (27.5404,-135.5808);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (27.3636,-136.4293) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (27.9293,-135.8636) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt] (27.6464,-137.5607) -- (28.053,-137.1541) (28.6541,-136.553) -- (29.0607,-136.1464) (28.0884,-137.1187) -- (28.2475,-136.2879);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (28.0707,-137.1364) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (28.6364,-136.5707) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, densely dashed] (27.5227,-136.0227) -- (28.2298,-136.7298);
+% Component: dpdt
+% Mechanically linked DPDT contacts: six stable terminals.
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-139) -- (-0.425,-139) (0.425,-138.5) -- (1,-138.5) (0.425,-139.5) -- (1,-139.5) (-0.375,-139) -- (0.35,-138.5);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (-0.4,-139) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (0.4,-138.5) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (0.4,-139.5) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-140.5) -- (-0.425,-140.5) (0.425,-140) -- (1,-140) (0.425,-141) -- (1,-141) (-0.375,-140.5) -- (0.35,-140);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (-0.4,-140.5) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (0.4,-140) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (0.4,-141) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, densely dashed] (0,-138.75) -- (0,-140.25);
+% Component: dpdt
+% Mechanically linked DPDT contacts: six stable terminals.
+\draw[draw=dcColor0, line width=1.4226pt] (3.8232,-138.5126) -- (4.2298,-138.9191) (5.1844,-139.1666) -- (5.591,-139.5732) (4.4773,-139.8737) -- (4.8839,-140.2803) (4.2652,-138.9545) -- (5.1314,-139.1136);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (4.2475,-138.9368) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (5.1667,-139.149) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (4.4596,-139.8561) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt] (2.7626,-139.5732) -- (3.1691,-139.9798) (4.1237,-140.2273) -- (4.5303,-140.6339) (3.4166,-140.9344) -- (3.8232,-141.341) (3.2045,-140.0152) -- (4.0707,-140.1743);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (3.1868,-139.9975) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (4.1061,-140.2096) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (3.399,-140.9167) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, densely dashed] (4.7071,-139.0429) -- (3.6464,-140.1036);
+% Component: dpdt
+% Mechanically linked DPDT contacts: six stable terminals.
+\draw[draw=dcColor0, line width=1.4226pt] (8.75,-138.75) -- (8.75,-139.325) (9.25,-140.175) -- (9.25,-140.75) (8.25,-140.175) -- (8.25,-140.75) (8.75,-139.375) -- (9.25,-140.1);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (8.75,-139.35) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (9.25,-140.15) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (8.25,-140.15) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt] (7.25,-138.75) -- (7.25,-139.325) (7.75,-140.175) -- (7.75,-140.75) (6.75,-140.175) -- (6.75,-140.75) (7.25,-139.375) -- (7.75,-140.1);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (7.25,-139.35) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (7.75,-140.15) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (6.75,-140.15) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, densely dashed] (9,-139.75) -- (7.5,-139.75);
+% Component: dpdt
+% Mechanically linked DPDT contacts: six stable terminals.
+\draw[draw=dcColor0, line width=1.4226pt] (13.2374,-139.5732) -- (12.8309,-139.9798) (12.5834,-140.9344) -- (12.1768,-141.341) (11.8763,-140.2273) -- (11.4697,-140.6339) (12.7955,-140.0152) -- (12.6364,-140.8814);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (12.8132,-139.9975) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (12.601,-140.9167) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (11.8939,-140.2096) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt] (12.1768,-138.5126) -- (11.7702,-138.9191) (11.5227,-139.8737) -- (11.1161,-140.2803) (10.8156,-139.1666) -- (10.409,-139.5732) (11.7348,-138.9545) -- (11.5757,-139.8207);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (11.7525,-138.9368) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (11.5404,-139.8561) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (10.8333,-139.149) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, densely dashed] (12.7071,-140.4571) -- (11.6464,-139.3964);
+% Component: dpdt
+% Mechanically linked DPDT contacts: six stable terminals.
+\draw[draw=dcColor0, line width=1.4226pt] (17,-140.5) -- (16.425,-140.5) (15.575,-141) -- (15,-141) (15.575,-140) -- (15,-140) (16.375,-140.5) -- (15.65,-141);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (16.4,-140.5) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (15.6,-141) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (15.6,-140) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt] (17,-139) -- (16.425,-139) (15.575,-139.5) -- (15,-139.5) (15.575,-138.5) -- (15,-138.5) (16.375,-139) -- (15.65,-139.5);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (16.4,-139) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (15.6,-139.5) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (15.6,-138.5) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, densely dashed] (16,-140.75) -- (16,-139.25);
+% Component: dpdt
+% Mechanically linked DPDT contacts: six stable terminals.
+\draw[draw=dcColor0, line width=1.4226pt] (20.1768,-140.9874) -- (19.7702,-140.5809) (18.8156,-140.3334) -- (18.409,-139.9268) (19.5227,-139.6263) -- (19.1161,-139.2197) (19.7348,-140.5455) -- (18.8686,-140.3864);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (19.7525,-140.5632) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (18.8333,-140.351) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (19.5404,-139.6439) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt] (21.2374,-139.9268) -- (20.8309,-139.5202) (19.8763,-139.2727) -- (19.4697,-138.8661) (20.5834,-138.5656) -- (20.1768,-138.159) (20.7955,-139.4848) -- (19.9293,-139.3257);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (20.8132,-139.5025) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (19.8939,-139.2904) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (20.601,-138.5833) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, densely dashed] (19.2929,-140.4571) -- (20.3536,-139.3964);
+% Component: dpdt
+% Mechanically linked DPDT contacts: six stable terminals.
+\draw[draw=dcColor0, line width=1.4226pt] (23.25,-140.75) -- (23.25,-140.175) (22.75,-139.325) -- (22.75,-138.75) (23.75,-139.325) -- (23.75,-138.75) (23.25,-140.125) -- (22.75,-139.4);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (23.25,-140.15) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (22.75,-139.35) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (23.75,-139.35) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt] (24.75,-140.75) -- (24.75,-140.175) (24.25,-139.325) -- (24.25,-138.75) (25.25,-139.325) -- (25.25,-138.75) (24.75,-140.125) -- (24.25,-139.4);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (24.75,-140.15) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (24.25,-139.35) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (25.25,-139.35) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, densely dashed] (23,-139.75) -- (24.5,-139.75);
+% Component: dpdt
+% Mechanically linked DPDT contacts: six stable terminals.
+\draw[draw=dcColor0, line width=1.4226pt] (26.7626,-139.9268) -- (27.1691,-139.5202) (27.4166,-138.5656) -- (27.8232,-138.159) (28.1237,-139.2727) -- (28.5303,-138.8661) (27.2045,-139.4848) -- (27.3636,-138.6186);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (27.1868,-139.5025) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (27.399,-138.5833) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (28.1061,-139.2904) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt] (27.8232,-140.9874) -- (28.2298,-140.5809) (28.4773,-139.6263) -- (28.8839,-139.2197) (29.1844,-140.3334) -- (29.591,-139.9268) (28.2652,-140.5455) -- (28.4243,-139.6793);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (28.2475,-140.5632) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (28.4596,-139.6439) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (29.1667,-140.351) circle (1.7783pt);
+\draw[draw=dcColor0, line width=1.4226pt, densely dashed] (27.2929,-139.0429) -- (28.3536,-140.1036);
+% Component: ohmmeter
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-143) to[ohmmeter, fill=white, name=dcComponent352] (1,-143);
+% Component: ohmmeter
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-142.2929) to[ohmmeter, fill=white, name=dcComponent353] (4.7071,-143.7071);
+% Component: ohmmeter
+\draw[draw=dcColor0, line width=1.4226pt] (8,-142) to[ohmmeter, fill=white, name=dcComponent354] (8,-144);
+% Component: ohmmeter
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-142.2929) to[ohmmeter, fill=white, name=dcComponent355] (11.2929,-143.7071);
+% Component: ohmmeter
+\draw[draw=dcColor0, line width=1.4226pt] (17,-143) to[ohmmeter, fill=white, name=dcComponent356] (15,-143);
+% Component: ohmmeter
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-143.7071) to[ohmmeter, fill=white, name=dcComponent357] (19.2929,-142.2929);
+% Component: ohmmeter
+\draw[draw=dcColor0, line width=1.4226pt] (24,-144) to[ohmmeter, fill=white, name=dcComponent358] (24,-142);
+% Component: ohmmeter
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-143.7071) to[ohmmeter, fill=white, name=dcComponent359] (28.7071,-142.2929);
+% Component: galvanometer
+% Circular G meter: no documented dedicated galvanometer bipole.
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-146.25) -- (-0.5,-146.25) (0.5,-146.25) -- (1,-146.25);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (0,-146.25) circle (14.2264pt);
+\node[rotate=0, inner sep=0pt, text=dcColor0, font=\fontsize{14.2264}{18.4943}\selectfont] at (0,-146.275) {G};
+% Component: galvanometer
+% Circular G meter: no documented dedicated galvanometer bipole.
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-145.5429) -- (3.6464,-145.8964) (4.3536,-146.6036) -- (4.7071,-146.9571);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (4,-146.25) circle (14.2264pt);
+\node[rotate=-45, inner sep=0pt, text=dcColor0, font=\fontsize{14.2264}{18.4943}\selectfont] at (3.9823,-146.2677) {G};
+% Component: galvanometer
+% Circular G meter: no documented dedicated galvanometer bipole.
+\draw[draw=dcColor0, line width=1.4226pt] (8,-145.25) -- (8,-145.75) (8,-146.75) -- (8,-147.25);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (8,-146.25) circle (14.2264pt);
+\node[rotate=-90, inner sep=0pt, text=dcColor0, font=\fontsize{14.2264}{18.4943}\selectfont] at (7.975,-146.25) {G};
+% Component: galvanometer
+% Circular G meter: no documented dedicated galvanometer bipole.
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-145.5429) -- (12.3536,-145.8964) (11.6464,-146.6036) -- (11.2929,-146.9571);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (12,-146.25) circle (14.2264pt);
+\node[rotate=-135, inner sep=0pt, text=dcColor0, font=\fontsize{14.2264}{18.4943}\selectfont] at (11.9823,-146.2323) {G};
+% Component: galvanometer
+% Circular G meter: no documented dedicated galvanometer bipole.
+\draw[draw=dcColor0, line width=1.4226pt] (17,-146.25) -- (16.5,-146.25) (15.5,-146.25) -- (15,-146.25);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (16,-146.25) circle (14.2264pt);
+\node[rotate=-180, inner sep=0pt, text=dcColor0, font=\fontsize{14.2264}{18.4943}\selectfont] at (16,-146.225) {G};
+% Component: galvanometer
+% Circular G meter: no documented dedicated galvanometer bipole.
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-146.9571) -- (20.3536,-146.6036) (19.6464,-145.8964) -- (19.2929,-145.5429);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (20,-146.25) circle (14.2264pt);
+\node[rotate=-225, inner sep=0pt, text=dcColor0, font=\fontsize{14.2264}{18.4943}\selectfont] at (20.0177,-146.2323) {G};
+% Component: galvanometer
+% Circular G meter: no documented dedicated galvanometer bipole.
+\draw[draw=dcColor0, line width=1.4226pt] (24,-147.25) -- (24,-146.75) (24,-145.75) -- (24,-145.25);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (24,-146.25) circle (14.2264pt);
+\node[rotate=-270, inner sep=0pt, text=dcColor0, font=\fontsize{14.2264}{18.4943}\selectfont] at (24.025,-146.25) {G};
+% Component: galvanometer
+% Circular G meter: no documented dedicated galvanometer bipole.
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-146.9571) -- (27.6464,-146.6036) (28.3536,-145.8964) -- (28.7071,-145.5429);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (28,-146.25) circle (14.2264pt);
+\node[rotate=-315, inner sep=0pt, text=dcColor0, font=\fontsize{14.2264}{18.4943}\selectfont] at (28.0177,-146.2677) {G};
+% Component: signalGround
+\draw[draw=dcColor0, line width=1.4226pt] (0,-148.5) -- (0,-149.5) node[sground, rotate=0, fill=white] {};
+% Component: signalGround
+\draw[draw=dcColor0, line width=1.4226pt] (4.7071,-148.7929) -- (4,-149.5) node[sground, rotate=-45, fill=white] {};
+% Component: signalGround
+\draw[draw=dcColor0, line width=1.4226pt] (9,-149.5) -- (8,-149.5) node[sground, rotate=-90, fill=white] {};
+% Component: signalGround
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-150.2071) -- (12,-149.5) node[sground, rotate=-135, fill=white] {};
+% Component: signalGround
+\draw[draw=dcColor0, line width=1.4226pt] (16,-150.5) -- (16,-149.5) node[sground, rotate=-180, fill=white] {};
+% Component: signalGround
+\draw[draw=dcColor0, line width=1.4226pt] (19.2929,-150.2071) -- (20,-149.5) node[sground, rotate=-225, fill=white] {};
+% Component: signalGround
+\draw[draw=dcColor0, line width=1.4226pt] (23,-149.5) -- (24,-149.5) node[sground, rotate=-270, fill=white] {};
+% Component: signalGround
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-148.7929) -- (28,-149.5) node[sground, rotate=-315, fill=white] {};
+% Component: chassisGround
+\draw[draw=dcColor0, line width=1.4226pt] (0,-151.75) -- (0,-152.75) node[cground, rotate=0, fill=white] {};
+% Component: chassisGround
+\draw[draw=dcColor0, line width=1.4226pt] (4.7071,-152.0429) -- (4,-152.75) node[cground, rotate=-45, fill=white] {};
+% Component: chassisGround
+\draw[draw=dcColor0, line width=1.4226pt] (9,-152.75) -- (8,-152.75) node[cground, rotate=-90, fill=white] {};
+% Component: chassisGround
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-153.4571) -- (12,-152.75) node[cground, rotate=-135, fill=white] {};
+% Component: chassisGround
+\draw[draw=dcColor0, line width=1.4226pt] (16,-153.75) -- (16,-152.75) node[cground, rotate=-180, fill=white] {};
+% Component: chassisGround
+\draw[draw=dcColor0, line width=1.4226pt] (19.2929,-153.4571) -- (20,-152.75) node[cground, rotate=-225, fill=white] {};
+% Component: chassisGround
+\draw[draw=dcColor0, line width=1.4226pt] (23,-152.75) -- (24,-152.75) node[cground, rotate=-270, fill=white] {};
+% Component: chassisGround
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-152.0429) -- (28,-152.75) node[cground, rotate=-315, fill=white] {};
+% Component: centerTapTransformer
+% Center-tap transformer with five exact semantic terminals.
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-155) -- (-0.5,-155) -- (-0.5,-155.4) .. controls (-0.05,-155.4) and (-0.05,-155.7) .. (-0.5,-155.7) .. controls (-0.05,-155.7) and (-0.05,-156) .. (-0.5,-156) .. controls (-0.05,-156) and (-0.05,-156.3) .. (-0.5,-156.3) .. controls (-0.05,-156.3) and (-0.05,-156.6) .. (-0.5,-156.6) -- (-0.5,-157) -- (-1,-157) (1,-155) -- (0.5,-155) -- (0.5,-155.4) .. controls (0.05,-155.4) and (0.05,-155.7) .. (0.5,-155.7) .. controls (0.05,-155.7) and (0.05,-156) .. (0.5,-156) .. controls (0.05,-156) and (0.05,-156.3) .. (0.5,-156.3) .. controls (0.05,-156.3) and (0.05,-156.6) .. (0.5,-156.6) -- (0.5,-157) -- (1,-157);
+\draw[draw=dcColor0, line width=1.4226pt] (-0.075,-155.375) -- (-0.075,-156.625) (0.075,-155.375) -- (0.075,-156.625);
+\draw[draw=dcColor0, line width=1.4226pt] (0.5,-156) -- (1.5,-156);
+% Component: centerTapTransformer
+% Center-tap transformer with five exact semantic terminals.
+\draw[draw=dcColor0, line width=1.4226pt] (4,-154.5858) -- (4.3536,-154.9393) -- (4.0707,-155.2222) .. controls (4.3889,-155.5404) and (4.1768,-155.7525) .. (3.8586,-155.4343) .. controls (4.1768,-155.7525) and (3.9646,-155.9646) .. (3.6464,-155.6464) .. controls (3.9646,-155.9646) and (3.7525,-156.1768) .. (3.4343,-155.8586) .. controls (3.7525,-156.1768) and (3.5404,-156.3889) .. (3.2222,-156.0707) -- (2.9393,-156.3536) -- (2.5858,-156) (5.4142,-156) -- (5.0607,-155.6464) -- (4.7778,-155.9293) .. controls (4.4596,-155.6111) and (4.2475,-155.8232) .. (4.5657,-156.1414) .. controls (4.2475,-155.8232) and (4.0354,-156.0354) .. (4.3536,-156.3536) .. controls (4.0354,-156.0354) and (3.8232,-156.2475) .. (4.1414,-156.5657) .. controls (3.8232,-156.2475) and (3.6111,-156.4596) .. (3.9293,-156.7778) -- (3.6464,-157.0607) -- (4,-157.4142);
+\draw[draw=dcColor0, line width=1.4226pt] (4.3889,-155.505) -- (3.505,-156.3889) (4.495,-155.6111) -- (3.6111,-156.495);
+\draw[draw=dcColor0, line width=1.4226pt] (4.3536,-156.3536) -- (5.0607,-157.0607);
+% Component: centerTapTransformer
+% Center-tap transformer with five exact semantic terminals.
+\draw[draw=dcColor0, line width=1.4226pt] (9,-155) -- (9,-155.5) -- (8.6,-155.5) .. controls (8.6,-155.95) and (8.3,-155.95) .. (8.3,-155.5) .. controls (8.3,-155.95) and (8,-155.95) .. (8,-155.5) .. controls (8,-155.95) and (7.7,-155.95) .. (7.7,-155.5) .. controls (7.7,-155.95) and (7.4,-155.95) .. (7.4,-155.5) -- (7,-155.5) -- (7,-155) (9,-157) -- (9,-156.5) -- (8.6,-156.5) .. controls (8.6,-156.05) and (8.3,-156.05) .. (8.3,-156.5) .. controls (8.3,-156.05) and (8,-156.05) .. (8,-156.5) .. controls (8,-156.05) and (7.7,-156.05) .. (7.7,-156.5) .. controls (7.7,-156.05) and (7.4,-156.05) .. (7.4,-156.5) -- (7,-156.5) -- (7,-157);
+\draw[draw=dcColor0, line width=1.4226pt] (8.625,-155.925) -- (7.375,-155.925) (8.625,-156.075) -- (7.375,-156.075);
+\draw[draw=dcColor0, line width=1.4226pt] (8,-156.5) -- (8,-157.5);
+% Component: centerTapTransformer
+% Center-tap transformer with five exact semantic terminals.
+\draw[draw=dcColor0, line width=1.4226pt] (13.4142,-156) -- (13.0607,-156.3536) -- (12.7778,-156.0707) .. controls (12.4596,-156.3889) and (12.2475,-156.1768) .. (12.5657,-155.8586) .. controls (12.2475,-156.1768) and (12.0354,-155.9646) .. (12.3536,-155.6464) .. controls (12.0354,-155.9646) and (11.8232,-155.7525) .. (12.1414,-155.4343) .. controls (11.8232,-155.7525) and (11.6111,-155.5404) .. (11.9293,-155.2222) -- (11.6464,-154.9393) -- (12,-154.5858) (12,-157.4142) -- (12.3536,-157.0607) -- (12.0707,-156.7778) .. controls (12.3889,-156.4596) and (12.1768,-156.2475) .. (11.8586,-156.5657) .. controls (12.1768,-156.2475) and (11.9646,-156.0354) .. (11.6464,-156.3536) .. controls (11.9646,-156.0354) and (11.7525,-155.8232) .. (11.4343,-156.1414) .. controls (11.7525,-155.8232) and (11.5404,-155.6111) .. (11.2222,-155.9293) -- (10.9393,-155.6464) -- (10.5858,-156);
+\draw[draw=dcColor0, line width=1.4226pt] (12.495,-156.3889) -- (11.6111,-155.505) (12.3889,-156.495) -- (11.505,-155.6111);
+\draw[draw=dcColor0, line width=1.4226pt] (11.6464,-156.3536) -- (10.9393,-157.0607);
+% Component: centerTapTransformer
+% Center-tap transformer with five exact semantic terminals.
+\draw[draw=dcColor0, line width=1.4226pt] (17,-157) -- (16.5,-157) -- (16.5,-156.6) .. controls (16.05,-156.6) and (16.05,-156.3) .. (16.5,-156.3) .. controls (16.05,-156.3) and (16.05,-156) .. (16.5,-156) .. controls (16.05,-156) and (16.05,-155.7) .. (16.5,-155.7) .. controls (16.05,-155.7) and (16.05,-155.4) .. (16.5,-155.4) -- (16.5,-155) -- (17,-155) (15,-157) -- (15.5,-157) -- (15.5,-156.6) .. controls (15.95,-156.6) and (15.95,-156.3) .. (15.5,-156.3) .. controls (15.95,-156.3) and (15.95,-156) .. (15.5,-156) .. controls (15.95,-156) and (15.95,-155.7) .. (15.5,-155.7) .. controls (15.95,-155.7) and (15.95,-155.4) .. (15.5,-155.4) -- (15.5,-155) -- (15,-155);
+\draw[draw=dcColor0, line width=1.4226pt] (16.075,-156.625) -- (16.075,-155.375) (15.925,-156.625) -- (15.925,-155.375);
+\draw[draw=dcColor0, line width=1.4226pt] (15.5,-156) -- (14.5,-156);
+% Component: centerTapTransformer
+% Center-tap transformer with five exact semantic terminals.
+\draw[draw=dcColor0, line width=1.4226pt] (20,-157.4142) -- (19.6464,-157.0607) -- (19.9293,-156.7778) .. controls (19.6111,-156.4596) and (19.8232,-156.2475) .. (20.1414,-156.5657) .. controls (19.8232,-156.2475) and (20.0354,-156.0354) .. (20.3536,-156.3536) .. controls (20.0354,-156.0354) and (20.2475,-155.8232) .. (20.5657,-156.1414) .. controls (20.2475,-155.8232) and (20.4596,-155.6111) .. (20.7778,-155.9293) -- (21.0607,-155.6464) -- (21.4142,-156) (18.5858,-156) -- (18.9393,-156.3536) -- (19.2222,-156.0707) .. controls (19.5404,-156.3889) and (19.7525,-156.1768) .. (19.4343,-155.8586) .. controls (19.7525,-156.1768) and (19.9646,-155.9646) .. (19.6464,-155.6464) .. controls (19.9646,-155.9646) and (20.1768,-155.7525) .. (19.8586,-155.4343) .. controls (20.1768,-155.7525) and (20.3889,-155.5404) .. (20.0707,-155.2222) -- (20.3536,-154.9393) -- (20,-154.5858);
+\draw[draw=dcColor0, line width=1.4226pt] (19.6111,-156.495) -- (20.495,-155.6111) (19.505,-156.3889) -- (20.3889,-155.505);
+\draw[draw=dcColor0, line width=1.4226pt] (19.6464,-155.6464) -- (18.9393,-154.9393);
+% Component: centerTapTransformer
+% Center-tap transformer with five exact semantic terminals.
+\draw[draw=dcColor0, line width=1.4226pt] (23,-157) -- (23,-156.5) -- (23.4,-156.5) .. controls (23.4,-156.05) and (23.7,-156.05) .. (23.7,-156.5) .. controls (23.7,-156.05) and (24,-156.05) .. (24,-156.5) .. controls (24,-156.05) and (24.3,-156.05) .. (24.3,-156.5) .. controls (24.3,-156.05) and (24.6,-156.05) .. (24.6,-156.5) -- (25,-156.5) -- (25,-157) (23,-155) -- (23,-155.5) -- (23.4,-155.5) .. controls (23.4,-155.95) and (23.7,-155.95) .. (23.7,-155.5) .. controls (23.7,-155.95) and (24,-155.95) .. (24,-155.5) .. controls (24,-155.95) and (24.3,-155.95) .. (24.3,-155.5) .. controls (24.3,-155.95) and (24.6,-155.95) .. (24.6,-155.5) -- (25,-155.5) -- (25,-155);
+\draw[draw=dcColor0, line width=1.4226pt] (23.375,-156.075) -- (24.625,-156.075) (23.375,-155.925) -- (24.625,-155.925);
+\draw[draw=dcColor0, line width=1.4226pt] (24,-155.5) -- (24,-154.5);
+% Component: centerTapTransformer
+% Center-tap transformer with five exact semantic terminals.
+\draw[draw=dcColor0, line width=1.4226pt] (26.5858,-156) -- (26.9393,-155.6464) -- (27.2222,-155.9293) .. controls (27.5404,-155.6111) and (27.7525,-155.8232) .. (27.4343,-156.1414) .. controls (27.7525,-155.8232) and (27.9646,-156.0354) .. (27.6464,-156.3536) .. controls (27.9646,-156.0354) and (28.1768,-156.2475) .. (27.8586,-156.5657) .. controls (28.1768,-156.2475) and (28.3889,-156.4596) .. (28.0707,-156.7778) -- (28.3536,-157.0607) -- (28,-157.4142) (28,-154.5858) -- (27.6464,-154.9393) -- (27.9293,-155.2222) .. controls (27.6111,-155.5404) and (27.8232,-155.7525) .. (28.1414,-155.4343) .. controls (27.8232,-155.7525) and (28.0354,-155.9646) .. (28.3536,-155.6464) .. controls (28.0354,-155.9646) and (28.2475,-156.1768) .. (28.5657,-155.8586) .. controls (28.2475,-156.1768) and (28.4596,-156.3889) .. (28.7778,-156.0707) -- (29.0607,-156.3536) -- (29.4142,-156);
+\draw[draw=dcColor0, line width=1.4226pt] (27.505,-155.6111) -- (28.3889,-156.495) (27.6111,-155.505) -- (28.495,-156.3889);
+\draw[draw=dcColor0, line width=1.4226pt] (28.3536,-155.6464) -- (29.0607,-154.9393);
+% Component: coupledInductors
+\node[transformer, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.65, transform shape] (dcComponent392) at (0,-159.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-158.25) -- (dcComponent392.A1);
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-160.25) -- (dcComponent392.A2);
+\draw[draw=dcColor0, line width=1.4226pt] (1,-158.25) -- (dcComponent392.B1);
+\draw[draw=dcColor0, line width=1.4226pt] (1,-160.25) -- (dcComponent392.B2);
+% Component: coupledInductors
+\node[transformer, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.65, transform shape] (dcComponent393) at (4,-159.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (4,-157.8358) -- (dcComponent393.A1);
+\draw[draw=dcColor0, line width=1.4226pt] (2.5858,-159.25) -- (dcComponent393.A2);
+\draw[draw=dcColor0, line width=1.4226pt] (5.4142,-159.25) -- (dcComponent393.B1);
+\draw[draw=dcColor0, line width=1.4226pt] (4,-160.6642) -- (dcComponent393.B2);
+% Component: coupledInductors
+\node[transformer, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.65, transform shape] (dcComponent394) at (8,-159.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (9,-158.25) -- (dcComponent394.A1);
+\draw[draw=dcColor0, line width=1.4226pt] (7,-158.25) -- (dcComponent394.A2);
+\draw[draw=dcColor0, line width=1.4226pt] (9,-160.25) -- (dcComponent394.B1);
+\draw[draw=dcColor0, line width=1.4226pt] (7,-160.25) -- (dcComponent394.B2);
+% Component: coupledInductors
+\node[transformer, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.65, transform shape] (dcComponent395) at (12,-159.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (13.4142,-159.25) -- (dcComponent395.A1);
+\draw[draw=dcColor0, line width=1.4226pt] (12,-157.8358) -- (dcComponent395.A2);
+\draw[draw=dcColor0, line width=1.4226pt] (12,-160.6642) -- (dcComponent395.B1);
+\draw[draw=dcColor0, line width=1.4226pt] (10.5858,-159.25) -- (dcComponent395.B2);
+% Component: coupledInductors
+\node[transformer, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.65, transform shape] (dcComponent396) at (16,-159.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-160.25) -- (dcComponent396.A1);
+\draw[draw=dcColor0, line width=1.4226pt] (17,-158.25) -- (dcComponent396.A2);
+\draw[draw=dcColor0, line width=1.4226pt] (15,-160.25) -- (dcComponent396.B1);
+\draw[draw=dcColor0, line width=1.4226pt] (15,-158.25) -- (dcComponent396.B2);
+% Component: coupledInductors
+\node[transformer, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.65, transform shape] (dcComponent397) at (20,-159.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (20,-160.6642) -- (dcComponent397.A1);
+\draw[draw=dcColor0, line width=1.4226pt] (21.4142,-159.25) -- (dcComponent397.A2);
+\draw[draw=dcColor0, line width=1.4226pt] (18.5858,-159.25) -- (dcComponent397.B1);
+\draw[draw=dcColor0, line width=1.4226pt] (20,-157.8358) -- (dcComponent397.B2);
+% Component: coupledInductors
+\node[transformer, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.65, transform shape] (dcComponent398) at (24,-159.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (23,-160.25) -- (dcComponent398.A1);
+\draw[draw=dcColor0, line width=1.4226pt] (25,-160.25) -- (dcComponent398.A2);
+\draw[draw=dcColor0, line width=1.4226pt] (23,-158.25) -- (dcComponent398.B1);
+\draw[draw=dcColor0, line width=1.4226pt] (25,-158.25) -- (dcComponent398.B2);
+% Component: coupledInductors
+\node[transformer, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.65, transform shape] (dcComponent399) at (28,-159.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (26.5858,-159.25) -- (dcComponent399.A1);
+\draw[draw=dcColor0, line width=1.4226pt] (28,-160.6642) -- (dcComponent399.A2);
+\draw[draw=dcColor0, line width=1.4226pt] (28,-157.8358) -- (dcComponent399.B1);
+\draw[draw=dcColor0, line width=1.4226pt] (29.4142,-159.25) -- (dcComponent399.B2);
+% Component: opAmp
+\node[op amp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.6, transform shape] (dcComponent400) at (0,-162.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-162) -- (dcComponent400.-);
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-163) -- (dcComponent400.+);
+\draw[draw=dcColor0, line width=1.4226pt] (1,-162.5) -- (dcComponent400.out);
+% Component: opAmp
+\node[op amp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.6, transform shape] (dcComponent401) at (4,-162.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (3.6464,-161.4393) -- (dcComponent401.-);
+\draw[draw=dcColor0, line width=1.4226pt] (2.9393,-162.1464) -- (dcComponent401.+);
+\draw[draw=dcColor0, line width=1.4226pt] (4.7071,-163.2071) -- (dcComponent401.out);
+% Component: opAmp
+\node[op amp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.6, transform shape] (dcComponent402) at (8,-162.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (8.5,-161.5) -- (dcComponent402.-);
+\draw[draw=dcColor0, line width=1.4226pt] (7.5,-161.5) -- (dcComponent402.+);
+\draw[draw=dcColor0, line width=1.4226pt] (8,-163.5) -- (dcComponent402.out);
+% Component: opAmp
+\node[op amp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.6, transform shape] (dcComponent403) at (12,-162.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (13.0607,-162.1464) -- (dcComponent403.-);
+\draw[draw=dcColor0, line width=1.4226pt] (12.3536,-161.4393) -- (dcComponent403.+);
+\draw[draw=dcColor0, line width=1.4226pt] (11.2929,-163.2071) -- (dcComponent403.out);
+% Component: opAmp
+\node[op amp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.6, transform shape] (dcComponent404) at (16,-162.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-163) -- (dcComponent404.-);
+\draw[draw=dcColor0, line width=1.4226pt] (17,-162) -- (dcComponent404.+);
+\draw[draw=dcColor0, line width=1.4226pt] (15,-162.5) -- (dcComponent404.out);
+% Component: opAmp
+\node[op amp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.6, transform shape] (dcComponent405) at (20,-162.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (20.3536,-163.5607) -- (dcComponent405.-);
+\draw[draw=dcColor0, line width=1.4226pt] (21.0607,-162.8536) -- (dcComponent405.+);
+\draw[draw=dcColor0, line width=1.4226pt] (19.2929,-161.7929) -- (dcComponent405.out);
+% Component: opAmp
+\node[op amp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.6, transform shape] (dcComponent406) at (24,-162.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (23.5,-163.5) -- (dcComponent406.-);
+\draw[draw=dcColor0, line width=1.4226pt] (24.5,-163.5) -- (dcComponent406.+);
+\draw[draw=dcColor0, line width=1.4226pt] (24,-161.5) -- (dcComponent406.out);
+% Component: opAmp
+\node[op amp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.6, transform shape] (dcComponent407) at (28,-162.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (26.9393,-162.8536) -- (dcComponent407.-);
+\draw[draw=dcColor0, line width=1.4226pt] (27.6464,-163.5607) -- (dcComponent407.+);
+\draw[draw=dcColor0, line width=1.4226pt] (28.7071,-161.7929) -- (dcComponent407.out);
+% Component: comparator
+\node[op amp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.6, transform shape] (dcComponent408) at (0,-165.75) {>};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-165.25) -- (dcComponent408.-);
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-166.25) -- (dcComponent408.+);
+\draw[draw=dcColor0, line width=1.4226pt] (1,-165.75) -- (dcComponent408.out);
+% Component: comparator
+\node[op amp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.6, transform shape] (dcComponent409) at (4,-165.75) {>};
+\draw[draw=dcColor0, line width=1.4226pt] (3.6464,-164.6893) -- (dcComponent409.-);
+\draw[draw=dcColor0, line width=1.4226pt] (2.9393,-165.3964) -- (dcComponent409.+);
+\draw[draw=dcColor0, line width=1.4226pt] (4.7071,-166.4571) -- (dcComponent409.out);
+% Component: comparator
+\node[op amp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.6, transform shape] (dcComponent410) at (8,-165.75) {>};
+\draw[draw=dcColor0, line width=1.4226pt] (8.5,-164.75) -- (dcComponent410.-);
+\draw[draw=dcColor0, line width=1.4226pt] (7.5,-164.75) -- (dcComponent410.+);
+\draw[draw=dcColor0, line width=1.4226pt] (8,-166.75) -- (dcComponent410.out);
+% Component: comparator
+\node[op amp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.6, transform shape] (dcComponent411) at (12,-165.75) {>};
+\draw[draw=dcColor0, line width=1.4226pt] (13.0607,-165.3964) -- (dcComponent411.-);
+\draw[draw=dcColor0, line width=1.4226pt] (12.3536,-164.6893) -- (dcComponent411.+);
+\draw[draw=dcColor0, line width=1.4226pt] (11.2929,-166.4571) -- (dcComponent411.out);
+% Component: comparator
+\node[op amp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.6, transform shape] (dcComponent412) at (16,-165.75) {>};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-166.25) -- (dcComponent412.-);
+\draw[draw=dcColor0, line width=1.4226pt] (17,-165.25) -- (dcComponent412.+);
+\draw[draw=dcColor0, line width=1.4226pt] (15,-165.75) -- (dcComponent412.out);
+% Component: comparator
+\node[op amp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.6, transform shape] (dcComponent413) at (20,-165.75) {>};
+\draw[draw=dcColor0, line width=1.4226pt] (20.3536,-166.8107) -- (dcComponent413.-);
+\draw[draw=dcColor0, line width=1.4226pt] (21.0607,-166.1036) -- (dcComponent413.+);
+\draw[draw=dcColor0, line width=1.4226pt] (19.2929,-165.0429) -- (dcComponent413.out);
+% Component: comparator
+\node[op amp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.6, transform shape] (dcComponent414) at (24,-165.75) {>};
+\draw[draw=dcColor0, line width=1.4226pt] (23.5,-166.75) -- (dcComponent414.-);
+\draw[draw=dcColor0, line width=1.4226pt] (24.5,-166.75) -- (dcComponent414.+);
+\draw[draw=dcColor0, line width=1.4226pt] (24,-164.75) -- (dcComponent414.out);
+% Component: comparator
+\node[op amp, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.6, transform shape] (dcComponent415) at (28,-165.75) {>};
+\draw[draw=dcColor0, line width=1.4226pt] (26.9393,-166.1036) -- (dcComponent415.-);
+\draw[draw=dcColor0, line width=1.4226pt] (27.6464,-166.8107) -- (dcComponent415.+);
+\draw[draw=dcColor0, line width=1.4226pt] (28.7071,-165.0429) -- (dcComponent415.out);
+% Component: andGate
+\node[and port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.8, transform shape] (dcComponent416) at (0,-169) {};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-168.5) -- (dcComponent416.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-169.5) -- (dcComponent416.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (1,-169) -- (dcComponent416.out);
+% Component: andGate
+\node[and port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.8, transform shape] (dcComponent417) at (4,-169) {};
+\draw[draw=dcColor0, line width=1.4226pt] (3.6464,-167.9393) -- (dcComponent417.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (2.9393,-168.6464) -- (dcComponent417.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (4.7071,-169.7071) -- (dcComponent417.out);
+% Component: andGate
+\node[and port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.8, transform shape] (dcComponent418) at (8,-169) {};
+\draw[draw=dcColor0, line width=1.4226pt] (8.5,-168) -- (dcComponent418.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (7.5,-168) -- (dcComponent418.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (8,-170) -- (dcComponent418.out);
+% Component: andGate
+\node[and port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.8, transform shape] (dcComponent419) at (12,-169) {};
+\draw[draw=dcColor0, line width=1.4226pt] (13.0607,-168.6464) -- (dcComponent419.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (12.3536,-167.9393) -- (dcComponent419.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (11.2929,-169.7071) -- (dcComponent419.out);
+% Component: andGate
+\node[and port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.8, transform shape] (dcComponent420) at (16,-169) {};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-169.5) -- (dcComponent420.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (17,-168.5) -- (dcComponent420.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (15,-169) -- (dcComponent420.out);
+% Component: andGate
+\node[and port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.8, transform shape] (dcComponent421) at (20,-169) {};
+\draw[draw=dcColor0, line width=1.4226pt] (20.3536,-170.0607) -- (dcComponent421.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (21.0607,-169.3536) -- (dcComponent421.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (19.2929,-168.2929) -- (dcComponent421.out);
+% Component: andGate
+\node[and port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.8, transform shape] (dcComponent422) at (24,-169) {};
+\draw[draw=dcColor0, line width=1.4226pt] (23.5,-170) -- (dcComponent422.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (24.5,-170) -- (dcComponent422.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (24,-168) -- (dcComponent422.out);
+% Component: andGate
+\node[and port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.8, transform shape] (dcComponent423) at (28,-169) {};
+\draw[draw=dcColor0, line width=1.4226pt] (26.9393,-169.3536) -- (dcComponent423.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (27.6464,-170.0607) -- (dcComponent423.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (28.7071,-168.2929) -- (dcComponent423.out);
+% Component: orGate
+\node[or port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.8, transform shape] (dcComponent424) at (0,-172.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-171.75) -- (dcComponent424.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-172.75) -- (dcComponent424.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (1,-172.25) -- (dcComponent424.out);
+% Component: orGate
+\node[or port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.8, transform shape] (dcComponent425) at (4,-172.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (3.6464,-171.1893) -- (dcComponent425.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (2.9393,-171.8964) -- (dcComponent425.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (4.7071,-172.9571) -- (dcComponent425.out);
+% Component: orGate
+\node[or port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.8, transform shape] (dcComponent426) at (8,-172.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (8.5,-171.25) -- (dcComponent426.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (7.5,-171.25) -- (dcComponent426.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (8,-173.25) -- (dcComponent426.out);
+% Component: orGate
+\node[or port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.8, transform shape] (dcComponent427) at (12,-172.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (13.0607,-171.8964) -- (dcComponent427.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (12.3536,-171.1893) -- (dcComponent427.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (11.2929,-172.9571) -- (dcComponent427.out);
+% Component: orGate
+\node[or port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.8, transform shape] (dcComponent428) at (16,-172.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-172.75) -- (dcComponent428.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (17,-171.75) -- (dcComponent428.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (15,-172.25) -- (dcComponent428.out);
+% Component: orGate
+\node[or port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.8, transform shape] (dcComponent429) at (20,-172.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (20.3536,-173.3107) -- (dcComponent429.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (21.0607,-172.6036) -- (dcComponent429.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (19.2929,-171.5429) -- (dcComponent429.out);
+% Component: orGate
+\node[or port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.8, transform shape] (dcComponent430) at (24,-172.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (23.5,-173.25) -- (dcComponent430.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (24.5,-173.25) -- (dcComponent430.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (24,-171.25) -- (dcComponent430.out);
+% Component: orGate
+\node[or port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.8, transform shape] (dcComponent431) at (28,-172.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (26.9393,-172.6036) -- (dcComponent431.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (27.6464,-173.3107) -- (dcComponent431.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (28.7071,-171.5429) -- (dcComponent431.out);
+% Component: notGate
+\node[not port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.8, transform shape] (dcComponent432) at (0,-175.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-175.5) -- (dcComponent432.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (1,-175.5) -- (dcComponent432.out);
+% Component: notGate
+\node[not port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.8, transform shape] (dcComponent433) at (4,-175.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-174.7929) -- (dcComponent433.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (4.7071,-176.2071) -- (dcComponent433.out);
+% Component: notGate
+\node[not port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.8, transform shape] (dcComponent434) at (8,-175.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (8,-174.5) -- (dcComponent434.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (8,-176.5) -- (dcComponent434.out);
+% Component: notGate
+\node[not port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.8, transform shape] (dcComponent435) at (12,-175.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-174.7929) -- (dcComponent435.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (11.2929,-176.2071) -- (dcComponent435.out);
+% Component: notGate
+\node[not port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.8, transform shape] (dcComponent436) at (16,-175.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-175.5) -- (dcComponent436.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (15,-175.5) -- (dcComponent436.out);
+% Component: notGate
+\node[not port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.8, transform shape] (dcComponent437) at (20,-175.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-176.2071) -- (dcComponent437.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (19.2929,-174.7929) -- (dcComponent437.out);
+% Component: notGate
+\node[not port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.8, transform shape] (dcComponent438) at (24,-175.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (24,-176.5) -- (dcComponent438.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (24,-174.5) -- (dcComponent438.out);
+% Component: notGate
+\node[not port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.8, transform shape] (dcComponent439) at (28,-175.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-176.2071) -- (dcComponent439.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (28.7071,-174.7929) -- (dcComponent439.out);
+% Component: nandGate
+\node[nand port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.8, transform shape] (dcComponent440) at (0,-178.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-178.25) -- (dcComponent440.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-179.25) -- (dcComponent440.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (1,-178.75) -- (dcComponent440.out);
+% Component: nandGate
+\node[nand port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.8, transform shape] (dcComponent441) at (4,-178.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (3.6464,-177.6893) -- (dcComponent441.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (2.9393,-178.3964) -- (dcComponent441.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (4.7071,-179.4571) -- (dcComponent441.out);
+% Component: nandGate
+\node[nand port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.8, transform shape] (dcComponent442) at (8,-178.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (8.5,-177.75) -- (dcComponent442.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (7.5,-177.75) -- (dcComponent442.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (8,-179.75) -- (dcComponent442.out);
+% Component: nandGate
+\node[nand port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.8, transform shape] (dcComponent443) at (12,-178.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (13.0607,-178.3964) -- (dcComponent443.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (12.3536,-177.6893) -- (dcComponent443.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (11.2929,-179.4571) -- (dcComponent443.out);
+% Component: nandGate
+\node[nand port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.8, transform shape] (dcComponent444) at (16,-178.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-179.25) -- (dcComponent444.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (17,-178.25) -- (dcComponent444.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (15,-178.75) -- (dcComponent444.out);
+% Component: nandGate
+\node[nand port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.8, transform shape] (dcComponent445) at (20,-178.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (20.3536,-179.8107) -- (dcComponent445.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (21.0607,-179.1036) -- (dcComponent445.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (19.2929,-178.0429) -- (dcComponent445.out);
+% Component: nandGate
+\node[nand port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.8, transform shape] (dcComponent446) at (24,-178.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (23.5,-179.75) -- (dcComponent446.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (24.5,-179.75) -- (dcComponent446.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (24,-177.75) -- (dcComponent446.out);
+% Component: nandGate
+\node[nand port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.8, transform shape] (dcComponent447) at (28,-178.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (26.9393,-179.1036) -- (dcComponent447.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (27.6464,-179.8107) -- (dcComponent447.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (28.7071,-178.0429) -- (dcComponent447.out);
+% Component: norGate
+\node[nor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.8, transform shape] (dcComponent448) at (0,-182) {};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-181.5) -- (dcComponent448.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-182.5) -- (dcComponent448.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (1,-182) -- (dcComponent448.out);
+% Component: norGate
+\node[nor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.8, transform shape] (dcComponent449) at (4,-182) {};
+\draw[draw=dcColor0, line width=1.4226pt] (3.6464,-180.9393) -- (dcComponent449.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (2.9393,-181.6464) -- (dcComponent449.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (4.7071,-182.7071) -- (dcComponent449.out);
+% Component: norGate
+\node[nor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.8, transform shape] (dcComponent450) at (8,-182) {};
+\draw[draw=dcColor0, line width=1.4226pt] (8.5,-181) -- (dcComponent450.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (7.5,-181) -- (dcComponent450.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (8,-183) -- (dcComponent450.out);
+% Component: norGate
+\node[nor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.8, transform shape] (dcComponent451) at (12,-182) {};
+\draw[draw=dcColor0, line width=1.4226pt] (13.0607,-181.6464) -- (dcComponent451.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (12.3536,-180.9393) -- (dcComponent451.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (11.2929,-182.7071) -- (dcComponent451.out);
+% Component: norGate
+\node[nor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.8, transform shape] (dcComponent452) at (16,-182) {};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-182.5) -- (dcComponent452.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (17,-181.5) -- (dcComponent452.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (15,-182) -- (dcComponent452.out);
+% Component: norGate
+\node[nor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.8, transform shape] (dcComponent453) at (20,-182) {};
+\draw[draw=dcColor0, line width=1.4226pt] (20.3536,-183.0607) -- (dcComponent453.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (21.0607,-182.3536) -- (dcComponent453.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (19.2929,-181.2929) -- (dcComponent453.out);
+% Component: norGate
+\node[nor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.8, transform shape] (dcComponent454) at (24,-182) {};
+\draw[draw=dcColor0, line width=1.4226pt] (23.5,-183) -- (dcComponent454.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (24.5,-183) -- (dcComponent454.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (24,-181) -- (dcComponent454.out);
+% Component: norGate
+\node[nor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.8, transform shape] (dcComponent455) at (28,-182) {};
+\draw[draw=dcColor0, line width=1.4226pt] (26.9393,-182.3536) -- (dcComponent455.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (27.6464,-183.0607) -- (dcComponent455.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (28.7071,-181.2929) -- (dcComponent455.out);
+% Component: xorGate
+\node[xor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.8, transform shape] (dcComponent456) at (0,-185.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-184.75) -- (dcComponent456.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-185.75) -- (dcComponent456.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (1,-185.25) -- (dcComponent456.out);
+% Component: xorGate
+\node[xor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.8, transform shape] (dcComponent457) at (4,-185.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (3.6464,-184.1893) -- (dcComponent457.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (2.9393,-184.8964) -- (dcComponent457.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (4.7071,-185.9571) -- (dcComponent457.out);
+% Component: xorGate
+\node[xor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.8, transform shape] (dcComponent458) at (8,-185.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (8.5,-184.25) -- (dcComponent458.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (7.5,-184.25) -- (dcComponent458.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (8,-186.25) -- (dcComponent458.out);
+% Component: xorGate
+\node[xor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.8, transform shape] (dcComponent459) at (12,-185.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (13.0607,-184.8964) -- (dcComponent459.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (12.3536,-184.1893) -- (dcComponent459.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (11.2929,-185.9571) -- (dcComponent459.out);
+% Component: xorGate
+\node[xor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.8, transform shape] (dcComponent460) at (16,-185.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-185.75) -- (dcComponent460.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (17,-184.75) -- (dcComponent460.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (15,-185.25) -- (dcComponent460.out);
+% Component: xorGate
+\node[xor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.8, transform shape] (dcComponent461) at (20,-185.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (20.3536,-186.3107) -- (dcComponent461.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (21.0607,-185.6036) -- (dcComponent461.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (19.2929,-184.5429) -- (dcComponent461.out);
+% Component: xorGate
+\node[xor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.8, transform shape] (dcComponent462) at (24,-185.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (23.5,-186.25) -- (dcComponent462.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (24.5,-186.25) -- (dcComponent462.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (24,-184.25) -- (dcComponent462.out);
+% Component: xorGate
+\node[xor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.8, transform shape] (dcComponent463) at (28,-185.25) {};
+\draw[draw=dcColor0, line width=1.4226pt] (26.9393,-185.6036) -- (dcComponent463.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (27.6464,-186.3107) -- (dcComponent463.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (28.7071,-184.5429) -- (dcComponent463.out);
+% Component: xnorGate
+\node[xnor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.8, transform shape] (dcComponent464) at (0,-188.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-188) -- (dcComponent464.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-189) -- (dcComponent464.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (1,-188.5) -- (dcComponent464.out);
+% Component: xnorGate
+\node[xnor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.8, transform shape] (dcComponent465) at (4,-188.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (3.6464,-187.4393) -- (dcComponent465.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (2.9393,-188.1464) -- (dcComponent465.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (4.7071,-189.2071) -- (dcComponent465.out);
+% Component: xnorGate
+\node[xnor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.8, transform shape] (dcComponent466) at (8,-188.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (8.5,-187.5) -- (dcComponent466.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (7.5,-187.5) -- (dcComponent466.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (8,-189.5) -- (dcComponent466.out);
+% Component: xnorGate
+\node[xnor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.8, transform shape] (dcComponent467) at (12,-188.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (13.0607,-188.1464) -- (dcComponent467.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (12.3536,-187.4393) -- (dcComponent467.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (11.2929,-189.2071) -- (dcComponent467.out);
+% Component: xnorGate
+\node[xnor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.8, transform shape] (dcComponent468) at (16,-188.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-189) -- (dcComponent468.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (17,-188) -- (dcComponent468.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (15,-188.5) -- (dcComponent468.out);
+% Component: xnorGate
+\node[xnor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.8, transform shape] (dcComponent469) at (20,-188.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (20.3536,-189.5607) -- (dcComponent469.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (21.0607,-188.8536) -- (dcComponent469.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (19.2929,-187.7929) -- (dcComponent469.out);
+% Component: xnorGate
+\node[xnor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.8, transform shape] (dcComponent470) at (24,-188.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (23.5,-189.5) -- (dcComponent470.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (24.5,-189.5) -- (dcComponent470.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (24,-187.5) -- (dcComponent470.out);
+% Component: xnorGate
+\node[xnor port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.8, transform shape] (dcComponent471) at (28,-188.5) {};
+\draw[draw=dcColor0, line width=1.4226pt] (26.9393,-188.8536) -- (dcComponent471.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (27.6464,-189.5607) -- (dcComponent471.in 2);
+\draw[draw=dcColor0, line width=1.4226pt] (28.7071,-187.7929) -- (dcComponent471.out);
+% Component: buffer
+\node[buffer port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.8, transform shape] (dcComponent472) at (0,-191.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-191.75) -- (dcComponent472.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (1,-191.75) -- (dcComponent472.out);
+% Component: buffer
+\node[buffer port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.8, transform shape] (dcComponent473) at (4,-191.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-191.0429) -- (dcComponent473.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (4.7071,-192.4571) -- (dcComponent473.out);
+% Component: buffer
+\node[buffer port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.8, transform shape] (dcComponent474) at (8,-191.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (8,-190.75) -- (dcComponent474.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (8,-192.75) -- (dcComponent474.out);
+% Component: buffer
+\node[buffer port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.8, transform shape] (dcComponent475) at (12,-191.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-191.0429) -- (dcComponent475.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (11.2929,-192.4571) -- (dcComponent475.out);
+% Component: buffer
+\node[buffer port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.8, transform shape] (dcComponent476) at (16,-191.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-191.75) -- (dcComponent476.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (15,-191.75) -- (dcComponent476.out);
+% Component: buffer
+\node[buffer port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.8, transform shape] (dcComponent477) at (20,-191.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-192.4571) -- (dcComponent477.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (19.2929,-191.0429) -- (dcComponent477.out);
+% Component: buffer
+\node[buffer port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.8, transform shape] (dcComponent478) at (24,-191.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (24,-192.75) -- (dcComponent478.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (24,-190.75) -- (dcComponent478.out);
+% Component: buffer
+\node[buffer port, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.8, transform shape] (dcComponent479) at (28,-191.75) {};
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-192.4571) -- (dcComponent479.in 1);
+\draw[draw=dcColor0, line width=1.4226pt] (28.7071,-191.0429) -- (dcComponent479.out);
+% Component: terminal
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-195) -- (0,-195) node[ocirc, rotate=0, fill=white] {};
+% Component: terminal
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-194.2929) -- (4,-195) node[ocirc, rotate=-45, fill=white] {};
+% Component: terminal
+\draw[draw=dcColor0, line width=1.4226pt] (8,-194) -- (8,-195) node[ocirc, rotate=-90, fill=white] {};
+% Component: terminal
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-194.2929) -- (12,-195) node[ocirc, rotate=-135, fill=white] {};
+% Component: terminal
+\draw[draw=dcColor0, line width=1.4226pt] (17,-195) -- (16,-195) node[ocirc, rotate=-180, fill=white] {};
+% Component: terminal
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-195.7071) -- (20,-195) node[ocirc, rotate=-225, fill=white] {};
+% Component: terminal
+\draw[draw=dcColor0, line width=1.4226pt] (24,-196) -- (24,-195) node[ocirc, rotate=-270, fill=white] {};
+% Component: terminal
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-195.7071) -- (28,-195) node[ocirc, rotate=-315, fill=white] {};
+% Component: testPoint
+\draw[draw=dcColor0, line width=1.4226pt] (0,-199.25) -- (0,-198.25) node[ocirc, rotate=0, fill=white] {};
+% Component: testPoint
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-198.9571) -- (4,-198.25) node[ocirc, rotate=-45, fill=white] {};
+% Component: testPoint
+\draw[draw=dcColor0, line width=1.4226pt] (7,-198.25) -- (8,-198.25) node[ocirc, rotate=-90, fill=white] {};
+% Component: testPoint
+\draw[draw=dcColor0, line width=1.4226pt] (11.2929,-197.5429) -- (12,-198.25) node[ocirc, rotate=-135, fill=white] {};
+% Component: testPoint
+\draw[draw=dcColor0, line width=1.4226pt] (16,-197.25) -- (16,-198.25) node[ocirc, rotate=-180, fill=white] {};
+% Component: testPoint
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-197.5429) -- (20,-198.25) node[ocirc, rotate=-225, fill=white] {};
+% Component: testPoint
+\draw[draw=dcColor0, line width=1.4226pt] (25,-198.25) -- (24,-198.25) node[ocirc, rotate=-270, fill=white] {};
+% Component: testPoint
+\draw[draw=dcColor0, line width=1.4226pt] (28.7071,-198.9571) -- (28,-198.25) node[ocirc, rotate=-315, fill=white] {};
+% Component: connector2
+% Connector socket with two exact, independent pins.
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (-0.45,-200.75) -- (0.45,-200.75) -- (0.45,-202.25) -- (-0.45,-202.25) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-201) -- (-0.125,-201);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (-0.075,-201) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-202) -- (-0.125,-202);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (-0.075,-202) circle (2.134pt);
+% Component: connector2
+% Connector socket with two exact, independent pins.
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (4.2121,-200.6515) -- (4.8485,-201.2879) -- (3.7879,-202.3485) -- (3.1515,-201.7121) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (3.6464,-200.4393) -- (4.2652,-201.0581);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (4.3005,-201.0934) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (2.9393,-201.1464) -- (3.5581,-201.7652);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (3.5934,-201.8005) circle (2.134pt);
+% Component: connector2
+% Connector socket with two exact, independent pins.
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (8.75,-201.05) -- (8.75,-201.95) -- (7.25,-201.95) -- (7.25,-201.05) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (8.5,-200.5) -- (8.5,-201.375);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (8.5,-201.425) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (7.5,-200.5) -- (7.5,-201.375);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (7.5,-201.425) circle (2.134pt);
+% Component: connector2
+% Connector socket with two exact, independent pins.
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (12.8485,-201.7121) -- (12.2121,-202.3485) -- (11.1515,-201.2879) -- (11.7879,-200.6515) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (13.0607,-201.1464) -- (12.4419,-201.7652);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (12.4066,-201.8005) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (12.3536,-200.4393) -- (11.7348,-201.0581);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (11.6995,-201.0934) circle (2.134pt);
+% Component: connector2
+% Connector socket with two exact, independent pins.
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (16.45,-202.25) -- (15.55,-202.25) -- (15.55,-200.75) -- (16.45,-200.75) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (17,-202) -- (16.125,-202);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (16.075,-202) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (17,-201) -- (16.125,-201);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (16.075,-201) circle (2.134pt);
+% Component: connector2
+% Connector socket with two exact, independent pins.
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (19.7879,-202.3485) -- (19.1515,-201.7121) -- (20.2121,-200.6515) -- (20.8485,-201.2879) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (20.3536,-202.5607) -- (19.7348,-201.9419);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (19.6995,-201.9066) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (21.0607,-201.8536) -- (20.4419,-201.2348);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (20.4066,-201.1995) circle (2.134pt);
+% Component: connector2
+% Connector socket with two exact, independent pins.
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (23.25,-201.95) -- (23.25,-201.05) -- (24.75,-201.05) -- (24.75,-201.95) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (23.5,-202.5) -- (23.5,-201.625);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (23.5,-201.575) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (24.5,-202.5) -- (24.5,-201.625);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (24.5,-201.575) circle (2.134pt);
+% Component: connector2
+% Connector socket with two exact, independent pins.
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (27.1515,-201.2879) -- (27.7879,-200.6515) -- (28.8485,-201.7121) -- (28.2121,-202.3485) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (26.9393,-201.8536) -- (27.5581,-201.2348);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (27.5934,-201.1995) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (27.6464,-202.5607) -- (28.2652,-201.9419);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (28.3005,-201.9066) circle (2.134pt);
+% Component: connector3
+% Connector socket with three exact, independent pins.
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (-0.45,-204) -- (0.45,-204) -- (0.45,-205.5) -- (-0.45,-205.5) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-204.25) -- (-0.125,-204.25);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (-0.075,-204.25) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-204.75) -- (-0.125,-204.75);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (-0.075,-204.75) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-205.25) -- (-0.125,-205.25);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (-0.075,-205.25) circle (2.134pt);
+% Component: connector3
+% Connector socket with three exact, independent pins.
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (4.2121,-203.9015) -- (4.8485,-204.5379) -- (3.7879,-205.5985) -- (3.1515,-204.9621) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (3.6464,-203.6893) -- (4.2652,-204.3081);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (4.3005,-204.3434) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-204.0429) -- (3.9116,-204.6616);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (3.947,-204.697) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (2.9393,-204.3964) -- (3.5581,-205.0152);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (3.5934,-205.0505) circle (2.134pt);
+% Component: connector3
+% Connector socket with three exact, independent pins.
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (8.75,-204.3) -- (8.75,-205.2) -- (7.25,-205.2) -- (7.25,-204.3) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (8.5,-203.75) -- (8.5,-204.625);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (8.5,-204.675) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (8,-203.75) -- (8,-204.625);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (8,-204.675) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (7.5,-203.75) -- (7.5,-204.625);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (7.5,-204.675) circle (2.134pt);
+% Component: connector3
+% Connector socket with three exact, independent pins.
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (12.8485,-204.9621) -- (12.2121,-205.5985) -- (11.1515,-204.5379) -- (11.7879,-203.9015) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (13.0607,-204.3964) -- (12.4419,-205.0152);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (12.4066,-205.0505) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-204.0429) -- (12.0884,-204.6616);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (12.053,-204.697) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (12.3536,-203.6893) -- (11.7348,-204.3081);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (11.6995,-204.3434) circle (2.134pt);
+% Component: connector3
+% Connector socket with three exact, independent pins.
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (16.45,-205.5) -- (15.55,-205.5) -- (15.55,-204) -- (16.45,-204) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (17,-205.25) -- (16.125,-205.25);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (16.075,-205.25) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (17,-204.75) -- (16.125,-204.75);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (16.075,-204.75) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (17,-204.25) -- (16.125,-204.25);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (16.075,-204.25) circle (2.134pt);
+% Component: connector3
+% Connector socket with three exact, independent pins.
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (19.7879,-205.5985) -- (19.1515,-204.9621) -- (20.2121,-203.9015) -- (20.8485,-204.5379) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (20.3536,-205.8107) -- (19.7348,-205.1919);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (19.6995,-205.1566) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-205.4571) -- (20.0884,-204.8384);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (20.053,-204.803) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (21.0607,-205.1036) -- (20.4419,-204.4848);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (20.4066,-204.4495) circle (2.134pt);
+% Component: connector3
+% Connector socket with three exact, independent pins.
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (23.25,-205.2) -- (23.25,-204.3) -- (24.75,-204.3) -- (24.75,-205.2) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (23.5,-205.75) -- (23.5,-204.875);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (23.5,-204.825) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (24,-205.75) -- (24,-204.875);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (24,-204.825) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (24.5,-205.75) -- (24.5,-204.875);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (24.5,-204.825) circle (2.134pt);
+% Component: connector3
+% Connector socket with three exact, independent pins.
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (27.1515,-204.5379) -- (27.7879,-203.9015) -- (28.8485,-204.9621) -- (28.2121,-205.5985) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (26.9393,-205.1036) -- (27.5581,-204.4848);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (27.5934,-204.4495) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-205.4571) -- (27.9116,-204.8384);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (27.947,-204.803) circle (2.134pt);
+\draw[draw=dcColor0, line width=1.4226pt] (27.6464,-205.8107) -- (28.2652,-205.1919);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (28.3005,-205.1566) circle (2.134pt);
+% Component: port
+% Single-connection diagram port outline.
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-208) -- (-0.5,-208);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (-0.5,-207.7) -- (0.25,-207.7) -- (0.55,-208) -- (0.25,-208.3) -- (-0.5,-208.3) -- cycle;
+% Component: port
+% Single-connection diagram port outline.
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-207.2929) -- (3.6464,-207.6464);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (3.8586,-207.4343) -- (4.3889,-207.9646) -- (4.3889,-208.3889) -- (3.9646,-208.3889) -- (3.4343,-207.8586) -- cycle;
+% Component: port
+% Single-connection diagram port outline.
+\draw[draw=dcColor0, line width=1.4226pt] (8,-207) -- (8,-207.5);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (8.3,-207.5) -- (8.3,-208.25) -- (8,-208.55) -- (7.7,-208.25) -- (7.7,-207.5) -- cycle;
+% Component: port
+% Single-connection diagram port outline.
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-207.2929) -- (12.3536,-207.6464);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (12.5657,-207.8586) -- (12.0354,-208.3889) -- (11.6111,-208.3889) -- (11.6111,-207.9646) -- (12.1414,-207.4343) -- cycle;
+% Component: port
+% Single-connection diagram port outline.
+\draw[draw=dcColor0, line width=1.4226pt] (17,-208) -- (16.5,-208);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (16.5,-208.3) -- (15.75,-208.3) -- (15.45,-208) -- (15.75,-207.7) -- (16.5,-207.7) -- cycle;
+% Component: port
+% Single-connection diagram port outline.
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-208.7071) -- (20.3536,-208.3536);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (20.1414,-208.5657) -- (19.6111,-208.0354) -- (19.6111,-207.6111) -- (20.0354,-207.6111) -- (20.5657,-208.1414) -- cycle;
+% Component: port
+% Single-connection diagram port outline.
+\draw[draw=dcColor0, line width=1.4226pt] (24,-209) -- (24,-208.5);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (23.7,-208.5) -- (23.7,-207.75) -- (24,-207.45) -- (24.3,-207.75) -- (24.3,-208.5) -- cycle;
+% Component: port
+% Single-connection diagram port outline.
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-208.7071) -- (27.6464,-208.3536);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (27.4343,-208.1414) -- (27.9646,-207.6111) -- (28.3889,-207.6111) -- (28.3889,-208.0354) -- (27.8586,-208.5657) -- cycle;
+% Component: fuse
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-211.25) to[fuse, fill=white, name=dcComponent520] (1,-211.25);
+% Component: fuse
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-210.5429) to[fuse, fill=white, name=dcComponent521] (4.7071,-211.9571);
+% Component: fuse
+\draw[draw=dcColor0, line width=1.4226pt] (8,-210.25) to[fuse, fill=white, name=dcComponent522] (8,-212.25);
+% Component: fuse
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-210.5429) to[fuse, fill=white, name=dcComponent523] (11.2929,-211.9571);
+% Component: fuse
+\draw[draw=dcColor0, line width=1.4226pt] (17,-211.25) to[fuse, fill=white, name=dcComponent524] (15,-211.25);
+% Component: fuse
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-211.9571) to[fuse, fill=white, name=dcComponent525] (19.2929,-210.5429);
+% Component: fuse
+\draw[draw=dcColor0, line width=1.4226pt] (24,-212.25) to[fuse, fill=white, name=dcComponent526] (24,-210.25);
+% Component: fuse
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-211.9571) to[fuse, fill=white, name=dcComponent527] (28.7071,-210.5429);
+% Component: lamp
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-214.5) to[lamp, fill=white, name=dcComponent528] (1,-214.5);
+% Component: lamp
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-213.7929) to[lamp, fill=white, name=dcComponent529] (4.7071,-215.2071);
+% Component: lamp
+\draw[draw=dcColor0, line width=1.4226pt] (8,-213.5) to[lamp, fill=white, name=dcComponent530] (8,-215.5);
+% Component: lamp
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-213.7929) to[lamp, fill=white, name=dcComponent531] (11.2929,-215.2071);
+% Component: lamp
+\draw[draw=dcColor0, line width=1.4226pt] (17,-214.5) to[lamp, fill=white, name=dcComponent532] (15,-214.5);
+% Component: lamp
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-215.2071) to[lamp, fill=white, name=dcComponent533] (19.2929,-213.7929);
+% Component: lamp
+\draw[draw=dcColor0, line width=1.4226pt] (24,-215.5) to[lamp, fill=white, name=dcComponent534] (24,-213.5);
+% Component: lamp
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-215.2071) to[lamp, fill=white, name=dcComponent535] (28.7071,-213.7929);
+% Component: motor
+\node[elmech, draw=dcColor0, line width=1.4226pt, fill=white, rotate=0, scale=0.65, transform shape] (dcComponent536) at (0,-217.75) {M};
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-217.75) -- (dcComponent536.west);
+\draw[draw=dcColor0, line width=1.4226pt] (1,-217.75) -- (dcComponent536.east);
+% Component: motor
+\node[elmech, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-45, scale=0.65, transform shape] (dcComponent537) at (4,-217.75) {M};
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-217.0429) -- (dcComponent537.west);
+\draw[draw=dcColor0, line width=1.4226pt] (4.7071,-218.4571) -- (dcComponent537.east);
+% Component: motor
+\node[elmech, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-90, scale=0.65, transform shape] (dcComponent538) at (8,-217.75) {M};
+\draw[draw=dcColor0, line width=1.4226pt] (8,-216.75) -- (dcComponent538.west);
+\draw[draw=dcColor0, line width=1.4226pt] (8,-218.75) -- (dcComponent538.east);
+% Component: motor
+\node[elmech, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-135, scale=0.65, transform shape] (dcComponent539) at (12,-217.75) {M};
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-217.0429) -- (dcComponent539.west);
+\draw[draw=dcColor0, line width=1.4226pt] (11.2929,-218.4571) -- (dcComponent539.east);
+% Component: motor
+\node[elmech, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-180, scale=0.65, transform shape] (dcComponent540) at (16,-217.75) {M};
+\draw[draw=dcColor0, line width=1.4226pt] (17,-217.75) -- (dcComponent540.west);
+\draw[draw=dcColor0, line width=1.4226pt] (15,-217.75) -- (dcComponent540.east);
+% Component: motor
+\node[elmech, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-225, scale=0.65, transform shape] (dcComponent541) at (20,-217.75) {M};
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-218.4571) -- (dcComponent541.west);
+\draw[draw=dcColor0, line width=1.4226pt] (19.2929,-217.0429) -- (dcComponent541.east);
+% Component: motor
+\node[elmech, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-270, scale=0.65, transform shape] (dcComponent542) at (24,-217.75) {M};
+\draw[draw=dcColor0, line width=1.4226pt] (24,-218.75) -- (dcComponent542.west);
+\draw[draw=dcColor0, line width=1.4226pt] (24,-216.75) -- (dcComponent542.east);
+% Component: motor
+\node[elmech, draw=dcColor0, line width=1.4226pt, fill=white, rotate=-315, scale=0.65, transform shape] (dcComponent543) at (28,-217.75) {M};
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-218.4571) -- (dcComponent543.west);
+\draw[draw=dcColor0, line width=1.4226pt] (28.7071,-217.0429) -- (dcComponent543.east);
+% Component: speaker
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-221) to[loudspeaker, fill=white, name=dcComponent544] (1,-221);
+% Component: speaker
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-220.2929) to[loudspeaker, fill=white, name=dcComponent545] (4.7071,-221.7071);
+% Component: speaker
+\draw[draw=dcColor0, line width=1.4226pt] (8,-220) to[loudspeaker, fill=white, name=dcComponent546] (8,-222);
+% Component: speaker
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-220.2929) to[loudspeaker, fill=white, name=dcComponent547] (11.2929,-221.7071);
+% Component: speaker
+\draw[draw=dcColor0, line width=1.4226pt] (17,-221) to[loudspeaker, fill=white, name=dcComponent548] (15,-221);
+% Component: speaker
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-221.7071) to[loudspeaker, fill=white, name=dcComponent549] (19.2929,-220.2929);
+% Component: speaker
+\draw[draw=dcColor0, line width=1.4226pt] (24,-222) to[loudspeaker, fill=white, name=dcComponent550] (24,-220);
+% Component: speaker
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-221.7071) to[loudspeaker, fill=white, name=dcComponent551] (28.7071,-220.2929);
+% Component: buzzer
+% Buzzer: native symbol unavailable in the bundled CircuitikZ compiler; shared SVG-equivalent geometry.
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-224.25) -- (-0.5,-224.25) (0.5,-224.25) -- (1,-224.25);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (-0.5,-223.95) -- (0.5,-223.95) -- (0.5,-224.55) -- (-0.5,-224.55) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (-0.25,-223.775) .. controls (-0.0833,-223.6083) and (0.0833,-223.6083) .. (0.25,-223.775) (-0.375,-223.625) .. controls (-0.125,-223.375) and (0.125,-223.375) .. (0.375,-223.625);
+% Component: buzzer
+% Buzzer: native symbol unavailable in the bundled CircuitikZ compiler; shared SVG-equivalent geometry.
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-223.5429) -- (3.6464,-223.8964) (4.3536,-224.6036) -- (4.7071,-224.9571);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (3.8586,-223.6843) -- (4.5657,-224.3914) -- (4.1414,-224.8157) -- (3.4343,-224.1086) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (4.1591,-223.7373) .. controls (4.3948,-223.7373) and (4.5127,-223.8552) .. (4.5127,-224.0909) (4.1768,-223.5429) .. controls (4.5303,-223.5429) and (4.7071,-223.7197) .. (4.7071,-224.0732);
+% Component: buzzer
+% Buzzer: native symbol unavailable in the bundled CircuitikZ compiler; shared SVG-equivalent geometry.
+\draw[draw=dcColor0, line width=1.4226pt] (8,-223.25) -- (8,-223.75) (8,-224.75) -- (8,-225.25);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (8.3,-223.75) -- (8.3,-224.75) -- (7.7,-224.75) -- (7.7,-223.75) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (8.475,-224) .. controls (8.6417,-224.1667) and (8.6417,-224.3333) .. (8.475,-224.5) (8.625,-223.875) .. controls (8.875,-224.125) and (8.875,-224.375) .. (8.625,-224.625);
+% Component: buzzer
+% Buzzer: native symbol unavailable in the bundled CircuitikZ compiler; shared SVG-equivalent geometry.
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-223.5429) -- (12.3536,-223.8964) (11.6464,-224.6036) -- (11.2929,-224.9571);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (12.5657,-224.1086) -- (11.8586,-224.8157) -- (11.4343,-224.3914) -- (12.1414,-223.6843) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (12.5127,-224.4091) .. controls (12.5127,-224.6448) and (12.3948,-224.7627) .. (12.1591,-224.7627) (12.7071,-224.4268) .. controls (12.7071,-224.7803) and (12.5303,-224.9571) .. (12.1768,-224.9571);
+% Component: buzzer
+% Buzzer: native symbol unavailable in the bundled CircuitikZ compiler; shared SVG-equivalent geometry.
+\draw[draw=dcColor0, line width=1.4226pt] (17,-224.25) -- (16.5,-224.25) (15.5,-224.25) -- (15,-224.25);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (16.5,-224.55) -- (15.5,-224.55) -- (15.5,-223.95) -- (16.5,-223.95) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (16.25,-224.725) .. controls (16.0833,-224.8917) and (15.9167,-224.8917) .. (15.75,-224.725) (16.375,-224.875) .. controls (16.125,-225.125) and (15.875,-225.125) .. (15.625,-224.875);
+% Component: buzzer
+% Buzzer: native symbol unavailable in the bundled CircuitikZ compiler; shared SVG-equivalent geometry.
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-224.9571) -- (20.3536,-224.6036) (19.6464,-223.8964) -- (19.2929,-223.5429);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (20.1414,-224.8157) -- (19.4343,-224.1086) -- (19.8586,-223.6843) -- (20.5657,-224.3914) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (19.8409,-224.7627) .. controls (19.6052,-224.7627) and (19.4873,-224.6448) .. (19.4873,-224.4091) (19.8232,-224.9571) .. controls (19.4697,-224.9571) and (19.2929,-224.7803) .. (19.2929,-224.4268);
+% Component: buzzer
+% Buzzer: native symbol unavailable in the bundled CircuitikZ compiler; shared SVG-equivalent geometry.
+\draw[draw=dcColor0, line width=1.4226pt] (24,-225.25) -- (24,-224.75) (24,-223.75) -- (24,-223.25);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (23.7,-224.75) -- (23.7,-223.75) -- (24.3,-223.75) -- (24.3,-224.75) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (23.525,-224.5) .. controls (23.3583,-224.3333) and (23.3583,-224.1667) .. (23.525,-224) (23.375,-224.625) .. controls (23.125,-224.375) and (23.125,-224.125) .. (23.375,-223.875);
+% Component: buzzer
+% Buzzer: native symbol unavailable in the bundled CircuitikZ compiler; shared SVG-equivalent geometry.
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-224.9571) -- (27.6464,-224.6036) (28.3536,-223.8964) -- (28.7071,-223.5429);
+\draw[draw=dcColor0, line width=1.4226pt, fill=white] (27.4343,-224.3914) -- (28.1414,-223.6843) -- (28.5657,-224.1086) -- (27.8586,-224.8157) -- cycle;
+\draw[draw=dcColor0, line width=1.4226pt] (27.4873,-224.0909) .. controls (27.4873,-223.8552) and (27.6052,-223.7373) .. (27.8409,-223.7373) (27.2929,-224.0732) .. controls (27.2929,-223.7197) and (27.4697,-223.5429) .. (27.8232,-223.5429);
+% Component: circleBlock
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-227.5) to[esource, fill=white, name=dcComponent560] (1,-227.5);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{9.2471}{12.0213}\selectfont] at (0,-227.5) {BLOCK};
+% Component: circleBlock
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-226.7929) to[esource, fill=white, name=dcComponent561] (4.7071,-228.2071);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-45, font=\fontsize{9.2471}{12.0213}\selectfont] at (4,-227.5) {BLOCK};
+% Component: circleBlock
+\draw[draw=dcColor0, line width=1.4226pt] (8,-226.5) to[esource, fill=white, name=dcComponent562] (8,-228.5);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-90, font=\fontsize{9.2471}{12.0213}\selectfont] at (8,-227.5) {BLOCK};
+% Component: circleBlock
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-226.7929) to[esource, fill=white, name=dcComponent563] (11.2929,-228.2071);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-135, font=\fontsize{9.2471}{12.0213}\selectfont] at (12,-227.5) {BLOCK};
+% Component: circleBlock
+\draw[draw=dcColor0, line width=1.4226pt] (17,-227.5) to[esource, fill=white, name=dcComponent564] (15,-227.5);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-180, font=\fontsize{9.2471}{12.0213}\selectfont] at (16,-227.5) {BLOCK};
+% Component: circleBlock
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-228.2071) to[esource, fill=white, name=dcComponent565] (19.2929,-226.7929);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-225, font=\fontsize{9.2471}{12.0213}\selectfont] at (20,-227.5) {BLOCK};
+% Component: circleBlock
+\draw[draw=dcColor0, line width=1.4226pt] (24,-228.5) to[esource, fill=white, name=dcComponent566] (24,-226.5);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-270, font=\fontsize{9.2471}{12.0213}\selectfont] at (24,-227.5) {BLOCK};
+% Component: circleBlock
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-228.2071) to[esource, fill=white, name=dcComponent567] (28.7071,-226.7929);
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-315, font=\fontsize{9.2471}{12.0213}\selectfont] at (28,-227.5) {BLOCK};
+% Component: americanResistor
+\draw[draw=dcColor0, line width=1.4226pt] (-1,-230.75) to[R, american resistors, fill=white, name=dcComponent568] (1,-230.75);
+% Component: americanResistor
+\draw[draw=dcColor0, line width=1.4226pt] (3.2929,-230.0429) to[R, american resistors, fill=white, name=dcComponent569] (4.7071,-231.4571);
+% Component: americanResistor
+\draw[draw=dcColor0, line width=1.4226pt] (8,-229.75) to[R, american resistors, fill=white, name=dcComponent570] (8,-231.75);
+% Component: americanResistor
+\draw[draw=dcColor0, line width=1.4226pt] (12.7071,-230.0429) to[R, american resistors, fill=white, name=dcComponent571] (11.2929,-231.4571);
+% Component: americanResistor
+\draw[draw=dcColor0, line width=1.4226pt] (17,-230.75) to[R, american resistors, fill=white, name=dcComponent572] (15,-230.75);
+% Component: americanResistor
+\draw[draw=dcColor0, line width=1.4226pt] (20.7071,-231.4571) to[R, american resistors, fill=white, name=dcComponent573] (19.2929,-230.0429);
+% Component: americanResistor
+\draw[draw=dcColor0, line width=1.4226pt] (24,-231.75) to[R, american resistors, fill=white, name=dcComponent574] (24,-229.75);
+% Component: americanResistor
+\draw[draw=dcColor0, line width=1.4226pt] (27.2929,-231.4571) to[R, american resistors, fill=white, name=dcComponent575] (28.7071,-230.0429);
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,0.75) {resistor};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-2.5) {capacitor};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-5.75) {polarizedCapacitor};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-9) {inductor};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-12.25) {variableResistor};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-15.5) {potentiometer};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-18.75) {voltageSource};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-22) {currentSource};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-25.25) {battery};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-28.5) {dependentVoltage};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-31.75) {dependentCurrent};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-35) {diode};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-38.25) {led};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-41.5) {zener};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-44.75) {openSwitch};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-48) {closedSwitch};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-51.25) {ground};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-54.5) {ammeter};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-57.75) {voltmeter};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-60.25) {transformer};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-64.25) {blackBox};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-67.05) {thermistor};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-70.3) {photoresistor};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-73.55) {variableCapacitor};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-76.8) {variableInductor};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-80.05) {acVoltageSource};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-83.3) {acCurrentSource};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-86.55) {genericVoltageSource};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-89.8) {genericCurrentSource};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-93.05) {singleCellBattery};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-96.3) {photodiode};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-99.55) {schottky};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-102.8) {varactor};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-105.75) {npn};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-109) {pnp};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-112.25) {nmos};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-115.5) {pmos};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-118.75) {njfet};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-122) {pjfet};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-125.55) {spdt};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-128.8) {pushButtonNO};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-132.05) {pushButtonNC};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-135.3) {dpst};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-138) {dpdt};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-141.8) {ohmmeter};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-145.05) {galvanometer};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-148) {signalGround};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-151.25) {chassisGround};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-154.5) {centerTapTransformer};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-157.75) {coupledInductors};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-161.3) {opAmp};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-164.55) {comparator};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-167.8) {andGate};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-171.05) {orGate};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-174.3) {notGate};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-177.55) {nandGate};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-180.8) {norGate};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-184.05) {xorGate};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-187.3) {xnorGate};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-190.55) {buffer};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-193.8) {terminal};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-197.05) {testPoint};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-200.3) {connector2};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-203.55) {connector3};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-206.8) {port};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-210.05) {fuse};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-213.3) {lamp};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-216.55) {motor};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-219.8) {speaker};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-223.05) {buzzer};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-226.3) {circleBlock};
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,-229.55) {americanResistor};
+\end{circuitikz}

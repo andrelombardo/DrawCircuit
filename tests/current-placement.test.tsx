@@ -1,3 +1,4 @@
+import { exportObsidian } from './helpers/unoptimizedObsidian';
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { Resvg } from '@resvg/resvg-js';
@@ -18,7 +19,7 @@ import { findInlineCandidate } from '../src/smartPlacement/findCandidates';
 import { smartPlacement } from '../src/smartPlacement/smartConnection';
 import { useEditorStore } from '../src/store/editorStore';
 import { exportSVG } from '../src/svg/exporter';
-import { exportTikz, exportObsidian } from '../src/tikz/exporter';
+import { exportTikz } from '../src/tikz/exporter';
 import { getExportSelection } from '../src/tikz/selection';
 import { add, moveObject, pointsPath, rotatePoint, wirePoints } from '../src/utils/geometry';
 import {

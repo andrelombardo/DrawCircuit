@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "title": "Unicode",
+  "objects": [
+    {
+      "kind": "text",
+      "id": "object-0",
+      "x": 0,
+      "y": 0,
+      "text": "Rete elettrica: più capacità, già è così — 50 Ω",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    },
+    {
+      "kind": "text",
+      "id": "object-1",
+      "x": 580,
+      "y": 0,
+      "text": "ÀÁÂÃÄÅ ÆÇÈÉÊË ÌÍÎÏ ÐÑÒÓÔÕÖ ØÙÚÛÜ ÝÞß",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    },
+    {
+      "kind": "text",
+      "id": "object-2",
+      "x": 0,
+      "y": 110,
+      "text": "àáâãäå æçèéêë ìíîï ðñòóôõö øùúûü ýþÿ",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    },
+    {
+      "kind": "text",
+      "id": "object-3",
+      "x": 580,
+      "y": 110,
+      "text": "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ αβγδεζηθικλμνξοπρστυφχψω",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    },
+    {
+      "kind": "text",
+      "id": "object-4",
+      "x": 0,
+      "y": 220,
+      "text": "Кириллица: АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    },
+    {
+      "kind": "text",
+      "id": "object-5",
+      "x": 580,
+      "y": 220,
+      "text": "āăąćĉċčďđēĕėęěĝğġģĥħĩīĭįİı Őő Űű Șș Țț",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    },
+    {
+      "kind": "text",
+      "id": "object-6",
+      "x": 0,
+      "y": 330,
+      "text": "Decomposti: é ä Å í; ﬁ ﬂ; العربية 日本語 中文",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    },
+    {
+      "kind": "text",
+      "id": "object-7",
+      "x": 580,
+      "y": 330,
+      "text": "\\mathbf{ÀÉΩЖ}_{123}+\\text{caffè più}",
+      "color": "#df4949",
+      "fontSize": 24,
+      "align": "middle",
+      "rotation": 0
+    }
+  ]
+}

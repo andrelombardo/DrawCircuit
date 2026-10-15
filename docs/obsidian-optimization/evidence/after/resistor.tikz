@@ -1,0 +1,9 @@
+% DrawCircuit — coordinates in cm; SVG Y axis inverted.
+\definecolor{dcColor0}{HTML}{171A20}
+\definecolor{dcColor1}{HTML}{2463CB}
+\begin{circuitikz}[european resistors, american inductors, american ports, line cap=round, line join=round]
+\ctikzset{bipoles/length=1.4cm}
+% Component: resistor
+\draw[draw=dcColor0, line width=1.4226pt] (-1,0) to[R, fill=white, name=dcComponent0] (1,0);
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (0,0.75) {$R_1$};
+\end{circuitikz}

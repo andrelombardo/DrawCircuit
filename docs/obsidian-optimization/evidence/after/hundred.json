@@ -1,0 +1,3606 @@
+{
+  "version": 1,
+  "title": "100 componenti",
+  "objects": [
+    {
+      "kind": "component",
+      "id": "object-0",
+      "type": "resistor",
+      "x": 0,
+      "y": 0,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_1",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-1",
+      "type": "capacitor",
+      "x": 150,
+      "y": 0,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_2",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-2",
+      "type": "inductor",
+      "x": 300,
+      "y": 0,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_3",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-3",
+      "type": "voltageSource",
+      "x": 450,
+      "y": 0,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_4",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-4",
+      "type": "diode",
+      "x": 600,
+      "y": 0,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_5",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-5",
+      "type": "resistor",
+      "x": 750,
+      "y": 0,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_6",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-6",
+      "type": "capacitor",
+      "x": 900,
+      "y": 0,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_7",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-7",
+      "type": "inductor",
+      "x": 1050,
+      "y": 0,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_8",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-8",
+      "type": "voltageSource",
+      "x": 1200,
+      "y": 0,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_9",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-9",
+      "type": "diode",
+      "x": 1350,
+      "y": 0,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_10",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-10",
+      "type": "resistor",
+      "x": 0,
+      "y": 120,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_11",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-11",
+      "type": "capacitor",
+      "x": 150,
+      "y": 120,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_12",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-12",
+      "type": "inductor",
+      "x": 300,
+      "y": 120,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_13",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-13",
+      "type": "voltageSource",
+      "x": 450,
+      "y": 120,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_14",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-14",
+      "type": "diode",
+      "x": 600,
+      "y": 120,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_15",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-15",
+      "type": "resistor",
+      "x": 750,
+      "y": 120,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_16",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-16",
+      "type": "capacitor",
+      "x": 900,
+      "y": 120,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_17",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-17",
+      "type": "inductor",
+      "x": 1050,
+      "y": 120,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_18",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-18",
+      "type": "voltageSource",
+      "x": 1200,
+      "y": 120,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_19",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-19",
+      "type": "diode",
+      "x": 1350,
+      "y": 120,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_20",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-20",
+      "type": "resistor",
+      "x": 0,
+      "y": 240,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_21",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-21",
+      "type": "capacitor",
+      "x": 150,
+      "y": 240,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_22",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-22",
+      "type": "inductor",
+      "x": 300,
+      "y": 240,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_23",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-23",
+      "type": "voltageSource",
+      "x": 450,
+      "y": 240,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_24",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-24",
+      "type": "diode",
+      "x": 600,
+      "y": 240,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_25",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-25",
+      "type": "resistor",
+      "x": 750,
+      "y": 240,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_26",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-26",
+      "type": "capacitor",
+      "x": 900,
+      "y": 240,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_27",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-27",
+      "type": "inductor",
+      "x": 1050,
+      "y": 240,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_28",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-28",
+      "type": "voltageSource",
+      "x": 1200,
+      "y": 240,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_29",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-29",
+      "type": "diode",
+      "x": 1350,
+      "y": 240,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_30",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-30",
+      "type": "resistor",
+      "x": 0,
+      "y": 360,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_31",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-31",
+      "type": "capacitor",
+      "x": 150,
+      "y": 360,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_32",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-32",
+      "type": "inductor",
+      "x": 300,
+      "y": 360,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_33",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-33",
+      "type": "voltageSource",
+      "x": 450,
+      "y": 360,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_34",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-34",
+      "type": "diode",
+      "x": 600,
+      "y": 360,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_35",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-35",
+      "type": "resistor",
+      "x": 750,
+      "y": 360,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_36",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-36",
+      "type": "capacitor",
+      "x": 900,
+      "y": 360,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_37",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-37",
+      "type": "inductor",
+      "x": 1050,
+      "y": 360,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_38",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-38",
+      "type": "voltageSource",
+      "x": 1200,
+      "y": 360,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_39",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-39",
+      "type": "diode",
+      "x": 1350,
+      "y": 360,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_40",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-40",
+      "type": "resistor",
+      "x": 0,
+      "y": 480,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_41",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-41",
+      "type": "capacitor",
+      "x": 150,
+      "y": 480,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_42",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-42",
+      "type": "inductor",
+      "x": 300,
+      "y": 480,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_43",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-43",
+      "type": "voltageSource",
+      "x": 450,
+      "y": 480,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_44",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-44",
+      "type": "diode",
+      "x": 600,
+      "y": 480,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_45",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-45",
+      "type": "resistor",
+      "x": 750,
+      "y": 480,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_46",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-46",
+      "type": "capacitor",
+      "x": 900,
+      "y": 480,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_47",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-47",
+      "type": "inductor",
+      "x": 1050,
+      "y": 480,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_48",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-48",
+      "type": "voltageSource",
+      "x": 1200,
+      "y": 480,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_49",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-49",
+      "type": "diode",
+      "x": 1350,
+      "y": 480,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_50",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-50",
+      "type": "resistor",
+      "x": 0,
+      "y": 600,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_51",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-51",
+      "type": "capacitor",
+      "x": 150,
+      "y": 600,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_52",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-52",
+      "type": "inductor",
+      "x": 300,
+      "y": 600,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_53",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-53",
+      "type": "voltageSource",
+      "x": 450,
+      "y": 600,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_54",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-54",
+      "type": "diode",
+      "x": 600,
+      "y": 600,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_55",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-55",
+      "type": "resistor",
+      "x": 750,
+      "y": 600,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_56",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-56",
+      "type": "capacitor",
+      "x": 900,
+      "y": 600,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_57",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-57",
+      "type": "inductor",
+      "x": 1050,
+      "y": 600,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_58",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-58",
+      "type": "voltageSource",
+      "x": 1200,
+      "y": 600,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_59",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-59",
+      "type": "diode",
+      "x": 1350,
+      "y": 600,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_60",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-60",
+      "type": "resistor",
+      "x": 0,
+      "y": 720,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_61",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-61",
+      "type": "capacitor",
+      "x": 150,
+      "y": 720,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_62",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-62",
+      "type": "inductor",
+      "x": 300,
+      "y": 720,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_63",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-63",
+      "type": "voltageSource",
+      "x": 450,
+      "y": 720,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_64",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-64",
+      "type": "diode",
+      "x": 600,
+      "y": 720,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_65",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-65",
+      "type": "resistor",
+      "x": 750,
+      "y": 720,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_66",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-66",
+      "type": "capacitor",
+      "x": 900,
+      "y": 720,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_67",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-67",
+      "type": "inductor",
+      "x": 1050,
+      "y": 720,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_68",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-68",
+      "type": "voltageSource",
+      "x": 1200,
+      "y": 720,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_69",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-69",
+      "type": "diode",
+      "x": 1350,
+      "y": 720,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_70",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-70",
+      "type": "resistor",
+      "x": 0,
+      "y": 840,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_71",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-71",
+      "type": "capacitor",
+      "x": 150,
+      "y": 840,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_72",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-72",
+      "type": "inductor",
+      "x": 300,
+      "y": 840,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_73",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-73",
+      "type": "voltageSource",
+      "x": 450,
+      "y": 840,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_74",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-74",
+      "type": "diode",
+      "x": 600,
+      "y": 840,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_75",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-75",
+      "type": "resistor",
+      "x": 750,
+      "y": 840,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_76",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-76",
+      "type": "capacitor",
+      "x": 900,
+      "y": 840,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_77",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-77",
+      "type": "inductor",
+      "x": 1050,
+      "y": 840,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_78",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-78",
+      "type": "voltageSource",
+      "x": 1200,
+      "y": 840,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_79",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-79",
+      "type": "diode",
+      "x": 1350,
+      "y": 840,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_80",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-80",
+      "type": "resistor",
+      "x": 0,
+      "y": 960,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_81",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-81",
+      "type": "capacitor",
+      "x": 150,
+      "y": 960,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_82",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-82",
+      "type": "inductor",
+      "x": 300,
+      "y": 960,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_83",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-83",
+      "type": "voltageSource",
+      "x": 450,
+      "y": 960,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_84",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-84",
+      "type": "diode",
+      "x": 600,
+      "y": 960,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_85",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-85",
+      "type": "resistor",
+      "x": 750,
+      "y": 960,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_86",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-86",
+      "type": "capacitor",
+      "x": 900,
+      "y": 960,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_87",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-87",
+      "type": "inductor",
+      "x": 1050,
+      "y": 960,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_88",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-88",
+      "type": "voltageSource",
+      "x": 1200,
+      "y": 960,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_89",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-89",
+      "type": "diode",
+      "x": 1350,
+      "y": 960,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_90",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-90",
+      "type": "resistor",
+      "x": 0,
+      "y": 1080,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_91",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-91",
+      "type": "capacitor",
+      "x": 150,
+      "y": 1080,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_92",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-92",
+      "type": "inductor",
+      "x": 300,
+      "y": 1080,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_93",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-93",
+      "type": "voltageSource",
+      "x": 450,
+      "y": 1080,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_94",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-94",
+      "type": "diode",
+      "x": 600,
+      "y": 1080,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_95",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-95",
+      "type": "resistor",
+      "x": 750,
+      "y": 1080,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_96",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-96",
+      "type": "capacitor",
+      "x": 900,
+      "y": 1080,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_97",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-97",
+      "type": "inductor",
+      "x": 1050,
+      "y": 1080,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_98",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-98",
+      "type": "voltageSource",
+      "x": 1200,
+      "y": 1080,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_99",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    },
+    {
+      "kind": "component",
+      "id": "object-99",
+      "type": "diode",
+      "x": 1350,
+      "y": 1080,
+      "rotation": 0,
+      "terminals": [
+        {
+          "id": "a",
+          "name": "a",
+          "localX": -40,
+          "localY": 0,
+          "direction": "x"
+        },
+        {
+          "id": "b",
+          "name": "b",
+          "localX": 40,
+          "localY": 0,
+          "direction": "x"
+        }
+      ],
+      "label": {
+        "text": "R_100",
+        "offset": {
+          "x": 0,
+          "y": -30
+        },
+        "color": "#2463cb",
+        "fontSize": 22,
+        "rotation": 0
+      },
+      "color": "#171a20",
+      "width": 2
+    }
+  ]
+}

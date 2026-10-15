@@ -1,0 +1,38 @@
+% DrawCircuit — coordinates in cm; SVG Y axis inverted.
+\definecolor{dcColor0}{HTML}{3478AD}
+\definecolor{dcColor1}{HTML}{BA3A42}
+\definecolor{dcColor2}{HTML}{269978}
+\definecolor{dcColor3}{HTML}{DF4949}
+\begin{circuitikz}[european resistors, american inductors, american ports, line cap=round, line join=round]
+\ctikzset{bipoles/length=1.4cm}
+\begin{scope}[opacity=0.65, transparency group]
+% Electrical annotation: current
+\draw[draw=dcColor0,line width=2.134pt,line cap=round,line join=round] (0.8,-0.75) -- (1.7,-0.75);
+\draw[draw=dcColor0,line width=2.134pt,line cap=round,line join=round] (1.45,-0.8625) -- (1.7,-0.75) -- (1.45,-0.6375);
+\end{scope}
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{16.3603}{21.2684}\selectfont] at (1.25,-1.35) {$I_0$};
+\begin{scope}[opacity=0.65, transparency group]
+% Electrical annotation: polarity
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (4.5,-0.75) {-};
+\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (7,-0.75) {+};
+\end{scope}
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=-45, font=\fontsize{16.3603}{21.2684}\selectfont] at (5.75,-1.95) {$I_1$};
+\begin{scope}[opacity=0.65, transparency group]
+% Electrical annotation: voltage
+\draw[draw=dcColor0,line width=2.134pt] (9,-0.75) -- (11.5,-0.75);
+\draw[draw=dcColor0,line width=2.134pt] (9.2,-0.6625) -- (9,-0.75) -- (9.2,-0.8375);
+\end{scope}
+\node[text=dcColor1, anchor=center, inner sep=0pt, rotate=-90, font=\fontsize{16.3603}{21.2684}\selectfont] at (10.25,-0.15) {$I_2$};
+\begin{scope}[opacity=0.55, transparency group]
+% Annotation: bracket
+\draw[draw=dcColor2, line width=2.134pt] (0,-2.25) -- (0,-1.9) -- (9.5,-1.9) -- (9.5,-2.25);
+\end{scope}
+\node[text=dcColor2, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{15.649}{20.3437}\selectfont] at (4.75,-1.46) {$\frac{1}{2}$};
+\begin{scope}[opacity=0.5, transparency group]
+\draw[<-, draw=dcColor3, line width=1.4226pt] (1.5735,-3.7926) arc[start angle=75, end angle=385, radius=1.25cm];
+\end{scope}
+\begin{scope}[opacity=0.8, transparency group]
+\node[text=dcColor3, anchor=west, inner sep=0pt, rotate=-315, font=\fontsize{17.0717}{22.1931}\selectfont] at (4.5,-4.5) {日本語 العربية 🙂 𝔸 é};
+\end{scope}
+\node[text=dcColor3, anchor=west, inner sep=0pt, rotate=0, font=\fontsize{12.8037}{16.6449}\selectfont] at (4.5,-6.5) {   testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi testo con spazi };
+\end{circuitikz}

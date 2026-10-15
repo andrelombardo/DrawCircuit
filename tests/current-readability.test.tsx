@@ -1,3 +1,4 @@
+import { exportObsidian } from './helpers/unoptimizedObsidian';
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { Resvg } from '@resvg/resvg-js';
@@ -16,7 +17,7 @@ import { createWire } from '../src/model/factories';
 import { emptyDocument } from '../src/model/demo';
 import { serializeDocument } from '../src/model/serialization';
 import { exportSVG } from '../src/svg/exporter';
-import { exportTikz, exportObsidian } from '../src/tikz/exporter';
+import { exportTikz } from '../src/tikz/exporter';
 import { getExportSelection } from '../src/tikz/selection';
 import { distance, midpoint, pointsPath, localToWorld, wirePoints } from '../src/utils/geometry';
 import { currentZoomFixture } from './helpers/currentZoomFixture';

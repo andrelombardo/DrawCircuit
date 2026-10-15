@@ -1,11 +1,12 @@
 /// <reference types="vite/client" />
+import { exportObsidian } from './helpers/unoptimizedObsidian';
 import { describe, expect, it } from 'vitest';
 import { componentTypes, COLORS, type CircuitDocument } from '../src/model/types';
 import { createComponent } from '../src/model/catalog';
 import { emptyDocument } from '../src/model/demo';
 import { circuitPresets } from '../src/presets/registry';
 import { instantiatePreset } from '../src/presets/instantiate';
-import { exportObsidian, exportTikz } from '../src/tikz/exporter';
+import { exportTikz } from '../src/tikz/exporter';
 import { canvasArrowHead, chevron } from '../src/tikz/arrowheads';
 import { canvasTextTikz, xmlText } from '../src/tikz/canvasText';
 import {
