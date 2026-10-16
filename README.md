@@ -25,7 +25,7 @@ Circuit labels and formulas use **Comic Relief**, bundled with the app so visito
 3. Connect terminals with wires and edit the selection in **Proprietà**.
 4. Open **Esporta** to copy or download your circuit.
 
-The public URL is now `/DrawCircuit/` (case-sensitive). Browser data stays on the same origin; open the current URL to retire the previous installation. Existing PWA shortcuts may need to be installed again from the new address.
+The canonical public URL is `/DrawCircuit/`. The lowercase [address `/drawcircuit/`](https://andrelombardo.github.io/drawcircuit/) redirects to it through the separate [Pages entry-point repository](https://github.com/andrelombardo/andrelombardo.github.io); the app repository remains `DrawCircuit`. Browser data stays on the same origin; open the current URL to retire the previous installation. Existing PWA shortcuts may need to be installed again from the canonical address.
 
 The interface and [user guide](docs/manuale.md) are in Italian. See the [web app guide](docs/pwa.md) for installation, local data, and browser differences.
 
