@@ -27,6 +27,8 @@ import {
   snap,
   snapPoint,
   rotatePoint,
+  resolveEndpoint,
+  safeWirePoints,
   wirePoints,
 } from '../../utils/geometry';
 import { moveSelection } from '../../utils/operations';
@@ -39,6 +41,8 @@ import {
   normalizeDocumentWires,
   TERMINAL_DRAG_THRESHOLD,
   wireCandidate,
+  drawingWireCandidate,
+  wireEndpointCandidate,
 } from '../../utils/wires';
 import type { WireCandidate, WireDraft } from '../../utils/wires';
 import {
@@ -65,7 +69,12 @@ type Drag =
       moveContext?: MoveContext;
     }
   | { type: 'marquee'; origin: Point; additive: boolean }
-  | { type: 'terminal-wire'; screen: Point; start: WireCandidate; started: boolean }
+  | {
+      type: 'terminal-wire';
+      screen: Point;
+      start: WireCandidate;
+      started: boolean;
+    }
   | {
       type: 'arrow' | 'loop-arrow' | 'voltage' | 'brace' | 'bracket' | 'rectangle' | 'line';
       origin: Point;
@@ -137,7 +146,11 @@ export function useCanvasInteractions(
   const [dragging, setDragging] = useState<'move' | 'pan' | 'handle' | 'wire' | null>(null);
   const activeLabel = useEditorStore((s) => s.activeLabel);
   const setActiveLabel = useEditorStore((s) => s.setActiveLabel);
-  const [editing, setEditing] = useState<{ id: string; text: string; point: Point } | null>(null);
+  const [editing, setEditing] = useState<{
+    id: string;
+    text: string;
+    point: Point;
+  } | null>(null);
   useEffect(() => {
     const start = (e: Event) => {
       const type = (e as CustomEvent).detail;
@@ -180,11 +193,16 @@ export function useCanvasInteractions(
     if (!draftRef.current || !screenPointerRef.current || !svgRef.current) return;
     const pointer = screenPointerRef.current,
       p = world(pointer.x, pointer.y),
-      candidate = wireCandidate(p, useEditorStore.getState().document, viewport.zoom);
+      candidate = drawingWireCandidate(
+        p,
+        useEditorStore.getState().document,
+        viewport.zoom,
+        draftRef.current,
+      );
     mouseRef.current = p;
     setOverlay({
       ...blank,
-      mouse: candidate.point,
+      mouse: p,
       target: candidate.kind === 'grid' ? null : candidate.point,
     });
   }, [viewport, world, svgRef]);
@@ -384,7 +402,16 @@ export function useCanvasInteractions(
         await s.paste();
       } else if (e.key === 'Delete' || e.key === 'Backspace') {
         e.preventDefault();
-        s.remove(e.shiftKey);
+        const draft = draftRef.current;
+        if (draft) {
+          if (draft.vertices.length)
+            setWireDraft({ ...draft, vertices: draft.vertices.slice(0, -1) });
+          else {
+            setWireDraft(null);
+            s.cancelGesture();
+            setOverlay(blank);
+          }
+        } else s.remove(e.shiftKey);
       } else if (e.key === 'Escape') {
         s.setSplitWire(null);
         setFirstPoint(null);
@@ -399,7 +426,9 @@ export function useCanvasInteractions(
         setEditing(null);
       } else if (e.key === 'Enter' && draftRef.current) {
         e.preventDefault();
-        finishWire(wireCandidate(mouseRef.current, s.document, viewport.zoom));
+        finishWire(
+          drawingWireCandidate(mouseRef.current, s.document, viewport.zoom, draftRef.current),
+        );
       } else if (e.key === 'Enter' && s.selection.length === 1) {
         const o = s.document.objects.find((o) => o.id === s.selection[0]);
         const target = inlineTextTarget(o, s.document);
@@ -586,19 +615,26 @@ export function useCanvasInteractions(
     if (s.tool === 'wire') {
       const d = draftRef.current;
       if (!d && e.detail >= 2) return;
-      const target = wireCandidate(p, s.document, viewport.zoom);
+      const target = drawingWireCandidate(p, s.document, viewport.zoom, d);
       if (!d) {
         s.beginGesture();
         const result = beginWire(s.document, target, s.wireRouting);
         if (result.doc !== s.document) s.preview(result.doc);
         setWireDraft(result.draft);
       } else if (target.kind !== 'grid' || e.detail >= 2) finishWire(target);
-      else if (!d.vertices.length || distance(d.vertices.at(-1)!, target.point) > 0.001)
+      else if (
+        distance(d.vertices.at(-1) ?? resolveEndpoint(d.start, s.document), target.point) > 0.001
+      )
         setWireDraft({ ...d, vertices: [...d.vertices, target.point] });
-      const candidate = wireCandidate(p, useEditorStore.getState().document, viewport.zoom);
+      const candidate = drawingWireCandidate(
+        p,
+        useEditorStore.getState().document,
+        viewport.zoom,
+        draftRef.current,
+      );
       setOverlay({
         ...blank,
-        mouse: candidate.point,
+        mouse: p,
         target: candidate.kind === 'grid' ? null : candidate.point,
       });
       return;
@@ -712,12 +748,7 @@ export function useCanvasInteractions(
       s.beginGesture();
       const wire = objectMap.get(id);
       const segment =
-        !handle &&
-        !labelId &&
-        ids.length === 1 &&
-        wire?.kind === 'wire' &&
-        wire.routing &&
-        wire.routing !== 'orthogonal'
+        !handle && !labelId && ids.length === 1 && wire?.kind === 'wire'
           ? nearestWire(
               p,
               s.document,
@@ -798,10 +829,15 @@ export function useCanvasInteractions(
         d.started = true;
         setDragging('wire');
       }
-      const candidate = wireCandidate(p, useEditorStore.getState().document, viewport.zoom);
+      const candidate = drawingWireCandidate(
+        p,
+        useEditorStore.getState().document,
+        viewport.zoom,
+        draftRef.current,
+      );
       setOverlay({
         ...blank,
-        mouse: candidate.point,
+        mouse: p,
         target: candidate.kind === 'grid' ? null : candidate.point,
       });
       return;
@@ -968,15 +1004,29 @@ export function useCanvasInteractions(
                       const a = points[index],
                         b = points[index + 1];
                       const length = distance(a, b) || 1,
-                        normal = { x: -(b.y - a.y) / length, y: (b.x - a.x) / length };
-                      const amount = raw.x * normal.x + raw.y * normal.y;
-                      const shift = { x: normal.x * amount, y: normal.y * amount };
+                        normal = {
+                          x: -(b.y - a.y) / length,
+                          y: (b.x - a.x) / length,
+                        };
+                      const projected = raw.x * normal.x + raw.y * normal.y;
+                      const amount =
+                        !o.routing || o.routing === 'orthogonal' ? snap(projected) : projected;
+                      const shift = {
+                        x: normal.x * amount,
+                        y: normal.y * amount,
+                      };
                       const route = points.map((point, i) =>
                         i === index || i === index + 1 ? add(point, shift) : point,
                       );
                       if (index === 0) route.unshift(points[0]);
                       if (index === points.length - 2) route.push(points.at(-1)!);
-                      return { ...o, vertices: route.slice(1, -1) };
+                      const moved = { ...o, vertices: route.slice(1, -1) };
+                      return !o.routing || o.routing === 'orthogonal'
+                        ? {
+                            ...moved,
+                            vertices: safeWirePoints(moved, d.doc).slice(1, -1),
+                          }
+                        : moved;
                     }
                     if (d.handle?.startsWith('vertex:'))
                       return {
@@ -985,7 +1035,13 @@ export function useCanvasInteractions(
                           i === Number(d.handle!.split(':')[1]) ? snapPoint(p) : v,
                         ),
                       };
-                    const target = wireCandidate(p, d.doc, viewport.zoom, new Set([o.id])),
+                    const target = wireEndpointCandidate(
+                        p,
+                        o,
+                        d.handle === 'wireStart' ? 'start' : 'end',
+                        d.doc,
+                        viewport.zoom,
+                      ),
                       endpoint: Endpoint =
                         target.kind === 'wire'
                           ? { kind: 'free', point: target.point }
@@ -1071,11 +1127,16 @@ export function useCanvasInteractions(
     }
     const target =
       s.tool === 'wire' || s.tool === 'junction'
-        ? wireCandidate(p, s.document, viewport.zoom)
+        ? drawingWireCandidate(
+            p,
+            s.document,
+            viewport.zoom,
+            s.tool === 'wire' ? draftRef.current : null,
+          )
         : null;
     setOverlay({
       ...blank,
-      mouse: target?.point ?? snapPoint(p),
+      mouse: p,
       target: target && target.kind !== 'grid' ? target.point : null,
     });
   };
@@ -1087,7 +1148,14 @@ export function useCanvasInteractions(
     if (svgRef.current?.hasPointerCapture(e.pointerId))
       svgRef.current.releasePointerCapture(e.pointerId);
     if (d?.type === 'terminal-wire' && d.started)
-      finishWire(wireCandidate(world(e.clientX, e.clientY), s.document, viewport.zoom));
+      finishWire(
+        drawingWireCandidate(
+          world(e.clientX, e.clientY),
+          s.document,
+          viewport.zoom,
+          draftRef.current,
+        ),
+      );
     if (d?.type === 'move' || d?.type === 'label' || d?.type === 'handle') {
       if (
         s.document !== d.doc &&
@@ -1098,7 +1166,14 @@ export function useCanvasInteractions(
         const wire = doc.objects.find((o) => o.id === d.ids[0]);
         if (wire?.kind === 'wire') {
           const p = world(e.clientX, e.clientY),
-            candidate = wireCandidate(p, doc, viewport.zoom, new Set([wire.id]));
+            original = d.doc.objects.find((o) => o.id === wire.id);
+          const candidate = wireEndpointCandidate(
+            p,
+            original?.kind === 'wire' ? original : wire,
+            d.handle === 'wireStart' ? 'start' : 'end',
+            d.doc,
+            viewport.zoom,
+          );
           if (candidate.kind === 'wire') {
             const result = insertJunction(doc, candidate.point);
             result.doc.objects = result.doc.objects.map((o) =>
@@ -1170,14 +1245,16 @@ export function useCanvasInteractions(
       s.setTool('select');
     }
     if (s.tool === 'wire') {
-      const candidate = wireCandidate(
-        world(e.clientX, e.clientY),
-        useEditorStore.getState().document,
-        viewport.zoom,
-      );
+      const p = world(e.clientX, e.clientY),
+        candidate = drawingWireCandidate(
+          p,
+          useEditorStore.getState().document,
+          viewport.zoom,
+          draftRef.current,
+        );
       setOverlay({
         ...blank,
-        mouse: candidate.point,
+        mouse: p,
         target: candidate.kind === 'grid' ? null : candidate.point,
       });
     } else setOverlay(blank);
@@ -1186,7 +1263,14 @@ export function useCanvasInteractions(
     const s = useEditorStore.getState();
     if (s.tool === 'wire') {
       if (draftRef.current)
-        finishWire(wireCandidate(world(e.clientX, e.clientY), s.document, viewport.zoom));
+        finishWire(
+          drawingWireCandidate(
+            world(e.clientX, e.clientY),
+            s.document,
+            viewport.zoom,
+            draftRef.current,
+          ),
+        );
       return;
     }
     if (s.tool !== 'select') return;

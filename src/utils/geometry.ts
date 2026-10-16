@@ -300,6 +300,48 @@ function routeWire(wire: Wire, doc: CircuitDocument, protectTerminals: boolean):
     [startPoint, ...points, endPoint].filter(
       (p, i, all) => i === 0 || distance(p, all[i - 1]) > 0.001,
     );
+  if (protectTerminals) {
+    // Only terminal pins constrain the exit axis. Nodes and free points follow
+    // the gesture instead of inheriting a horizontal pin and a middle dogleg.
+    const dominant = (a: Point, b: Point) =>
+      Math.abs(b.x - a.x) >= Math.abs(b.y - a.y) ? 'x' : 'y';
+    if (!wire.vertices.length) {
+      const points =
+        wire.startEndpoint.kind !== 'terminal' && wire.endEndpoint.kind === 'terminal'
+          ? orthogonal(end, start, ed).reverse()
+          : orthogonal(
+              start,
+              end,
+              wire.startEndpoint.kind === 'terminal' ? sd : dominant(start, end),
+              wire.startEndpoint.kind === 'terminal' &&
+                wire.endEndpoint.kind === 'terminal' &&
+                sd === ed,
+            );
+      return withLeads(route(points, wire.startEndpoint, wire.endEndpoint));
+    }
+    const result: Point[] = [start];
+    for (const [i, point] of wire.vertices.entries()) {
+      const previous = result.at(-1)!;
+      result.push(
+        ...route(
+          orthogonal(
+            previous,
+            point,
+            i === 0 && wire.startEndpoint.kind === 'terminal' ? sd : dominant(previous, point),
+          ),
+          i === 0 ? wire.startEndpoint : null,
+          null,
+        ).slice(1),
+      );
+    }
+    const previous = result.at(-1)!;
+    const tail =
+      wire.endEndpoint.kind === 'terminal'
+        ? route(orthogonal(end, previous, ed), wire.endEndpoint, null).reverse()
+        : orthogonal(previous, end, dominant(previous, end));
+    result.push(...tail.slice(1));
+    return withLeads(result);
+  }
   if (!wire.vertices.length)
     return withLeads(
       route(orthogonal(start, end, sd, sd === ed), wire.startEndpoint, wire.endEndpoint),

@@ -2,6 +2,7 @@ import { createCurrent, currentWireAnchor } from '../annotations/electrical';
 import { placeNodeLabel } from './nodeLabels';
 import { makeId } from '../model/catalog';
 import { createJunction, createWire } from '../model/factories';
+import { GRID } from '../model/types';
 import type {
   CircuitDocument,
   CircuitObject,
@@ -17,6 +18,7 @@ import {
   nearestTarget,
   nearestWire,
   projectOnSegment,
+  resolveEndpoint,
   snapPoint,
   safeWirePoints,
   wirePoints,
@@ -30,6 +32,74 @@ export interface WireDraft {
   vertices: Point[];
 }
 export const TERMINAL_DRAG_THRESHOLD = 5;
+
+export interface WireSnapContext {
+  anchor: Point;
+  routing?: WireRouting;
+}
+
+/** Use the authored axis before the absolute grid, including off-grid pins/nodes. */
+function alignedWirePoint(p: Point, zoom: number, context?: WireSnapContext): Point {
+  const point = snapPoint(p);
+  if (!context || context.routing === 'free') return point;
+  const { anchor } = context,
+    dx = p.x - anchor.x,
+    dy = p.y - anchor.y,
+    tolerance = 10 / zoom;
+  if (Math.abs(dx) <= tolerance) point.x = anchor.x;
+  if (Math.abs(dy) <= tolerance) point.y = anchor.y;
+  if (
+    context.routing === '45' &&
+    Math.abs(dx) > tolerance &&
+    Math.abs(dy) > tolerance &&
+    Math.abs(Math.abs(dx) - Math.abs(dy)) / Math.SQRT2 <= tolerance
+  ) {
+    // Quantize along the diagonal rather than independently on the two axes.
+    const length = Math.round((Math.abs(dx) + Math.abs(dy)) / 2 / GRID) * GRID;
+    return {
+      x: anchor.x + Math.sign(dx) * length,
+      y: anchor.y + Math.sign(dy) * length,
+    };
+  }
+  return point;
+}
+
+export function drawingWireCandidate(
+  p: Point,
+  doc: CircuitDocument,
+  zoom: number,
+  draft: WireDraft | null,
+): WireCandidate {
+  return wireCandidate(
+    p,
+    doc,
+    zoom,
+    new Set(),
+    draft
+      ? {
+          anchor: draft.vertices.at(-1) ?? resolveEndpoint(draft.start, doc),
+          routing: draft.routing,
+        }
+      : undefined,
+  );
+}
+
+export function wireEndpointCandidate(
+  p: Point,
+  wire: Wire,
+  side: 'start' | 'end',
+  doc: CircuitDocument,
+  zoom: number,
+): WireCandidate {
+  const anchor =
+    side === 'start'
+      ? (wire.vertices[0] ?? resolveEndpoint(wire.endEndpoint, doc))
+      : (wire.vertices.at(-1) ?? resolveEndpoint(wire.startEndpoint, doc));
+  return wireCandidate(p, doc, zoom, new Set([wire.id]), {
+    anchor,
+    routing: wire.routing,
+  });
+}
 
 /** A wire target is resolved only on begin/commit, so hover never changes topology. */
 export function resolveWireCandidate(doc: CircuitDocument, candidate: WireCandidate) {
@@ -125,6 +195,7 @@ export function wireCandidate(
   doc: CircuitDocument,
   zoom: number,
   excluded = new Set<string>(),
+  context?: WireSnapContext,
 ): WireCandidate {
   // All distances are screen pixels. Close terminals win before junctions, wires and grid.
   let terminal: WireCandidate | null = null,
@@ -148,8 +219,29 @@ export function wireCandidate(
   if (target)
     return { ...target, kind: target.endpoint.kind === 'terminal' ? 'terminal' : 'junction' };
   const hit = nearestWire(p, doc, 12 / zoom, excluded);
-  if (hit) return { kind: 'wire', point: hit.point, wireId: hit.wire.id };
-  const point = snapPoint(p);
+  if (hit) {
+    const a = hit.points[hit.segment],
+      b = hit.points[hit.segment + 1];
+    const aligned = alignedWirePoint(p, zoom, context);
+    if (context && context.routing !== 'free') {
+      if (a.x === b.x && Math.abs(p.y - context.anchor.y) <= 10 / zoom) aligned.x = a.x;
+      if (a.y === b.y && Math.abs(p.x - context.anchor.x) <= 10 / zoom) aligned.y = a.y;
+    }
+    const point = projectOnSegment(aligned, a, b);
+    // Alignment may choose a point only on the actual segment under the pointer.
+    return {
+      kind: 'wire',
+      point:
+        context &&
+        context.routing !== 'free' &&
+        distance(aligned, point) < 0.001 &&
+        distance(p, point) < 14 / zoom
+          ? point
+          : hit.point,
+      wireId: hit.wire.id,
+    };
+  }
+  const point = alignedWirePoint(p, zoom, context);
   return { kind: 'grid', point, endpoint: { kind: 'free', point } };
 }
 /** Remove only points between their neighbors, never a deliberate backtrack. */

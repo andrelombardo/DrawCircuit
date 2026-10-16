@@ -32,7 +32,9 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
           <p>
             <b>02 · Collega</b>Premi W, clicca un terminale, un nodo o un filo: sul filo nasce un
             nodo reale. I clic sul foglio aggiungono svolte; doppio clic o Enter termina su un punto
-            libero. Scegli Ortogonale, 45° o Libero; Shift + W cambia routing.
+            libero. Il filo si allinea al punto iniziale e all’ultima svolta, anche fuori griglia.
+            Backspace rimuove l’ultima svolta. Scegli Ortogonale, 45° o Libero; Shift + W cambia
+            routing.
           </p>
           <p>
             <b>03 · Annota</b>Premi N per un nodo, A per una freccia, L per una maglia. Usa Testo

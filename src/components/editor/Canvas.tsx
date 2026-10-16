@@ -12,7 +12,7 @@ import { catalog } from '../../model/catalog';
 import { componentTypes, GRID } from '../../model/types';
 import { wirePoints, pointsPath } from '../../utils/geometry';
 import type { ComponentType } from '../../model/types';
-import { wireCandidate, wirePreview } from '../../utils/wires';
+import { drawingWireCandidate, wirePreview } from '../../utils/wires';
 import { TargetFeedbackLayer } from './TargetFeedbackLayer';
 import { DistanceGuideLayer } from './DistanceGuideLayer';
 import { CircuitLayer } from './CircuitLayer';
@@ -104,7 +104,7 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onExport, onHel
             : null;
   let previewPath = '';
   if (draft && overlay.mouse) {
-    const candidate = wireCandidate(overlay.mouse, doc, v.zoom);
+    const candidate = drawingWireCandidate(overlay.mouse, doc, v.zoom, draft);
     const wire = wirePreview(draft, candidate, doc);
     previewPath = pointsPath(wirePoints(wire, doc));
   }
@@ -127,7 +127,7 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onExport, onHel
                     : 'Seleziona il primo punto · clicca o trascina verso il secondo · Esc annulla'
                   : tool === 'wire'
                     ? draft
-                      ? 'Aggiungi una svolta · clic su terminale, nodo o filo per collegare · Enter per terminare'
+                      ? 'Clic per una svolta · Backspace torna indietro · Enter termina · Esc annulla'
                       : 'Clicca un terminale, un nodo o un filo per iniziare'
                     : tool === 'junction'
                       ? 'Clicca per inserire nodi · Esc o V termina'
