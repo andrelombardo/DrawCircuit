@@ -1,9 +1,0 @@
-% DrawCircuit — coordinates in cm; SVG Y axis inverted.
-\definecolor{dcColor0}{HTML}{DF4949}
-\begin{circuitikz}[european resistors, american inductors, american ports, line cap=round, line join=round]
-\ctikzset{bipoles/length=1.4cm}
-\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-270, font=\fontsize{17.0717}{22.1931}\selectfont] at (0,0) {$A^{\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime\prime}$};
-\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-270, font=\fontsize{17.0717}{22.1931}\selectfont] at (14.5,0) {Testo: \%\#\{\}\textbackslash{}\$\& <xml> "citazione" \_ \textasciicircum{} \textasciitilde{}};
-\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-270, font=\fontsize{17.0717}{22.1931}\selectfont] at (0,-2.75) {prima};
-\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=-270, font=\fontsize{17.0717}{22.1931}\selectfont] at (0,-4.37) {terza};
-\end{circuitikz}

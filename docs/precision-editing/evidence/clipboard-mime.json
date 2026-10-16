@@ -1,9 +1,0 @@
-{
-  "types": ["Files"],
-  "items": [
-    {
-      "kind": "file",
-      "type": "image/png"
-    }
-  ]
-}

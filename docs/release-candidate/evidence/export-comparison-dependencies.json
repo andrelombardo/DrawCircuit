@@ -1,8 +1,0 @@
-{
-  "embeddedKaTeXWoff2Faces": 20,
-  "missingFontUrls": [],
-  "systemFontRequired": "Comic Sans MS or Comic Sans; cursive fallback differs on other systems",
-  "systemFontDistributed": false,
-  "thirdPartyNotice": "Existing KaTeX MIT notice included in HTML comment; no project license introduced",
-  "nativePreview": "Requires plugin TeX font families; browser may substitute. Not certified as PDF typography."
-}

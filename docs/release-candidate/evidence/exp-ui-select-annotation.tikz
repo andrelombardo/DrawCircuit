@@ -1,6 +1,0 @@
-% DrawCircuit — coordinates in cm; SVG Y axis inverted.
-\definecolor{dcColor0}{HTML}{DF4949}
-\begin{circuitikz}[european resistors, american inductors, american ports, line cap=round, line join=round]
-\ctikzset{bipoles/length=1.4cm}
-\node[text=dcColor0, anchor=center, inner sep=0pt, rotate=0, font=\fontsize{16.3603}{21.2684}\selectfont] at (0.4744,-0.575) {$i_1$};
-\end{circuitikz}

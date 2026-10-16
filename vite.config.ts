@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 export default defineConfig({
   base: './',
@@ -14,14 +14,5 @@ export default defineConfig({
               : undefined,
       },
     },
-  },
-
-  test: {
-    // Long DOM workflows compete for CPU when Vitest uses every available core.
-    // Match the release runner without weakening assertions or test timeouts.
-    maxWorkers: 2,
-    environment: 'node',
-    setupFiles: ['tests/setup.ts'],
-    include: ['tests/**/*.test.{ts,tsx}'],
   },
 });

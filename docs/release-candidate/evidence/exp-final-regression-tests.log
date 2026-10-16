@@ -1,8 +1,0 @@
-
- RUN  v4.1.11 /Users/andrealombardo/Desktop/DrawCircuit
-
-
- Test Files  2 passed (2)
-      Tests  13 passed (13)
-   Start at  08:37:49
-   Duration  1.07s (transform 317ms, setup 40ms, import 615ms, tests 598ms, environment 456ms)

@@ -1,1 +1,0 @@
-PASS: senza rete il worker non fornisce una copia offline. Dati locali conservati: true

@@ -1,9 +1,0 @@
-{
-  "ok": true,
-  "plugin": "Inline TikZ",
-  "version": "0.2.1",
-  "compilerSha256": "bf777b889838870f902fed6989d7afbc5daeab799698582e299ff1cdea036e1a",
-  "execution": "installed bundle, isolated process",
-  "bytes": 7513,
-  "sha256": "3907304c1471e1b704c547d8524a8b0b0465ea8cd1d15247a8e4d00d299a45d3"
-}

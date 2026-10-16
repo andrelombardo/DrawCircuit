@@ -19,15 +19,6 @@ as the size/compatibility fallback. Both WOFF and WOFF2 subsets carry the comple
 unmodified OFL in compressed XML metadata.
 
 Routine builds use these checked-in inputs and need no Python/font compiler.
-To regenerate them when updating the fonts:
-
-```sh
-python3 -m venv /tmp/drawcircuit-font-tools
-/tmp/drawcircuit-font-tools/bin/pip install 'fonttools[woff]==4.60.2' 'brotli==1.2.0'
-/tmp/drawcircuit-font-tools/bin/python scripts/prepare-obsidian-fonts.py
-```
-
-Run from the repository root. Re-run the font, renderer, resource and multi-SVG
-checks in [the report](../../../docs/obsidian-optimization/report.md) after an
-update. The preparation script rejects unhandled GSUB lookups, GPOS/kern changes
-and non-BMP source fonts; extend and verify their closure before accepting them.
+When updating the source fonts, regenerate both JSON inputs and ASCII subsets
+together, retaining the metadata described above. Verify font coverage, metrics,
+shaping and exported SVG rendering before accepting an update.

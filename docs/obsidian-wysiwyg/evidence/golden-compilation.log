@@ -1,8 +1,0 @@
-file://[workspace]/scripts/verify-obsidian.mjs:30
-  if (!result?.ok) throw new Error(`${file}: ${result?.error ?? 'Compilation timed out'}`);
-                         ^
-
-Error: docs/obsidian-wysiwyg/evidence/golden.md: Compilation timed out
-    at file://[workspace]/scripts/verify-obsidian.mjs:30:26
-
-Node.js v26.5.0

@@ -18,13 +18,7 @@ npm run build
 npm run preview
 ```
 
-Verifiche e formattazione:
-
-```sh
-npm run lint
-npm test
-npm run format:check
-```
+Verifica il codice con `npm run lint` e `npm run build`, poi prova disegno, modifica, salvataggio ed export nel browser con `npm run preview`.
 
 ## Uso
 
@@ -42,8 +36,6 @@ npm run format:check
 - Trascina il grip della toolbar per spostarla: la posizione viene conservata separatamente dal circuito e adattata a resize e sidebar. L’icona download apre l’export TikZ, Obsidian e SVG. Il pulsante **Aiuto** è in basso a destra; zoom e griglia restano in basso a sinistra.
 
 La sidebar si nasconde e riapre dal bordo, si ridimensiona tra 200 e 480 px e si ripristina con doppio clic sul separatore. Visibilità e larghezza sono preferenze locali separate dal JSON; pan e zoom si conservano durante il resize.
-
-L'esempio iniziale è la rete con nodi A/B/C/D, sei resistenze, label con pedici e annotazioni di maglia richiesta. Una copia riapribile è in `examples/rete-quattro-nodi.json`.
 
 ## Interazioni del disegno
 
@@ -66,8 +58,7 @@ Il JSON resta alla versione 1: i nuovi campi opzionali hanno default compatibili
 | Editor      | `src/components/editor/Canvas.tsx`, `useCanvasInteractions.ts` | SVG, viewport, pointer events, scorciatoie, drag, nodi su fili, handle e anteprime                        |
 | Rendering   | `src/circuit/`, `CircuitLayer.tsx`                             | Simboli SVG riutilizzabili, fili, nodi, testo con pedici e frecce; componenti React memoizzati            |
 | Interfaccia | `src/components/toolbar/`, `palette/`, `properties/`           | Palette ricercabile, toolbar, inspector delle proprietà, export e guida                                   |
-| TikZ        | `src/tikz/exporter.ts`, `componentMappings.ts`                 | Conversione coordinate, simboli CircuitikZ, colori, label, Bézier, archi e standalone                     |
-| Test        | `tests/`                                                       | Geometria, modello, riferimenti, esportazione, cronologia e workflow completi nel DOM                     |
+| TikZ        | `src/tikz/exporter.ts`, `symbolGeometry.ts`                 | Conversione coordinate, simboli CircuitikZ, colori, label, Bézier, archi e standalone                     |
 
 Il documento contiene `objects[]`: componenti, junction, wire, testi e frecce. Gli endpoint dei fili sono riferimenti `{kind:'terminal', componentId, terminalId}`, `{kind:'junction', junctionId}` oppure punti liberi. Le coordinate dei terminali vengono risolte al rendering e durante l'export; non sono copie assolute da aggiornare manualmente. Rimuovere un componente o nodo conserva i fili, trasformando le estremità collegate in punti liberi alle posizioni precedenti.
 
@@ -81,31 +72,11 @@ Le anteprime del mouse e la viewport sono separate dal documento. Il rendering d
 
 I formati condividono il traversal, le coordinate, i colori, la validazione e gli helper geometrici; la modalità Obsidian sceglie la geometria SVG originale. L'export omette fili senza lunghezza, subpath vuoti, ID ripetuti, fili duplicati e oggetti invalidi. Definisce solo i colori usati, normalizzati in HEX maiuscolo e senza duplicati. Le label mantengono il source matematico valido e l'alias `\ohm`; testo e formule non valide vengono escapati. Questi controlli non modificano il documento o il canvas.
 
-Il [report WYSIWYG](../docs/obsidian-wysiwyg/report.md) contiene il confronto canvas/render compilato, le misure geometriche, le verifiche dei font e i risultati della suite. Sono disponibili il [circuito di riferimento JSON](../docs/obsidian-wysiwyg/evidence/golden.json) e il [blocco Obsidian immediatamente incollabile](../docs/obsidian-wysiwyg/evidence/golden.md). Il [report precedente](../docs/obsidian-export/report.md) documenta l'introduzione del formato incollabile.
-
 Scala standard: **40 px = 1 cm**, con inversione dell'asse Y. Le label sono nodi indipendenti. 63 simboli usano componenti nativi CircuitikZ; nove usano geometria condivisa con SVG: i due trasformatori con geometria vincolata, DPST, DPDT, galvanometro, connettori 2/3 pin, porta generica e buzzer. I nomi nativi sono verificati nella [documentazione ufficiale CircuitikZ](https://rmano.github.io/circuitikz/node-The-components-list.html).
 
-Scala Obsidian: **1 unità canvas = 0,75 pt TeX = 0,0263595 cm**, quindi 1 CSS px nell’SVG del renderer verificato. Il testo usa Comic Relief tramite SVG vettoriale e mantiene il layout KaTeX. Il codice include solo i pesi usati e sceglie sottoinsiemi incorporati quando sono più corti, preservando metriche, dipendenze e licenza completa; il font originale resta il fallback. Non occorre installarlo o scaricarlo da Internet. Stili, percorsi ripetuti e frammenti SVG vengono compattati senza cambiare il disegno. I blocchi già copiati restano validi; riesportandoli si ottiene il nuovo codice. Senza DOM o con un driver TeX diverso rimane il fallback sans serif diritto, senza `fontspec`. Il [report di ottimizzazione e confronto PNG](obsidian-optimization/report.md) contiene misure reali, confronti pixel e indicazioni sullo spazio occupato nel vault.
+Scala Obsidian: **1 unità canvas = 0,75 pt TeX = 0,0263595 cm**, quindi 1 CSS px nell’SVG del renderer verificato. Il testo usa Comic Relief tramite SVG vettoriale e mantiene il layout KaTeX. Il codice include solo i pesi usati e sceglie sottoinsiemi incorporati quando sono più corti, preservando metriche, dipendenze e licenza completa; il font originale resta il fallback. Non occorre installarlo o scaricarlo da Internet. Stili, percorsi ripetuti e frammenti SVG vengono compattati senza cambiare il disegno. I blocchi già copiati restano validi; riesportandoli si ottiene il nuovo codice. Senza DOM o con un driver TeX diverso rimane il fallback sans serif diritto, senza `fontspec`.
 
 Non ci sono scelte font. Lo standalone funziona con pdfLaTeX e i pacchetti standard `standalone`, `amsmath`, `amssymb` e `circuitikz`. Con XeLaTeX o LuaLaTeX usa automaticamente Comic Relief quando installato, altrimenti il font LaTeX disponibile.
-
-Il documento di verifica con **72 simboli × 4 rotazioni = 288 componenti** compila con successo. Anche `examples/schema-libreria-mista.tex` e `examples/label-kalam-comic.tex` sono stati compilati.
-
-## Verifiche
-
-La verifica dell’11 ottobre 2026 passa **1.767 test**, lint, formattazione e build. Inspector, precisione geometrica, stili dei fili, annotazioni e Taglia sono documentati nel [report proprietà e precisione](properties-precision/report.md), con prove nel browser, screenshot ed export compilati. Le precedenti nove funzioni sono documentate nel [report editor](editor-upgrades/report.md). I conteggi riportati negli audit seguenti si riferiscono alle rispettive versioni storiche.
-
-**401 test automatici** verificano geometria e terminali dei 72 componenti, Smart Placement, fili, junction, frecce/maglie, storia, JSON, migrazione di valore e font legacy, rendering KaTeX, export e sidebar. Il [report label e sidebar](../docs/labels-sidebar/report.md) documenta il Golden Workflow nel browser reale, le tre viewport richieste e le compilazioni LaTeX.
-
-L’audit del 1–2 ottobre 2026 ha usato quattro agenti indipendenti e il browser reale tramite il tunnel HTTPS fornito dall’utente. Il golden workflow, download JSON/TEX, riapertura, reload, stress di 400 oggetti e viewport laptop sono verificati. Sono stati corretti 12 problemi riprodotti. Le compilazioni usano Tectonic/XeTeX; pdfLaTeX, FPS/heap e il percorso keyboard clipboard nel browser controllato rimangono limiti espliciti. Il [report finale](../docs/audit/report-finale.md) contiene risultati, evidenze e TOP 5 problemi.
-
-Per rigenerare gli esempi e i file di verifica:
-
-```sh
-npm run fixtures
-```
-
-Il fixture di carico viene scritto in `/private/tmp/drawcircuit-stress.json` ed è usato dalle verifiche interne di serializzazione e rendering. I test DOM verificano correttezza e rendering; non costituiscono una garanzia di frame rate su qualsiasi hardware.
 
 ## Limiti intenzionali
 
@@ -113,10 +84,10 @@ Il fixture di carico viene scritto in `/private/tmp/drawcircuit-stress.json` ed 
 - Le nuove maglie sono ellissi di 324° con apertura di 36°; quelle circolari della prima versione rimangono compatibili. L’export usa archi ellittici vettoriali secondo la [documentazione TikZ](https://tikz.dev/tikz-paths#sec-14.7).
 - Il testo matematico usa KaTeX: pedici, apici, frazioni, radici e i comandi supportati dall’engine. Il source rimane nel JSON; il LaTeX non valido appare letterale e resta modificabile. `\ohm` è l’unico alias dell’editor e diventa `\Omega` durante rendering ed export. Il testo normale, i caratteri delle formule e la preview usano Comic Relief incluso nel sito; la UI mantiene Inter. Il canvas viene montato dopo il caricamento dei due pesi, così le misure iniziali usano il font corretto. SVG e PNG incorporano gli stessi font: non richiedono Comic Relief installato. I glifi matematici speciali mantengono le metriche e i tracciati KaTeX.
 - I simboli nativi CircuitikZ possono differire leggermente nelle proporzioni rispetto agli SVG; terminali, orientamento, colori e posizioni delle annotazioni rimangono coerenti.
-- Clipboard e download dipendono dai permessi del browser. Copia/incolla ha un fallback interno durante la sessione; il dialogo TikZ seleziona il codice se la copia negli appunti non è disponibile. Il browser integrato può limitare i test automatici di clipboard e download; questi percorsi sono verificati anche tramite test DOM.
+- Clipboard e download dipendono dai permessi del browser. Copia/incolla ha un fallback interno durante la sessione; il dialogo TikZ seleziona il codice se la copia negli appunti non è disponibile.
 - Il salvataggio locale appartiene a quel browser e a quell'origine. Per utilizzare il disegno in altri strumenti esporta TikZ, Obsidian o SVG dalla toolbar. Nessun backend, account, simulazione o servizio cloud.
 
-### Secondo passaggio: interazioni
+### Connessioni e selezione
 
 - **W + clic su filo** crea un nodo e avvia o termina un ramo. Tutti i fili che passano per il punto vengono divisi e riferiti al nodo. Nodo e ramo sono una sola operazione Annulla; Esc o cambio strumento annulla i nodi provvisori. Space + trascina mantiene il filo in corso.
 - **Enter** su un nodo, componente o testo selezionato apre l’editor inline. Enter conferma, Esc cancella; il doppio clic continua a funzionare.
@@ -127,7 +98,7 @@ Il fixture di carico viene scritto in `/private/tmp/drawcircuit-stress.json` ed 
 - Livelli del canvas: rettangoli e linee decorative, fili, componenti, nodi, altre annotazioni, label associate; selezione e handle sono sempre sopra e non entrano nell’export.
 - Il JSON v1 rimane compatibile con i documenti precedenti; aggiunge l’oggetto `loop-arrow` con bounding box, verso, posizione della punta, colore e spessore.
 
-### Terzo passaggio: libreria e font
+### Libreria e font
 
 In **Passivi** trovi anche **Resistenza statunitense**, il simbolo a zig zag, ricercabile con `zig zag` o `americana`.
 
@@ -135,12 +106,7 @@ La palette usa categorie collassabili, anteprime del vero simbolo, tooltip e ali
 
 Il JSON rimane alla versione 1. Al caricamento una label non vuota prevale sul vecchio `value`; una label vuota o mancante usa il valore legacy. Il campo `value` e le scelte `fontFamily` vengono rimossi dal modello interno. Nei nuovi dati rimane il source originale, con posizione, colore e dimensione della label. Le preferenze sidebar sono separate, sotto `drawcircuit.sidebar.v1`.
 
-Il registry centrale in `src/model/catalog.ts` raccoglie nomi, categorie, alias, terminali, assi di uscita, bounds, label offset, geometria e strategia TikZ. `src/model/symbolGeometry.ts` contiene primitive vettoriali comuni; il canvas renderizza solo gli oggetti presenti. `componentMappings.ts` è una vista derivata del registry. I terminali nuovi hanno ID e nomi semantici; quelli dei 21 componenti iniziali conservano le coordinate e gli ID originali.
-
-- Riepilogo completo: [docs/terzo-passaggio.md](../docs/terzo-passaggio.md).
-- Catalogo visuale SVG: [docs/libreria-componenti.svg](../docs/libreria-componenti.svg), rigenerabile con `node scripts/create-library-preview.mjs`.
-- Schema misto riapribile: [examples/schema-libreria-mista.json](../examples/schema-libreria-mista.json), con [TikZ](../examples/schema-libreria-mista.tex).
-- Esempio con label A/B/r_AB: [examples/label-kalam-comic.json](../examples/label-kalam-comic.json), con [TikZ portabile](../examples/label-kalam-comic.tex).
+Il registry centrale in `src/model/catalog.ts` raccoglie nomi, categorie, alias, terminali, assi di uscita, bounds, label offset, geometria e strategia TikZ. `src/model/symbolGeometry.ts` contiene primitive vettoriali comuni; il canvas renderizza solo gli oggetti presenti. I terminali nuovi hanno ID e nomi semantici; quelli dei 21 componenti iniziali conservano le coordinate e gli ID originali.
 
 ### Smart Placement
 
@@ -148,7 +114,7 @@ Durante l’inserimento sono visibili i terminali e i nodi collegabili: avvicina
 
 **Inserisci in filo** abilita esplicitamente l’inserimento inline dei bipoli: conferma solo quando l’anteprima mostra il filo interrotto ai due terminali. Segmenti troppo corti o attraversati da rami/incroci conservano il placement libero. Per transistor, trasformatori, op amp, connettori e porte il terminale viene scelto automaticamente dalla preview più vicina al target; il clic diretto su un terminale o nodo avvia un’ancora. La preview mostra indicatori grafici senza nomi dei pin. Il normale placement, il drag degli oggetti esistenti e Wire mantengono le loro interazioni.
 
-Le connessioni usano gli endpoint semantici esistenti e ogni smart placement occupa una sola voce di Undo. JSON v1, localStorage ed export restano compatibili. [Report e Golden UX Test](../docs/smart-placement/report.md), con circuito riapribile e prove browser. **334 test automatici**, inclusi i 281 test precedenti invariati.
+Le connessioni usano gli endpoint semantici esistenti e ogni smart placement occupa una sola voce di Undo. JSON v1, localStorage ed export restano compatibili.
 
 ### Blocchi rapidi
 
@@ -158,23 +124,19 @@ Sono disponibili serie/parallelo di 2 o 3 resistenze, stella, delta, partitori V
 
 Il registro dichiarativo in `src/presets/registry.ts` genera normali componenti, fili e junction con factory condivise, nuovi UUID e label senza collisioni. Tutti gli oggetti vengono selezionati dopo l’inserimento e costituiscono una sola operazione Undo. Puoi poi modificarli individualmente usando gli strumenti esistenti. JSON v1, LaTeX, Comic Relief e TikZ seguono i percorsi normali dell’editor.
 
-**478 test passano**, inclusi 77 nuovi test sui preset. Il [report completo](../docs/presets/report.md) descrive i 23 blocchi e il Golden Test nel browser, con JSON riapribili ed export TikZ compilati.
-
-### Polish UX: selezione, guide e export selezione
+### Selezione, guide ed export
 
 La selezione singola evidenzia il simbolo senza cornice; quella multipla conserva un bounds comune. Corpo e label usano grab/grabbing, con drag indipendente delle label. Durante lo spostamento compaiono quote locali e allineamenti: la spaziatura uniforme scatta entro 7 pixel dello schermo; Alt/Option ignora le assistenze. Le quote spariscono a fine gesto e non entrano nel documento, negli export o nella cronologia.
 
 Nel dialogo Export scegli **Tutto il circuito** oppure **Solo selezione** per TikZ, Obsidian e standalone. La selezione include automaticamente i fili interni; esclude i collegamenti verso oggetti esterni se non selezionati esplicitamente. L’inspector mostra le proprietà del tipo di oggetto e offre Sostituisci anche nei gruppi che contengono componenti.
 
-**788 test passano**, inclusi 48 nuovi test. Il [report UX completo](../docs/ux-refinement/report.md) contiene audit delle azioni, regole geometriche, Golden Workflow nel browser, screenshot ed evidenze di export.
-
-## Sidebar e logo (4 ottobre 2026)
+## Sidebar e logo
 
 **T** mostra/nasconde Componenti usando lo stesso comando del pulsante sidebar. Non agisce durante la scrittura in input, ricerca, etichette, testo, contenteditable o dialoghi. Testo si seleziona dalla toolbar e non ha una nuova shortcut. Il precedente ⌘/Ctrl T resta compatibile quando ricevuto dall’app.
 
 Gli hint di placement omettono Alt/Option, che continua a disattivare temporaneamente le assistenze. La precedente toolbar contestuale è stata sostituita dall’inspector delle proprietà. Il branding usa un unico [master XNOR vettoriale trasparente](../assets/brand/drawcircuit-logo.svg); favicon, PNG e icone PWA derivano dal master, senza branding nel workspace.
 
-## Proprietà, precisione e nuove annotazioni (11–13 ottobre 2026)
+## Proprietà, precisione e annotazioni
 
 **Proprietà** è la sidebar destra. Il pulsante nell’intestazione la nasconde; quello sul canvas la riapre. Trascina il bordo sinistro per ridimensionarla (252–440 px, inizialmente 292 px); doppio clic ripristina la larghezza. Il separatore è utilizzabile anche con frecce, Home ed End. Stato e larghezza sono salvati in `drawcircuit.inspector.v1`, separatamente dal circuito e dalla palette sinistra. Su finestre fino a 1050 px l’inspector si sovrappone al canvas e può essere chiuso. L’apertura e il ridimensionamento conservano zoom e punto al centro della vista.
 
@@ -208,18 +170,16 @@ Il rettangolo nasce senza riempimento. Selezionalo sul bordo, spostalo, trascina
 
 Gli eventi nativi Copia/Taglia/Incolla dei menu del browser sono supportati anche quando non viene inviato un keydown. In input, textarea, ricerca, editing inline e contenteditable rimane il comportamento nativo del testo.
 
-JSON v1, blocchi personali, SVG, CircuitikZ e Obsidian conservano rettangoli, linee, stili e opacità. Guide, griglia, selezione e handle restano fuori dagli export. Il [report di verifica iniziale](properties-precision/report.md) comprende le prove del circuito a tre generatori e file riapribili/esportati. Il [report dell’inspector rivisto](inspector-design/report.md) documenta il layout compatto, i comandi nel menu e la verifica responsive.
+JSON v1, blocchi personali, SVG, CircuitikZ e Obsidian conservano rettangoli, linee, stili e opacità. Guide, griglia, selezione e handle restano fuori dagli export.
 
-## Annotazioni integrate e PNG della selezione (12 ottobre 2026)
+## Annotazioni integrate e PNG della selezione
 
 Seleziona un bipolo compatibile e attiva **Annotazioni elettriche → Polarità e tensione**: il componente rimane selezionato. Nella stessa sezione modifica la label LaTeX, **Inverti polarità**, offset dell’annotazione e della label, colori, opacità, spessore e dimensione del testo. La label si chiama **Etichetta tensione**; colori, opacità, spessore e dimensione sono nel gruppo richiudibile **Stile annotazione**. Gli offset indicano spostamenti relativi in unità canvas. Disattivare la casella rimuove l’annotazione; Undo la ripristina con tutte le proprietà.
 
 Selezionando un filo, **Annotazioni elettriche → Corrente** aggiunge o mostra la corrente integrata. Su fili con più tratti, **Riferimento corrente** permette di scegliere **Lungo il filo** oppure un singolo **Tratto**, mantenendo la percentuale quando cambi riferimento. Puoi modificare posizione percentuale, label, **Inverti verso corrente** e offset della label. La freccia resta sul filo. Le correnti non vengono applicate artificialmente ai bipoli. Eventuali annotazioni multiple dei documenti precedenti restano modificabili singolarmente.
 
-I menu delle proprietà seguono lo stesso stile dei menu dell’editor e indicano la scelta corrente con una spunta. Frecce e Home/End navigano tra le opzioni; Enter conferma, Escape chiude, Tab passa al controllo successivo. Quando scegli un altro oggetto, il pannello torna all’inizio; le modifiche dello stesso oggetto conservano invece lo scorrimento. Le verifiche di menu, righe condizionali e larghezze sono nel [report di coerenza della sidebar](sidebar-consistency/report.md).
+I menu delle proprietà seguono lo stesso stile dei menu dell’editor e indicano la scelta corrente con una spunta. Frecce e Home/End navigano tra le opzioni; Enter conferma, Escape chiude, Tab passa al controllo successivo. Quando scegli un altro oggetto, il pannello torna all’inizio; le modifiche dello stesso oggetto conservano invece lo scorrimento.
 
 **Clic destro → Salva come immagine** scarica la selezione in PNG trasparente a 4×, usando l’SVG e la stessa inclusione dei collegamenti interni degli altri export. Include le annotazioni associate ai componenti/fili, esclude griglia, guide e controlli dell’editor. Gli incroci usano tagli geometrici senza aloni bianchi. L’SVG conserva il suo comportamento precedente; TikZ, CircuitikZ e Obsidian restano nel dialogo Esporta. I PNG molto grandi mantengono i limiti di allocazione esistenti.
 
-Vedi il [report con prove automatiche e browser](ux-editor-refactor/report.md).
-
-La [revisione della coerenza della sidebar](sidebar-quality/audit.md) e il [confronto visivo](../design-qa.md) documentano la rifinitura del 13 ottobre. Enter e Space sui controlli del pannello non avviano comandi del canvas. Undo/redo da selettori, pulsanti e gruppi del pannello conservano il contesto degli oggetti ancora presenti; durante la scrittura nei campi testuali rimane l’undo nativo.
+Enter e Space sui controlli del pannello non avviano comandi del canvas. Undo/redo da selettori, pulsanti e gruppi del pannello conservano il contesto degli oggetti ancora presenti; durante la scrittura nei campi testuali rimane l’undo nativo.

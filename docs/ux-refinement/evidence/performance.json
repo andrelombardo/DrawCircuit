@@ -1,9 +1,0 @@
-{
-  "objects": 3000,
-  "moves": 1000,
-  "indexBuildMs": 11.735083,
-  "medianMoveMs": 0.01850000000000307,
-  "p95MoveMs": 0.08737500000000153,
-  "maxMoveMs": 37.87629200000001,
-  "note": "Node geometry benchmark; excludes browser rendering and does not measure FPS"
-}
