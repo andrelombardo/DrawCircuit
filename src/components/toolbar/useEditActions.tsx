@@ -6,7 +6,7 @@ import {
   Replace,
   Scissors,
   Trash2,
-  ImageDown,
+  ClipboardCopy,
   Scan,
 } from 'lucide-react';
 import { commonReplacements } from '../../model/replacement';
@@ -121,11 +121,11 @@ export function useEditActions(canvasOnly = false) {
     contextItems.push(
       {
         id: 'image',
-        label: 'Salva come immagine',
-        icon: <ImageDown size={15} />,
+        label: 'Copia come immagine',
+        icon: <ClipboardCopy size={15} />,
         separatorBefore: true,
         disabled: commands.imageBusy,
-        onSelect: commands.saveImage,
+        onSelect: commands.copyImage,
       },
       {
         id: 'block',

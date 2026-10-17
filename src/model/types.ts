@@ -135,6 +135,16 @@ export interface StrokeStyle {
   dashLength?: number;
   dashGap?: number;
 }
+export interface WireHighlight {
+  color: string;
+  opacity: number;
+  width: number;
+}
+export const DEFAULT_WIRE_HIGHLIGHT: WireHighlight = {
+  color: '#43d34f',
+  opacity: 0.4,
+  width: 12,
+};
 export interface Wire extends StrokeStyle {
   /** Missing in v1 documents means orthogonal. */
   routing?: WireRouting;
@@ -143,6 +153,8 @@ export interface Wire extends StrokeStyle {
   startEndpoint: Endpoint;
   endEndpoint: Endpoint;
   vertices: Point[];
+  /** A translucent marker behind the wire, independent of its electrical stroke. */
+  highlight?: WireHighlight;
   color: string;
   /** Independent of HEX color; missing means fully opaque. */
   opacity?: number;

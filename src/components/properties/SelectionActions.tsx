@@ -6,9 +6,8 @@ import { createPersonalBlock, usePersonalBlocks } from '../../personalBlocks/lib
 import { BlockNameDialog } from '../toolbar/BlockNameDialog';
 import { ReplaceDialog } from './ReplaceDialog';
 import { EditorCommandContext } from './EditorCommandContext';
-import { exportPNG } from '../../png/exporter';
+import { copyPNG } from '../../png/exporter';
 import { getExportSelection } from '../../tikz/selection';
-import { download, fileName } from '../../utils/files';
 
 /** Dialogs are shared by canvas commands and the personal block library.
  * Capture the command's selection before focus moves into a dialog. */
@@ -24,7 +23,7 @@ export function SelectionActions({ children }: { children: ReactNode }) {
     <EditorCommandContext.Provider
       value={{
         imageBusy,
-        saveImage: async () => {
+        copyImage: async () => {
           const { document, selection, notify } = useEditorStore.getState();
           if (!selection.length || imageBusy) return;
           // Capture the same semantic selection closure used by every export format.
@@ -32,14 +31,10 @@ export function SelectionActions({ children }: { children: ReactNode }) {
           if (!subset.objects.length) return;
           setImageBusy(true);
           try {
-            download(
-              await exportPNG(subset),
-              `${fileName(document.title)}-selezione.png`,
-              'image/png',
-            );
-            notify('Immagine PNG salvata · sfondo trasparente');
+            await copyPNG(subset);
+            notify('Immagine copiata · sfondo trasparente');
           } catch (error) {
-            notify(error instanceof Error ? error.message : 'Impossibile salvare il PNG.');
+            notify(error instanceof Error ? error.message : 'Impossibile copiare l’immagine.');
           } finally {
             setImageBusy(false);
           }

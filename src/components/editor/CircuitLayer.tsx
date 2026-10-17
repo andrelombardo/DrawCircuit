@@ -6,7 +6,7 @@ import { ElectricalView } from '../../circuit/annotations/ElectricalView';
 import { wireDrawingPaths } from '../../annotations/electrical';
 import { memo, useMemo } from 'react';
 import type { CircuitDocument } from '../../model/types';
-import { wirePoints } from '../../utils/geometry';
+import { pointsPath, wirePoints } from '../../utils/geometry';
 import { ComponentView } from '../../circuit/components/ComponentView';
 import { WireView } from '../../circuit/wires/WireView';
 import { JunctionView } from '../../circuit/junctions/JunctionView';
@@ -52,6 +52,22 @@ export const CircuitLayer = memo(function CircuitLayer({
         {doc.objects.map((o) =>
           o.kind === 'rectangle' || o.kind === 'line' ? (
             <GraphicView key={o.id} object={o} />
+          ) : null,
+        )}
+      </g>
+      <g data-layer="wire-highlights" pointerEvents="none">
+        {wires.map(({ object, points }) =>
+          object.highlight ? (
+            <path
+              key={object.id}
+              d={pointsPath(points)}
+              fill="none"
+              stroke={object.highlight.color}
+              strokeWidth={object.highlight.width}
+              opacity={object.highlight.opacity}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           ) : null,
         )}
       </g>

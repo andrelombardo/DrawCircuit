@@ -133,6 +133,16 @@ export function deserializeDocument(raw: string): CircuitDocument {
     } else if (o.kind === 'junction') {
       if (!num(o.x) || !num(o.y) || !label(o.label) || !color(o.color)) fail();
     } else if (o.kind === 'wire') {
+      if (o.highlight !== undefined) {
+        const h = record(o.highlight);
+        if (
+          !color(h.color) ||
+          h.opacity === undefined ||
+          !opacity(h.opacity) ||
+          !positive(h.width, 100)
+        )
+          fail();
+      }
       if (
         (o.routing !== undefined && !['orthogonal', '45', 'free'].includes(String(o.routing))) ||
         !endpoint(o.startEndpoint) ||

@@ -1,7 +1,7 @@
 import { braceGeometry } from '../annotations/brace';
 import { componentRegistry } from '../model/catalog';
 import type { CircuitDocument, CircuitObject, Point } from '../model/types';
-import { localToWorld, objectBounds, rotatePoint } from './geometry';
+import { localToWorld, objectBounds, rotatePoint, wirePoints } from './geometry';
 import { svgPathToTikz } from '../tikz/symbolGeometry';
 
 export interface Bounds {
@@ -29,6 +29,16 @@ function pointBounds(points: Point[]): Bounds {
  * Junction spacing is measured node-to-node, as with terminal-to-terminal gaps. */
 export function visualBounds(o: CircuitObject, doc: CircuitDocument): Bounds {
   if (o.kind === 'junction') return { x: o.x, y: o.y, width: 0, height: 0 };
+  if (o.kind === 'wire') {
+    const b = pointBounds(wirePoints(o, doc));
+    const padding = Math.max(o.width, o.highlight?.width ?? 0) / 2;
+    return {
+      x: b.x - padding,
+      y: b.y - padding,
+      width: b.width + padding * 2,
+      height: b.height + padding * 2,
+    };
+  }
   if (o.kind !== 'component') return objectBounds(o, doc);
   const points: Point[] = [];
   for (const s of componentRegistry[o.type].shapes) {

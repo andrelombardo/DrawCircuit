@@ -1,4 +1,4 @@
-import { COLORS, componentTypes } from './types';
+import { COLORS } from './types';
 import type { CircuitComponent, ComponentType, Point, Terminal } from './types';
 import * as g from './symbolGeometry';
 import { symbolMeasurementBounds } from './symbolBounds';
@@ -121,7 +121,14 @@ const def = (
     terminals,
     bounds: { x, y, width: right - x, height: bottom - y },
     measurementBounds: symbolMeasurementBounds(shapes),
-    labelOffset: { x: 0, y: y - 14 },
+    // Use the rendered silhouette, including leads and auxiliary marks, rather
+    // than the padded hit area. Leave room for half of the 22px label plus a gap.
+    labelOffset: {
+      x: 0,
+      y:
+        symbolMeasurementBounds(shapes.map((shape) => ({ ...shape, measurement: undefined }))).y -
+        19,
+    },
     ...(internalText !== undefined ? { internalText } : {}),
   };
 };
@@ -801,9 +808,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'BLOCK',
   ),
 };
-// Preserve the existing label position for every legacy two-terminal component.
-for (const type of componentTypes.slice(0, 21))
-  componentRegistry[type].labelOffset = { x: 0, y: type === 'transformer' ? -60 : -30 };
 export const catalog: ComponentDefinition[] = Object.values(componentRegistry);
 const normalized = (s: string) =>
   s
