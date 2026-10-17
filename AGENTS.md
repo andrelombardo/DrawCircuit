@@ -10,7 +10,7 @@
 - Keep the static manifest installable under `/DrawCircuit/`. Do not add offline caching or update dialogs. `public/sw.js` and `src/pwa/retireLegacyOffline.ts` only retire legacy workers/caches; read `docs/pwa.md` before changing or removing them. The previous `/drawcircuit/` scope is an explicit migration alias. Never clear user storage or other applications’ caches.
 - Use local dev/production preview when validating changes before deployment. Visiting the public site requires no local server or tunnel.
 - Keep Comic Relief bundled and self-hosted for circuit text; load both faces before canvas measurements. Preserve its third-party OFL notice and embedded SVG/PNG fonts. The UI keeps Inter.
-- Do not introduce a license or publish credentials. Audit staged/tracked files before publishing; keep local environment files and generated builds ignored.
+- Preserve the MIT license and third-party license notices. Never publish credentials. Audit staged/tracked files before publishing; keep local environment files and generated builds ignored.
 
 ## Cleanup after every task
 

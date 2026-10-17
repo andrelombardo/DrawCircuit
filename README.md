@@ -72,3 +72,7 @@ Pushes to `main` run lint and the production build before publishing to GitHub P
 - [Web app guide](docs/pwa.md): installation, local data, and migration from old offline installations.
 - [Architecture](docs/architecture.md): modules, persistence, rendering, and build.
 - [Deployment guide](docs/releases.md): quality checks, GitHub Pages, and verification.
+
+## License
+
+DrawCircuit is licensed under the [MIT License](LICENSE), copyright © 2026 Andrea Lombardo. Third-party dependencies and bundled assets retain their respective licenses, including Comic Relief under the [SIL Open Font License 1.1](src/fonts/comic-relief/OFL.txt).
