@@ -53,6 +53,8 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
             ['N · clic ripetuti', 'Inserisci più nodi · Esc termina'],
             ['Shift + W', 'Cambia routing del filo'],
             ['Alt/Option + clic label', 'Scegli tra label sovrapposte'],
+            ['Alt/Option + clic', 'Seleziona l’evidenziazione sotto al circuito'],
+            ['Shift + Alt/Option + clic', 'Seleziona più evidenziazioni sovrapposte'],
             ['Shift + handle rotazione', 'Aggancia la freccia a multipli di 15°'],
             ['Trascina sul foglio', 'Selezione a rettangolo'],
             ['R', 'Ruota componente di 45° · graffa/staffa di 90°'],
@@ -96,6 +98,10 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
           undo. Distribuisci per centri o spazi liberi; la distanza esatta mantiene fermo il primo
           elemento. Scegli lo stile dei fili o Dividi filo per una continuazione tratteggiata.
           Rettangoli e linee decorative non creano connessioni elettriche.
+          Evidenziatore, nel menu Disegno e annotazioni, segue una porzione di filo in modalità
+          Intelligente oppure disegna ovunque in modalità Libera. Modalità, colore, opacità e
+          spessore si regolano in Proprietà. Gli estremi si modificano con gli handle;
+          “Scollega dal filo” rende il tratto spostabile in modo indipendente.
         </p>
         <p className="help-note">
           L’anteprima Smart Placement indica aggancio e collegamento; Alt/Option li ignora.

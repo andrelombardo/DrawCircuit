@@ -4,6 +4,7 @@ import {
   Download,
   GripVertical,
   Hand,
+  Highlighter,
   MousePointer2,
   Pencil,
   Redo2,
@@ -51,6 +52,7 @@ export function DrawingToolbar({
     redo = useEditorStore((s) => s.redo);
   const drawingTools = [
     'wire',
+    'highlight',
     'rectangle',
     'line',
     'junction',
@@ -110,6 +112,13 @@ export function DrawingToolbar({
       label: 'Corrente sul filo',
       icon: <CurrentInlineIcon />,
       onSelect: () => setTool('current'),
+    },
+    {
+      id: 'highlight',
+      label: 'Evidenziatore',
+      icon: <Highlighter size={18} />,
+      separatorBefore: true,
+      onSelect: () => setTool('highlight'),
     },
     {
       id: 'rectangle',

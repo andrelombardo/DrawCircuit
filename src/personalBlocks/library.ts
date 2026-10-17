@@ -89,6 +89,8 @@ export function instantiatePersonalBlock(
           height = rotation % 180 === 90 ? o.width : o.height;
         return { ...o, x: center.x - width / 2, y: center.y - height / 2, width, height };
       }
+      if (o.kind === 'highlight')
+        return o.mode === 'free' ? { ...o, points: o.points.map(rp) } : o;
       if (o.kind === 'line') return { ...o, start: rp(o.start), end: rp(o.end) };
       if (o.kind === 'wire')
         return {

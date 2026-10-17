@@ -1,3 +1,4 @@
+import { highlightPath, highlightPoints } from '../../annotations/highlight';
 import { arrowCenter, rotationHandle } from '../../utils/arrows';
 import { braceGeometry } from '../../annotations/brace';
 import { electricalDrawingGeometry } from '../../annotations/electrical';
@@ -85,17 +86,19 @@ export function SelectionLayer({
         .filter((o) => selection.includes(o.id))
         .map((o) => {
           const path =
-            o.kind === 'line'
-              ? pointsPath([o.start, o.end])
-              : o.kind === 'brace'
-                ? braceGeometry(o).d
-                : o.kind === 'wire'
-                  ? pointsPath(wirePoints(o, doc))
-                  : o.kind === 'arrow'
-                    ? arrowPath(o)
-                    : o.kind === 'loop-arrow'
-                      ? loopPath(o)
-                      : null;
+            o.kind === 'highlight'
+              ? highlightPath(o, doc)
+              : o.kind === 'line'
+                ? pointsPath([o.start, o.end])
+                : o.kind === 'brace'
+                  ? braceGeometry(o).d
+                  : o.kind === 'wire'
+                    ? pointsPath(wirePoints(o, doc))
+                    : o.kind === 'arrow'
+                      ? arrowPath(o)
+                      : o.kind === 'loop-arrow'
+                        ? loopPath(o)
+                        : null;
           return (
             <g key={o.id} data-object={o.id}>
               {path ? (
@@ -109,6 +112,16 @@ export function SelectionLayer({
                   pointerEvents="none"
                 />
               ) : null}
+              {o.kind === 'highlight' &&
+                (() => {
+                  const points = highlightPoints(o, doc);
+                  return points.length ? (
+                    <>
+                      <Handle p={points[0]} name="highlightStart" zoom={zoom} />
+                      <Handle p={points.at(-1)!} name="highlightEnd" zoom={zoom} />
+                    </>
+                  ) : null;
+                })()}
               {o.kind === 'wire' && (
                 <>
                   {o.vertices.map((p, i) => (

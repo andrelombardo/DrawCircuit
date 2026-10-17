@@ -5,7 +5,7 @@ import { usePersonalBlocks } from '../../personalBlocks/library';
 import { SelectionActions } from '../properties/SelectionActions';
 import { ActionMenu } from '../toolbar/ActionMenu';
 import { useEditActions } from '../toolbar/useEditActions';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CircleAlert, Grid2X2, HelpCircle, Maximize, Minus, Plus } from 'lucide-react';
 import { useEditorStore } from '../../store/editorStore';
 import { catalog } from '../../model/catalog';
@@ -56,6 +56,15 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onExport, onHel
   } | null>(null);
   const { contextItems } = useEditActions(contextMenu?.canvasOnly);
   const inspector = useInspectorPreferences();
+  const setInspectorPreferences = inspector.setPreferences;
+  useEffect(
+    () =>
+      useEditorStore.subscribe((s, previous) => {
+        if (s.tool === 'highlight' && previous.tool !== 'highlight')
+          setInspectorPreferences((p) => ({ ...p, visible: true }));
+      }),
+    [setInspectorPreferences],
+  );
   const focusModality = useCanvasFocus();
   const svgRef = useRef<SVGSVGElement>(null),
     doc = useEditorStore((s) => s.document),
@@ -108,8 +117,9 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onExport, onHel
     const wire = wirePreview(draft, candidate, doc);
     previewPath = pointsPath(wirePoints(wire, doc));
   }
-  const hint =
-    tool === 'rectangle'
+  const hint = tool === 'highlight'
+    ? 'Trascina per evidenziare · impostazioni in Proprietà · Esc torna a Selezione'
+    : tool === 'rectangle'
       ? 'Trascina per disegnare · Shift quadrato · Option dal centro · Esc annulla'
       : tool === 'line'
         ? 'Trascina una linea decorativa · Shift aggancia a 45° · Esc annulla'
@@ -219,6 +229,7 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onExport, onHel
           }}
           onPointerUp={interactions.pointerUp}
           onPointerCancel={interactions.cancel}
+          onLostPointerCapture={interactions.lostCapture}
           onDoubleClick={interactions.doubleClick}
           onPointerLeave={() => {
             terminalProximity.leave();
@@ -257,6 +268,7 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onExport, onHel
           <g transform={`translate(${v.x} ${v.y}) scale(${v.zoom})`}>
             <CircuitLayer
               doc={doc}
+              highlightDraft={overlay.highlight}
               selection={editing ? [] : selection}
               terminals={terminalsNeeded}
               nearbyComponents={editing ? [] : terminalProximity.ids}

@@ -1,3 +1,4 @@
+import { remapHighlightSpans } from '../annotations/highlight';
 import { createCurrent, currentWireAnchor } from '../annotations/electrical';
 import { placeNodeLabel } from './nodeLabels';
 import { makeId } from '../model/catalog';
@@ -280,7 +281,13 @@ export function normalizeDocumentWires(doc: CircuitDocument): CircuitDocument {
   });
   // Redundant waypoints can change route indices without changing the branch.
   // Rebind the same physical current position through the existing split path.
-  return normalizedIds.size ? remapSplitWireCurrents(doc, { ...doc, objects }, normalizedIds) : doc;
+  return normalizedIds.size
+    ? remapHighlightSpans(
+        doc,
+        remapSplitWireCurrents(doc, { ...doc, objects }, normalizedIds),
+        normalizedIds,
+      )
+    : doc;
 }
 /** Quick Junction: split all incident wires, preserving terminal references at endpoints. */
 export function insertJunction(
@@ -361,7 +368,10 @@ export function insertJunction(
     ...doc,
     objects: existing ? objects : [...objects, junction],
   });
-  return { doc: remapSplitWireCurrents(doc, next, splitIds), junction };
+  return {
+    doc: remapHighlightSpans(doc, remapSplitWireCurrents(doc, next, splitIds), splitIds),
+    junction,
+  };
 }
 
 /** Keep current annotations on the corresponding physical branch after a wire is split. */
@@ -436,7 +446,11 @@ export function splitWireAtPoint(
     objects: doc.objects.flatMap((o) => (o.id === id ? [first, second] : [o])).concat(junction),
   };
   return {
-    doc: remapSplitWireCurrents(doc, next, new Map([[id, [id, second.id]]])),
+    doc: remapHighlightSpans(
+      doc,
+      remapSplitWireCurrents(doc, next, new Map([[id, [id, second.id]]])),
+      new Map([[id, [id, second.id]]]),
+    ),
     secondId: second.id,
   };
 }

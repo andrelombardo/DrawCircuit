@@ -251,6 +251,24 @@ export interface LineAnnotation extends StrokeStyle {
   width: number;
   opacity?: number;
 }
+export interface HighlightStyle {
+  color: string;
+  opacity: number;
+  width: number;
+}
+export interface HighlightSpan {
+  wireId: string;
+  /** Directed fractions of the resolved route's arc length, independent of vertices. */
+  start: number;
+  end: number;
+}
+export type Highlight = HighlightStyle & { kind: 'highlight'; id: string } & (
+  | { mode: 'smart'; spans: HighlightSpan[] }
+  | { mode: 'free'; points: Point[]; smoothing?: boolean; breaks?: number[] }
+);
+export interface HighlightSettings extends HighlightStyle {
+  mode: Highlight['mode'];
+}
 export type CircuitObject =
   | CircuitComponent
   | Junction
@@ -261,7 +279,8 @@ export type CircuitObject =
   | ElectricalAnnotation
   | BraceAnnotation
   | RectangleAnnotation
-  | LineAnnotation;
+  | LineAnnotation
+  | Highlight;
 export interface CircuitDocument {
   version: 1;
   title: string;
@@ -269,6 +288,7 @@ export interface CircuitDocument {
 }
 export type Tool =
   | 'select'
+  | 'highlight'
   | 'rectangle'
   | 'line'
   | 'wire'

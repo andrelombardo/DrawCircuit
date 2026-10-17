@@ -116,6 +116,41 @@ export function deserializeDocument(raw: string): CircuitDocument {
         )
           fail();
       });
+    } else if (o.kind === 'highlight') {
+      if (!color(o.color) || !positive(o.width, 200) || o.opacity === undefined) fail();
+      if (o.mode === 'free') {
+        if (
+          (o.smoothing !== undefined && typeof o.smoothing !== 'boolean') ||
+          !Array.isArray(o.points) ||
+          o.points.length < 2 ||
+          o.points.length > 20000 ||
+          !o.points.every(point)
+        )
+          fail();
+        if (
+          o.breaks !== undefined &&
+          (!Array.isArray(o.breaks) || o.breaks.length > 1000 ||
+            !o.breaks.every((index, i, all) =>
+              Number.isInteger(index) && index > 0 && index < (o.points as unknown[]).length &&
+              (!i || index > all[i - 1])))
+        ) fail();
+      } else if (o.mode === 'smart') {
+        if (!Array.isArray(o.spans) || !o.spans.length || o.spans.length > 1000) fail();
+        for (const entry of o.spans as unknown[]) {
+          const span = record(entry);
+          if (
+            !str(span.wireId) ||
+            !span.wireId ||
+            !num(span.start) ||
+            !num(span.end) ||
+            Number(span.start) < 0 ||
+            Number(span.start) > 1 ||
+            Number(span.end) < 0 ||
+            Number(span.end) > 1
+          )
+            fail();
+        }
+      } else fail();
     } else if (o.kind === 'rectangle') {
       if (
         !num(o.x) ||
@@ -247,6 +282,13 @@ export function deserializeDocument(raw: string): CircuitDocument {
       resolveEndpoint(o.startEndpoint, doc);
       resolveEndpoint(o.endEndpoint, doc);
     }
+  for (const o of doc.objects)
+    if (
+      o.kind === 'highlight' &&
+      o.mode === 'smart' &&
+      o.spans.some((s) => !doc.objects.some((w) => w.id === s.wireId && w.kind === 'wire'))
+    )
+      fail();
   for (const o of doc.objects)
     if (o.kind === 'electrical') {
       if (o.wireId && !doc.objects.some((t) => t.id === o.wireId && t.kind === 'wire')) fail();

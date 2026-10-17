@@ -18,6 +18,7 @@ export function layoutTargets(doc: CircuitDocument, ids: string[]) {
     (o) =>
       selected.has(o.id) &&
       !(o.kind === 'wire' && (o.startEndpoint.kind !== 'free' || o.endEndpoint.kind !== 'free')) &&
+      !(o.kind === 'highlight' && o.mode === 'smart') &&
       !(o.kind === 'electrical' && (o.componentId || o.wireId)),
   );
 }

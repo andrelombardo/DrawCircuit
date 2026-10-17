@@ -1,3 +1,4 @@
+import { highlightPath } from '../annotations/highlight';
 import { dashPattern } from '../utils/strokeStyle';
 import type { StrokeStyle } from '../model/types';
 import { drawingWireGaps, translucentCrossing } from '../utils/wireRendering';
@@ -172,6 +173,14 @@ function generateTikz(source: CircuitDocument, canvas: boolean, compact = false)
       o.label.opacity,
     );
   };
+  for (const o of doc.objects)
+    if (o.kind === 'highlight') {
+      const path = svgPathToTikz(highlightPath(o, doc), tikzCoordinate);
+      if (path)
+        lines.push(
+          `\\draw[draw=${col(o.color)}, opacity=${fmt(o.opacity)}, line width=${pixelsToPt(o.width)}pt] ${path};`,
+        );
+    }
   // Graphic annotations sit behind the electrical circuit, matching the canvas.
   for (const o of doc.objects) {
     if (o.kind === 'rectangle') {
@@ -238,7 +247,7 @@ function generateTikz(source: CircuitDocument, canvas: boolean, compact = false)
     o.kind === 'component' ? 0 : o.kind === 'junction' ? 1 : 2;
   const labels: (() => void)[] = [];
   for (const o of [...doc.objects]
-    .filter((o) => o.kind !== 'rectangle' && o.kind !== 'line')
+    .filter((o) => o.kind !== 'highlight' && o.kind !== 'rectangle' && o.kind !== 'line')
     .sort((a, b) => rank(a) - rank(b))) {
     if (rank(o) === 2 && labels.length) {
       labels.splice(0).forEach((draw) => draw());

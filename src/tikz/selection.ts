@@ -1,3 +1,4 @@
+import { detachHighlight } from '../annotations/highlight';
 import { detachElectrical } from '../annotations/electrical';
 import type { CircuitDocument, Endpoint, Wire } from '../model/types';
 import { moveObject, resolveEndpoint, wirePoints } from '../utils/geometry';
@@ -84,8 +85,12 @@ export function getExportSelection(doc: CircuitDocument, ids: readonly string[])
   // Current/polarity annotations have an explicit semantic host in the model.
   for (const o of doc.objects)
     if (
-      o.kind === 'electrical' &&
-      ((o.componentId && included.has(o.componentId)) || (o.wireId && included.has(o.wireId)))
+      (o.kind === 'highlight' &&
+        o.mode === 'smart' &&
+        o.spans.every((s) => included.has(s.wireId))) ||
+      (o.kind === 'electrical' &&
+        ((o.componentId && included.has(o.componentId)) ||
+          (o.wireId && included.has(o.wireId))))
     )
       included.add(o.id);
   const endpoint = (ep: Endpoint): Endpoint =>
@@ -95,6 +100,12 @@ export function getExportSelection(doc: CircuitDocument, ids: readonly string[])
   const objects = doc.objects
     .filter((o) => included.has(o.id))
     .map((o) => {
+      if (
+        o.kind === 'highlight' &&
+        o.mode === 'smart' &&
+        o.spans.some((s) => !included.has(s.wireId))
+      )
+        return detachHighlight(o, doc);
       if (
         o.kind === 'electrical' &&
         ((o.wireId && !included.has(o.wireId)) || (o.componentId && !included.has(o.componentId)))

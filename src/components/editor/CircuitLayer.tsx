@@ -1,3 +1,5 @@
+import { HighlightView } from '../../circuit/annotations/HighlightView';
+import type { Highlight } from '../../model/types';
 import { GraphicView } from '../../circuit/annotations/GraphicView';
 import { drawingWireGaps } from '../../utils/wireRendering';
 import { BraceView } from '../../circuit/annotations/BraceView';
@@ -25,8 +27,10 @@ export const CircuitLayer = memo(function CircuitLayer({
   editingTextId,
   editingLabelId,
   hoveredArrow,
+  highlightDraft,
 }: {
   doc: CircuitDocument;
+  highlightDraft?: Highlight | null;
   selection: string[];
   terminals: boolean;
   nearbyComponents?: string[];
@@ -48,6 +52,16 @@ export const CircuitLayer = memo(function CircuitLayer({
   );
   return (
     <>
+      <g data-layer="highlights">
+        {doc.objects.map((o) =>
+          o.kind === 'highlight' ? <HighlightView key={o.id} object={o} doc={doc} /> : null,
+        )}
+        {highlightDraft && (
+          <g pointerEvents="none">
+            <HighlightView object={highlightDraft} doc={doc} interactive={false} />
+          </g>
+        )}
+      </g>
       <g data-layer="graphics">
         {doc.objects.map((o) =>
           o.kind === 'rectangle' || o.kind === 'line' ? (

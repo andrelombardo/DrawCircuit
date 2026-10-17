@@ -102,6 +102,36 @@ export function isExportableObject(o: CircuitObject): boolean {
         positive(o.label.fontSize) &&
         rotation(o.label.rotation)
       );
+    case 'highlight':
+      return (
+        positive(o.width) &&
+        o.width <= 200 &&
+        o.opacity !== undefined &&
+        (o.mode === 'free'
+          ? (o.smoothing === undefined || typeof o.smoothing === 'boolean') &&
+            Array.isArray(o.points) &&
+            o.points.length >= 2 &&
+            o.points.every(finitePoint) &&
+            (o.breaks === undefined ||
+              (Array.isArray(o.breaks) && o.breaks.every((index, i, all) =>
+                Number.isInteger(index) && index > 0 && index < o.points.length &&
+                (!i || index > all[i - 1]))))
+          : o.mode === 'smart' &&
+            Array.isArray(o.spans) &&
+            o.spans.length > 0 &&
+            o.spans.every(
+              (s) =>
+                !!s &&
+                typeof s.wireId === 'string' &&
+                !!s.wireId &&
+                Number.isFinite(s.start) &&
+                Number.isFinite(s.end) &&
+                s.start >= 0 &&
+                s.start <= 1 &&
+                s.end >= 0 &&
+                s.end <= 1,
+            ))
+      );
     case 'junction':
       return finitePoint(o);
     case 'text':

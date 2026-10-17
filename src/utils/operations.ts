@@ -1,3 +1,4 @@
+import { detachHighlight, highlightPoints } from '../annotations/highlight';
 import { detachElectrical } from '../annotations/electrical';
 import { rotateArrow } from './arrows';
 import { makeId } from '../model/catalog';
@@ -23,12 +24,16 @@ export function extractSelection(doc: CircuitDocument, ids: string[]): CircuitDo
     objects: doc.objects
       .filter((o) => selected.has(o.id))
       .map((o) =>
-        o.kind === 'electrical' &&
-        ((o.wireId && !selected.has(o.wireId)) || (o.componentId && !selected.has(o.componentId)))
-          ? detachElectrical(o, doc)
-          : o.kind === 'wire'
-            ? detachWireEndpoints(o, ep, doc)
-            : o,
+        o.kind === 'highlight' &&
+        o.mode === 'smart' &&
+        o.spans.some((s) => !selected.has(s.wireId))
+          ? detachHighlight(o, doc)
+          : o.kind === 'electrical' &&
+              ((o.wireId && !selected.has(o.wireId)) || (o.componentId && !selected.has(o.componentId)))
+            ? detachElectrical(o, doc)
+            : o.kind === 'wire'
+              ? detachWireEndpoints(o, ep, doc)
+              : o,
       ),
   };
 }
@@ -59,6 +64,11 @@ export function cloneObjects(
         labels.add(copy.label.text);
       }
     }
+    if (copy.kind === 'highlight' && copy.mode === 'smart')
+      copy.spans = copy.spans.map((s) => ({
+        ...s,
+        wireId: ids.get(s.wireId)!,
+      }));
     if (copy.kind === 'electrical') {
       if (copy.wireId) copy.wireId = ids.get(copy.wireId);
       if (copy.componentId) copy.componentId = ids.get(copy.componentId);
@@ -82,12 +92,17 @@ export function removeObjects(doc: CircuitDocument, ids: string[]): CircuitDocum
     objects: doc.objects
       .filter((o) => !removed.has(o.id))
       .map((o) =>
-        o.kind === 'electrical' &&
-        ((o.wireId && removed.has(o.wireId)) || (o.componentId && removed.has(o.componentId)))
-          ? detachElectrical(o, doc)
-          : o.kind === 'wire'
-            ? detachWireEndpoints(o, ep, doc)
-            : o,
+        o.kind === 'highlight' &&
+        o.mode === 'smart' &&
+        o.spans.some((s) => removed.has(s.wireId))
+          ? detachHighlight(o, doc)
+          : o.kind === 'electrical' &&
+              ((o.wireId && removed.has(o.wireId)) ||
+                (o.componentId && removed.has(o.componentId)))
+            ? detachElectrical(o, doc)
+            : o.kind === 'wire'
+              ? detachWireEndpoints(o, ep, doc)
+              : o,
       ),
   };
 }
@@ -187,7 +202,14 @@ export function rotateObjects(
         ? { x: o.x + o.width / 2, y: o.y + o.height / 2 }
         : { x: o.x, y: o.y };
     if (o.kind === 'wire')
-      return midpoint(resolveEndpoint(o.startEndpoint, doc), resolveEndpoint(o.endEndpoint, doc));
+      return midpoint(
+        resolveEndpoint(o.startEndpoint, doc),
+        resolveEndpoint(o.endEndpoint, doc),
+      );
+    if (o.kind === 'highlight') {
+      const p = highlightPoints(o, doc);
+      return midpoint(p[0], p.at(-1)!);
+    }
     return midpoint(o.start, o.end);
   });
   const center =
@@ -228,6 +250,11 @@ export function rotateObjects(
           };
         }
         return o;
+      }
+      if (o.kind === 'highlight') {
+        if (o.mode === 'smart' && o.spans.every((s) => selected.has(s.wireId))) return o;
+        const free = detachHighlight(o, doc);
+        return free.mode === 'free' ? { ...free, points: free.points.map(rp) } : free;
       }
       if (o.kind === 'component')
         return {

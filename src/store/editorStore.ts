@@ -1,3 +1,5 @@
+import { DEFAULT_HIGHLIGHT, reconcileHighlights } from '../annotations/highlight';
+import type { HighlightSettings } from '../model/types';
 import { usePersonalBlocks, instantiatePersonalBlock } from '../personalBlocks/library';
 import {
   replaceComponent as replaceComponentInDocument,
@@ -52,6 +54,8 @@ interface EditorState {
   placementRotation: Rotation;
   rotatePlacement: () => void;
   arrowType: ArrowAnnotation['type'];
+  highlightSettings: HighlightSettings;
+  setHighlightSettings: (settings: Partial<HighlightSettings>) => void;
   wireRouting: WireRouting;
   setWireRouting: (routing: WireRouting) => void;
   grid: boolean;
@@ -130,6 +134,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         360) as Rotation,
     })),
   arrowType: 'straight',
+  highlightSettings: { ...DEFAULT_HIGHLIGHT },
+  setHighlightSettings: (settings) =>
+    set((s) => ({
+      highlightSettings: { ...s.highlightSettings, ...settings },
+    })),
   wireRouting: 'orthogonal',
   setWireRouting: (wireRouting) => set({ wireRouting }),
   grid: true,
@@ -157,7 +166,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   toggleGrid: () => set((s) => ({ grid: !s.grid })),
   commit: (document) =>
     set((s) => ({
-      document: reconcileCurrentSegments(s.gestureStart ?? s.document, document),
+      document: reconcileHighlights(
+        s.gestureStart ?? s.document,
+        reconcileCurrentSegments(s.gestureStart ?? s.document, document),
+      ),
       past: [...s.past, s.document].slice(-100),
       future: [],
       gestureStart: null,
@@ -242,7 +254,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   beginGesture: () => set((s) => ({ gestureStart: s.gestureStart ?? s.document })),
   preview: (document) =>
     set((s) => ({
-      document: reconcileCurrentSegments(s.gestureStart ?? s.document, document),
+      document: reconcileHighlights(
+        s.gestureStart ?? s.document,
+        reconcileCurrentSegments(s.gestureStart ?? s.document, document),
+      ),
     })),
   endGesture: () => {
     const s = get();

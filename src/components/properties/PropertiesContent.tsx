@@ -1,3 +1,4 @@
+import { HighlightProperties } from './HighlightProperties';
 import { commonValue } from './commonValue';
 import { useShallow } from 'zustand/react/shallow';
 import {
@@ -41,6 +42,7 @@ const names: Record<CircuitObject['kind'], string> = {
   brace: 'Graffa / Staffa',
   rectangle: 'Rettangolo',
   line: 'Linea decorativa',
+  highlight: 'Evidenziazione',
 };
 export function PropertiesContent() {
   // Local input drafts live in the fields. Unrelated object edits preserve this selector's result.
@@ -50,6 +52,7 @@ export function PropertiesContent() {
       return s.document.objects.filter((o) => ids.has(o.id));
     }),
   );
+  const tool = useEditorStore((s) => s.tool);
   const activeLabel = useEditorStore((s) => s.activeLabel);
   const state = () => useEditorStore.getState();
   const apply = (fn: (o: CircuitObject) => CircuitObject) => state().updateSelection(fn);
@@ -157,6 +160,11 @@ export function PropertiesContent() {
         onCommit={(v) => setRotation(Number(v))}
       />
     ));
+  if (tool === 'highlight') return <HighlightProperties key="highlight-tool" />;
+  if (objects.length && objects.every((o) => o.kind === 'highlight'))
+    return (
+      <HighlightProperties key={objects.map((o) => o.id).join(',')} objects={objects} />
+    );
   if (!objects.length)
     return (
       <div className="inspector-empty">

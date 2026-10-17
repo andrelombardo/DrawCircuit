@@ -1,3 +1,11 @@
+import {
+  highlightPoints,
+  nearestHighlightWire,
+  projectHighlight,
+  routeLength,
+  simplifyHighlight,
+} from '../../annotations/highlight';
+import type { Highlight } from '../../model/types';
 import { rectangleFromDrag, resizeRectangle } from '../../utils/rectangles';
 import type { RectangleAnnotation, LineAnnotation } from '../../model/types';
 import { createBrace, resizeBrace } from '../../annotations/brace';
@@ -59,6 +67,7 @@ import { useSmartPlacement } from '../../smartPlacement/useSmartPlacement';
 import { isMac } from '../../utils/platform';
 import { clampZoom, readZoomPreference, saveZoomPreference } from './zoomPreferences';
 type Drag =
+  | { type: 'highlight'; object: Highlight; points: Point[]; tolerance: number }
   | { type: 'pan'; screen: Point; view: Viewport }
   | {
       type: 'move' | 'label' | 'handle';
@@ -80,6 +89,7 @@ type Drag =
       origin: Point;
     };
 export interface Overlay {
+  highlight: Highlight | null;
   mouse: Point | null;
   target: Point | null;
   box: { x: number; y: number; width: number; height: number } | null;
@@ -97,6 +107,7 @@ export interface Overlay {
   wireTarget: string | null;
 }
 const blank: Overlay = {
+  highlight: null,
   mouse: null,
   target: null,
   box: null,
@@ -507,7 +518,8 @@ export function useCanvasInteractions(
         if (
           s.tool !== prev.tool ||
           s.pendingPresetId !== prev.pendingPresetId ||
-          (prev.gestureStart && !s.gestureStart && draftRef.current) ||
+          (prev.gestureStart && !s.gestureStart &&
+            (draftRef.current || drag.current?.type === 'highlight')) ||
           (s.document !== prev.document &&
             drag.current?.type === 'terminal-wire' &&
             !drag.current.started)
@@ -569,7 +581,25 @@ export function useCanvasInteractions(
     const unique = [
       ...new Map(labels.map((element) => [element.getAttribute('data-label'), element])).values(),
     ];
-    if (!unique.length) return e.target as Element;
+    if (!unique.length) {
+      const objects = document
+        .elementsFromPoint(e.clientX, e.clientY)
+        .map((el) => el.closest('[data-object]'))
+        .filter((el): el is Element => !!el && !!svgRef.current?.contains(el));
+      const targets = [
+        ...new Map(objects.map((el) => [el.getAttribute('data-object'), el])).values(),
+      ];
+      if (e.shiftKey) {
+        const highlight = targets.find((el) => el.closest('[data-layer="highlights"]'));
+        if (highlight) return highlight;
+      }
+      const current = targets.findIndex(
+        (el) => el.getAttribute('data-object') === useEditorStore.getState().selection[0],
+      );
+      return targets.length
+        ? targets[(Math.max(0, current) + 1) % targets.length]
+        : (e.target as Element);
+    }
     const current = unique.findIndex(
       (element) => element.getAttribute('data-label') === useEditorStore.getState().activeLabel,
     );
@@ -637,6 +667,43 @@ export function useCanvasInteractions(
         mouse: p,
         target: candidate.kind === 'grid' ? null : candidate.point,
       });
+      return;
+    }
+    if (s.tool === 'highlight') {
+      const settings = s.highlightSettings;
+      const near =
+        settings.mode === 'smart'
+          ? nearestHighlightWire(s.document, p, 14 / viewport.zoom)
+          : null;
+      if (settings.mode === 'smart' && !near) {
+        s.notify('Inizia il tratto su un filo, oppure scegli la modalità Libera.');
+        return;
+      }
+      const object: Highlight = near
+        ? {
+            ...settings,
+            kind: 'highlight',
+            id: 'preview',
+            mode: 'smart',
+            spans: [{ wireId: near.wireId, start: near.ratio, end: near.ratio }],
+          }
+        : {
+            ...settings,
+            kind: 'highlight',
+            id: 'preview',
+            mode: 'free',
+            points: [p],
+          };
+      svg.setPointerCapture(e.pointerId);
+      s.select([]);
+      s.beginGesture();
+      drag.current = {
+        type: 'highlight',
+        object,
+        points: [p],
+        tolerance: 0.65 / viewport.zoom,
+      };
+      setOverlay({ ...blank, highlight: object });
       return;
     }
     if (s.tool === 'current') {
@@ -786,6 +853,34 @@ export function useCanvasInteractions(
       drag.current = { type: 'marquee', origin: p, additive: e.shiftKey };
     }
   };
+  const advanceHighlight = (
+    d: Extract<Drag, { type: 'highlight' }>,
+    e: ReactPointerEvent<SVGSVGElement>,
+  ) => {
+    let object = d.object;
+    const samples = e.nativeEvent.getCoalescedEvents?.() ?? [];
+    for (const sample of [...samples, e]) {
+      const p = world(sample.clientX, sample.clientY);
+      if (object.mode === 'smart') {
+        const span = object.spans[0],
+          doc = useEditorStore.getState().document;
+        const wire = doc.objects.find((o) => o.id === span.wireId);
+        if (wire?.kind !== 'wire') continue;
+        const projection = projectHighlight(wirePoints(wire, doc), p, span.end);
+        if (projection.distance <= Math.max(24 / viewport.zoom, object.width))
+          object = { ...object, spans: [{ ...span, end: projection.ratio }] };
+      } else if (distance(d.points.at(-1)!, p) >= 0.5 / viewport.zoom) {
+        d.points.push(p);
+        if (d.points.length > 2048) d.points = simplifyHighlight(d.points, d.tolerance);
+        object = {
+          ...object,
+          points: simplifyHighlight(d.points, d.tolerance),
+        };
+      }
+    }
+    d.object = object;
+    return object;
+  };
   const pointerMove = (e: ReactPointerEvent<SVGSVGElement>) => {
     const p = world(e.clientX, e.clientY),
       s = useEditorStore.getState();
@@ -810,6 +905,10 @@ export function useCanvasInteractions(
             })
           : null;
       setHoveredArrow(hovered?.id ?? null);
+    }
+    if (d?.type === 'highlight') {
+      setOverlay({ ...blank, highlight: advanceHighlight(d, e) });
+      return;
     }
     if (d?.type === 'pan') {
       setViewport({
@@ -974,6 +1073,31 @@ export function useCanvasInteractions(
                       o,
                       rotationGesture(arrowCenter(o), d.origin, p, e.shiftKey, arrowOrientation(o)),
                     );
+                  if (o.kind === 'highlight') {
+                    const first = d.handle === 'highlightStart';
+                    if (o.mode === 'free')
+                      return {
+                        ...o,
+                        points: o.points.map((q, i) =>
+                          i === (first ? 0 : o.points.length - 1) ? p : q,
+                        ),
+                      };
+                    const index = first ? 0 : o.spans.length - 1,
+                      span = o.spans[index];
+                    const wire = d.doc.objects.find((w) => w.id === span.wireId);
+                    if (wire?.kind !== 'wire') return o;
+                    const ratio = projectHighlight(
+                      wirePoints(wire, d.doc),
+                      p,
+                      first ? span.start : span.end,
+                    ).ratio;
+                    return {
+                      ...o,
+                      spans: o.spans.map((s, i) =>
+                        i === index ? { ...s, [first ? 'start' : 'end']: ratio } : s,
+                      ),
+                    };
+                  }
                   if (o.kind === 'loop-arrow') {
                     if (d.handle === 'loopHead')
                       return { ...o, arrowPosition: loopPositionAt(o, p) };
@@ -1055,6 +1179,18 @@ export function useCanvasInteractions(
               });
       s.preview({ ...d.doc, objects });
       setOverlay({ ...blank, guides, distances, target });
+      return;
+    }
+    if (s.tool === 'highlight') {
+      const near =
+        s.highlightSettings.mode === 'smart'
+          ? nearestHighlightWire(s.document, p, 14 / viewport.zoom)
+          : null;
+      setOverlay({
+        ...blank,
+        target: near?.point ?? null,
+        wireTarget: near?.wireId ?? null,
+      });
       return;
     }
     if (s.tool === 'polarity') {
@@ -1147,6 +1283,22 @@ export function useCanvasInteractions(
     setDragging(null);
     if (svgRef.current?.hasPointerCapture(e.pointerId))
       svgRef.current.releasePointerCapture(e.pointerId);
+    if (d?.type === 'highlight') {
+      let object = advanceHighlight(d, e);
+      if (object.mode === 'free')
+        object = {
+          ...object,
+          points: simplifyHighlight(d.points, d.tolerance).map((p) => ({
+            x: Math.round(p.x * 100) / 100,
+            y: Math.round(p.y * 100) / 100,
+          })),
+        };
+      const points = highlightPoints(object, s.document);
+      if (points.length >= 2 && routeLength(points) >= 1 / viewport.zoom) {
+        s.add([{ ...object, id: makeId() }]);
+        s.select([]);
+      } else s.cancelGesture();
+    }
     if (d?.type === 'terminal-wire' && d.started)
       finishWire(
         drawingWireCandidate(
@@ -1193,7 +1345,8 @@ export function useCanvasInteractions(
       }
       const doc = useEditorStore.getState().document;
       const changesWireGeometry =
-        d.type === 'handle' ||
+        (d.type === 'handle' &&
+          d.doc.objects.some((o) => d.ids.includes(o.id) && o.kind === 'wire')) ||
         (d.type === 'move' &&
           d.doc.objects.some(
             (o) => d.ids.includes(o.id) && ['wire', 'component', 'junction'].includes(o.kind),
@@ -1211,7 +1364,9 @@ export function useCanvasInteractions(
         const ids = s.document.objects
           .filter((o) => {
             const b = objectBounds(o, s.document);
-            return b.x >= x && b.y >= y && b.x + b.width <= x + w && b.y + b.height <= y + h;
+            return (
+              b.x >= x && b.y >= y && b.x + b.width <= x + w && b.y + b.height <= y + h
+            );
           })
           .map((o) => o.id);
         s.select(d.additive ? [...new Set([...s.selection, ...ids])] : ids);
@@ -1350,6 +1505,13 @@ export function useCanvasInteractions(
     },
     doubleClick,
     drop,
+    lostCapture: () => {
+      if (drag.current?.type === 'highlight') {
+        drag.current = null;
+        useEditorStore.getState().cancelGesture();
+        setOverlay(blank);
+      }
+    },
     cancel: () => {
       useEditorStore.getState().cancelGesture();
       drag.current = null;
