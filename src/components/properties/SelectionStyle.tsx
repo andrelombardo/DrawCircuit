@@ -90,7 +90,7 @@ export function ColorControl({
           items={[
             ...Object.entries(colors).map(([name, color]) => ({
               id: name,
-              label: label + ': ' + (colorNames[name as keyof typeof colorNames] ?? name),
+              label: colorNames[name as keyof typeof colorNames] ?? name,
               icon: <span className="inspector-swatch" style={{ backgroundColor: color }} />,
               onSelect: () => onChange(color),
             })),
