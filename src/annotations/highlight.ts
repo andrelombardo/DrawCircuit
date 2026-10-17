@@ -55,11 +55,9 @@ function componentHighlight(object: Highlight, doc: CircuitDocument) {
   if (component?.kind !== 'component') return null;
   const b = componentRegistry[component.type].measurementBounds;
   const horizontal = b.width >= b.height;
-  const minor = Math.min(b.width, b.height);
-  const half = Math.max(0.1, Math.max(b.width, b.height) - minor) / 2;
+  const half = Math.max(0.1, Math.max(b.width, b.height)) / 2;
   const center = { x: b.x + b.width / 2, y: b.y + b.height / 2 };
   return {
-    width: minor + object.width,
     points: [-1, 1].map((sign) =>
       localToWorld(component, {
         x: center.x + (horizontal ? sign * half : 0),
@@ -96,7 +94,7 @@ export function highlightSpanExists(span: HighlightSpan, doc: CircuitDocument) {
     host?.kind === 'component' && host.terminals.some((t) => t.id === span.terminalId);
 }
 
-/** Detached body patches follow the main route without taking its endpoint handles. */
+/** Legacy detached body patches do not take the main route's endpoint handles. */
 export function highlightEndpointIndices(object: Extract<Highlight, { mode: 'free' }>) {
   const ends = [...(object.breaks ?? []), object.points.length];
   const main = ends.map((_, i) => i).filter((i) => !object.widthOffsets?.[i]);
@@ -240,40 +238,15 @@ function smoothPath(points: Point[]) {
       .join('')
   );
 }
-/** One opacity group covers the joined route and symbol bodies, avoiding dark seams. */
+/** Every route uses the chosen width, including legacy detached body patches.
+ * The renderer groups opacity so overlapping routes cannot create dark seams. */
 export function highlightDrawing(object: Highlight, doc: CircuitDocument) {
-  const routes = highlightRoutes(object, doc);
-  const drawing = routes.map((points, i) => ({
+  return highlightRoutes(object, doc).map((points) => ({
     points,
     d: object.mode === 'free' && object.smoothing !== false ? smoothPath(points) : pointsPath(points),
-    width: object.mode === 'component' ? componentHighlight(object, doc)!.width :
-      object.width + (object.mode === 'free' ? object.widthOffsets?.[i] ?? 0 : 0),
+    width: object.width,
   }));
-  if (object.mode !== 'smart') return drawing;
-  const bodies = new Set<string>();
-  for (const span of object.spans) {
-    if ('wireId' in span || bodies.has(span.componentId)) continue;
-    const component = hostById(doc, span.componentId);
-    if (component?.kind !== 'component') continue;
-    const route = componentHighlightRoute(component, span.terminalId);
-    if (!route.length) continue;
-    const length = routeLength(route);
-    // The middle anchor is the body entry (or the center for a straight lead).
-    const b = componentRegistry[component.type].measurementBounds;
-    const terminal = component.terminals.find((t) => t.id === span.terminalId)!;
-    const entry = localToWorld(component, {
-      x: Math.max(b.x, Math.min(b.x + b.width, terminal.localX)),
-      y: Math.max(b.y, Math.min(b.y + b.height, terminal.localY)),
-    });
-    if (length && Math.max(span.start, span.end) * length < distance(route[0], entry) - 1e-6) continue;
-    const body = componentHighlight({ ...object, mode: 'component', componentId: component.id }, doc)!;
-    if (body.width > object.width) drawing.push({ ...body, d: pointsPath(body.points) });
-    bodies.add(component.id);
-  }
-  return drawing;
 }
-export const highlightStrokeWidth = (object: Highlight, doc: CircuitDocument) =>
-  Math.max(object.width, ...highlightDrawing(object, doc).map((stroke) => stroke.width));
 export function highlightBounds(object: Highlight, doc: CircuitDocument) {
   let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
   for (const { points, width } of highlightDrawing(object, doc)) {
@@ -299,14 +272,11 @@ export function detachHighlight(object: Highlight, doc: CircuitDocument): Highli
   const drawing = highlightDrawing(object, doc);
   let count = 0;
   const breaks = drawing.slice(0, -1).map((stroke) => (count += stroke.points.length));
-  const width = object.mode === 'component' ? highlightStrokeWidth(object, doc) : object.width;
-  const widthOffsets = drawing.map((stroke) => stroke.width - width);
   return {
     kind: 'highlight', id: object.id, mode: 'free', color: object.color,
-    width, opacity: object.opacity, smoothing: false,
+    width: object.width, opacity: object.opacity, smoothing: false,
     points: drawing.flatMap((stroke) => stroke.points),
     ...(breaks.length ? { breaks } : {}),
-    ...(widthOffsets.some((offset) => offset) ? { widthOffsets } : {}),
   };
 }
 
