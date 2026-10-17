@@ -11,7 +11,7 @@ DrawCircuit è un’applicazione web statica. L’unica destinazione è [GitHub 
 
 Le pull request eseguono gli stessi controlli senza pubblicazione. La pipeline non usa routing per piattaforma, versioni automatiche, tag di release o permessi di scrittura sui contenuti del repository. I deployment sono serializzati.
 
-Prima di pubblicare, verificare localmente con `npm run preview`, controllando anche il prefisso `/DrawCircuit/` (`npm run preview -- --base /DrawCircuit/`). Provare nel browser disegno, modifica, salvataggio locale ed export: il repository non include una suite di test automatici. Il build usa percorsi relativi per manifest, icone e asset. Non includere build generate, file `.env` o chiavi private nei commit.
+Prima di pubblicare, verificare localmente con `npm run preview`, controllando anche il prefisso `/DrawCircuit/` (`npm run preview -- --base /DrawCircuit/`). Provare nel browser disegno, modifica, salvataggio locale e copia immagine: il repository non include una suite di test automatici. Il build usa percorsi relativi per manifest, icone e asset. Non includere build generate, file `.env` o chiavi private nei commit.
 
 Per verificare una pubblicazione, controllare che il commit della run Actions e del deployment Pages corrisponda a quello da provare; quindi aprire l’URL pubblico e confrontare, se necessario, gli hash degli asset HTML con l’artefatto di quella run. Il sito pubblico non contiene modifiche locali non pubblicate. Nessun file di versionamento viene generato nell’app.
 

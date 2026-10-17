@@ -1,10 +1,9 @@
 import { useEditorCommands } from '../components/properties/EditorCommandContext';
 import { useRef, useState } from 'react';
 import { ChevronDown, Pencil, Trash2 } from 'lucide-react';
-import { usePersonalBlocks, serializePersonalBlocks } from './library';
+import { usePersonalBlocks } from './library';
 import { useEditorStore } from '../store/editorStore';
 import { BlockNameDialog } from '../components/toolbar/BlockNameDialog';
-import { download } from '../utils/files';
 export function PersonalBlockPalette({ search }: { search: string }) {
   const commands = useEditorCommands();
   const selected = useEditorStore((s) => s.selection.length);
@@ -73,18 +72,6 @@ export function PersonalBlockPalette({ search }: { search: string }) {
             Salva selezione come blocco
           </button>
           <div className="personal-library-actions">
-            <button
-              onClick={() =>
-                download(
-                  serializePersonalBlocks(blocks),
-                  'drawcircuit-blocchi.json',
-                  'application/json',
-                )
-              }
-              disabled={!blocks.length}
-            >
-              Esporta blocchi
-            </button>
             <button onClick={() => file.current?.click()}>Importa blocchi</button>
           </div>
         </>

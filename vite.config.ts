@@ -7,11 +7,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) =>
-          id.includes('/src/tikz/font-data/')
-            ? 'obsidian-fonts'
-            : id.includes('/node_modules/katex/')
-              ? 'latex'
-              : undefined,
+          id.includes('/node_modules/katex/') ? 'latex' : undefined,
       },
     },
   },

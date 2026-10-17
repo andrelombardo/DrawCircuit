@@ -65,7 +65,7 @@ export function pngDimensions(svg: string, scale = PNG_SCALE) {
     Math.sqrt(PNG_MAX_PIXELS / (sourceWidth * sourceHeight)),
   );
   if (effectiveScale < Math.min(1, scale))
-    throw new Error('PNG troppo grande: esporta una selezione più piccola.');
+    throw new Error('Immagine troppo grande: copia una selezione più piccola.');
   let width = Math.min(PNG_MAX_DIMENSION, Math.max(1, Math.ceil(sourceWidth * effectiveScale)));
   let height = Math.min(PNG_MAX_DIMENSION, Math.max(1, Math.ceil(sourceHeight * effectiveScale)));
   // Ceil can cross the pixel budget; leave space for that final pixel on each axis.
@@ -211,7 +211,7 @@ export async function copyPNG(doc: CircuitDocument) {
     !navigator.clipboard?.write ||
     (ClipboardItem.supports && !ClipboardItem.supports('image/png'))
   )
-    throw new Error('Questo browser non consente la copia immagine. Usa Scarica PNG.');
+    throw new Error('Questo browser non consente la copia di immagini negli appunti.');
   const png = exportPNG(doc);
   // A denied clipboard can reject before the image promise settles.
   void png.catch(() => {});

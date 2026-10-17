@@ -4,12 +4,11 @@ import { X } from 'lucide-react';
 import { ComponentSidebar } from './components/palette/ComponentSidebar';
 import { useSidebarPreferences } from './components/palette/useSidebarPreferences';
 import { Canvas } from './components/editor/Canvas';
-import { ExportDialog } from './components/toolbar/ExportDialog';
 import { HelpDialog } from './components/toolbar/HelpDialog';
 import { useEditorStore } from './store/editorStore';
 export default function App() {
   const sidebar = useSidebarPreferences();
-  const [dialog, setDialog] = useState<'export' | 'help' | null>(null),
+  const [helpOpen, setHelpOpen] = useState(false),
     notice = useEditorStore((s) => s.notice);
   useEffect(() => {
     if (!notice) return;
@@ -22,14 +21,12 @@ export default function App() {
         <div className="workspace">
           <ComponentSidebar {...sidebar} />
           <Canvas
-            onExport={() => setDialog('export')}
-            onHelp={() => setDialog('help')}
+            onHelp={() => setHelpOpen(true)}
             sidebarVisible={sidebar.preferences.visible}
             onToggleSidebar={sidebar.toggleSidebar}
           />
         </div>
-        {dialog === 'export' && <ExportDialog onClose={() => setDialog(null)} />}{' '}
-        {dialog === 'help' && <HelpDialog onClose={() => setDialog(null)} />}
+        {helpOpen && <HelpDialog onClose={() => setHelpOpen(false)} />}
         {notice && (
           <div className="toast" role="status">
             {notice}

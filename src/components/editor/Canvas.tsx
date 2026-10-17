@@ -37,7 +37,6 @@ import { useCanvasFocus } from './useCanvasFocus';
 type CanvasProps = {
   sidebarVisible?: boolean;
   onToggleSidebar?: () => void;
-  onExport?: () => void;
   onHelp?: () => void;
 };
 export function Canvas(props: CanvasProps) {
@@ -47,7 +46,7 @@ export function Canvas(props: CanvasProps) {
     </SelectionActions>
   );
 }
-function CanvasContent({ sidebarVisible = true, onToggleSidebar, onExport, onHelp }: CanvasProps) {
+function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp }: CanvasProps) {
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;
@@ -155,14 +154,14 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onExport, onHel
   return (
     <div className="editor-shell">
       <main className="editor" aria-label="Editor circuito">
-        <DrawingToolbar onExport={onExport} sidebarVisible={sidebarVisible} />
+        <DrawingToolbar sidebarVisible={sidebarVisible} />
         {!sidebarVisible && (
           <SidebarToggle side="left" visible={false} onToggle={onToggleSidebar} />
         )}
         {storageError && (
           <div className="persistence-error floating-surface" role="alert">
             <CircleAlert size={12} />
-            Salvataggio locale non disponibile. Mantieni aperta la pagina ed esporta il circuito.
+            Salvataggio locale non disponibile. Mantieni aperta la pagina e usa “Copia come immagine”.
           </div>
         )}
         {!inspector.preferences.visible && (
@@ -404,7 +403,7 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onExport, onHel
               <br />
               Un clic, e il tuo circuito prende forma.
             </p>
-            <span>SVG vettoriale · appunti a mano · export TikZ</span>
+            <span>Circuiti elettrici · appunti a mano</span>
           </div>
         )}
         <div className="editor-bottom">

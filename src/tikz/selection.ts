@@ -3,7 +3,6 @@ import { detachElectrical } from '../annotations/electrical';
 import type { CircuitDocument, Endpoint, Wire } from '../model/types';
 import { moveObject, resolveEndpoint, wirePoints } from '../utils/geometry';
 import { contentBounds, unionBounds } from '../utils/visualBounds';
-import { exportTikz, exportObsidian } from './exporter';
 
 /** Selection closure uses model IDs only. Labels are owned by their objects;
  * internal connections may pass through unselected Junctions, never through
@@ -133,9 +132,5 @@ export function getExportSelection(doc: CircuitDocument, ids: readonly string[])
     objects: objects.map((o) => moveObject(o, { x: -bounds.x, y: -bounds.y }, included)),
   };
 }
-/** Kept as the existing public name for callers and export helpers. */
+/** Shared by image copying and personal blocks. */
 export const selectionDocument = getExportSelection;
-export const exportSelectionTikz = (doc: CircuitDocument, ids: string[]) =>
-  exportTikz(selectionDocument(doc, ids));
-export const exportSelectionObsidian = (doc: CircuitDocument, ids: string[]) =>
-  exportObsidian(selectionDocument(doc, ids));

@@ -18,7 +18,7 @@ npm run build
 npm run preview
 ```
 
-Verifica il codice con `npm run lint` e `npm run build`, poi prova disegno, modifica, salvataggio ed export nel browser con `npm run preview`.
+Verifica il codice con `npm run lint` e `npm run build`, poi prova disegno, modifica, salvataggio e copia immagine nel browser con `npm run preview`.
 
 ## Uso
 
@@ -33,7 +33,7 @@ Verifica il codice con `npm run lint` e `npm run build`, poi prova disegno, modi
 - **Cmd/Ctrl Z** annulla; **Cmd/Ctrl Shift Z** oppure **Ctrl Y** ripete. Uno spostamento completo occupa una sola voce di cronologia.
 - **Space + trascina** o **H** sposta la vista. Rotellina/trackpad e i pulsanti +/− controllano lo zoom. **1** adatta alla vista. **G** nasconde la griglia.
 - Il workspace parte dal bordo superiore, senza header, branding o gestione File. Il circuito viene salvato automaticamente in localStorage dopo 400 ms di inattività e prima di chiusura/reload. La cronologia conserva le ultime 100 operazioni durante la sessione.
-- Trascina il grip della toolbar per spostarla: la posizione viene conservata separatamente dal circuito e adattata a resize e sidebar. L’icona download apre l’export TikZ, Obsidian e SVG. Il pulsante **Aiuto** è in basso a destra; zoom e griglia restano in basso a sinistra.
+- Trascina il grip della toolbar per spostarla: la posizione viene conservata separatamente dal circuito e adattata a resize e sidebar. Il pulsante **Aiuto** è in basso a destra; zoom e griglia restano in basso a sinistra.
 
 La sidebar si nasconde e riapre dal bordo, si ridimensiona tra 200 e 480 px e si ripristina con doppio clic sul separatore. Visibilità e larghezza sono preferenze locali separate dal JSON; pan e zoom si conservano durante il resize.
 
@@ -43,8 +43,8 @@ La sidebar si nasconde e riapre dal bordo, si ridimensiona tra 200 e 480 px e si
 - **Corrente sul filo:** il comando applica direttamente una corrente integrata. La freccia segue il ramo e si accorcia sui segmenti brevi; la toolbar ne inverte il verso. Le vecchie correnti esterne vengono lette come integrate, conservando testo, direzione e riferimenti.
 - **Sostituzione multipla:** seleziona componenti con Shift + clic o con un rettangolo, poi **clic destro → Sostituisci…**. Il dialogo propone soltanto simboli compatibili con tutti i componenti selezionati e spiega quando non ci sono destinazioni comuni. Fili e nodi eventualmente selezionati rimangono intatti; un solo undo ripristina l’intero gruppo.
 - **Label dei nodi:** la posizione iniziale evita per quanto possibile simboli, testi e fili vicini. Le label già spostate restano dove sono. Clicca e trascina il testo per muoverlo indipendentemente dal nodo; i tasti freccia lo spostano di una unità, Shift + freccia di dieci. **Alt/Option + clic** passa tra label sovrapposte nello stesso punto.
-- **Opacità:** in **Proprietà → Aspetto** inserisci una percentuale da 0 a 100 nel campo accanto al colore. Simbolo e label hanno controlli indipendenti; il testo autonomo ha un solo controllo. Enter o un clic esterno conferma la modifica, Escape annulla. Funziona anche sulla selezione multipla, con un solo undo per conferma. Colore HEX e opacità sono salvati separatamente e vengono esportati in SVG, PNG, TikZ/CircuitikZ e Obsidian.
-- **Frecce e maglie:** **Specchia orizzontalmente/verticalmente** riflette forma e punti di controllo; **Inverti freccia** cambia invece il verso della punta. I comandi di mirroring agiscono anche su più frecce selezionate. Avvicina il mouse a una freccia selezionata e trascina il piccolo handle esterno per ruotarla; **Shift** aggancia l’orientamento a multipli di 15°, **Esc** annulla. La rotazione conserva curva, punta e dimensioni dell’ellisse, viene salvata e rimane negli export.
+- **Opacità:** in **Proprietà → Aspetto** inserisci una percentuale da 0 a 100 nel campo accanto al colore. Simbolo e label hanno controlli indipendenti; il testo autonomo ha un solo controllo. Enter o un clic esterno conferma la modifica, Escape annulla. Funziona anche sulla selezione multipla, con un solo undo per conferma. Colore HEX e opacità sono salvati separatamente e rimangono nella copia immagine.
+- **Frecce e maglie:** **Specchia orizzontalmente/verticalmente** riflette forma e punti di controllo; **Inverti freccia** cambia invece il verso della punta. I comandi di mirroring agiscono anche su più frecce selezionate. Avvicina il mouse a una freccia selezionata e trascina il piccolo handle esterno per ruotarla; **Shift** aggancia l’orientamento a multipli di 15°, **Esc** annulla. La rotazione conserva curva, punta e dimensioni dell’ellisse, viene salvata e rimane nella copia immagine.
 
 Il JSON resta alla versione 1: i nuovi campi opzionali hanno default compatibili (opacità 1, routing ortogonale, rotazione delle maglie 0). La scelta iniziale delle label è euristica; in disegni molto affollati può essere necessario trascinarle. L’editor inline modifica il sorgente LaTeX: la formula resta renderizzata, ma il cursore dentro comandi e formule composte segue un’approssimazione delle posizioni del sorgente, non un editor matematico strutturato.
 
@@ -57,35 +57,26 @@ Il JSON resta alla versione 1: i nuovi campi opzionali hanno default compatibili
 | Geometria   | `src/utils/geometry.ts`, `operations.ts`                       | Trasformazioni, rotazioni, routing ortogonale/45°/libero, snapping, bounds, duplicazione e cancellazione  |
 | Editor      | `src/components/editor/Canvas.tsx`, `useCanvasInteractions.ts` | SVG, viewport, pointer events, scorciatoie, drag, nodi su fili, handle e anteprime                        |
 | Rendering   | `src/circuit/`, `CircuitLayer.tsx`                             | Simboli SVG riutilizzabili, fili, nodi, testo con pedici e frecce; componenti React memoizzati            |
-| Interfaccia | `src/components/toolbar/`, `palette/`, `properties/`           | Palette ricercabile, toolbar, inspector delle proprietà, export e guida                                   |
-| TikZ        | `src/tikz/exporter.ts`, `symbolGeometry.ts`                 | Conversione coordinate, simboli CircuitikZ, colori, label, Bézier, archi e standalone                     |
+| Interfaccia | `src/components/toolbar/`, `palette/`, `properties/`           | Palette ricercabile, toolbar, inspector delle proprietà, copia immagine e guida                                   |
 
-Il documento contiene `objects[]`: componenti, junction, wire, testi e frecce. Gli endpoint dei fili sono riferimenti `{kind:'terminal', componentId, terminalId}`, `{kind:'junction', junctionId}` oppure punti liberi. Le coordinate dei terminali vengono risolte al rendering e durante l'export; non sono copie assolute da aggiornare manualmente. Rimuovere un componente o nodo conserva i fili, trasformando le estremità collegate in punti liberi alle posizioni precedenti.
+Il documento contiene `objects[]`: componenti, junction, wire, testi e frecce. Gli endpoint dei fili sono riferimenti `{kind:'terminal', componentId, terminalId}`, `{kind:'junction', junctionId}` oppure punti liberi. Le coordinate dei terminali vengono risolte al rendering e durante la copia immagine; non sono copie assolute da aggiornare manualmente. Rimuovere un componente o nodo conserva i fili, trasformando le estremità collegate in punti liberi alle posizioni precedenti.
 
 Le anteprime del mouse e la viewport sono separate dal documento. Il rendering dei simboli è memoizzato; un indice del documento rende costante la ricerca dei componenti collegati. Pan, zoom e anteprime non ricreano i simboli. Durante il drag vengono aggiornati gli oggetti spostati e i percorsi dei fili; la cronologia registra solo la fine del gesto.
 
-## TikZ / CircuitikZ
+## Copia come immagine
 
-**Copy TikZ** copia le definizioni dei colori e l'ambiente `circuitikz`. Nel documento ospite includi `\usepackage{circuitikz}`. **Download .tex** genera un documento standalone; il formato standard non richiede font personalizzati.
+Seleziona gli elementi da copiare, apri il menu con il tasto destro e scegli **Copia come immagine**. Per includere tutto il circuito, usa prima **Cmd/Ctrl A**. L’app copia un PNG trasparente a 4× negli appunti, pronto da incollare in altre applicazioni. Include fili interni, etichette, annotazioni associate ed evidenziazioni; griglia, guide e controlli restano esclusi. I font del circuito sono incorporati nella rappresentazione SVG interna prima della rasterizzazione.
 
-**Copia per Obsidian** copia un blocco Markdown completo, direttamente incollabile in una nota con [Inline TikZ](https://github.com/lachlanharrisdev/obsidian-inline-tikz) o TikZJax: delimitatori ` ```tikz `, package, preambolo, `\begin{document}`, circuito e `\end{document}`. Questa modalità riproduce i 72 simboli del canvas con TikZ puro, preservando proporzioni, terminali, label, nodi e punte delle frecce. La scheda **Obsidian** mostra il testo copiato; se il browser nega l'accesso agli appunti viene selezionata per la copia manuale. Non include `documentclass` o file di font.
-
-I formati condividono il traversal, le coordinate, i colori, la validazione e gli helper geometrici; la modalità Obsidian sceglie la geometria SVG originale. L'export omette fili senza lunghezza, subpath vuoti, ID ripetuti, fili duplicati e oggetti invalidi. Definisce solo i colori usati, normalizzati in HEX maiuscolo e senza duplicati. Le label mantengono il source matematico valido e l'alias `\ohm`; testo e formule non valide vengono escapati. Questi controlli non modificano il documento o il canvas.
-
-Scala standard: **40 px = 1 cm**, con inversione dell'asse Y. Le label sono nodi indipendenti. 63 simboli usano componenti nativi CircuitikZ; nove usano geometria condivisa con SVG: i due trasformatori con geometria vincolata, DPST, DPDT, galvanometro, connettori 2/3 pin, porta generica e buzzer. I nomi nativi sono verificati nella [documentazione ufficiale CircuitikZ](https://rmano.github.io/circuitikz/node-The-components-list.html).
-
-Scala Obsidian: **1 unità canvas = 0,75 pt TeX = 0,0263595 cm**, quindi 1 CSS px nell’SVG del renderer verificato. Il testo usa Comic Relief tramite SVG vettoriale e mantiene il layout KaTeX. Il codice include solo i pesi usati e sceglie sottoinsiemi incorporati quando sono più corti, preservando metriche, dipendenze e licenza completa; il font originale resta il fallback. Non occorre installarlo o scaricarlo da Internet. Stili, percorsi ripetuti e frammenti SVG vengono compattati senza cambiare il disegno. I blocchi già copiati restano validi; riesportandoli si ottiene il nuovo codice. Senza DOM o con un driver TeX diverso rimane il fallback sans serif diritto, senza `fontspec`.
-
-Non ci sono scelte font. Lo standalone funziona con pdfLaTeX e i pacchetti standard `standalone`, `amsmath`, `amssymb` e `circuitikz`. Con XeLaTeX o LuaLaTeX usa automaticamente Comic Relief quando installato, altrimenti il font LaTeX disponibile.
+Non ci sono pulsanti di esportazione, download di file, formati TikZ/Obsidian o archivi JSON scaricabili. Il documento e i blocchi personali continuano a salvarsi nel browser. È possibile importare librerie di blocchi già disponibili.
 
 ## Limiti intenzionali
 
 - Il routing può essere ortogonale, a 45° o libero; non cerca di evitare automaticamente ostacoli o incroci. Gli incroci sono scollegati finché non inserisci una junction.
-- Le nuove maglie sono ellissi di 324° con apertura di 36°; quelle circolari della prima versione rimangono compatibili. L’export usa archi ellittici vettoriali secondo la [documentazione TikZ](https://tikz.dev/tikz-paths#sec-14.7).
-- Il testo matematico usa KaTeX: pedici, apici, frazioni, radici e i comandi supportati dall’engine. Il source rimane nel JSON; il LaTeX non valido appare letterale e resta modificabile. `\ohm` è l’unico alias dell’editor e diventa `\Omega` durante rendering ed export. Il testo normale, i caratteri delle formule e la preview usano Comic Relief incluso nel sito; la UI mantiene Inter. Il canvas viene montato dopo il caricamento dei due pesi, così le misure iniziali usano il font corretto. SVG e PNG incorporano gli stessi font: non richiedono Comic Relief installato. I glifi matematici speciali mantengono le metriche e i tracciati KaTeX.
+- Le nuove maglie sono ellissi di 324° con apertura di 36°; quelle circolari della prima versione rimangono compatibili. La copia immagine mantiene gli archi ellittici.
+- Il testo matematico usa KaTeX: pedici, apici, frazioni, radici e i comandi supportati dall’engine. Il source rimane nel JSON; il LaTeX non valido appare letterale e resta modificabile. `\ohm` è l’unico alias dell’editor e diventa `\Omega` durante rendering e copia immagine. Il testo normale, i caratteri delle formule e la preview usano Comic Relief incluso nel sito; la UI mantiene Inter. Il canvas viene montato dopo il caricamento dei due pesi, così le misure iniziali usano il font corretto. La rappresentazione SVG interna e il PNG incorporano gli stessi font: non richiedono Comic Relief installato. I glifi matematici speciali mantengono le metriche e i tracciati KaTeX.
 - I simboli nativi CircuitikZ possono differire leggermente nelle proporzioni rispetto agli SVG; terminali, orientamento, colori e posizioni delle annotazioni rimangono coerenti.
-- Clipboard e download dipendono dai permessi del browser. Copia/incolla ha un fallback interno durante la sessione; il dialogo TikZ seleziona il codice se la copia negli appunti non è disponibile.
-- Il salvataggio locale appartiene a quel browser e a quell'origine. Per utilizzare il disegno in altri strumenti esporta TikZ, Obsidian o SVG dalla toolbar. Nessun backend, account, simulazione o servizio cloud.
+- La copia negli appunti dipende dai permessi del browser. Copia/incolla degli oggetti ha un fallback interno durante la sessione; la copia immagine mostra un errore se il browser non la consente.
+- Il salvataggio locale appartiene a quel browser e a quell'origine. Per utilizzare il disegno in altri strumenti scegli **Clic destro → Copia come immagine**. Nessun backend, account, simulazione o servizio cloud.
 
 ### Connessioni e selezione
 
@@ -95,7 +86,7 @@ Non ci sono scelte font. Lo standalone funziona con pdfLaTeX e i pacchetti stand
 - Snap: terminale vicino, nodo/terminale, filo, griglia; soglie in pixel dello schermo. Hit area di fili, terminali e handle indipendenti dallo zoom.
 - **Cmd/Ctrl D** genera nuovi ID e numeri di label automatiche, mantenendo le label personalizzate. Le connessioni esterne alla selezione vengono scollegate dalle copie.
 - Inspector destro persistente con sezioni Generale, Posizione, Aspetto, Testo e Geometria; le proprietà dipendono dal tipo e dalla selezione. I comandi sono nel menu contestuale del canvas; la toolbar conserva Annulla/Ripeti senza il menu Modifica.
-- Livelli del canvas: rettangoli e linee decorative, fili, componenti, nodi, altre annotazioni, label associate; selezione e handle sono sempre sopra e non entrano nell’export.
+- Livelli del canvas: rettangoli e linee decorative, fili, componenti, nodi, altre annotazioni, label associate; selezione e handle sono sempre sopra e non entrano nella copia immagine.
 - Il JSON v1 rimane compatibile con i documenti precedenti; aggiunge l’oggetto `loop-arrow` con bounding box, verso, posizione della punta, colore e spessore.
 
 ### Libreria e font
@@ -106,7 +97,7 @@ La palette usa categorie collassabili, anteprime del vero simbolo, tooltip e ali
 
 Il JSON rimane alla versione 1. Al caricamento una label non vuota prevale sul vecchio `value`; una label vuota o mancante usa il valore legacy. Il campo `value` e le scelte `fontFamily` vengono rimossi dal modello interno. Nei nuovi dati rimane il source originale, con posizione, colore e dimensione della label. Le preferenze sidebar sono separate, sotto `drawcircuit.sidebar.v1`.
 
-Il registry centrale in `src/model/catalog.ts` raccoglie nomi, categorie, alias, terminali, assi di uscita, bounds, label offset, geometria e strategia TikZ. `src/model/symbolGeometry.ts` contiene primitive vettoriali comuni; il canvas renderizza solo gli oggetti presenti. I terminali nuovi hanno ID e nomi semantici; quelli dei 21 componenti iniziali conservano le coordinate e gli ID originali.
+Il registry centrale in `src/model/catalog.ts` raccoglie nomi, categorie, alias, terminali, assi di uscita, bounds, label offset, geometria e metadati dei simboli. `src/model/symbolGeometry.ts` contiene primitive vettoriali comuni; il canvas renderizza solo gli oggetti presenti. I terminali nuovi hanno ID e nomi semantici; quelli dei 21 componenti iniziali conservano le coordinate e gli ID originali.
 
 ### Smart Placement
 
@@ -114,7 +105,7 @@ Durante l’inserimento sono visibili i terminali e i nodi collegabili: avvicina
 
 **Inserisci in filo** abilita esplicitamente l’inserimento inline dei bipoli: conferma solo quando l’anteprima mostra il filo interrotto ai due terminali. Segmenti troppo corti o attraversati da rami/incroci conservano il placement libero. Per transistor, trasformatori, op amp, connettori e porte il terminale viene scelto automaticamente dalla preview più vicina al target; il clic diretto su un terminale o nodo avvia un’ancora. La preview mostra indicatori grafici senza nomi dei pin. Il normale placement, il drag degli oggetti esistenti e Wire mantengono le loro interazioni.
 
-Le connessioni usano gli endpoint semantici esistenti e ogni smart placement occupa una sola voce di Undo. JSON v1, localStorage ed export restano compatibili.
+Le connessioni usano gli endpoint semantici esistenti e ogni smart placement occupa una sola voce di Undo. JSON v1, localStorage e copia immagine restano compatibili.
 
 ### Blocchi rapidi
 
@@ -122,13 +113,13 @@ La sezione **Blocchi rapidi** aggiunge 23 configurazioni nella palette, separate
 
 Sono disponibili serie/parallelo di 2 o 3 resistenze, stella, delta, partitori V/I, Wheatstone, generatori reali V/I, Thévenin, Norton, RC/RL/RLC serie e parallelo, generatore + R, due maglie, tre rami e generatore + resistenza serie + carico.
 
-Il registro dichiarativo in `src/presets/registry.ts` genera normali componenti, fili e junction con factory condivise, nuovi UUID e label senza collisioni. Tutti gli oggetti vengono selezionati dopo l’inserimento e costituiscono una sola operazione Undo. Puoi poi modificarli individualmente usando gli strumenti esistenti. JSON v1, LaTeX, Comic Relief e TikZ seguono i percorsi normali dell’editor.
+Il registro dichiarativo in `src/presets/registry.ts` genera normali componenti, fili e junction con factory condivise, nuovi UUID e label senza collisioni. Tutti gli oggetti vengono selezionati dopo l’inserimento e costituiscono una sola operazione Undo. Puoi poi modificarli individualmente usando gli strumenti esistenti. JSON v1, LaTeX e Comic Relief seguono i percorsi normali dell’editor.
 
-### Selezione, guide ed export
+### Selezione, guide e copia immagine
 
-La selezione singola evidenzia il simbolo senza cornice; quella multipla conserva un bounds comune. Corpo e label usano grab/grabbing, con drag indipendente delle label. Durante lo spostamento compaiono quote locali e allineamenti: la spaziatura uniforme scatta entro 7 pixel dello schermo; Alt/Option ignora le assistenze. Le quote spariscono a fine gesto e non entrano nel documento, negli export o nella cronologia.
+La selezione singola evidenzia il simbolo senza cornice; quella multipla conserva un bounds comune. Corpo e label usano grab/grabbing, con drag indipendente delle label. Durante lo spostamento compaiono quote locali e allineamenti: la spaziatura uniforme scatta entro 7 pixel dello schermo; Alt/Option ignora le assistenze. Le quote spariscono a fine gesto e non entrano nel documento, nelle immagini copiate o nella cronologia.
 
-Nel dialogo Export scegli **Tutto il circuito** oppure **Solo selezione** per TikZ, Obsidian e standalone. La selezione include automaticamente i fili interni; esclude i collegamenti verso oggetti esterni se non selezionati esplicitamente. L’inspector mostra le proprietà del tipo di oggetto e offre Sostituisci anche nei gruppi che contengono componenti.
+Per copiare tutto il circuito come immagine seleziona prima tutti gli oggetti; per copiarne una parte seleziona soltanto gli elementi desiderati. La selezione include automaticamente i fili interni; esclude i collegamenti verso oggetti esterni se non selezionati esplicitamente. L’inspector mostra le proprietà del tipo di oggetto e offre Sostituisci anche nei gruppi che contengono componenti.
 
 ## Sidebar e logo
 
@@ -142,7 +133,7 @@ Gli hint di placement omettono Alt/Option, che continua a disattivare temporanea
 
 Il riepilogo mostra il tipo oppure il numero di elementi selezionati. Per una selezione multipla X/Y sono l’angolo superiore sinistro dei limiti geometrici; modificare una coordinata trasla l’intera selezione. L’etichetta è in alto. **Posizione** contiene un unico campo **Rotazione** per un oggetto orientabile o per la sua label selezionata. **Trasformazioni** distingue esplicitamente **Ruota gruppo di…** nelle selezioni compatibili e le riflessioni. Dimensione e allineamento del testo sono in **Aspetto**, insieme ai controlli pertinenti; **Geometria** raccoglie le proprietà specifiche e la disposizione. Nelle selezioni eterogenee sono disponibili soltanto le proprietà comuni; per proprietà specifiche seleziona gli oggetti del tipo interessato. Valori diversi mostrano **Valori misti**, **Misto** o un trattino. Una modifica comune riguarda tutta la selezione, con un solo undo. I campi numerici/testuali, comprese le percentuali di opacità, si confermano con Enter o perdendo il focus; Escape annulla il draft. Le proprietà locali ancora in scrittura non modificano il circuito.
 
-X/Y e W/H sono affiancati in campi compatti. Ogni riga colore mostra una swatch, il valore HEX e l’opacità indipendente; clicca il colore per i cinque preset o **Colore personalizzato…**. Il selettore nativo raggruppa le anteprime in un solo gesto. Il clic destro sulla selezione offre Duplica, Copia, Taglia, Incolla, Elimina, Sostituisci, Salva come blocco, Salva come immagine e i comandi pertinenti al tipo. Le evidenziazioni offrono anche Elimina e, quando associate a un filo o componente, il comando per scollegarle. I toggle delle due sidebar usano lo stesso componente con icone specchiate.
+X/Y e W/H sono affiancati in campi compatti. Ogni riga colore mostra una swatch, il valore HEX e l’opacità indipendente; clicca il colore per i cinque preset o **Colore personalizzato…**. Il selettore nativo raggruppa le anteprime in un solo gesto. Il clic destro sulla selezione offre Duplica, Copia, Taglia, Incolla, Elimina, Sostituisci, Salva come blocco, Copia come immagine e i comandi pertinenti al tipo. Le evidenziazioni offrono anche Elimina e, quando associate a un filo o componente, il comando per scollegarle. I toggle delle due sidebar usano lo stesso componente con icone specchiate.
 
 ### Allineare e distribuire
 
@@ -172,7 +163,7 @@ I valori iniziali sono giallo `#FACC15`, opacità 40% e spessore 12 u. Il menu c
 
 Seleziona un tratto sul suo bordo o con **Alt/Option + clic** quando è coperto dal circuito; **Shift + Alt/Option + clic** aggiunge o rimuove evidenziazioni sovrapposte dalla multiselezione. Le proprietà comuni modificano colore, opacità e spessore. Le evidenziazioni dei componenti seguono corpo, posizione e rotazione del simbolo. **Scollega dal componente** congela il tratto per spostarlo liberamente. Gli handle modificano gli estremi dei tratti liberi o sui fili; per i tratti intelligenti **Inizio/Fine** consentono coordinate esatte in unità lungo il filo. Gli estremi sono proporzionali alla lunghezza del percorso risolto: seguono spostamenti, vertici e cambi di routing. Un filo diviso mantiene i riferimenti sui rami risultanti; eliminandolo il tratto resta libero sul foglio. **Scollega dal filo** permette di spostare liberamente una copia geometrica del tratto. I percorsi liberi si spostano anche con i tasti freccia.
 
-Copia, taglia, incolla, duplicazione, eliminazione, blocchi personali e Undo/Redo usano il normale sistema degli oggetti. Copiare soltanto un’evidenziazione intelligente produce un percorso indipendente; copiarla con i suoi fili o componenti rimappa i riferimenti. Il JSON v1 continua a leggere i documenti precedenti e valida le nuove geometrie. SVG, PNG e TikZ/Obsidian includono le evidenziazioni, anche nell’export della sola selezione. Ogni tratto viene esportato come un percorso vettoriale, senza immagini raster o nuovi pacchetti TikZ.
+Copia, taglia, incolla, duplicazione, eliminazione, blocchi personali e Undo/Redo usano il normale sistema degli oggetti. Copiare soltanto un’evidenziazione intelligente produce un percorso indipendente; copiarla con i suoi fili o componenti rimappa i riferimenti. Il JSON v1 continua a leggere i documenti precedenti e valida le nuove geometrie. La copia immagine include le evidenziazioni della selezione, usando lo stesso percorso vettoriale del canvas prima della rasterizzazione.
 
 ### Taglia e appunti
 
@@ -180,7 +171,7 @@ Copia, taglia, incolla, duplicazione, eliminazione, blocchi personali e Undo/Red
 
 Gli eventi nativi Copia/Taglia/Incolla dei menu del browser sono supportati anche quando non viene inviato un keydown. In input, textarea, ricerca, editing inline e contenteditable rimane il comportamento nativo del testo.
 
-JSON v1, blocchi personali, SVG, CircuitikZ e Obsidian conservano rettangoli, linee, stili e opacità. Guide, griglia, selezione e handle restano fuori dagli export.
+Il salvataggio locale, i blocchi personali e la copia immagine conservano rettangoli, linee, stili e opacità. Guide, griglia, selezione e handle restano fuori dalle immagini copiate.
 
 ## Annotazioni integrate e PNG della selezione
 
@@ -190,6 +181,6 @@ Selezionando un filo, **Annotazioni elettriche → Corrente** aggiunge o mostra 
 
 I menu delle proprietà seguono lo stesso stile dei menu dell’editor e indicano la scelta corrente con una spunta. Frecce e Home/End navigano tra le opzioni; Enter conferma, Escape chiude, Tab passa al controllo successivo. Quando scegli un altro oggetto, il pannello torna all’inizio; le modifiche dello stesso oggetto conservano invece lo scorrimento.
 
-**Clic destro → Salva come immagine** scarica la selezione in PNG trasparente a 4×, usando l’SVG e la stessa inclusione dei collegamenti interni degli altri export. Include le annotazioni associate ai componenti/fili, esclude griglia, guide e controlli dell’editor. Gli incroci usano tagli geometrici senza aloni bianchi. L’SVG conserva il suo comportamento precedente; TikZ, CircuitikZ e Obsidian restano nel dialogo Esporta. I PNG molto grandi mantengono i limiti di allocazione esistenti.
+**Clic destro → Copia come immagine** copia la selezione negli appunti come PNG trasparente a 4×, usando la rappresentazione SVG interna e includendo i collegamenti interni. Include le annotazioni associate ai componenti/fili, esclude griglia, guide e controlli dell’editor. Gli incroci usano tagli geometrici senza aloni bianchi. I PNG molto grandi mantengono i limiti di allocazione esistenti.
 
 Enter e Space sui controlli del pannello non avviano comandi del canvas. Undo/redo da selettori, pulsanti e gruppi del pannello conservano il contesto degli oggetti ancora presenti; durante la scrittura nei campi testuali rimane l’undo nativo.

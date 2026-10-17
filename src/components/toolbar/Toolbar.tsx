@@ -1,7 +1,6 @@
 import {
   ArrowRight,
   CircleDot,
-  Download,
   GripVertical,
   Hand,
   Highlighter,
@@ -30,10 +29,8 @@ import {
 } from './DrawingIcons';
 
 export function DrawingToolbar({
-  onExport,
   sidebarVisible = true,
 }: {
-  onExport?: () => void;
   sidebarVisible?: boolean;
 }) {
   const {
@@ -193,9 +190,6 @@ export function DrawingToolbar({
         onClick={() => setTool('pan')}
       >
         <Hand size={18} />
-      </IconButton>
-      <IconButton label="Esporta" onClick={onExport}>
-        <Download size={18} />
       </IconButton>
     </div>
   );

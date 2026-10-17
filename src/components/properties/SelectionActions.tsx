@@ -26,7 +26,7 @@ export function SelectionActions({ children }: { children: ReactNode }) {
         copyImage: async () => {
           const { document, selection, notify } = useEditorStore.getState();
           if (!selection.length || imageBusy) return;
-          // Capture the same semantic selection closure used by every export format.
+          // Include internal connections and annotations belonging to the selected hosts.
           const subset = getExportSelection(document, selection);
           if (!subset.objects.length) return;
           setImageBusy(true);

@@ -36,16 +36,6 @@
   --border: var(--ui-border);
 }
 
-.archive-export {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 14px;
-  color: var(--ui-text-secondary);
-  font-size: 12px;
-}
 * {
   box-sizing: border-box;
 }
@@ -667,7 +657,6 @@ svg {
   justify-content: center;
   padding: 24px;
 }
-.export-dialog,
 .help-dialog,
 .confirm-dialog {
   position: relative;
@@ -708,7 +697,6 @@ svg {
   color: var(--ui-text-secondary);
   margin-bottom: var(--ui-space-3);
 }
-.export-dialog h2,
 .help-dialog h2,
 .confirm-dialog h2 {
   font-size: 18px;
@@ -716,72 +704,11 @@ svg {
   letter-spacing: -0.3px;
   margin: 0 32px 8px 0;
 }
-.export-dialog > p,
 .confirm-dialog p {
   font-size: 12px;
   color: var(--ui-text-secondary);
   line-height: 1.5;
   margin: 0 0 16px;
-}
-.code-tabs {
-  display: flex;
-  border: 1px solid var(--ui-border);
-  border-bottom: 0;
-  background: var(--ui-surface-secondary);
-  border-radius: 8px 8px 0 0;
-  padding: 4px;
-  gap: 4px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-.code-tabs button {
-  font-size: 12px;
-  height: var(--ui-control-height);
-  padding: 0 var(--ui-space-2);
-  border-radius: 6px;
-  color: var(--ui-text-secondary);
-}
-.code-tabs button.selected {
-  background: var(--ui-bg);
-  color: var(--ui-text);
-  box-shadow: var(--ui-shadow);
-}
-.code-tabs > span {
-  margin-left: auto;
-  font-size: 10px;
-  color: var(--ui-text-secondary);
-  padding: 0 4px;
-}
-.code-preview {
-  display: block;
-  width: 100%;
-  height: clamp(130px, calc(90dvh - 320px), 280px);
-  resize: vertical;
-  padding: 16px;
-  border: 1px solid var(--ui-border);
-  border-radius: 0 0 8px 8px;
-  background: var(--ui-bg);
-  color: var(--ui-text-secondary);
-  font-family: ui-monospace, SFMono-Regular, monospace;
-  font-size: 11px;
-  line-height: 1.6;
-  white-space: pre;
-  tab-size: 2;
-}
-.export-dialog-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: var(--ui-space-2);
-  margin-top: var(--ui-space-3);
-  border-top: 1px solid var(--ui-border);
-  padding-top: var(--ui-space-3);
-}
-.export-dialog-footer > span {
-  flex-basis: 100%;
-  color: var(--ui-text-secondary);
-  font-size: 10px;
 }
 .primary-button,
 .secondary-button {
@@ -1015,28 +942,14 @@ kbd {
   .arrow-tool-options {
     top: 105px;
   }
-  .export-dialog-footer {
-    flex-wrap: wrap;
-  }
-  .export-dialog-footer > span {
-    width: 100%;
-  }
-  .code-tabs > span {
-    display: none;
-  }
   .modal-backdrop {
     padding: 14px;
   }
-  .export-dialog,
   .help-dialog {
     padding: 24px;
   }
-  .export-dialog h2,
   .help-dialog h2 {
     font-size: 20px;
-  }
-  .code-preview {
-    height: 240px;
   }
   .shortcut-grid,
   .help-steps {
@@ -1380,26 +1293,6 @@ kbd {
   opacity: 1;
   transition: opacity 0.12s 0.3s;
 }
-.export-scope {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--ui-space-1);
-  margin: var(--ui-space-3) 0;
-  font-size: 12px;
-  color: var(--ui-text-secondary);
-}
-.export-scope button {
-  height: var(--ui-control-height);
-  padding: 0 var(--ui-space-2);
-  border: 1px solid transparent;
-  border-radius: var(--ui-radius-sm);
-}
-.export-scope button[aria-pressed='true'] {
-  color: var(--ui-accent);
-  background: var(--ui-accent-soft);
-  border-color: transparent;
-}
 /* On narrow sheets the color picker replaces the row of preset swatches. */
 .editor {
   container-type: inline-size;
@@ -1518,9 +1411,7 @@ kbd {
 .arrow-tool-options button:hover,
 .placement-controls button:hover,
 .personal-block-row button:hover,
-.personal-library-actions button:hover,
-.export-scope button:hover:not(:disabled),
-.code-tabs button:hover {
+.personal-library-actions button:hover {
   background: var(--ui-hover);
 }
 .destructive-button:hover:not(:disabled) {
@@ -1605,7 +1496,6 @@ summary:focus-visible {
     background: transparent;
     padding: 0;
   }
-  .export-dialog,
   .help-dialog {
     padding: 20px;
   }
@@ -2366,25 +2256,6 @@ summary:focus-visible {
   }
 }
 
-.png-export-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  padding-left: 6px;
-  border-left: 1px solid var(--ui-border);
-}
-.png-export-actions button {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  border: 1px solid var(--ui-border);
-  background: var(--ui-surface);
-  color: var(--ui-text);
-}
-.png-export-actions button:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
 /* Keep placement instructions and controls available on narrow canvases too. */
 .has-placement-controls .canvas-hint {
   display: block;

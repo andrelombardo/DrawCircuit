@@ -12,18 +12,18 @@
   <a href="docs/manuale.md">User guide</a>
 </p>
 
-Place components, connect them, and add mathematical labels and electrical annotations. Export the result as a diagram or as TikZ code for your documents.
+Place components, connect them, and add mathematical labels and electrical annotations. Select the diagram and choose **Copia come immagine** from the right-click menu to paste it into your documents.
 
 DrawCircuit is a web editor that saves your work in your browser and requires no account. It loads from the network and can be installed as a standalone web app in supporting browsers. Local circuits, personal blocks, and preferences remain in the browser between visits.
 
-Circuit labels and formulas use **Comic Relief**, bundled with the app so visitors see the same font without installing it. SVG, PNG, and copied Obsidian TikZ exports preserve the font too, without requiring it to be installed. The interface keeps Inter. Obsidian exports select embedded font subsets and compact shared drawing instructions. See the font's [source and SIL Open Font License](src/fonts/comic-relief/README.md).
+Circuit labels and formulas use **Comic Relief**, bundled with the app so visitors see the same font without installing it. Copied PNG images preserve the font without requiring it to be installed. The interface keeps Inter. See the font's [source and SIL Open Font License](src/fonts/comic-relief/README.md).
 
 ## Get started
 
 1. Open the [browser app](https://andrelombardo.github.io/DrawCircuit/).
 2. Choose a component from **Componenti**, then click the sheet to place it.
 3. Connect terminals with wires and edit the selection in **Proprietà**.
-4. Open **Esporta** to copy or download your circuit.
+4. Select the elements, right-click and choose **Copia come immagine**. Use **Select all** first to copy the whole circuit.
 
 The canonical public URL is `/DrawCircuit/`. The lowercase [address `/drawcircuit/`](https://andrelombardo.github.io/drawcircuit/) redirects to it through the separate [Pages entry-point repository](https://github.com/andrelombardo/andrelombardo.github.io); the app repository remains `DrawCircuit`. Browser data stays on the same origin; open the current URL to retire the previous installation. Existing PWA shortcuts may need to be installed again from the canonical address.
 
@@ -35,8 +35,8 @@ The interface and [user guide](docs/manuale.md) are in Italian. See the [web app
 - **Annotate diagrams:** LaTeX labels, current and voltage arrows, polarity signs, loop arrows, text, and decorative shapes.
 - **Reuse arrangements:** start from quick blocks or save a selection as a personal block.
 - **Edit precisely:** move, rotate, replace, align, and distribute components; adjust numeric spacing, colours, and styles with undo and redo.
-- **Export your work:** TikZ/CircuitikZ, standalone `.tex`, Obsidian TikZ blocks, SVG, and transparent PNG, for the whole circuit or a selection.
-- **Keep local copies:** automatic saving, portable JSON archives, and personal block library import/export.
+- **Copy as an image:** transparent PNG from the selection’s right-click menu, including internal wires and associated annotations.
+- **Keep your work:** automatic browser saving and a personal block library with support for importing existing libraries.
 
 ## Run locally
 
@@ -64,11 +64,11 @@ The editor uses React, TypeScript, Vite, and Zustand. Diagrams render as SVG; Ka
 | `npm run build`        | Build the browser app in `dist/`.     |
 | `npm run preview`      | Preview the browser production build. |
 
-Pushes to `main` run lint and the production build before publishing to GitHub Pages. Pull requests run the same checks without publishing. Check drawing, editing, local persistence, and exports in the browser before publishing. See the [deployment guide](docs/releases.md).
+Pushes to `main` run lint and the production build before publishing to GitHub Pages. Pull requests run the same checks without publishing. Check drawing, editing, local persistence, and image copying in the browser before publishing. See the [deployment guide](docs/releases.md).
 
 ## Documentation
 
-- [User guide](docs/manuale.md): drawing, editing, shortcuts, exports, and technical details.
+- [User guide](docs/manuale.md): drawing, editing, shortcuts, image copying, and technical details.
 - [Web app guide](docs/pwa.md): installation, local data, and migration from old offline installations.
 - [Architecture](docs/architecture.md): modules, persistence, rendering, and build.
 - [Deployment guide](docs/releases.md): quality checks, GitHub Pages, and verification.

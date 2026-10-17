@@ -161,7 +161,7 @@ function persist(blocks: PersonalBlock[]) {
     blockPersistence.save(blocks);
     return '';
   } catch {
-    return 'Salvataggio dei blocchi non disponibile: esporta la libreria JSON.';
+    return 'Salvataggio dei blocchi non disponibile. Mantieni aperta la pagina.';
   }
 }
 export const usePersonalBlocks = create<LibraryState>((set, get) => ({

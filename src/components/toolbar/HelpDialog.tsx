@@ -113,9 +113,10 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
           raggruppare, poi aggiungi l’etichetta; R ruota di 90° e “Inverti lato” cambia lato. Clic
           destro sul foglio o sugli elementi apre le azioni pertinenti; le scorciatoie mantengono
           disponibili i comandi di modifica. Salva come blocco è anche nella libreria Blocchi
-          personali. Trascina il grip per spostare la toolbar: la posizione viene ricordata. Export
-          offre TikZ, Obsidian, File .tex, SVG e le azioni dirette “Copia PNG” e “Scarica PNG”,
-          anche per la selezione. Il circuito e il livello di zoom vengono salvati automaticamente
+          personali. Trascina il grip per spostare la toolbar: la posizione viene ricordata.
+          Per copiare il disegno, seleziona gli elementi e scegli “Copia come immagine” dal menu
+          del tasto destro. Per copiare tutto il circuito, usa prima Seleziona tutto.
+          Il circuito e il livello di zoom vengono salvati automaticamente
           in questo browser.
         </p>
       </section>
