@@ -189,19 +189,6 @@ function generateTikz(source: CircuitDocument, canvas: boolean, compact = false)
       );
   }
   // Wires first: native component bodies then cover their own interiors.
-  for (const o of doc.objects) {
-    if (o.kind !== 'wire' || !o.highlight) continue;
-    try {
-      const points = wirePoints(o, doc);
-      if (points.length < 2 || !points.every(finitePoint)) continue;
-      const h = o.highlight;
-      lines.push(
-        `\\draw[draw=${col(h.color)}, opacity=${fmt(h.opacity)}, line width=${pixelsToPt(h.width)}pt] ${points.map(tikzCoordinate).join(' -- ')};`,
-      );
-    } catch {
-      /* Skip a dangling wire, as for its electrical stroke below. */
-    }
-  }
   const wires = new Set<string>();
   const currentGaps = drawingWireGaps(doc);
   for (const o of doc.objects)

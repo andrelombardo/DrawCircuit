@@ -126,13 +126,6 @@ export function isExportableObject(o: CircuitObject): boolean {
       return finitePoint(o.start) && finitePoint(o.end) && positive(o.width) && validStroke(o);
     case 'wire':
       return (
-        (o.highlight === undefined ||
-          (!!o.highlight &&
-            !!normalizeHex(o.highlight.color) &&
-            o.highlight.opacity !== undefined &&
-            opacity(o.highlight.opacity) &&
-            positive(o.highlight.width) &&
-            o.highlight.width <= 100)) &&
         (o.routing === undefined || ['orthogonal', '45', 'free'].includes(o.routing)) &&
         positive(o.width) &&
         validStroke(o) &&

@@ -107,17 +107,6 @@ export function exportSVG(
     }
   }
   const currentGaps = drawingWireGaps(doc, options.transparent);
-  for (const o of doc.objects) {
-    if (o.kind !== 'wire' || !o.highlight) continue;
-    try {
-      const h = o.highlight;
-      parts.push(
-        `<g opacity="${f(h.opacity)}">${path(pointsPath(wirePoints(o, doc)), h.color, h.width)}</g>`,
-      );
-    } catch {
-      /* Skip a dangling wire, as for its electrical stroke below. */
-    }
-  }
   for (const o of doc.objects.filter((o) => o.kind === 'wire')) {
     try {
       const paths = wireDrawingPaths(wirePoints(o, doc), currentGaps.get(o.id));

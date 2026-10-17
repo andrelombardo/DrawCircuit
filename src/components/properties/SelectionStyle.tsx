@@ -11,7 +11,7 @@ const colorNames = { ink: 'Nero', blue: 'Blu', red: 'Rosso', green: 'Verde', pur
 const labeled = (o: CircuitObject) => 'label' in o;
 const stroked = (o: CircuitObject) => 'width' in o || 'strokeWidth' in o;
 
-export function ColorControl({
+function ColorControl({
   label,
   value,
   onChange,

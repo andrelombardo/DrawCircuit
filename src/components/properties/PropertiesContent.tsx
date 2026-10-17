@@ -24,7 +24,6 @@ import type { Axis } from '../../utils/selectionGeometry';
 import { arrowOrientation, rotateArrow } from '../../utils/arrows';
 import { inlineTextTarget, replaceInlineText } from '../../utils/labels';
 import { SelectionStyle } from './SelectionStyle';
-import { WireHighlightProperties } from './WireHighlightProperties';
 import { rotateObjects } from '../../utils/operations';
 import { ElectricalProperties } from './ElectricalProperties';
 import { SelectionGeometry } from './SelectionGeometry';
@@ -351,9 +350,6 @@ export function PropertiesContent() {
               </div>
             )}
         </InspectorSection>
-      )}
-      {!labelTarget && objects.every((o) => o.kind === 'wire') && (
-        <WireHighlightProperties wires={objects.filter((o) => o.kind === 'wire')} apply={apply} />
       )}
       {((groupRotation && !absoluteRotation) ||
         objects.every((item) => item.kind === 'arrow' || item.kind === 'loop-arrow')) && (
