@@ -1,9 +1,8 @@
 import { Highlighter, Unlink } from 'lucide-react';
 import type { Highlight, HighlightStyle } from '../../model/types';
-import { detachHighlight, HIGHLIGHT_COLORS, routeLength } from '../../annotations/highlight';
+import { detachHighlight, HIGHLIGHT_COLORS, highlightSpanPoints, routeLength } from '../../annotations/highlight';
 import { useEditorStore } from '../../store/editorStore';
 import { objectCenter } from '../../utils/selectionGeometry';
-import { wirePoints } from '../../utils/geometry';
 import { commonValue } from './commonValue';
 import { InspectorSection, PropertyField, PropertySelect } from './PropertyControls';
 import { ColorControl } from './SelectionStyle';
@@ -38,7 +37,7 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
       <Unlink size={14} />
       {single?.mode === 'component'
         ? 'Scollega dal componente'
-        : single?.mode === 'smart' ? 'Scollega dal filo' : 'Scollega dai riferimenti'}
+        : single?.mode === 'smart' ? 'Scollega dal percorso' : 'Scollega dai riferimenti'}
     </button>
   );
   return (
@@ -53,7 +52,7 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
             {!editing
               ? 'Impostazioni del prossimo tratto'
               : single?.mode === 'smart'
-                ? 'Associato al filo'
+                ? 'Associato al percorso'
                 : single?.mode === 'component'
                   ? 'Associato al componente'
                   : single ? 'Tratto libero' : 'Proprietà comuni'}
@@ -73,7 +72,7 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
           </PropertySelect>
           <p className="inspector-geometry-note">
             {settings.mode === 'smart'
-              ? 'Clicca un componente oppure trascina lungo un filo.'
+              ? 'Clicca un componente oppure trascina lungo fili e componenti collegati.'
               : 'Trascina sul foglio per evidenziare a mano libera.'}
           </p>
         </div>
@@ -117,13 +116,11 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
               {(['start', 'end'] as const).map((side) => {
                 const index = side === 'start' ? 0 : single.spans.length - 1,
                   span = single.spans[index];
-                const doc = state().document,
-                  wire = doc.objects.find((o) => o.id === span.wireId);
-                const length = wire?.kind === 'wire' ? routeLength(wirePoints(wire, doc)) : 0;
+                const length = routeLength(highlightSpanPoints(span, state().document));
                 return (
                   <PropertyField
                     key={side}
-                    label={side === 'start' ? 'Inizio sul filo' : 'Fine sul filo'}
+                    label={side === 'start' ? 'Inizio sul percorso' : 'Fine sul percorso'}
                     caption={side === 'start' ? 'Inizio' : 'Fine'}
                     numeric
                     min={0}
@@ -151,7 +148,7 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
                 );
               })}
               <p className="inspector-geometry-note">
-                Segue il percorso del filo. Gli estremi mantengono la posizione proporzionale se
+                Segue fili e componenti collegati. Gli estremi mantengono la posizione proporzionale se
                 cambia la lunghezza.
               </p>
             </>

@@ -1,4 +1,4 @@
-import type { CircuitDocument, Highlight, HighlightSpan, Point } from '../model/types';
+import type { CircuitComponent, CircuitDocument, Highlight, HighlightSpan, Point } from '../model/types';
 import { componentRegistry } from '../model/catalog';
 import {
   distance,
@@ -25,6 +25,16 @@ export const HIGHLIGHT_COLORS = {
 };
 export const routeLength = (points: Point[]) =>
   points.slice(1).reduce((sum, point, i) => sum + distance(points[i], point), 0);
+const hosts = new WeakMap<CircuitDocument, Map<string, CircuitDocument['objects'][number]>>();
+function hostById(doc: CircuitDocument, id: string) {
+  let index = hosts.get(doc);
+  if (!index) {
+    index = new Map(doc.objects.map((o) => [o.id, o]));
+    hosts.set(doc, index);
+  }
+  return index.get(id);
+}
+
 
 /** Target the symbol body, leaving wire gestures on its leads available. */
 export function highlightComponentAt(doc: CircuitDocument, point: Point, tolerance: number) {
@@ -41,7 +51,7 @@ export function highlightComponentAt(doc: CircuitDocument, point: Point, toleran
 
 function componentHighlight(object: Highlight, doc: CircuitDocument) {
   if (object.mode !== 'component') return null;
-  const component = doc.objects.find((o) => o.id === object.componentId);
+  const component = hostById(doc, object.componentId);
   if (component?.kind !== 'component') return null;
   const b = componentRegistry[component.type].measurementBounds;
   const horizontal = b.width >= b.height;
@@ -58,8 +68,41 @@ function componentHighlight(object: Highlight, doc: CircuitDocument) {
     ),
   };
 }
-export const highlightStrokeWidth = (object: Highlight, doc: CircuitDocument) =>
-  componentHighlight(object, doc)?.width ?? object.width;
+export const highlightSpanHost = (span: HighlightSpan) =>
+  'wireId' in span ? span.wireId : span.componentId;
+
+/** A component is a visual hub. Leads reach the body before turning toward its center. */
+export function componentHighlightRoute(component: CircuitComponent, terminalId: string): Point[] {
+  const terminal = component.terminals.find((t) => t.id === terminalId);
+  if (!terminal) return [];
+  const b = componentRegistry[component.type].measurementBounds;
+  const local = [
+    { x: terminal.localX, y: terminal.localY },
+    { x: Math.max(b.x, Math.min(b.x + b.width, terminal.localX)),
+      y: Math.max(b.y, Math.min(b.y + b.height, terminal.localY)) },
+    { x: b.x + b.width / 2, y: b.y + b.height / 2 },
+  ];
+  return local.filter((p, i) => !i || distance(p, local[i - 1]) > 1e-7)
+    .map((p) => localToWorld(component, p));
+}
+export function highlightSpanPoints(span: HighlightSpan, doc: CircuitDocument): Point[] {
+  const host = hostById(doc, highlightSpanHost(span));
+  if ('wireId' in span) return host?.kind === 'wire' ? wirePoints(host, doc) : [];
+  return host?.kind === 'component' ? componentHighlightRoute(host, span.terminalId) : [];
+}
+export function highlightSpanExists(span: HighlightSpan, doc: CircuitDocument) {
+  const host = hostById(doc, highlightSpanHost(span));
+  return 'wireId' in span ? host?.kind === 'wire' :
+    host?.kind === 'component' && host.terminals.some((t) => t.id === span.terminalId);
+}
+
+/** Detached body patches follow the main route without taking its endpoint handles. */
+export function highlightEndpointIndices(object: Extract<Highlight, { mode: 'free' }>) {
+  const ends = [...(object.breaks ?? []), object.points.length];
+  const main = ends.map((_, i) => i).filter((i) => !object.widthOffsets?.[i]);
+  const first = main[0] ?? 0, last = main.at(-1) ?? ends.length - 1;
+  return [first ? ends[first - 1] : 0, ends[last] - 1];
+}
 
 /** Exact projection, deliberately independent of the circuit's grid snapping. */
 export function projectHighlight(points: Point[], point: Point, preferred = 0) {
@@ -83,22 +126,6 @@ export function projectHighlight(points: Point[], point: Point, preferred = 0) {
   }
   return best;
 }
-export function nearestHighlightWire(doc: CircuitDocument, point: Point, threshold: number) {
-  let best: {
-    wireId: string;
-    ratio: number;
-    point: Point;
-    distance: number;
-  } | null = null;
-  for (const wire of doc.objects) {
-    if (wire.kind !== 'wire') continue;
-    const projection = projectHighlight(wirePoints(wire, doc), point);
-    if (projection.distance < (best?.distance ?? threshold))
-      best = { ...projection, wireId: wire.id };
-  }
-  return best;
-}
-
 export function sliceHighlightRoute(points: Point[], start: number, end: number): Point[] {
   if (start > end) return sliceHighlightRoute(points, end, start).reverse();
   const length = routeLength(points),
@@ -134,16 +161,16 @@ export function highlightRoutes(object: Highlight, doc: CircuitDocument): Point[
   }
   const routes: Point[][] = [];
   for (const span of object.spans) {
-    const wire = doc.objects.find((o) => o.id === span.wireId);
-    if (wire?.kind !== 'wire') continue;
     try {
-      const points = sliceHighlightRoute(wirePoints(wire, doc), span.start, span.end);
+      const route = highlightSpanPoints(span, doc);
+      if (!route.length) continue;
+      const points = sliceHighlightRoute(route, span.start, span.end);
       const previous = routes.at(-1);
       if (previous && distance(previous.at(-1)!, points[0]) < 1e-6)
         previous.push(...points.slice(1));
       else routes.push(points);
     } catch {
-      /* Invalid export references do not interrupt the other objects. */
+      /* Invalid references do not interrupt the other objects. */
     }
   }
   return routes;
@@ -213,40 +240,74 @@ function smoothPath(points: Point[]) {
       .join('')
   );
 }
-/** Conservative Bezier bounds keep rounded strokes inside all export frames. */
-export function highlightExtentPoints(object: Highlight, doc: CircuitDocument): Point[] {
-  return highlightRoutes(object, doc).flatMap((points) =>
-    object.mode === 'free' && object.smoothing !== false
-      ? [...points, ...freehandCurves(points).flatMap(({ a, b }) => [a, b])]
-      : points,
-  );
-}
-export function highlightPath(object: Highlight, doc: CircuitDocument): string {
-  return highlightRoutes(object, doc)
-    .map((points) =>
-      object.mode === 'free' && object.smoothing !== false
-        ? smoothPath(points)
-        : pointsPath(points),
-    )
-    .join(' ');
-}
-export function detachHighlight(object: Highlight, doc: CircuitDocument): Highlight {
+/** One opacity group covers the joined route and symbol bodies, avoiding dark seams. */
+export function highlightDrawing(object: Highlight, doc: CircuitDocument) {
   const routes = highlightRoutes(object, doc);
+  const drawing = routes.map((points, i) => ({
+    points,
+    d: object.mode === 'free' && object.smoothing !== false ? smoothPath(points) : pointsPath(points),
+    width: object.mode === 'component' ? componentHighlight(object, doc)!.width :
+      object.width + (object.mode === 'free' ? object.widthOffsets?.[i] ?? 0 : 0),
+  }));
+  if (object.mode !== 'smart') return drawing;
+  const bodies = new Set<string>();
+  for (const span of object.spans) {
+    if ('wireId' in span || bodies.has(span.componentId)) continue;
+    const component = hostById(doc, span.componentId);
+    if (component?.kind !== 'component') continue;
+    const route = componentHighlightRoute(component, span.terminalId);
+    if (!route.length) continue;
+    const length = routeLength(route);
+    // The middle anchor is the body entry (or the center for a straight lead).
+    const b = componentRegistry[component.type].measurementBounds;
+    const terminal = component.terminals.find((t) => t.id === span.terminalId)!;
+    const entry = localToWorld(component, {
+      x: Math.max(b.x, Math.min(b.x + b.width, terminal.localX)),
+      y: Math.max(b.y, Math.min(b.y + b.height, terminal.localY)),
+    });
+    if (length && Math.max(span.start, span.end) * length < distance(route[0], entry) - 1e-6) continue;
+    const body = componentHighlight({ ...object, mode: 'component', componentId: component.id }, doc)!;
+    if (body.width > object.width) drawing.push({ ...body, d: pointsPath(body.points) });
+    bodies.add(component.id);
+  }
+  return drawing;
+}
+export const highlightStrokeWidth = (object: Highlight, doc: CircuitDocument) =>
+  Math.max(object.width, ...highlightDrawing(object, doc).map((stroke) => stroke.width));
+export function highlightBounds(object: Highlight, doc: CircuitDocument) {
+  let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
+  for (const { points, width } of highlightDrawing(object, doc)) {
+    const include = (p: Point) => {
+      left = Math.min(left, p.x - width / 2);
+      top = Math.min(top, p.y - width / 2);
+      right = Math.max(right, p.x + width / 2);
+      bottom = Math.max(bottom, p.y + width / 2);
+    };
+    points.forEach(include);
+    if (object.mode === 'free' && object.smoothing !== false)
+      for (const { a, b } of freehandCurves(points)) { include(a); include(b); }
+  }
+  return Number.isFinite(left)
+    ? { x: left, y: top, width: right - left, height: bottom - top }
+    : { x: 0, y: 0, width: 0, height: 0 };
+}
+export const highlightPath = (object: Highlight, doc: CircuitDocument) =>
+  highlightDrawing(object, doc).map((stroke) => stroke.d).join(' ');
+
+export function detachHighlight(object: Highlight, doc: CircuitDocument): Highlight {
+  if (object.mode === 'free') return object;
+  const drawing = highlightDrawing(object, doc);
   let count = 0;
-  const breaks = routes.slice(0, -1).map((route) => (count += route.length));
-  return object.mode === 'free'
-    ? object
-    : {
-        kind: 'highlight',
-        id: object.id,
-        mode: 'free',
-        color: object.color,
-        width: highlightStrokeWidth(object, doc),
-        opacity: object.opacity,
-        smoothing: false,
-        points: routes.flat(),
-        ...(breaks.length ? { breaks } : {}),
-      };
+  const breaks = drawing.slice(0, -1).map((stroke) => (count += stroke.points.length));
+  const width = object.mode === 'component' ? highlightStrokeWidth(object, doc) : object.width;
+  const widthOffsets = drawing.map((stroke) => stroke.width - width);
+  return {
+    kind: 'highlight', id: object.id, mode: 'free', color: object.color,
+    width, opacity: object.opacity, smoothing: false,
+    points: drawing.flatMap((stroke) => stroke.points),
+    ...(breaks.length ? { breaks } : {}),
+    ...(widthOffsets.some((offset) => offset) ? { widthOffsets } : {}),
+  };
 }
 
 /** Preserve the visible stroke when its host disappears; undo restores the reference. */
@@ -254,14 +315,13 @@ export function reconcileHighlights(
   previous: CircuitDocument,
   next: CircuitDocument,
 ): CircuitDocument {
-  const wires = new Set(next.objects.filter((o) => o.kind === 'wire').map((o) => o.id));
   const components = new Set(next.objects.filter((o) => o.kind === 'component').map((o) => o.id));
   let changed = false;
   const objects = next.objects.map((o) => {
     if (
       o.kind !== 'highlight' ||
       o.mode === 'free' ||
-      (o.mode === 'smart' ? o.spans.every((s) => wires.has(s.wireId)) : components.has(o.componentId))
+      (o.mode === 'smart' ? o.spans.every((s) => highlightSpanExists(s, next)) : components.has(o.componentId))
     )
       return o;
     const original = previous.objects.find((p) => p.id === o.id);
@@ -284,10 +344,11 @@ export function remapHighlightSpans(
       if (
         o.kind !== 'highlight' ||
         o.mode !== 'smart' ||
-        !o.spans.some((s) => splits.has(s.wireId))
+        !o.spans.some((s) => 'wireId' in s && splits.has(s.wireId))
       )
         return o;
       const spans = o.spans.flatMap((span): HighlightSpan[] => {
+        if (!('wireId' in span)) return [span];
         const ids = splits.get(span.wireId);
         if (!ids) return [span];
         const original = previous.objects.find((p) => p.id === span.wireId);

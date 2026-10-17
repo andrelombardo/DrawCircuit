@@ -1,3 +1,4 @@
+import { highlightSpanExists } from '../annotations/highlight';
 import { COLORS, componentTypes, isRotation } from './types';
 import { componentRegistry, terminalsFor } from './catalog';
 import type { CircuitDocument } from './types';
@@ -134,6 +135,9 @@ export function deserializeDocument(raw: string): CircuitDocument {
               Number.isInteger(index) && index > 0 && index < (o.points as unknown[]).length &&
               (!i || index > all[i - 1])))
         ) fail();
+        if (o.widthOffsets !== undefined &&
+          (!Array.isArray(o.widthOffsets) || o.widthOffsets.length !== ((o.breaks as unknown[] | undefined)?.length ?? 0) + 1 ||
+            !o.widthOffsets.every((width) => num(width) && Number(width) >= 0 && Number(width) <= 1000))) fail();
       } else if (o.mode === 'component') {
         if (!str(o.componentId) || !o.componentId) fail();
       } else if (o.mode === 'smart') {
@@ -141,8 +145,8 @@ export function deserializeDocument(raw: string): CircuitDocument {
         for (const entry of o.spans as unknown[]) {
           const span = record(entry);
           if (
-            !str(span.wireId) ||
-            !span.wireId ||
+            !((str(span.wireId) && !!span.wireId && span.componentId === undefined && span.terminalId === undefined) ||
+              (span.wireId === undefined && str(span.componentId) && !!span.componentId && str(span.terminalId) && !!span.terminalId)) ||
             !num(span.start) ||
             !num(span.end) ||
             Number(span.start) < 0 ||
@@ -288,7 +292,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
     if (
       o.kind === 'highlight' &&
       ((o.mode === 'smart' &&
-        o.spans.some((s) => !doc.objects.some((w) => w.id === s.wireId && w.kind === 'wire'))) ||
+        o.spans.some((s) => !highlightSpanExists(s, doc))) ||
         (o.mode === 'component' && !doc.objects.some((c) => c.id === o.componentId && c.kind === 'component')))
     )
       fail();

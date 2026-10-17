@@ -1,4 +1,4 @@
-import { highlightPath, highlightPoints } from '../../annotations/highlight';
+import { highlightPath, highlightPoints, highlightEndpointIndices } from '../../annotations/highlight';
 import { arrowCenter, rotationHandle } from '../../utils/arrows';
 import { braceGeometry } from '../../annotations/brace';
 import { electricalDrawingGeometry } from '../../annotations/electrical';
@@ -115,10 +115,11 @@ export function SelectionLayer({
               {o.kind === 'highlight' && o.mode !== 'component' &&
                 (() => {
                   const points = highlightPoints(o, doc);
+                  const indices = o.mode === 'free' ? highlightEndpointIndices(o) : [0, points.length - 1];
                   return points.length ? (
                     <>
-                      <Handle p={points[0]} name="highlightStart" zoom={zoom} />
-                      <Handle p={points.at(-1)!} name="highlightEnd" zoom={zoom} />
+                      <Handle p={points[indices[0]]} name="highlightStart" zoom={zoom} />
+                      <Handle p={points[indices[1]]} name="highlightEnd" zoom={zoom} />
                     </>
                   ) : null;
                 })()}

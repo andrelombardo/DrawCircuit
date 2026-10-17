@@ -1,7 +1,10 @@
+import { beginSmartHighlight, advanceSmartHighlight, nearestSmartHighlight } from '../../annotations/smartHighlight';
+import type { SmartHighlightTrace } from '../../annotations/smartHighlight';
 import {
   highlightPoints,
   highlightComponentAt,
-  nearestHighlightWire,
+  highlightSpanPoints,
+  highlightEndpointIndices,
   projectHighlight,
   routeLength,
   simplifyHighlight,
@@ -68,7 +71,8 @@ import { useSmartPlacement } from '../../smartPlacement/useSmartPlacement';
 import { isMac } from '../../utils/platform';
 import { clampZoom, readZoomPreference, saveZoomPreference } from './zoomPreferences';
 type Drag =
-  | { type: 'highlight'; object: Highlight; points: Point[]; tolerance: number }
+  | { type: 'highlight'; object: Highlight; points: Point[]; tolerance: number;
+      smart?: SmartHighlightTrace; componentStart?: Extract<Highlight, { mode: 'component' }> }
   | { type: 'pan'; screen: Point; view: Viewport }
   | {
       type: 'move' | 'label' | 'handle';
@@ -676,11 +680,9 @@ export function useCanvasInteractions(
         settings.mode === 'smart'
           ? highlightComponentAt(s.document, p, Math.min(6, 4 / viewport.zoom))
           : null;
-      const near =
-        !component && settings.mode === 'smart'
-          ? nearestHighlightWire(s.document, p, 14 / viewport.zoom)
-          : null;
-      if (settings.mode === 'smart' && !near && !component) {
+      const smart = settings.mode === 'smart'
+        ? beginSmartHighlight(s.document, p, 14 / viewport.zoom, component?.id) : null;
+      if (settings.mode === 'smart' && !smart && !component) {
         s.notify('Clicca un componente o inizia il tratto su un filo.');
         return;
       }
@@ -692,13 +694,13 @@ export function useCanvasInteractions(
             mode: 'component',
             componentId: component.id,
           }
-        : near
+        : smart
           ? {
               ...settings,
               kind: 'highlight',
               id: 'preview',
               mode: 'smart',
-              spans: [{ wireId: near.wireId, start: near.ratio, end: near.ratio }],
+              spans: smart.spans,
             }
           : {
               ...settings,
@@ -715,6 +717,8 @@ export function useCanvasInteractions(
         object,
         points: [p],
         tolerance: 0.65 / viewport.zoom,
+        smart: smart ?? undefined,
+        componentStart: object.mode === 'component' ? object : undefined,
       };
       setOverlay({ ...blank, highlight: object });
       return;
@@ -874,14 +878,13 @@ export function useCanvasInteractions(
     const samples = e.nativeEvent.getCoalescedEvents?.() ?? [];
     for (const sample of [...samples, e]) {
       const p = world(sample.clientX, sample.clientY);
-      if (object.mode === 'smart') {
-        const span = object.spans[0],
-          doc = useEditorStore.getState().document;
-        const wire = doc.objects.find((o) => o.id === span.wireId);
-        if (wire?.kind !== 'wire') continue;
-        const projection = projectHighlight(wirePoints(wire, doc), p, span.end);
-        if (projection.distance <= Math.max(24 / viewport.zoom, object.width))
-          object = { ...object, spans: [{ ...span, end: projection.ratio }] };
+      if (d.smart) {
+        const spans = advanceSmartHighlight(d.smart, p, viewport.zoom, object.width);
+        if (object.mode !== 'component' || distance(d.smart.origin, p) >= 3 / viewport.zoom)
+          object = {
+            kind: 'highlight', id: object.id, mode: 'smart', color: object.color,
+            opacity: object.opacity, width: object.width, spans,
+          };
       } else if (object.mode === 'free' && distance(d.points.at(-1)!, p) >= 0.5 / viewport.zoom) {
         d.points.push(p);
         if (d.points.length > 2048) d.points = simplifyHighlight(d.points, d.tolerance);
@@ -1092,16 +1095,16 @@ export function useCanvasInteractions(
                       return {
                         ...o,
                         points: o.points.map((q, i) =>
-                          i === (first ? 0 : o.points.length - 1) ? p : q,
+                          i === highlightEndpointIndices(o)[first ? 0 : 1] ? p : q,
                         ),
                       };
                     if (o.mode === 'component') return o;
                     const index = first ? 0 : o.spans.length - 1,
                       span = o.spans[index];
-                    const wire = d.doc.objects.find((w) => w.id === span.wireId);
-                    if (wire?.kind !== 'wire') return o;
+                    const route = highlightSpanPoints(span, d.doc);
+                    if (!route.length) return o;
                     const ratio = projectHighlight(
-                      wirePoints(wire, d.doc),
+                      route,
                       p,
                       first ? span.start : span.end,
                     ).ratio;
@@ -1202,13 +1205,13 @@ export function useCanvasInteractions(
           : null;
       const near =
         !component && s.highlightSettings.mode === 'smart'
-          ? nearestHighlightWire(s.document, p, 14 / viewport.zoom)
+          ? nearestSmartHighlight(s.document, p, 14 / viewport.zoom)
           : null;
       setOverlay({
         ...blank,
         target: near?.point ?? null,
-        wireTarget: near?.wireId ?? null,
-        componentTarget: component?.id ?? null,
+        wireTarget: near && 'wireId' in near.edge.host ? near.edge.host.wireId : null,
+        componentTarget: component?.id ?? (near && 'componentId' in near.edge.host ? near.edge.host.componentId : null),
       });
       return;
     }
@@ -1312,7 +1315,11 @@ export function useCanvasInteractions(
             y: Math.round(p.y * 100) / 100,
           })),
         };
-      const points = highlightPoints(object, s.document);
+      let points = highlightPoints(object, s.document);
+      if (d.componentStart && routeLength(points) < 1 / viewport.zoom) {
+        object = d.componentStart;
+        points = highlightPoints(object, s.document);
+      }
       if (
         object.mode === 'component' ||
         (points.length >= 2 && routeLength(points) >= 1 / viewport.zoom)

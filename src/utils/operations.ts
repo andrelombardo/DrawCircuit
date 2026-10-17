@@ -1,4 +1,4 @@
-import { detachHighlight, highlightPoints } from '../annotations/highlight';
+import { detachHighlight, highlightPoints, highlightSpanHost } from '../annotations/highlight';
 import { detachElectrical } from '../annotations/electrical';
 import { rotateArrow } from './arrows';
 import { makeId } from '../model/catalog';
@@ -25,7 +25,7 @@ export function extractSelection(doc: CircuitDocument, ids: string[]): CircuitDo
       .filter((o) => selected.has(o.id))
       .map((o) =>
         o.kind === 'highlight' &&
-        ((o.mode === 'smart' && o.spans.some((s) => !selected.has(s.wireId))) ||
+        ((o.mode === 'smart' && o.spans.some((s) => !selected.has(highlightSpanHost(s)))) ||
           (o.mode === 'component' && !selected.has(o.componentId)))
           ? detachHighlight(o, doc)
           : o.kind === 'electrical' &&
@@ -65,10 +65,9 @@ export function cloneObjects(
       }
     }
     if (copy.kind === 'highlight' && copy.mode === 'smart')
-      copy.spans = copy.spans.map((s) => ({
-        ...s,
-        wireId: ids.get(s.wireId)!,
-      }));
+      copy.spans = copy.spans.map((s) => 'wireId' in s
+        ? { ...s, wireId: ids.get(s.wireId)! }
+        : { ...s, componentId: ids.get(s.componentId)! });
     if (copy.kind === 'highlight' && copy.mode === 'component')
       copy.componentId = ids.get(copy.componentId)!;
     if (copy.kind === 'electrical') {
@@ -95,7 +94,7 @@ export function removeObjects(doc: CircuitDocument, ids: string[]): CircuitDocum
       .filter((o) => !removed.has(o.id))
       .map((o) =>
         o.kind === 'highlight' &&
-        ((o.mode === 'smart' && o.spans.some((s) => removed.has(s.wireId))) ||
+        ((o.mode === 'smart' && o.spans.some((s) => removed.has(highlightSpanHost(s)))) ||
           (o.mode === 'component' && removed.has(o.componentId)))
           ? detachHighlight(o, doc)
           : o.kind === 'electrical' &&
@@ -254,7 +253,7 @@ export function rotateObjects(
         return o;
       }
       if (o.kind === 'highlight') {
-        if (o.mode === 'smart' && o.spans.every((s) => selected.has(s.wireId))) return o;
+        if (o.mode === 'smart' && o.spans.every((s) => selected.has(highlightSpanHost(s)))) return o;
         if (o.mode === 'component' && selected.has(o.componentId)) return o;
         const free = detachHighlight(o, doc);
         return free.mode === 'free' ? { ...free, points: free.points.map(rp) } : free;

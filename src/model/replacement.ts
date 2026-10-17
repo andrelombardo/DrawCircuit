@@ -44,7 +44,16 @@ export function replaceComponent(
     objects: doc.objects.map((o) =>
       o.id === id
         ? component
-        : o.kind === 'wire'
+        : o.kind === 'highlight' && o.mode === 'smart'
+          ? {
+              ...o,
+              spans: o.spans.map((span) =>
+                'componentId' in span && span.componentId === id
+                  ? { ...span, terminalId: mapping.get(span.terminalId)! }
+                  : span,
+              ),
+            }
+          : o.kind === 'wire'
           ? {
               ...o,
               startEndpoint:

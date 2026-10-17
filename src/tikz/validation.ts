@@ -109,6 +109,9 @@ export function isExportableObject(o: CircuitObject): boolean {
         o.opacity !== undefined &&
         (o.mode === 'free'
           ? (o.smoothing === undefined || typeof o.smoothing === 'boolean') &&
+            (o.widthOffsets === undefined || (Array.isArray(o.widthOffsets) &&
+              o.widthOffsets.length === (o.breaks?.length ?? 0) + 1 &&
+              o.widthOffsets.every((width) => Number.isFinite(width) && width >= 0 && width <= 1000))) &&
             Array.isArray(o.points) &&
             o.points.length >= 2 &&
             o.points.every(finitePoint) &&
@@ -122,9 +125,9 @@ export function isExportableObject(o: CircuitObject): boolean {
             o.spans.length > 0 &&
             o.spans.every(
               (s) =>
-                !!s &&
-                typeof s.wireId === 'string' &&
-                !!s.wireId &&
+                !!s && typeof s === 'object' &&
+                ('wireId' in s ? typeof s.wireId === 'string' && !!s.wireId :
+                  typeof s.componentId === 'string' && !!s.componentId && typeof s.terminalId === 'string' && !!s.terminalId) &&
                 Number.isFinite(s.start) &&
                 Number.isFinite(s.end) &&
                 s.start >= 0 &&

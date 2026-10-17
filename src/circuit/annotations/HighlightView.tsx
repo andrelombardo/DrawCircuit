@@ -1,5 +1,5 @@
 import type { CircuitDocument, Highlight } from '../../model/types';
-import { highlightPath, highlightStrokeWidth } from '../../annotations/highlight';
+import { highlightDrawing } from '../../annotations/highlight';
 export function HighlightView({
   object,
   doc,
@@ -10,17 +10,23 @@ export function HighlightView({
   interactive?: boolean;
 }) {
   return (
-    <path
+    <g
       data-object={object.id}
       className="circuit-object highlight-stroke"
-      d={highlightPath(object, doc)}
       fill="none"
       stroke={object.color}
       opacity={object.opacity}
-      strokeWidth={highlightStrokeWidth(object, doc)}
       strokeLinecap="round"
       strokeLinejoin="round"
-      pointerEvents={interactive ? 'stroke' : 'none'}
-    />
+    >
+      {highlightDrawing(object, doc).map((stroke, i) => (
+        <path
+          key={i}
+          d={stroke.d}
+          strokeWidth={stroke.width}
+          pointerEvents={interactive ? 'stroke' : 'none'}
+        />
+      ))}
+    </g>
   );
 }

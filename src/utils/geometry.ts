@@ -1,4 +1,4 @@
-import { highlightExtentPoints, highlightStrokeWidth } from '../annotations/highlight';
+import { highlightBounds } from '../annotations/highlight';
 import { braceGeometry } from '../annotations/brace';
 import { electricalDrawingGeometry, electricalGeometry } from '../annotations/electrical';
 import { componentRegistry } from '../model/catalog';
@@ -533,19 +533,7 @@ export function objectBounds(
   doc: CircuitDocument,
 ): { x: number; y: number; width: number; height: number } {
   let points: Point[];
-  if (o.kind === 'highlight') {
-    const points = highlightExtentPoints(o, doc);
-    if (!points.length) return { x: 0, y: 0, width: 0, height: 0 };
-    const width = highlightStrokeWidth(o, doc);
-    const x = Math.min(...points.map((p) => p.x)) - width / 2,
-      y = Math.min(...points.map((p) => p.y)) - width / 2;
-    return {
-      x,
-      y,
-      width: Math.max(...points.map((p) => p.x)) + width / 2 - x,
-      height: Math.max(...points.map((p) => p.y)) + width / 2 - y,
-    };
-  }
+  if (o.kind === 'highlight') return highlightBounds(o, doc);
   if (o.kind === 'brace') {
     const g = braceGeometry(o);
     points = g.points.flatMap((p) => [
