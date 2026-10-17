@@ -118,7 +118,7 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onExport, onHel
     previewPath = pointsPath(wirePoints(wire, doc));
   }
   const hint = tool === 'highlight'
-    ? 'Trascina per evidenziare · impostazioni in Proprietà · Esc torna a Selezione'
+    ? 'Evidenzia componenti e fili · impostazioni in Proprietà · Esc torna a Selezione'
     : tool === 'rectangle'
       ? 'Trascina per disegnare · Shift quadrato · Option dal centro · Esc annulla'
       : tool === 'line'

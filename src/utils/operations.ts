@@ -25,8 +25,8 @@ export function extractSelection(doc: CircuitDocument, ids: string[]): CircuitDo
       .filter((o) => selected.has(o.id))
       .map((o) =>
         o.kind === 'highlight' &&
-        o.mode === 'smart' &&
-        o.spans.some((s) => !selected.has(s.wireId))
+        ((o.mode === 'smart' && o.spans.some((s) => !selected.has(s.wireId))) ||
+          (o.mode === 'component' && !selected.has(o.componentId)))
           ? detachHighlight(o, doc)
           : o.kind === 'electrical' &&
               ((o.wireId && !selected.has(o.wireId)) || (o.componentId && !selected.has(o.componentId)))
@@ -69,6 +69,8 @@ export function cloneObjects(
         ...s,
         wireId: ids.get(s.wireId)!,
       }));
+    if (copy.kind === 'highlight' && copy.mode === 'component')
+      copy.componentId = ids.get(copy.componentId)!;
     if (copy.kind === 'electrical') {
       if (copy.wireId) copy.wireId = ids.get(copy.wireId);
       if (copy.componentId) copy.componentId = ids.get(copy.componentId);
@@ -93,8 +95,8 @@ export function removeObjects(doc: CircuitDocument, ids: string[]): CircuitDocum
       .filter((o) => !removed.has(o.id))
       .map((o) =>
         o.kind === 'highlight' &&
-        o.mode === 'smart' &&
-        o.spans.some((s) => removed.has(s.wireId))
+        ((o.mode === 'smart' && o.spans.some((s) => removed.has(s.wireId))) ||
+          (o.mode === 'component' && removed.has(o.componentId)))
           ? detachHighlight(o, doc)
           : o.kind === 'electrical' &&
               ((o.wireId && removed.has(o.wireId)) ||
@@ -253,6 +255,7 @@ export function rotateObjects(
       }
       if (o.kind === 'highlight') {
         if (o.mode === 'smart' && o.spans.every((s) => selected.has(s.wireId))) return o;
+        if (o.mode === 'component' && selected.has(o.componentId)) return o;
         const free = detachHighlight(o, doc);
         return free.mode === 'free' ? { ...free, points: free.points.map(rp) } : free;
       }

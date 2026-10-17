@@ -86,8 +86,8 @@ export function getExportSelection(doc: CircuitDocument, ids: readonly string[])
   for (const o of doc.objects)
     if (
       (o.kind === 'highlight' &&
-        o.mode === 'smart' &&
-        o.spans.every((s) => included.has(s.wireId))) ||
+        ((o.mode === 'smart' && o.spans.every((s) => included.has(s.wireId))) ||
+          (o.mode === 'component' && included.has(o.componentId)))) ||
       (o.kind === 'electrical' &&
         ((o.componentId && included.has(o.componentId)) ||
           (o.wireId && included.has(o.wireId))))
@@ -102,8 +102,8 @@ export function getExportSelection(doc: CircuitDocument, ids: readonly string[])
     .map((o) => {
       if (
         o.kind === 'highlight' &&
-        o.mode === 'smart' &&
-        o.spans.some((s) => !included.has(s.wireId))
+        ((o.mode === 'smart' && o.spans.some((s) => !included.has(s.wireId))) ||
+          (o.mode === 'component' && !included.has(o.componentId)))
       )
         return detachHighlight(o, doc);
       if (

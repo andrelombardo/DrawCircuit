@@ -1,5 +1,6 @@
 import {
   highlightPoints,
+  highlightComponentAt,
   nearestHighlightWire,
   projectHighlight,
   routeLength,
@@ -671,29 +672,41 @@ export function useCanvasInteractions(
     }
     if (s.tool === 'highlight') {
       const settings = s.highlightSettings;
-      const near =
+      const component =
         settings.mode === 'smart'
+          ? highlightComponentAt(s.document, p, Math.min(6, 4 / viewport.zoom))
+          : null;
+      const near =
+        !component && settings.mode === 'smart'
           ? nearestHighlightWire(s.document, p, 14 / viewport.zoom)
           : null;
-      if (settings.mode === 'smart' && !near) {
-        s.notify('Inizia il tratto su un filo, oppure scegli la modalità Libera.');
+      if (settings.mode === 'smart' && !near && !component) {
+        s.notify('Clicca un componente o inizia il tratto su un filo.');
         return;
       }
-      const object: Highlight = near
+      const object: Highlight = component
         ? {
             ...settings,
             kind: 'highlight',
             id: 'preview',
-            mode: 'smart',
-            spans: [{ wireId: near.wireId, start: near.ratio, end: near.ratio }],
+            mode: 'component',
+            componentId: component.id,
           }
-        : {
-            ...settings,
-            kind: 'highlight',
-            id: 'preview',
-            mode: 'free',
-            points: [p],
-          };
+        : near
+          ? {
+              ...settings,
+              kind: 'highlight',
+              id: 'preview',
+              mode: 'smart',
+              spans: [{ wireId: near.wireId, start: near.ratio, end: near.ratio }],
+            }
+          : {
+              ...settings,
+              kind: 'highlight',
+              id: 'preview',
+              mode: 'free',
+              points: [p],
+            };
       svg.setPointerCapture(e.pointerId);
       s.select([]);
       s.beginGesture();
@@ -869,7 +882,7 @@ export function useCanvasInteractions(
         const projection = projectHighlight(wirePoints(wire, doc), p, span.end);
         if (projection.distance <= Math.max(24 / viewport.zoom, object.width))
           object = { ...object, spans: [{ ...span, end: projection.ratio }] };
-      } else if (distance(d.points.at(-1)!, p) >= 0.5 / viewport.zoom) {
+      } else if (object.mode === 'free' && distance(d.points.at(-1)!, p) >= 0.5 / viewport.zoom) {
         d.points.push(p);
         if (d.points.length > 2048) d.points = simplifyHighlight(d.points, d.tolerance);
         object = {
@@ -1082,6 +1095,7 @@ export function useCanvasInteractions(
                           i === (first ? 0 : o.points.length - 1) ? p : q,
                         ),
                       };
+                    if (o.mode === 'component') return o;
                     const index = first ? 0 : o.spans.length - 1,
                       span = o.spans[index];
                     const wire = d.doc.objects.find((w) => w.id === span.wireId);
@@ -1182,14 +1196,19 @@ export function useCanvasInteractions(
       return;
     }
     if (s.tool === 'highlight') {
-      const near =
+      const component =
         s.highlightSettings.mode === 'smart'
+          ? highlightComponentAt(s.document, p, Math.min(6, 4 / viewport.zoom))
+          : null;
+      const near =
+        !component && s.highlightSettings.mode === 'smart'
           ? nearestHighlightWire(s.document, p, 14 / viewport.zoom)
           : null;
       setOverlay({
         ...blank,
         target: near?.point ?? null,
         wireTarget: near?.wireId ?? null,
+        componentTarget: component?.id ?? null,
       });
       return;
     }
@@ -1294,7 +1313,10 @@ export function useCanvasInteractions(
           })),
         };
       const points = highlightPoints(object, s.document);
-      if (points.length >= 2 && routeLength(points) >= 1 / viewport.zoom) {
+      if (
+        object.mode === 'component' ||
+        (points.length >= 2 && routeLength(points) >= 1 / viewport.zoom)
+      ) {
         s.add([{ ...object, id: makeId() }]);
         s.select([]);
       } else s.cancelGesture();

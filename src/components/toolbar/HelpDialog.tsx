@@ -98,10 +98,10 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
           undo. Distribuisci per centri o spazi liberi; la distanza esatta mantiene fermo il primo
           elemento. Scegli lo stile dei fili o Dividi filo per una continuazione tratteggiata.
           Rettangoli e linee decorative non creano connessioni elettriche.
-          Evidenziatore, nel menu Disegno e annotazioni, segue una porzione di filo in modalità
+          Evidenziatore, nel menu Disegno e annotazioni, evidenzia un componente con un clic o una porzione di filo con un trascinamento in modalità
           Intelligente oppure disegna ovunque in modalità Libera. Modalità, colore, opacità e
           spessore si regolano in Proprietà. Gli estremi si modificano con gli handle;
-          “Scollega dal filo” rende il tratto spostabile in modo indipendente.
+          Le evidenziazioni seguono il componente o filo; il comando “Scollega” le rende indipendenti.
         </p>
         <p className="help-note">
           L’anteprima Smart Placement indica aggancio e collegamento; Alt/Option li ignora.

@@ -105,7 +105,7 @@ export function isExportableObject(o: CircuitObject): boolean {
     case 'highlight':
       return (
         positive(o.width) &&
-        o.width <= 200 &&
+        o.width <= (o.mode === 'component' ? 200 : 1000) &&
         o.opacity !== undefined &&
         (o.mode === 'free'
           ? (o.smoothing === undefined || typeof o.smoothing === 'boolean') &&
@@ -116,6 +116,7 @@ export function isExportableObject(o: CircuitObject): boolean {
               (Array.isArray(o.breaks) && o.breaks.every((index, i, all) =>
                 Number.isInteger(index) && index > 0 && index < o.points.length &&
                 (!i || index > all[i - 1]))))
+          : o.mode === 'component' ? typeof o.componentId === 'string' && !!o.componentId
           : o.mode === 'smart' &&
             Array.isArray(o.spans) &&
             o.spans.length > 0 &&

@@ -11,17 +11,22 @@ const colorNames = { ink: 'Nero', blue: 'Blu', red: 'Rosso', green: 'Verde', pur
 const labeled = (o: CircuitObject) => 'label' in o;
 const stroked = (o: CircuitObject) => 'width' in o || 'strokeWidth' in o;
 
-function ColorControl({
+export function ColorControl({
   label,
   value,
   onChange,
   children,
+  colors = COLORS,
+  gesture = true,
 }: {
   label: string;
   value: string | undefined;
   onChange: (color: string) => void;
   children: ReactNode;
+  colors?: Readonly<Record<string, string>>;
+  gesture?: boolean;
 }) {
+  const colorLabel = label === 'Colore' ? label : 'Colore ' + label.toLowerCase();
   const lastColor = useRef(value);
   const ownsGesture = useRef(false);
   const picker = useRef<HTMLInputElement>(null);
@@ -60,7 +65,7 @@ function ColorControl({
     onChange(color);
   };
   const begin = () => {
-    if (!ownsGesture.current) {
+    if (gesture && !ownsGesture.current) {
       useEditorStore.getState().beginGesture();
       ownsGesture.current = true;
     }
@@ -69,7 +74,7 @@ function ColorControl({
     <PropertyRow caption={label} secondary={children} secondaryCaption="Opacità">
       <div className="inspector-color">
         <ActionMenu
-          label={'Colore ' + label.toLowerCase()}
+          label={colorLabel}
           className="inspector-color-trigger"
           icon={
             <>
@@ -83,9 +88,9 @@ function ColorControl({
             </>
           }
           items={[
-            ...Object.entries(COLORS).map(([name, color]) => ({
+            ...Object.entries(colors).map(([name, color]) => ({
               id: name,
-              label: label + ': ' + colorNames[name as keyof typeof colorNames],
+              label: label + ': ' + (colorNames[name as keyof typeof colorNames] ?? name),
               icon: <span className="inspector-swatch" style={{ backgroundColor: color }} />,
               onSelect: () => onChange(color),
             })),
@@ -106,7 +111,7 @@ function ColorControl({
           type="color"
           tabIndex={-1}
           value={value ?? COLORS.ink}
-          aria-label={'Colore ' + label.toLowerCase() + ' personalizzato'}
+          aria-label={colorLabel + ' personalizzato'}
           onPointerDown={begin}
           onInput={chooseCustom}
           onChange={chooseCustom}

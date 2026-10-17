@@ -117,7 +117,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
           fail();
       });
     } else if (o.kind === 'highlight') {
-      if (!color(o.color) || !positive(o.width, 200) || o.opacity === undefined) fail();
+      if (!color(o.color) || !positive(o.width, o.mode === 'component' ? 200 : 1000) || o.opacity === undefined) fail();
       if (o.mode === 'free') {
         if (
           (o.smoothing !== undefined && typeof o.smoothing !== 'boolean') ||
@@ -134,6 +134,8 @@ export function deserializeDocument(raw: string): CircuitDocument {
               Number.isInteger(index) && index > 0 && index < (o.points as unknown[]).length &&
               (!i || index > all[i - 1])))
         ) fail();
+      } else if (o.mode === 'component') {
+        if (!str(o.componentId) || !o.componentId) fail();
       } else if (o.mode === 'smart') {
         if (!Array.isArray(o.spans) || !o.spans.length || o.spans.length > 1000) fail();
         for (const entry of o.spans as unknown[]) {
@@ -285,8 +287,9 @@ export function deserializeDocument(raw: string): CircuitDocument {
   for (const o of doc.objects)
     if (
       o.kind === 'highlight' &&
-      o.mode === 'smart' &&
-      o.spans.some((s) => !doc.objects.some((w) => w.id === s.wireId && w.kind === 'wire'))
+      ((o.mode === 'smart' &&
+        o.spans.some((s) => !doc.objects.some((w) => w.id === s.wireId && w.kind === 'wire'))) ||
+        (o.mode === 'component' && !doc.objects.some((c) => c.id === o.componentId && c.kind === 'component')))
     )
       fail();
   for (const o of doc.objects)

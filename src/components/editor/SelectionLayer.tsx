@@ -112,7 +112,7 @@ export function SelectionLayer({
                   pointerEvents="none"
                 />
               ) : null}
-              {o.kind === 'highlight' &&
+              {o.kind === 'highlight' && o.mode !== 'component' &&
                 (() => {
                   const points = highlightPoints(o, doc);
                   return points.length ? (

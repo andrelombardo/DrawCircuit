@@ -264,10 +264,11 @@ export interface HighlightSpan {
 }
 export type Highlight = HighlightStyle & { kind: 'highlight'; id: string } & (
   | { mode: 'smart'; spans: HighlightSpan[] }
+  | { mode: 'component'; componentId: string }
   | { mode: 'free'; points: Point[]; smoothing?: boolean; breaks?: number[] }
 );
 export interface HighlightSettings extends HighlightStyle {
-  mode: Highlight['mode'];
+  mode: 'smart' | 'free';
 }
 export type CircuitObject =
   | CircuitComponent

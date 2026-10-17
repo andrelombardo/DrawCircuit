@@ -1,23 +1,17 @@
-import { useEffect, useRef } from 'react';
-import { Highlighter, Trash2, Unlink } from 'lucide-react';
+import { Highlighter, Unlink } from 'lucide-react';
 import type { Highlight, HighlightStyle } from '../../model/types';
 import { detachHighlight, HIGHLIGHT_COLORS, routeLength } from '../../annotations/highlight';
 import { useEditorStore } from '../../store/editorStore';
 import { objectCenter } from '../../utils/selectionGeometry';
 import { wirePoints } from '../../utils/geometry';
 import { commonValue } from './commonValue';
-import {
-  InspectorSection,
-  PropertyField,
-  PropertyRow,
-  PropertySelect,
-} from './PropertyControls';
+import { InspectorSection, PropertyField, PropertySelect } from './PropertyControls';
+import { ColorControl } from './SelectionStyle';
 import { SelectionGeometry } from './SelectionGeometry';
 
-/** One set of controls edits either the next stroke or the common selected style. */
+/** Reuse the inspector's standard color, opacity and numeric controls. */
 export function HighlightProperties({ objects = [] }: { objects?: Highlight[] }) {
   const settings = useEditorStore((s) => s.highlightSettings);
-  const ownsGesture = useRef(false);
   const editing = objects.length > 0;
   const values = editing ? objects : [settings];
   const state = () => useEditorStore.getState();
@@ -29,91 +23,24 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
       );
     else state().setHighlightSettings(patch);
   };
-  const begin = () => {
-    if (editing && !ownsGesture.current) {
-      ownsGesture.current = true;
-      state().beginGesture();
-    }
-  };
-  const finish = () => {
-    if (ownsGesture.current) {
-      ownsGesture.current = false;
-      state().endGesture();
-    }
-  };
-  useEffect(
-    () => () => {
-      if (ownsGesture.current) useEditorStore.getState().endGesture();
-    },
-    [],
-  );
   const single = objects.length === 1 ? objects[0] : null;
   const color = commonValue(values.map((o) => o.color));
-  const slider = (
-    property: 'opacity' | 'width',
-    caption: string,
-    max: number,
-    step: number,
-    unit: string,
-  ) => {
-    const factor = property === 'opacity' ? 100 : 1;
-    const value = commonValue(values.map((o) => o[property] * factor));
-    return (
-      <div className="highlight-range">
-        <PropertyRow caption={caption}>
-          <input
-            type="range"
-            aria-label={`${caption} evidenziatore`}
-            min={property === 'width' ? 1 : 0}
-            max={max}
-            step={step}
-            value={value ?? (property === 'width' ? 12 : 40)}
-            aria-valuetext={value === undefined ? 'Valori misti' : `${value}${unit}`}
-            onPointerDown={begin}
-            onPointerUp={finish}
-            onPointerCancel={() => {
-              if (ownsGesture.current) {
-                ownsGesture.current = false;
-                state().cancelGesture();
-              }
-            }}
-            onBlur={finish}
-            onKeyDown={(e) => {
-              if (
-                [
-                  'ArrowLeft',
-                  'ArrowRight',
-                  'ArrowUp',
-                  'ArrowDown',
-                  'Home',
-                  'End',
-                  'PageUp',
-                  'PageDown',
-                ].includes(e.key)
-              )
-                begin();
-              if (e.key === 'Escape' && ownsGesture.current) {
-                ownsGesture.current = false;
-                state().cancelGesture();
-              }
-            }}
-            onKeyUp={finish}
-            onChange={(e) => apply({ [property]: Number(e.target.value) / factor })}
-          />
-          <PropertyField
-            label={`${caption} evidenziatore numerico`}
-            caption=""
-            numeric
-            min={property === 'width' ? 1 : 0}
-            max={max}
-            unit={unit}
-            value={value === undefined ? undefined : Number(value.toFixed(2))}
-            onCommit={(v) => apply({ [property]: Number(v) / factor })}
-          />
-        </PropertyRow>
-      </div>
-    );
-  };
+  const opacity = commonValue(values.map((o) => Math.round(o.opacity * 100)));
+  const width = commonValue(values.map((o) => o.width));
+  const detachButton = (
+    <button
+      className="inspector-property-action"
+      onClick={() => {
+        const doc = state().document;
+        state().updateSelection((o) => o.kind === 'highlight' ? detachHighlight(o, doc) : o);
+      }}
+    >
+      <Unlink size={14} />
+      {single?.mode === 'component'
+        ? 'Scollega dal componente'
+        : single?.mode === 'smart' ? 'Scollega dal filo' : 'Scollega dai riferimenti'}
+    </button>
+  );
   return (
     <div className="inspector-properties">
       <div className="inspector-selection">
@@ -121,78 +48,67 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
           <Highlighter size={16} />
         </span>
         <div className="inspector-type">
-          <span>
-            {objects.length > 1 ? `${objects.length} evidenziazioni` : 'Evidenziatore'}
-          </span>
+          <span>{objects.length > 1 ? `${objects.length} evidenziazioni` : 'Evidenziatore'}</span>
           <small>
-            {editing
-              ? single?.mode === 'smart'
+            {!editing
+              ? 'Impostazioni del prossimo tratto'
+              : single?.mode === 'smart'
                 ? 'Associato al filo'
-                : single
-                  ? 'Tratto libero'
-                  : 'Proprietà comuni'
-              : 'Impostazioni del prossimo tratto'}
+                : single?.mode === 'component'
+                  ? 'Associato al componente'
+                  : single ? 'Tratto libero' : 'Proprietà comuni'}
           </small>
         </div>
       </div>
       {!editing && (
-        <InspectorSection title="Tratto">
+        <div className="inspector-general">
           <PropertySelect
             label="Modalità evidenziatore"
             caption="Modalità"
             value={settings.mode}
-            onChange={(v) =>
-              state().setHighlightSettings({
-                mode: v === 'free' ? 'free' : 'smart',
-              })
-            }
+            onChange={(v) => state().setHighlightSettings({ mode: v === 'free' ? 'free' : 'smart' })}
           >
             <option value="smart">Intelligente</option>
             <option value="free">Libera</option>
           </PropertySelect>
           <p className="inspector-geometry-note">
             {settings.mode === 'smart'
-              ? 'Inizia su un filo e seguilo, anche solo per una piccola porzione.'
-              : 'Trascina ovunque sul foglio per evidenziare a mano libera.'}
+              ? 'Clicca un componente oppure trascina lungo un filo.'
+              : 'Trascina sul foglio per evidenziare a mano libera.'}
           </p>
-        </InspectorSection>
+        </div>
       )}
       <InspectorSection title="Aspetto">
-        <PropertyRow caption="Colore">
-          <div className="highlight-palette" role="group" aria-label="Colori evidenziatore">
-            {Object.entries(HIGHLIGHT_COLORS).map(([name, hex]) => (
-              <button
-                key={name}
-                type="button"
-                aria-label={`Evidenziatore ${name.toLowerCase()}`}
-                title={name}
-                aria-pressed={color?.toLowerCase() === hex.toLowerCase()}
-                style={{ backgroundColor: hex }}
-                onClick={() => apply({ color: hex })}
-              />
-            ))}
-            <input
-              type="color"
-              aria-label="Colore evidenziatore personalizzato"
-              title="Colore personalizzato"
-              value={color ?? '#FACC15'}
-              onPointerDown={begin}
-              onInput={(e) => apply({ color: e.currentTarget.value })}
-              onChange={finish}
-              onBlur={finish}
+        <div className="inspector-style">
+          <ColorControl
+            label="Colore"
+            value={color}
+            colors={HIGHLIGHT_COLORS}
+            gesture={editing}
+            onChange={(color) => apply({ color })}
+          >
+            <PropertyField
+              label="Opacità evidenziatore"
+              caption=""
+              numeric
+              unit="%"
+              min={0}
+              max={100}
+              value={opacity}
+              onCommit={(v) => apply({ opacity: Number(v) / 100 })}
             />
-          </div>
-        </PropertyRow>
-        <PropertyField
-          label="Colore evidenziatore HEX"
-          caption="HEX"
-          value={color?.toUpperCase()}
-          onCommit={(v) => {
-            if (/^#[\da-f]{6}$/i.test(v)) apply({ color: v.toUpperCase() });
-          }}
-        />
-        {slider('opacity', 'Opacità', 100, 1, '%')}
-        {slider('width', 'Spessore', 200, 0.5, 'u')}
+          </ColorControl>
+          <PropertyField
+            label="Spessore evidenziatore"
+            caption="Spessore"
+            numeric
+            unit="u"
+            min={1}
+            max={objects.length && objects.every((o) => o.mode === 'free') ? 1000 : 200}
+            value={width}
+            onCommit={(v) => apply({ width: Number(v) })}
+          />
+        </div>
       </InspectorSection>
       {single && (
         <InspectorSection title="Geometria">
@@ -239,7 +155,7 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
                 cambia la lunghezza.
               </p>
             </>
-          ) : (
+          ) : single.mode === 'free' ? (
             <>
               <PropertyField
                 label="Posizione evidenziazione X"
@@ -270,11 +186,12 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
                 }
               />
             </>
+          ) : (
+            <p className="inspector-geometry-note">
+              Segue il componente quando lo sposti o ruoti.
+            </p>
           )}
-          <p className="inspector-geometry-note">
-            Trascina gli handle per modificare gli estremi. Option-clic seleziona gli oggetti
-            sovrapposti.
-          </p>
+          {single.mode !== 'free' && detachButton}
         </InspectorSection>
       )}
       {objects.length > 1 && objects.every((o) => o.mode === 'free') && (
@@ -282,24 +199,9 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
           <SelectionGeometry objects={objects} />
         </InspectorSection>
       )}
-      {editing && (
-        <InspectorSection title="Azioni">
-          {objects.some((o) => o.mode === 'smart') && (
-            <button
-              className="inspector-property-action"
-              onClick={() => {
-                const doc = state().document;
-                state().updateSelection((o) =>
-                  o.kind === 'highlight' ? detachHighlight(o, doc) : o,
-                );
-              }}
-            >
-              <Unlink size={14} /> Scollega dal filo
-            </button>
-          )}
-          <button className="inspector-property-action" onClick={() => state().remove()}>
-            <Trash2 size={14} /> Elimina
-          </button>
+      {objects.length > 1 && objects.some((o) => o.mode !== 'free') && (
+        <InspectorSection title="Geometria">
+          {detachButton}
         </InspectorSection>
       )}
     </div>

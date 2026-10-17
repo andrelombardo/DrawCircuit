@@ -1,4 +1,4 @@
-import { highlightPath } from '../annotations/highlight';
+import { highlightPath, highlightStrokeWidth } from '../annotations/highlight';
 import { dashPattern } from '../utils/strokeStyle';
 import type { StrokeStyle } from '../model/types';
 import { drawingWireGaps, translucentCrossing } from '../utils/wireRendering';
@@ -178,7 +178,7 @@ function generateTikz(source: CircuitDocument, canvas: boolean, compact = false)
       const path = svgPathToTikz(highlightPath(o, doc), tikzCoordinate);
       if (path)
         lines.push(
-          `\\draw[draw=${col(o.color)}, opacity=${fmt(o.opacity)}, line width=${pixelsToPt(o.width)}pt] ${path};`,
+          `\\draw[draw=${col(o.color)}, opacity=${fmt(o.opacity)}, line width=${pixelsToPt(highlightStrokeWidth(o, doc))}pt] ${path};`,
         );
     }
   // Graphic annotations sit behind the electrical circuit, matching the canvas.

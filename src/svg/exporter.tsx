@@ -1,4 +1,4 @@
-import { highlightPath } from '../annotations/highlight';
+import { highlightPath, highlightStrokeWidth } from '../annotations/highlight';
 import { dashPattern } from '../utils/strokeStyle';
 import type { StrokeStyle } from '../model/types';
 import { drawingWireGaps, translucentCrossing } from '../utils/wireRendering';
@@ -91,7 +91,7 @@ export function exportSVG(
       const d = highlightPath(o, doc);
       if (d) {
         boxes.push(visualBounds(o, doc));
-        parts.push(`<g opacity="${f(o.opacity)}">${path(d, o.color, o.width)}</g>`);
+        parts.push(`<g opacity="${f(o.opacity)}">${path(d, o.color, highlightStrokeWidth(o, doc))}</g>`);
       }
     }
   for (const o of doc.objects) {

@@ -1,5 +1,13 @@
 import type { CircuitDocument, Highlight, HighlightSpan, Point } from '../model/types';
-import { distance, pointsPath, projectOnSegment, wirePoints } from '../utils/geometry';
+import { componentRegistry } from '../model/catalog';
+import {
+  distance,
+  localToWorld,
+  pointsPath,
+  projectOnSegment,
+  rotatePoint,
+  wirePoints,
+} from '../utils/geometry';
 
 export const DEFAULT_HIGHLIGHT = {
   mode: 'smart',
@@ -17,6 +25,41 @@ export const HIGHLIGHT_COLORS = {
 };
 export const routeLength = (points: Point[]) =>
   points.slice(1).reduce((sum, point, i) => sum + distance(points[i], point), 0);
+
+/** Target the symbol body, leaving wire gestures on its leads available. */
+export function highlightComponentAt(doc: CircuitDocument, point: Point, tolerance: number) {
+  return [...doc.objects].reverse().find((o) => {
+    if (o.kind !== 'component') return false;
+    const p = rotatePoint({ x: point.x - o.x, y: point.y - o.y }, -o.rotation);
+    const b = componentRegistry[o.type].measurementBounds;
+    return (
+      p.x >= b.x - tolerance && p.x <= b.x + b.width + tolerance &&
+      p.y >= b.y - tolerance && p.y <= b.y + b.height + tolerance
+    );
+  });
+}
+
+function componentHighlight(object: Highlight, doc: CircuitDocument) {
+  if (object.mode !== 'component') return null;
+  const component = doc.objects.find((o) => o.id === object.componentId);
+  if (component?.kind !== 'component') return null;
+  const b = componentRegistry[component.type].measurementBounds;
+  const horizontal = b.width >= b.height;
+  const minor = Math.min(b.width, b.height);
+  const half = Math.max(0.1, Math.max(b.width, b.height) - minor) / 2;
+  const center = { x: b.x + b.width / 2, y: b.y + b.height / 2 };
+  return {
+    width: minor + object.width,
+    points: [-1, 1].map((sign) =>
+      localToWorld(component, {
+        x: center.x + (horizontal ? sign * half : 0),
+        y: center.y + (horizontal ? 0 : sign * half),
+      }),
+    ),
+  };
+}
+export const highlightStrokeWidth = (object: Highlight, doc: CircuitDocument) =>
+  componentHighlight(object, doc)?.width ?? object.width;
 
 /** Exact projection, deliberately independent of the circuit's grid snapping. */
 export function projectHighlight(points: Point[], point: Point, preferred = 0) {
@@ -81,6 +124,10 @@ export function sliceHighlightRoute(points: Point[], start: number, end: number)
   return result.length ? result : [points[0] ?? { x: 0, y: 0 }];
 }
 export function highlightRoutes(object: Highlight, doc: CircuitDocument): Point[][] {
+  if (object.mode === 'component') {
+    const geometry = componentHighlight(object, doc);
+    return geometry ? [geometry.points] : [];
+  }
   if (object.mode === 'free') {
     const ends = [...(object.breaks ?? []), object.points.length];
     return ends.map((end, i) => object.points.slice(i ? ends[i - 1] : 0, end));
@@ -194,7 +241,7 @@ export function detachHighlight(object: Highlight, doc: CircuitDocument): Highli
         id: object.id,
         mode: 'free',
         color: object.color,
-        width: object.width,
+        width: highlightStrokeWidth(object, doc),
         opacity: object.opacity,
         smoothing: false,
         points: routes.flat(),
@@ -208,12 +255,13 @@ export function reconcileHighlights(
   next: CircuitDocument,
 ): CircuitDocument {
   const wires = new Set(next.objects.filter((o) => o.kind === 'wire').map((o) => o.id));
+  const components = new Set(next.objects.filter((o) => o.kind === 'component').map((o) => o.id));
   let changed = false;
   const objects = next.objects.map((o) => {
     if (
       o.kind !== 'highlight' ||
-      o.mode !== 'smart' ||
-      o.spans.every((s) => wires.has(s.wireId))
+      o.mode === 'free' ||
+      (o.mode === 'smart' ? o.spans.every((s) => wires.has(s.wireId)) : components.has(o.componentId))
     )
       return o;
     const original = previous.objects.find((p) => p.id === o.id);
