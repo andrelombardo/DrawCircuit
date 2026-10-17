@@ -32,7 +32,7 @@ export function SelectionActions({ children }: { children: ReactNode }) {
           setImageBusy(true);
           try {
             await copyPNG(subset);
-            notify('Immagine copiata · sfondo trasparente');
+            notify('Immagine copiata');
           } catch (error) {
             notify(error instanceof Error ? error.message : 'Impossibile copiare l’immagine.');
           } finally {
