@@ -35,7 +35,7 @@ export const ComponentView = memo(function ComponentView({
                 cy={p.y}
                 r={0.01}
                 stroke="transparent"
-                strokeWidth={22}
+                strokeWidth={14}
                 vectorEffect="non-scaling-stroke"
               />
               <circle cx={p.x} cy={p.y} r={4} className="terminal" />

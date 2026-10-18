@@ -265,6 +265,20 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp, inspect
           </defs>
           <rect width="100%" height="100%" fill={grid ? 'url(#grid)' : 'transparent'} />
           <g transform={`translate(${v.x} ${v.y}) scale(${v.zoom})`}>
+            {!doc.objects.length && (
+              <foreignObject x={-175} y={-110} width={350} height={250} pointerEvents="none">
+                <div className="empty-sheet">
+                  <div className="empty-circuit" aria-hidden="true"
+                    style={{ maskImage: `url("${logoUrl}")` }} />
+                  <h2>Le idee iniziano da un foglio.</h2>
+                  <p>
+                    Scegli un componente dalla palette.<br />
+                    Un clic, e il tuo circuito prende forma.
+                  </p>
+                  <span>Circuiti elettrici · appunti a mano</span>
+                </div>
+              </foreignObject>
+            )}
             <CircuitLayer
               doc={doc}
               highlightDraft={overlay.highlight}
@@ -389,22 +403,6 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp, inspect
             onSave={interactions.saveEdit}
             onCancel={() => interactions.setEditing(null)}
           />
-        )}
-        {!doc.objects.length && (
-          <div className="empty-sheet">
-            <div
-              className="empty-circuit"
-              aria-hidden="true"
-              style={{ maskImage: `url("${logoUrl}")` }}
-            />
-            <h2>Le idee iniziano da un foglio.</h2>
-            <p>
-              Scegli un componente dalla palette.
-              <br />
-              Un clic, e il tuo circuito prende forma.
-            </p>
-            <span>Circuiti elettrici · appunti a mano</span>
-          </div>
         )}
         <div className="editor-bottom">
           <div className="zoom-controls floating-surface">

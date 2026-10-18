@@ -34,7 +34,8 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
             nodo reale. I clic sul foglio aggiungono svolte; doppio clic o Enter termina su un punto
             libero. Il filo si allinea al punto iniziale e all’ultima svolta, anche fuori griglia.
             Backspace rimuove l’ultima svolta. Scegli Ortogonale, 45° o Libero; Shift + W cambia
-            routing.
+            routing. In Selezione puoi anche trascinare un morsetto o un estremo del filo per
+            creare un nuovo collegamento. Trascina il corpo del filo per spostarlo.
           </p>
           <p>
             <b>03 · Annota</b>Premi N per un nodo, A per una freccia, L per una maglia. Usa Testo
@@ -60,6 +61,7 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
             ['R', 'Ruota componente di 45° · graffa/staffa di 90°'],
             ['Enter', 'Modifica nome o etichetta'],
             ['Alt + clic handle', 'Rimuovi svolta filo'],
+            ['Option/Alt + trascina estremo', 'Ricollega un filo esistente'],
             ['L', 'Disegna maglia ellittica'],
             [shortcut('D'), 'Duplica'],
             [`${shortcut('C')} / ${shortcut('X')} / ${shortcut('V')}`, 'Copia / taglia / incolla'],
@@ -86,7 +88,9 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
         </div>
         <p className="help-note">
           Trascina le etichette per spostarle. Doppio clic su un filo aggiunge una svolta
-          modificabile. I punti blu modificano frecce e fili; Alt + clic elimina una svolta. Nelle
+          modificabile. I punti tondi agli estremi prolungano il filo; Option/Alt + trascina
+          riposiziona l’estremo esistente. I punti quadrati modificano le svolte; Alt + clic ne
+          elimina una. Nelle
           maglie trascina gli angoli per ridimensionare e il punto sulla punta per spostarla. Scrivi{' '}
           <code>r_&#123;AB&#125;</code> per un pedice.
         </p>

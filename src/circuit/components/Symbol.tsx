@@ -27,7 +27,8 @@ export function Symbol({
           );
         if (shape.kind === 'circle')
           return (
-            <circle key={i} cx={shape.x} cy={shape.y} r={shape.r} fill={shape.fill ?? 'none'} />
+            <circle key={i} cx={shape.x} cy={shape.y} r={shape.r}
+              fill={shape.fill === 'currentColor' ? color : (shape.fill ?? 'none')} />
           );
         if (shape.kind === 'rect')
           return (

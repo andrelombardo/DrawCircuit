@@ -55,6 +55,8 @@ import {
   wireCandidate,
   drawingWireCandidate,
   wireEndpointCandidate,
+  wireEndAtPoint,
+  wireExtensionCandidate,
 } from '../../utils/wires';
 import type { WireCandidate, WireDraft } from '../../utils/wires';
 import {
@@ -363,8 +365,11 @@ export function useCanvasInteractions(
     const keydown = async (e: KeyboardEvent) => {
       if (e.isComposing || isEditing(e.target)) return;
       // Buttons and other controls retain native Space/Enter activation and
-      // navigation keys. Explicit modifier shortcuts remain available.
-      if (!e.ctrlKey && !e.metaKey && e.key !== 'Escape' &&
+      // navigation keys. Drawing shortcuts also work immediately after choosing
+      // a palette/tool button, without requiring a first click on the sheet.
+      if (!e.ctrlKey && !e.metaKey &&
+        [' ', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+          'Home', 'End', 'PageUp', 'PageDown'].includes(e.key) &&
         e.target instanceof Element && e.target.closest(
           'button, summary, [role="button"], [role="separator"], [role="slider"]',
         )) return;
@@ -781,14 +786,38 @@ export function useCanvasInteractions(
     const target = pointerTarget(e),
       el = target.closest('[data-object]'),
       id = el?.getAttribute('data-object'),
-      handle = target.closest('[data-handle]')?.getAttribute('data-handle'),
+      hitHandle = target.closest('[data-handle]')?.getAttribute('data-handle'),
       labelId = target.closest('[data-label]')?.getAttribute('data-label');
     const terminalId = target.closest('[data-terminal]')?.getAttribute('data-terminal'),
       component = id ? objectMap.get(id) : null;
-    if (s.tool === 'select' && terminalId && component?.kind === 'component' && !e.shiftKey) {
+    const groupDrag = !!id && s.selection.length > 1 && s.selection.includes(id);
+    const wireSide =
+      component?.kind === 'wire' && !labelId &&
+      (!hitHandle || hitHandle === 'wireStart' || hitHandle === 'wireEnd')
+        ? wireEndAtPoint(p, component, s.document, viewport.zoom)
+        : null;
+    const handle = wireSide && !groupDrag
+      ? (wireSide === 'start' ? 'wireStart' : 'wireEnd')
+      : hitHandle === 'wireStart' || hitHandle === 'wireEnd' ? undefined : hitHandle;
+    const quickWire = s.tool === 'select' && !e.shiftKey && !e.altKey &&
+      !groupDrag;
+    if (quickWire && wireSide && component?.kind === 'wire') {
+      s.select([component.id]);
+      setActiveLabel(null);
+      svg.setPointerCapture(e.pointerId);
+      drag.current = {
+        type: 'terminal-wire',
+        screen: { x: e.clientX, y: e.clientY },
+        start: wireExtensionCandidate(component, wireSide, s.document),
+        started: false,
+      };
+      return;
+    }
+    if (quickWire && terminalId && component?.kind === 'component') {
       const terminal = component.terminals.find((t) => t.id === terminalId);
       if (terminal) {
         s.select([component.id]);
+        setActiveLabel(null);
         svg.setPointerCapture(e.pointerId);
         drag.current = {
           type: 'terminal-wire',
@@ -828,7 +857,8 @@ export function useCanvasInteractions(
       s.beginGesture();
       const wire = objectMap.get(id);
       const segment =
-        !handle && !labelId && ids.length === 1 && wire?.kind === 'wire'
+        !handle && !labelId && ids.length === 1 && wire?.kind === 'wire' &&
+        (wire.startEndpoint.kind !== 'free' || wire.endEndpoint.kind !== 'free')
           ? nearestWire(
               p,
               s.document,
@@ -932,11 +962,13 @@ export function useCanvasInteractions(
     if (d?.type === 'terminal-wire') {
       if (!d.started) {
         if (distance({ x: e.clientX, y: e.clientY }, d.screen) < TERMINAL_DRAG_THRESHOLD) return;
+        // Resolving a wire end can change topology; mark it active before preview
+        // so the store subscription does not mistake that change for cancellation.
+        d.started = true;
         s.beginGesture();
         const result = beginWire(s.document, d.start, s.wireRouting);
         if (result.doc !== s.document) s.preview(result.doc);
         setWireDraft(result.draft);
-        d.started = true;
         setDragging('wire');
       }
       const candidate = drawingWireCandidate(
@@ -1154,9 +1186,18 @@ export function useCanvasInteractions(
                       const route = points.map((point, i) =>
                         i === index || i === index + 1 ? add(point, shift) : point,
                       );
-                      if (index === 0) route.unshift(points[0]);
-                      if (index === points.length - 2) route.push(points.at(-1)!);
-                      const moved = { ...o, vertices: route.slice(1, -1) };
+                      let startEndpoint = o.startEndpoint, endEndpoint = o.endEndpoint;
+                      if (index === 0) {
+                        if (startEndpoint.kind === 'free')
+                          startEndpoint = { kind: 'free', point: route[0] };
+                        else route.unshift(points[0]);
+                      }
+                      if (index === points.length - 2) {
+                        if (endEndpoint.kind === 'free')
+                          endEndpoint = { kind: 'free', point: route.at(-1)! };
+                        else route.push(points.at(-1)!);
+                      }
+                      const moved = { ...o, startEndpoint, endEndpoint, vertices: route.slice(1, -1) };
                       return !o.routing || o.routing === 'orthogonal'
                         ? {
                             ...moved,

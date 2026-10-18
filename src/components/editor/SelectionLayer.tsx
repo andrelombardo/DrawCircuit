@@ -6,6 +6,7 @@ import type { CircuitDocument, CircuitObject, Point } from '../../model/types';
 import { arrowPath, pointsPath, rotatePoint, wirePoints } from '../../utils/geometry';
 import { unionBounds, contentBounds } from '../../utils/visualBounds';
 import { loopGeometry, loopPath } from '../../utils/loops';
+import { WIRE_ENDPOINT_HIT_PX } from '../../utils/wires';
 function selectionBounds(object: CircuitObject, doc: CircuitDocument) {
   if (object.kind !== 'electrical' || object.mode !== 'current') return contentBounds(object, doc);
   const g = electricalDrawingGeometry(object, doc);
@@ -44,7 +45,12 @@ function Handle({
 }) {
   return (
     <g data-handle={name} className={`handle-hit handle-${name.split(':')[0]}`}>
-      <circle cx={p.x} cy={p.y} r={11 / zoom} fill="transparent" />
+      {(name === 'wireStart' || name === 'wireEnd') && (
+        <title>Trascina per prolungare · Option/Alt trascina per ricollegare</title>
+      )}
+      <circle cx={p.x} cy={p.y}
+        r={(name === 'wireStart' || name === 'wireEnd' ? WIRE_ENDPOINT_HIT_PX : 11) / zoom}
+        fill="transparent" />
       {square ? (
         <rect
           x={p.x - 4 / zoom}

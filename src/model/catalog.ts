@@ -155,7 +155,7 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Generatore di tensione DC',
     'Generatori',
     'V',
-    g.source(g.voltage),
+    g.directedSource(g.voltage),
     ['dc voltage source', 'tensione continua'],
   ),
   currentSource: def(
@@ -163,7 +163,7 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Generatore di corrente DC',
     'Generatori',
     'I',
-    g.source(g.current),
+    g.directedSource(g.currentBar),
     ['dc current source', 'corrente continua'],
   ),
   battery: def(
@@ -179,7 +179,7 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Tensione dipendente',
     'Generatori',
     'V',
-    g.source(g.voltage, true),
+    g.directedSource(g.voltage, true),
     ['dependent voltage source', 'controlled voltage'],
   ),
   dependentCurrent: def(
@@ -187,7 +187,7 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Corrente dipendente',
     'Generatori',
     'I',
-    g.source(g.current, true),
+    g.directedSource(g.current, true),
     ['dependent current source', 'controlled current'],
   ),
   diode: def('diode', 'Diodo', 'Diodi', 'D', g.diode, ['diode', 'standard diode']),
@@ -295,7 +295,7 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Generatore di tensione AC',
     'Generatori',
     'V',
-    g.source([...g.sine, g.text('V', 0, 12, 9)]),
+    g.directedSource([...g.sine, g.text('V', 0, 12, 9)]),
     ['ac voltage source', 'tensione alternata'],
   ),
   acCurrentSource: def(
@@ -303,7 +303,7 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Generatore di corrente AC',
     'Generatori',
     'I',
-    g.source([...g.sine, g.text('I', 0, 12, 9)]),
+    g.directedSource([...g.sine, g.text('I', 0, 12, 9)]),
     ['ac current source', 'corrente alternata'],
   ),
   genericVoltageSource: def(
@@ -311,7 +311,7 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Tensione generica',
     'Generatori',
     'V',
-    g.source([g.text('V')]),
+    g.directedSource([g.text('V')]),
     ['generic voltage source'],
   ),
   genericCurrentSource: def(
@@ -319,7 +319,7 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Corrente generica',
     'Generatori',
     'I',
-    g.source([g.text('I')]),
+    g.directedSource([g.text('I')]),
     ['generic current source'],
   ),
   singleCellBattery: def(

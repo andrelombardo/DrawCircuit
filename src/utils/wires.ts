@@ -33,6 +33,30 @@ export interface WireDraft {
   vertices: Point[];
 }
 export const TERMINAL_DRAG_THRESHOLD = 5;
+export const WIRE_ENDPOINT_HIT_PX = 7;
+
+/** Keep endpoint gestures separate from moving the body, even on short wires. */
+export function wireEndAtPoint(p: Point, wire: Wire, doc: CircuitDocument, zoom: number) {
+  const points = wirePoints(wire, doc);
+  const length = points.slice(1).reduce((sum, point, i) => sum + distance(points[i], point), 0);
+  const radius = Math.min(WIRE_ENDPOINT_HIT_PX / zoom, length / 4);
+  const start = distance(p, points[0]), end = distance(p, points.at(-1)!);
+  if (Math.min(start, end) > radius) return null;
+  return start <= end ? 'start' : 'end';
+}
+
+export function wireExtensionCandidate(
+  wire: Wire,
+  side: 'start' | 'end',
+  doc: CircuitDocument,
+): WireCandidate {
+  const endpoint = side === 'start' ? wire.startEndpoint : wire.endEndpoint;
+  const point = resolveEndpoint(endpoint, doc);
+  // A free end needs a real shared node so the extension stays connected.
+  return endpoint.kind === 'free'
+    ? { kind: 'wire', wireId: wire.id, point }
+    : { kind: endpoint.kind, endpoint, point };
+}
 
 export interface WireSnapContext {
   anchor: Point;

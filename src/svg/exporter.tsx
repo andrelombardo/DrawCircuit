@@ -156,7 +156,7 @@ export function exportSVG(
           if (shape.kind === 'path')
             return `<path d="${attr(shape.d)}" fill="${shape.fill ?? 'none'}"${shape.dashed ? ' stroke-dasharray="4 4"' : ''}/>`;
           if (shape.kind === 'circle')
-            return `<circle cx="${shape.x}" cy="${shape.y}" r="${shape.r}" fill="${shape.fill ?? 'none'}"/>`;
+            return `<circle cx="${shape.x}" cy="${shape.y}" r="${shape.r}" fill="${shape.fill === 'currentColor' ? o.color : (shape.fill ?? 'none')}"/>`;
           if (shape.kind === 'rect')
             return `<rect x="${shape.x}" y="${shape.y}" width="${shape.width}" height="${shape.height}" fill="${shape.fill ?? 'none'}"/>`;
           const { value, size } = symbolText(shape, o.bodyText);

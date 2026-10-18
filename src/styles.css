@@ -438,6 +438,19 @@ svg {
   cursor: crosshair;
   vector-effect: non-scaling-stroke;
 }
+.wire-endpoint {
+  pointer-events: none;
+}
+.wire-endpoint .terminal {
+  opacity: 0;
+}
+.tool-select .wire-endpoint {
+  pointer-events: all;
+  cursor: crosshair;
+}
+.tool-select .circuit-object:hover .wire-endpoint .terminal {
+  opacity: 1;
+}
 
 .tool-wire,
 .tool-junction,
@@ -528,10 +541,6 @@ svg {
   cursor: grab;
 }
 .empty-sheet {
-  position: absolute;
-  left: 50%;
-  top: 48%;
-  transform: translate(-50%, -50%);
   text-align: center;
   pointer-events: none;
   width: 350px;

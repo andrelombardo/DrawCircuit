@@ -33,6 +33,14 @@ export const WireView = memo(
           strokeLinecap="round"
           strokeLinejoin="round"
         />
+        {[points[0], points.at(-1)!].map((p, i) => (
+          <g key={i} data-wire-endpoint={i ? 'end' : 'start'} className="wire-endpoint">
+            <title>Trascina per prolungare · Option/Alt trascina per ricollegare</title>
+            <circle cx={p.x} cy={p.y} r={0.01} stroke="transparent" strokeWidth={14}
+              vectorEffect="non-scaling-stroke" />
+            <circle cx={p.x} cy={p.y} r={3} className="terminal" pointerEvents="none" />
+          </g>
+        ))}
       </g>
     );
   },

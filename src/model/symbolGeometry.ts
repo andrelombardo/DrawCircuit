@@ -1,7 +1,7 @@
 /** Shared, code-native geometry: SVG previews/canvas and exact pure-TikZ fallbacks. */
 export type SymbolShape = (
   | { kind: 'path'; d: string; fill?: 'white'; dashed?: boolean }
-  | { kind: 'circle'; x: number; y: number; r: number; fill?: 'white' }
+  | { kind: 'circle'; x: number; y: number; r: number; fill?: 'white' | 'currentColor' }
   | { kind: 'rect'; x: number; y: number; width: number; height: number; fill?: 'white' }
   | { kind: 'text'; x: number; y: number; text: string; size: number; body?: boolean }
 ) & { measurement?: false | { segments: [number, number][] } };
@@ -11,7 +11,7 @@ export const path = (d: string, fill?: 'white', dashed?: boolean): SymbolShape =
   fill,
   dashed,
 });
-export const circle = (x = 0, y = 0, r = 20, fill: 'white' = 'white'): SymbolShape => ({
+export const circle = (x = 0, y = 0, r = 20, fill: 'white' | 'currentColor' = 'white'): SymbolShape => ({
   kind: 'circle',
   x,
   y,
@@ -66,11 +66,17 @@ export const inductor = [
 ];
 export const variable = auxiliary([path('M-21 22L23-23'), head(23, -23, -46)]);
 export const current = [path('M-12 0H12'), head(12, 0)];
+// Perpendicular to the terminal axis: horizontal when the source is vertical.
+export const currentBar = [path('M0-10V10')];
 export const voltage = [path('M-11-5V5M-16 0H-6M7 0H15')];
 export const source = (inside: SymbolShape[] = [], dependent = false) => [
   leads,
   dependent ? path('M-22 0L0-22 22 0 0 22Z', 'white') : circle(),
   ...inside,
+];
+export const directedSource = (inside: SymbolShape[], dependent = false) => [
+  ...source(inside, dependent),
+  ...auxiliary([circle(-28, -18, 3, 'currentColor')]),
 ];
 export const sine = [path('M-14 0C-10-15-4-15 0 0C4 15 10 15 14 0')];
 export const diodeBody = path('M-14-14L12 0-14 14Z', 'white');
