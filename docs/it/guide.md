@@ -92,7 +92,7 @@ Non ci sono pulsanti di esportazione, download di file, formati TikZ/Obsidian o 
 - Snap: terminale vicino, nodo/terminale, filo, griglia; soglie in pixel dello schermo. Hit area di fili, terminali e handle indipendenti dallo zoom.
 - **Cmd/Ctrl D** genera nuovi ID e numeri di label automatiche, mantenendo le label personalizzate. Le connessioni esterne alla selezione vengono scollegate dalle copie.
 - Inspector destro persistente con sezioni Generale, Posizione, Aspetto, Testo e Geometria; le proprietà dipendono dal tipo e dalla selezione. I comandi sono nel menu contestuale del canvas; la toolbar conserva Annulla/Ripeti senza il menu Modifica.
-- Livelli del canvas: rettangoli e linee decorative, fili, componenti, nodi, altre annotazioni, label associate; selezione e handle sono sempre sopra e non entrano nella copia immagine.
+- Livelli del canvas: rettangoli, cerchi e linee decorative, fili, componenti, nodi, altre annotazioni, label associate; selezione e handle sono sempre sopra e non entrano nella copia immagine.
 - Il JSON v1 rimane compatibile con i documenti precedenti; aggiunge l’oggetto `loop-arrow` con bounding box, verso, posizione della punta, colore e spessore.
 
 ### Libreria e font
@@ -143,7 +143,7 @@ Quando elimini un blocco personale, **Annulla eliminazione** nella libreria ripr
 
 Il riepilogo mostra il tipo oppure il numero di elementi selezionati. Per una selezione multipla X/Y sono l’angolo superiore sinistro dei limiti geometrici; modificare una coordinata trasla l’intera selezione. L’etichetta è in alto. **Posizione** contiene un unico campo **Rotazione** per un oggetto orientabile o per la sua label selezionata. **Trasformazioni** distingue esplicitamente **Ruota gruppo di…** nelle selezioni compatibili e le riflessioni. Dimensione e allineamento del testo sono in **Aspetto**, insieme ai controlli pertinenti; **Geometria** raccoglie le proprietà specifiche e la disposizione. Nelle selezioni eterogenee sono disponibili soltanto le proprietà comuni; per proprietà specifiche seleziona gli oggetti del tipo interessato. Valori diversi mostrano **Valori misti**, **Misto** o un trattino. Una modifica comune riguarda tutta la selezione, con un solo undo. I campi numerici/testuali, comprese le percentuali di opacità, si confermano con Enter o perdendo il focus; Escape annulla il draft. Le proprietà locali ancora in scrittura non modificano il circuito.
 
-X/Y e W/H sono affiancati in campi compatti. Ogni riga colore mostra una swatch, il valore HEX e l’opacità indipendente; clicca il colore per i cinque preset o **Colore personalizzato…**. Il selettore nativo raggruppa le anteprime in un solo gesto. Il clic destro sulla selezione offre Duplica, Copia, Taglia, Incolla, Elimina, Sostituisci, Salva come blocco, Copia come immagine e i comandi pertinenti al tipo. Le evidenziazioni offrono anche Elimina e, quando associate a un filo o componente, il comando per scollegarle. I toggle delle due sidebar usano lo stesso componente con icone specchiate.
+Le dimensioni del testo e delle etichette arrivano fino a **200 px**. X/Y e W/H sono affiancati in campi compatti. Ogni riga colore mostra una swatch, il valore HEX e l’opacità indipendente; clicca il colore per i cinque preset o **Colore personalizzato…**. Il selettore nativo raggruppa le anteprime in un solo gesto. Il clic destro sulla selezione offre Duplica, Copia, Taglia, Incolla, Elimina, Sostituisci, Salva come blocco, Copia come immagine e i comandi pertinenti al tipo. Le evidenziazioni offrono anche Elimina e, quando associate a un filo o componente, il comando per scollegarle. I toggle delle due sidebar usano lo stesso componente con icone specchiate.
 
 ### Allineare e distribuire
 
@@ -155,15 +155,15 @@ Durante un drag le guide mostrano allineamenti, terminali, quote e spaziatura un
 
 ### Stili di linea e continuazioni
 
-Per fili, linee decorative e rettangoli scegli **Stile linea → Continua / Tratteggiata / Puntinata**. Trattino e intervallo si misurano in unità documento e possono essere modificati anche per più oggetti. Un filo privo di stile nei JSON precedenti resta continuo. Il tratteggio mantiene endpoint e topologia; una hit area continua permette di selezionarlo anche nei vuoti.
+Per fili, linee decorative, rettangoli e cerchi scegli **Stile linea → Continua / Tratteggiata / Puntinata**. Trattino e intervallo si misurano in unità documento e possono essere modificati anche per più oggetti. Un filo privo di stile nei JSON precedenti resta continuo. Il tratteggio mantiene endpoint e topologia; una hit area continua permette di selezionarlo anche nei vuoti.
 
 Per rendere tratteggiata solo una continuazione, seleziona il filo, usa **clic destro → Dividi filo…**, poi clicca sul punto desiderato. Il filo viene diviso in due tratti collegati, senza creare un nodo; il secondo rimane selezionato e può ricevere uno stile indipendente. Escape annulla la scelta del punto. La divisione conserva eventuali annotazioni di corrente e non viene eseguita sugli endpoint o su incroci con altri oggetti, evitando collegamenti involontari.
 
-### Rettangoli e linee decorative
+### Rettangoli, cerchi e linee decorative
 
-In **Disegno e annotazioni** trovi **Rettangolo** e **Linea decorativa**. Trascina per creare; la preview segue la griglia. Per il rettangolo **Shift** crea un quadrato e **Alt/Option** disegna dal centro; tutti i versi di trascinamento sono supportati. Per la linea **Shift** vincola a multipli di 45°. Escape annulla la preview.
+In **Disegno e annotazioni** trovi **Rettangolo**, **Cerchio** e **Linea decorativa**. Trascina per creare; la preview segue la griglia. Per il rettangolo **Shift** crea un quadrato; per rettangoli e cerchi **Alt/Option** disegna dal centro. Il cerchio mantiene sempre le proporzioni circolari, anche quando viene ridimensionato; tutti i versi di trascinamento sono supportati. Per la linea **Shift** vincola a multipli di 45°. Escape annulla la preview.
 
-Il rettangolo nasce senza riempimento. Selezionalo sul bordo, spostalo, trascina i quattro handle oppure modifica larghezza e altezza nell’inspector. **Aspetto** controlla colore, spessore e stile del contorno, riempimento e opacità indipendenti. Un rettangolo vuoto lascia selezionabili gli oggetti interni; entrambi i nuovi oggetti vengono disegnati dietro i componenti e non creano connessioni elettriche. La rotazione di 90° scambia larghezza e altezza: il rettangolo resta allineato agli assi. Un ridimensionamento completo è un solo undo; Escape ripristina la geometria iniziale.
+Rettangoli e cerchi nascono senza riempimento. Selezionali sul bordo, spostali e trascina i quattro handle; nell’inspector puoi modificare larghezza e altezza dei rettangoli oppure il **Diametro** dei cerchi. **Aspetto** controlla colore, spessore e stile del contorno, riempimento e opacità indipendenti. Rettangoli e cerchi vuoti lasciano selezionabili gli oggetti interni; queste forme vengono disegnati dietro i componenti e non creano connessioni elettriche. La rotazione di 90° scambia larghezza e altezza: il rettangolo resta allineato agli assi. Un ridimensionamento completo è un solo undo; Escape ripristina la geometria iniziale.
 
 ### Evidenziatore
 
@@ -189,7 +189,7 @@ Ogni trascinamento è una sola operazione Annulla/Ripeti; Esc, cambio strumento 
 
 Gli eventi nativi Copia/Taglia/Incolla dei menu del browser sono supportati anche quando non viene inviato un keydown. In input, textarea, ricerca, editing inline e contenteditable rimane il comportamento nativo del testo.
 
-Il salvataggio locale, i blocchi personali e la copia immagine conservano rettangoli, linee, stili e opacità. Guide, griglia, selezione e handle restano fuori dalle immagini copiate.
+Il salvataggio locale, i blocchi personali e la copia immagine conservano rettangoli, cerchi, linee, stili e opacità. Guide, griglia, selezione e handle restano fuori dalle immagini copiate.
 
 ## Annotazioni integrate e PNG della selezione
 

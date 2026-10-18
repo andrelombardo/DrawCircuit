@@ -69,7 +69,7 @@ export const CircuitLayer = memo(function CircuitLayer({
       </g>
       <g data-layer="graphics">
         {doc.objects.map((o) =>
-          o.kind === 'rectangle' || o.kind === 'line' ? (
+          o.kind === 'rectangle' || o.kind === 'circle' || o.kind === 'line' ? (
             <GraphicView key={o.id} object={o} />
           ) : null,
         )}

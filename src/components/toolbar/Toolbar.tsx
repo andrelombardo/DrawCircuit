@@ -2,6 +2,7 @@ import { t } from '../../i18n';
 import {
   ArrowRight,
   CircleDot,
+  Circle,
   GripVertical,
   Hand,
   Highlighter,
@@ -50,6 +51,7 @@ export function DrawingToolbar({ sidebarVisible = true }: { sidebarVisible?: boo
     'highlight',
     'highlight-eraser',
     'rectangle',
+    'circle',
     'line',
     'junction',
     'arrow',
@@ -143,6 +145,12 @@ export function DrawingToolbar({ sidebarVisible = true }: { sidebarVisible?: boo
       label: t('Rectangle'),
       icon: <Square size={18} />,
       onSelect: () => setTool('rectangle'),
+    },
+    {
+      id: 'circle',
+      label: t('Circle'),
+      icon: <Circle size={18} />,
+      onSelect: () => setTool('circle'),
     },
     {
       id: 'line',

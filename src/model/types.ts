@@ -234,8 +234,7 @@ export interface BraceAnnotation {
   opacity?: number;
   width: number;
 }
-export interface RectangleAnnotation extends StrokeStyle {
-  kind: 'rectangle';
+interface FilledShape extends StrokeStyle {
   id: string;
   x: number;
   y: number;
@@ -247,6 +246,14 @@ export interface RectangleAnnotation extends StrokeStyle {
   fill: string | 'none';
   fillOpacity?: number;
 }
+export interface RectangleAnnotation extends FilledShape {
+  kind: 'rectangle';
+}
+/** Circular annotations keep equal width and height, including while resizing. */
+export interface CircleAnnotation extends FilledShape {
+  kind: 'circle';
+}
+export type ShapeAnnotation = RectangleAnnotation | CircleAnnotation;
 export interface LineAnnotation extends StrokeStyle {
   kind: 'line';
   id: string;
@@ -295,6 +302,7 @@ export type CircuitObject =
   | ElectricalAnnotation
   | BraceAnnotation
   | RectangleAnnotation
+  | CircleAnnotation
   | LineAnnotation
   | Highlight;
 export interface CircuitDocument {
@@ -307,6 +315,7 @@ export type Tool =
   | 'highlight'
   | 'highlight-eraser'
   | 'rectangle'
+  | 'circle'
   | 'line'
   | 'wire'
   | 'junction'

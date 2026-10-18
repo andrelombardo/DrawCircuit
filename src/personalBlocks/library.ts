@@ -88,7 +88,7 @@ export function instantiatePersonalBlock(
           label: { ...o.label, offset: rp(o.label.offset) },
         };
       if (o.kind === 'text') return { ...o, ...rp(o), rotation: next(o.rotation) };
-      if (o.kind === 'rectangle') {
+      if (o.kind === 'rectangle' || o.kind === 'circle') {
         const center = rp({ x: o.x + o.width / 2, y: o.y + o.height / 2 });
         const width = rotation % 180 === 90 ? o.height : o.width,
           height = rotation % 180 === 90 ? o.width : o.height;

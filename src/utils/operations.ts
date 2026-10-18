@@ -218,6 +218,7 @@ export function rotateObjects(
   const selected = new Set(ids),
     objects = doc.objects.filter((o) => selected.has(o.id));
   if (!objects.length || increment === 0) return doc;
+  if (objects.length === 1 && objects[0].kind === 'circle') return doc;
   const angle: Rotation = increment ?? (objects.some((o) => o.kind === 'component') ? 45 : 90);
   const boxes = objects.map((o) => objectBounds(o, doc));
   const minX = Math.min(...boxes.map((b) => b.x)),
@@ -226,7 +227,7 @@ export function rotateObjects(
     maxY = Math.max(...boxes.map((b) => b.y + b.height));
   const anchors = objects.map((o): Point => {
     if ('x' in o)
-      return o.kind === 'loop-arrow'
+      return o.kind === 'loop-arrow' || o.kind === 'circle'
         ? { x: o.x + o.width / 2, y: o.y + o.height / 2 }
         : { x: o.x, y: o.y };
     if (o.kind === 'wire')
@@ -322,7 +323,7 @@ export function rotateObjects(
           label: { ...o.label, offset: rotatePoint(o.label.offset, 90) },
         };
       }
-      if (o.kind === 'rectangle') {
+      if (o.kind === 'rectangle' || o.kind === 'circle') {
         // Rectangles stay axis aligned; quarter turns exchange dimensions.
         const c = rp({ x: o.x + o.width / 2, y: o.y + o.height / 2 });
         const width = angle === 90 ? o.height : o.width,

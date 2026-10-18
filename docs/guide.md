@@ -38,7 +38,7 @@ In Select mode, drag a terminal or round wire endpoint to start a new connected 
 
 Double-click a wire to add a bend. Drag square handles to edit bends; **Alt/Option-click** a square removes it. Redundant bends are removed only when the visible route remains identical. **Esc** cancels a gesture; panning with Space does not discard an unfinished wire.
 
-Choose **Line style → Solid / Dashed / Dotted** in Properties for wires, decorative lines, and rectangles. Dash length and gap use document units. A continuous hit area keeps dashed objects selectable. To style only a continuation, select a wire, choose **right-click → Split wire…**, and click the split point. The connected second segment remains selected and can receive its own style. Splits preserve current annotations and avoid endpoints and crossings. **Esc** cancels split placement.
+Choose **Line style → Solid / Dashed / Dotted** in Properties for wires, decorative lines, rectangles, and circles. Dash length and gap use document units. A continuous hit area keeps dashed objects selectable. To style only a continuation, select a wire, choose **right-click → Split wire…**, and click the split point. The connected second segment remains selected and can receive its own style. Splits preserve current annotations and avoid endpoints and crossings. **Esc** cancels split placement.
 
 ## Properties and precise layout
 
@@ -46,7 +46,7 @@ The **Properties** sidebar shows the selected type or number of elements. It off
 
 - **Label / Content:** edit object text or a shared value. **Internal text** edits the text inside generic blocks.
 - **Position:** X/Y describe an object’s position or the top-left geometric bounds of a multiple selection. Editing a group coordinate translates the entire selection. Rotation applies to the object or selected label.
-- **Appearance:** adjust symbol/text and label colors and opacity independently; change line width, styles, text size/alignment, and rectangle fill where relevant. Click a color for preset swatches or **Custom color…**. Native color-picker previews form one gesture.
+- **Appearance:** adjust symbol/text and label colors and opacity independently; change line width, styles, text size (up to 200 px)/alignment, and shape fill where relevant. Click a color for preset swatches or **Custom color…**. Native color-picker previews form one gesture.
 - **Transforms:** rotate compatible groups around their center and mirror arrows or loops horizontally/vertically. **Reverse arrow** changes arrowhead direction without reflecting the shape.
 - **Geometry:** object-specific dimensions, endpoints, routing, braces, alignment, distribution, and spacing.
 
@@ -64,7 +64,7 @@ Labels and text support LaTeX: for example, `r_{AB}`, `V_{in}`, and `\frac{V}{R}
 
 New junction labels avoid nearby objects where possible. Existing moved labels stay where you place them. **Alt/Option-click** cycles overlapping labels.
 
-The **Drawing and annotations** pencil menu includes wires, junctions, arrows, loops, braces/brackets, electrical annotations, highlights, rectangles, and decorative lines.
+The **Drawing and annotations** pencil menu includes wires, junctions, arrows, loops, braces/brackets, electrical annotations, highlights, rectangles, circles, and decorative lines.
 
 ### Arrows, loops, and braces
 
@@ -100,9 +100,9 @@ Drag to erase only the crossed portions of every intersected highlight. A 4 px m
 
 **Properties → Size** adjusts the diameter from 6–160 document units; it stays in memory during the session and affects partial erasure only. The cursor outline uses the same canvas scale at any zoom. Each drag is one undo/redo action. Esc, tool changes, or pointer cancellation discard an unfinished erasure. To delete with the keyboard instead, use Select, Alt/Option-click a covered highlight if necessary, and press Delete/Backspace.
 
-### Rectangles and decorative lines
+### Rectangles, circles, and decorative lines
 
-Drag with **Rectangle** or **Decorative line** to create a shape. Rectangle uses **Shift** for a square and **Alt/Option** to draw from the center. Line uses **Shift** for 45° increments. Esc cancels previews. Rectangles start unfilled; select their border, resize with corner handles, or enter width/height. A 90° rotation exchanges rectangle width and height. Both shapes render behind the circuit and create no electrical connections. Empty rectangles leave interior objects selectable.
+Drag with **Rectangle**, **Circle**, or **Decorative line** to create a shape. Rectangle uses **Shift** for a square; Rectangle and Circle use **Alt/Option** to draw from the center. Circles stay circular when drawn or resized. Line uses **Shift** for 45° increments. Esc cancels previews. Rectangles and circles start unfilled; select their border and resize with corner handles. Enter width/height for rectangles or **Diameter** for circles in Properties. Both support independent outline/fill colors and opacity, plus solid, dashed, or dotted outlines. A 90° rotation exchanges rectangle width and height. These shapes render behind the circuit and create no electrical connections. Unfilled rectangles and circles leave interior objects selectable.
 
 ## Smart Placement and reusable blocks
 

@@ -1,13 +1,20 @@
 import { memo } from 'react';
-import type { LineAnnotation, RectangleAnnotation } from '../../model/types';
+import type { LineAnnotation, ShapeAnnotation } from '../../model/types';
 import { dashPattern } from '../../utils/strokeStyle';
 import { pointsPath } from '../../utils/geometry';
 export const GraphicView = memo(function GraphicView({
   object: o,
 }: {
-  object: LineAnnotation | RectangleAnnotation;
+  object: LineAnnotation | ShapeAnnotation;
 }) {
-  const width = o.kind === 'rectangle' ? o.strokeWidth : o.width;
+  const width = o.kind === 'line' ? o.width : o.strokeWidth;
+  const Shape = o.kind === 'circle' ? 'circle' : 'rect';
+  const geometry =
+    o.kind === 'line'
+      ? {}
+      : o.kind === 'circle'
+        ? { cx: o.x + o.width / 2, cy: o.y + o.height / 2, r: o.width / 2 }
+        : { x: o.x, y: o.y, width: o.width, height: o.height };
   const stroke = {
     fill: 'none',
     stroke: o.color,
@@ -19,38 +26,20 @@ export const GraphicView = memo(function GraphicView({
   };
   return (
     <g data-object={o.id} className="circuit-object">
-      {o.kind === 'rectangle' ? (
+      {o.kind !== 'line' ? (
         <>
           {o.fill !== 'none' && (
-            <rect
-              x={o.x}
-              y={o.y}
-              width={o.width}
-              height={o.height}
-              fill={o.fill}
-              fillOpacity={o.fillOpacity ?? 1}
-              stroke="none"
-            />
+            <Shape {...geometry} fill={o.fill} fillOpacity={o.fillOpacity ?? 1} stroke="none" />
           )}
-          <rect
-            x={o.x}
-            y={o.y}
-            width={o.width}
-            height={o.height}
+          <Shape
+            {...geometry}
             fill="none"
             stroke="transparent"
             strokeWidth={14}
             vectorEffect="non-scaling-stroke"
             pointerEvents="stroke"
           />
-          <rect
-            x={o.x}
-            y={o.y}
-            width={o.width}
-            height={o.height}
-            {...stroke}
-            pointerEvents="none"
-          />
+          <Shape {...geometry} {...stroke} pointerEvents="none" />
         </>
       ) : (
         <>

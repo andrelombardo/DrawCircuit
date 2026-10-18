@@ -16,8 +16,8 @@ import {
   simplifyHighlight,
 } from '../../annotations/highlight';
 import type { Highlight } from '../../model/types';
-import { rectangleFromDrag, resizeRectangle } from '../../utils/rectangles';
-import type { RectangleAnnotation, LineAnnotation } from '../../model/types';
+import { circleFromDrag, rectangleFromDrag, resizeShape } from '../../utils/rectangles';
+import type { ShapeAnnotation, LineAnnotation } from '../../model/types';
 import { createBrace, resizeBrace } from '../../annotations/brace';
 import { createCurrent, createElectrical, createPolarity } from '../../annotations/electrical';
 import { supportsPolarity } from '../../model/capabilities';
@@ -106,7 +106,15 @@ type Drag =
       started: boolean;
     }
   | {
-      type: 'arrow' | 'loop-arrow' | 'voltage' | 'brace' | 'bracket' | 'rectangle' | 'line';
+      type:
+        | 'arrow'
+        | 'loop-arrow'
+        | 'voltage'
+        | 'brace'
+        | 'bracket'
+        | 'rectangle'
+        | 'circle'
+        | 'line';
       origin: Point;
     };
 export interface Overlay {
@@ -120,7 +128,7 @@ export interface Overlay {
     | LoopArrow
     | ElectricalAnnotation
     | BraceAnnotation
-    | RectangleAnnotation
+    | ShapeAnnotation
     | LineAnnotation
     | null;
   distances: DistanceGuide[];
@@ -819,6 +827,7 @@ export function useCanvasInteractions(
     }
     if (
       s.tool === 'rectangle' ||
+      s.tool === 'circle' ||
       s.tool === 'line' ||
       s.tool === 'arrow' ||
       s.tool === 'loop-arrow' ||
@@ -1090,7 +1099,7 @@ export function useCanvasInteractions(
       });
       return;
     }
-    if (d?.type === 'rectangle' || d?.type === 'line') {
+    if (d?.type === 'rectangle' || d?.type === 'circle' || d?.type === 'line') {
       let end = snapPoint(p);
       if (d.type === 'line' && e.shiftKey) {
         const dx = end.x - d.origin.x,
@@ -1107,7 +1116,9 @@ export function useCanvasInteractions(
         arrow: {
           ...(d.type === 'rectangle'
             ? rectangleFromDrag(d.origin, end, e.shiftKey, e.altKey)
-            : createLine(d.origin, end)),
+            : d.type === 'circle'
+              ? circleFromDrag(d.origin, end, e.altKey)
+              : createLine(d.origin, end)),
           id: 'preview',
         },
       });
@@ -1237,8 +1248,11 @@ export function useCanvasInteractions(
                   if (o.kind === 'brace' && (d.handle === 'start' || d.handle === 'end')) {
                     return resizeBrace(o, d.handle, snapPoint(p));
                   }
-                  if (o.kind === 'rectangle' && d.handle?.startsWith('rect'))
-                    return resizeRectangle(o, d.handle, snapPoint(p), e.shiftKey);
+                  if (
+                    (o.kind === 'rectangle' || o.kind === 'circle') &&
+                    d.handle?.startsWith('rect')
+                  )
+                    return resizeShape(o, d.handle, snapPoint(p), e.shiftKey);
                   if (o.kind === 'line' && (d.handle === 'start' || d.handle === 'end'))
                     return { ...o, [d.handle]: snapPoint(p) };
                   if (o.kind === 'arrow') {
@@ -1536,13 +1550,14 @@ export function useCanvasInteractions(
     }
     if (
       (d?.type === 'rectangle' ||
+        d?.type === 'circle' ||
         d?.type === 'line' ||
         d?.type === 'arrow' ||
         d?.type === 'loop-arrow' ||
         d?.type === 'brace' ||
         d?.type === 'bracket') &&
       overlay.arrow &&
-      (overlay.arrow.kind === 'rectangle'
+      (overlay.arrow.kind === 'rectangle' || overlay.arrow.kind === 'circle'
         ? overlay.arrow.width >= 2 &&
           overlay.arrow.height >= 2 &&
           distance(d.origin, world(e.clientX, e.clientY)) > 3 / viewport.zoom

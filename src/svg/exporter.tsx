@@ -98,18 +98,24 @@ export function exportSVG(
     if (content) parts.push(`<g opacity="${f(group[0].opacity)}">${content}</g>`);
   }
   for (const o of doc.objects) {
-    if (o.kind === 'rectangle') {
+    if (o.kind === 'rectangle' || o.kind === 'circle') {
       boxes.push({
         x: o.x - o.strokeWidth / 2,
         y: o.y - o.strokeWidth / 2,
         width: o.width + o.strokeWidth,
         height: o.height + o.strokeWidth,
       });
-      const rect = `x="${f(o.x)}" y="${f(o.y)}" width="${f(o.width)}" height="${f(o.height)}"`;
+      const shape = o.kind === 'circle' ? 'circle' : 'rect';
+      const geometry =
+        o.kind === 'circle'
+          ? `cx="${f(o.x + o.width / 2)}" cy="${f(o.y + o.height / 2)}" r="${f(o.width / 2)}"`
+          : `x="${f(o.x)}" y="${f(o.y)}" width="${f(o.width)}" height="${f(o.height)}"`;
       if (o.fill !== 'none')
-        parts.push(`<rect ${rect} fill="${o.fill}" fill-opacity="${f(o.fillOpacity ?? 1)}"/>`);
+        parts.push(
+          `<${shape} ${geometry} fill="${o.fill}" fill-opacity="${f(o.fillOpacity ?? 1)}"/>`,
+        );
       parts.push(
-        `<rect ${rect} fill="none" stroke="${o.color}" stroke-width="${f(o.strokeWidth)}" opacity="${f(o.opacity ?? 1)}" stroke-linejoin="round"${dashPattern(o, o.strokeWidth) ? ` stroke-dasharray="${dashPattern(o, o.strokeWidth)!.map(f).join(' ')}"` : ''} stroke-linecap="round"/>`,
+        `<${shape} ${geometry} fill="none" stroke="${o.color}" stroke-width="${f(o.strokeWidth)}" opacity="${f(o.opacity ?? 1)}" stroke-linejoin="round"${dashPattern(o, o.strokeWidth) ? ` stroke-dasharray="${dashPattern(o, o.strokeWidth)!.map(f).join(' ')}"` : ''} stroke-linecap="round"/>`,
       );
     } else if (o.kind === 'line') {
       boxes.push(visualBounds(o, doc));
@@ -148,7 +154,11 @@ export function exportSVG(
   }
   for (const o of doc.objects.filter(
     (o) =>
-      o.kind !== 'highlight' && o.kind !== 'wire' && o.kind !== 'rectangle' && o.kind !== 'line',
+      o.kind !== 'highlight' &&
+      o.kind !== 'wire' &&
+      o.kind !== 'rectangle' &&
+      o.kind !== 'circle' &&
+      o.kind !== 'line',
   )) {
     const firstPart = parts.length;
     if (o.kind !== 'text' && o.kind !== 'electrical') boxes.push(visualBounds(o, doc));

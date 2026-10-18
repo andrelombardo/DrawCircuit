@@ -150,7 +150,7 @@ export function SelectionLayer({
                     ))}
                   </>
                 )}
-                {o.kind === 'rectangle' && (
+                {(o.kind === 'rectangle' || o.kind === 'circle') && (
                   <>
                     <rect
                       x={o.x}

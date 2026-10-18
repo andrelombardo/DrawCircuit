@@ -12,6 +12,7 @@ import {
   Square,
   Spline,
   CircleDot,
+  Circle,
   Type,
   Layers,
   ArrowRight,
@@ -44,6 +45,7 @@ const names: Record<CircuitObject['kind'], string> = {
   electrical: 'Electrical annotation',
   brace: 'Brace / Bracket',
   rectangle: 'Rectangle',
+  circle: 'Circle',
   line: 'Decorative line',
   highlight: 'Highlight',
 };
@@ -84,7 +86,7 @@ export function PropertiesContent() {
           ),
         );
   const lineObjects = objects.filter(
-    (o) => o.kind === 'wire' || o.kind === 'line' || o.kind === 'rectangle',
+    (o) => o.kind === 'wire' || o.kind === 'line' || o.kind === 'rectangle' || o.kind === 'circle',
   );
   const independentRotation = rotatables.length === objects.length;
   const selectedIds = new Set(objects.map((object) => object.id));
@@ -101,6 +103,7 @@ export function PropertiesContent() {
           'wire',
           'brace',
           'rectangle',
+          'circle',
           'line',
         ].includes(item.kind) &&
         !(hasComponent && ['brace', 'rectangle'].includes(item.kind)) &&
@@ -110,7 +113,7 @@ export function PropertiesContent() {
               ? !fixedWireConnection(ep, doc, selectedIds)
               : selectedIds.has(ep.kind === 'terminal' ? ep.componentId : ep.junctionId),
           )),
-    ) && objects.some((item) => !['wire', 'junction'].includes(item.kind));
+    ) && objects.some((item) => !['wire', 'junction', 'circle'].includes(item.kind));
   const electricalOnly = o?.kind === 'electrical' && !labelTarget;
   const absoluteRotation = !!labelTarget || (!!o && independentRotation);
   const rectangles = objects.filter((o) => o.kind === 'rectangle');
@@ -180,6 +183,8 @@ export function PropertiesContent() {
             <ComponentPreview component={componentRegistry[o.type]} />
           ) : o?.kind === 'rectangle' ? (
             <Square size={16} />
+          ) : o?.kind === 'circle' ? (
+            <Circle size={16} />
           ) : o?.kind === 'wire' || o?.kind === 'line' ? (
             <Spline size={16} />
           ) : o?.kind === 'junction' ? (
@@ -297,7 +302,10 @@ export function PropertiesContent() {
               value={commonValue(lineObjects.map((o) => o.lineStyle ?? 'solid'))}
               onChange={(v) =>
                 apply((o) =>
-                  o.kind === 'wire' || o.kind === 'line' || o.kind === 'rectangle'
+                  o.kind === 'wire' ||
+                  o.kind === 'line' ||
+                  o.kind === 'rectangle' ||
+                  o.kind === 'circle'
                     ? { ...o, lineStyle: v as LineStyle }
                     : o,
                 )
@@ -322,13 +330,15 @@ export function PropertiesContent() {
                     lineObjects
                       .filter((o) => o.lineStyle === 'dashed')
                       .map(
-                        (o) =>
-                          o.dashLength ?? (o.kind === 'rectangle' ? o.strokeWidth : o.width) * 4,
+                        (o) => o.dashLength ?? ('strokeWidth' in o ? o.strokeWidth : o.width) * 4,
                       ),
                   )}
                   onCommit={(v) =>
                     apply((o) =>
-                      (o.kind === 'wire' || o.kind === 'line' || o.kind === 'rectangle') &&
+                      (o.kind === 'wire' ||
+                        o.kind === 'line' ||
+                        o.kind === 'rectangle' ||
+                        o.kind === 'circle') &&
                       o.lineStyle === 'dashed'
                         ? { ...o, dashLength: Number(v) }
                         : o,
@@ -344,13 +354,14 @@ export function PropertiesContent() {
                   value={commonValue(
                     lineObjects
                       .filter((o) => o.lineStyle === 'dashed')
-                      .map(
-                        (o) => o.dashGap ?? (o.kind === 'rectangle' ? o.strokeWidth : o.width) * 2,
-                      ),
+                      .map((o) => o.dashGap ?? ('strokeWidth' in o ? o.strokeWidth : o.width) * 2),
                   )}
                   onCommit={(v) =>
                     apply((o) =>
-                      (o.kind === 'wire' || o.kind === 'line' || o.kind === 'rectangle') &&
+                      (o.kind === 'wire' ||
+                        o.kind === 'line' ||
+                        o.kind === 'rectangle' ||
+                        o.kind === 'circle') &&
                       o.lineStyle === 'dashed'
                         ? { ...o, dashGap: Number(v) }
                         : o,
@@ -412,7 +423,9 @@ export function PropertiesContent() {
       {!labelTarget &&
         (objects.length > 1 ||
           objects.some((o) =>
-            ['rectangle', 'line', 'wire', 'arrow', 'loop-arrow', 'brace'].includes(o.kind),
+            ['rectangle', 'circle', 'line', 'wire', 'arrow', 'loop-arrow', 'brace'].includes(
+              o.kind,
+            ),
           )) && (
           <InspectorSection title={t('Geometry')}>
             {objects.every((item) => item.kind === 'brace') && (
@@ -446,6 +459,20 @@ export function PropertiesContent() {
                   <ArrowLeftRight size={14} /> {t('Reverse arrow')}{' '}
                 </button>
               </PropertyRow>
+            )}
+            {objects.every((o) => o.kind === 'circle') && (
+              <PropertyField
+                label={t('Diameter')}
+                numeric
+                min={1}
+                max={1e7}
+                value={commonValue(objects.map((o) => (o.kind === 'circle' ? o.width : 0)))}
+                onCommit={(v) =>
+                  apply((o) =>
+                    o.kind === 'circle' ? { ...o, width: Number(v), height: Number(v) } : o,
+                  )
+                }
+              />
             )}
             {rectangles.length === objects.length && (
               <div className="inspector-pair">

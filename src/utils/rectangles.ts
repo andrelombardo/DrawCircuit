@@ -1,4 +1,4 @@
-import type { Point, RectangleAnnotation } from '../model/types';
+import type { CircleAnnotation, Point, ShapeAnnotation } from '../model/types';
 import { createRectangle } from '../model/factories';
 /** Both drawing directions, Shift square and Option centred drawing share normalization. */
 export function rectangleFromDrag(origin: Point, end: Point, square = false, centered = false) {
@@ -13,27 +13,25 @@ export function rectangleFromDrag(origin: Point, end: Point, square = false, cen
     y: origin.y + delta.y,
   });
 }
-export function resizeRectangle(
-  o: RectangleAnnotation,
+export function circleFromDrag(origin: Point, end: Point, centered = false): CircleAnnotation {
+  return { ...rectangleFromDrag(origin, end, true, centered), kind: 'circle' };
+}
+export function resizeShape(
+  o: ShapeAnnotation,
   handle: string,
   point: Point,
   square = false,
-): RectangleAnnotation {
+): ShapeAnnotation {
   const opposite = {
     x: handle.endsWith('W') ? o.x + o.width : o.x,
     y: handle.includes('N') ? o.y + o.height : o.y,
   };
+  const bounds = rectangleFromDrag(opposite, point, o.kind === 'circle' || square);
   return {
     ...o,
-    ...rectangleFromDrag(opposite, point, square),
-    id: o.id,
-    color: o.color,
-    strokeWidth: o.strokeWidth,
-    fill: o.fill,
-    fillOpacity: o.fillOpacity,
-    opacity: o.opacity,
-    lineStyle: o.lineStyle,
-    dashLength: o.dashLength,
-    dashGap: o.dashGap,
+    x: bounds.x,
+    y: bounds.y,
+    width: bounds.width,
+    height: bounds.height,
   };
 }

@@ -172,10 +172,12 @@ export function isExportableObject(o: CircuitObject): boolean {
         ['start', 'middle', 'end'].includes(o.align)
       );
     case 'rectangle':
+    case 'circle':
       return (
         finitePoint(o) &&
         positive(o.width) &&
         positive(o.height) &&
+        (o.kind !== 'circle' || o.width === o.height) &&
         positive(o.strokeWidth) &&
         (o.fill === 'none' || !!normalizeHex(o.fill)) &&
         opacity(o.fillOpacity) &&

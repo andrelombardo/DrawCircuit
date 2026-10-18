@@ -483,7 +483,8 @@ export function moveObject(o: CircuitObject, delta: Point, moved: Set<string>): 
     o.kind === 'junction' ||
     o.kind === 'text' ||
     o.kind === 'loop-arrow' ||
-    o.kind === 'rectangle'
+    o.kind === 'rectangle' ||
+    o.kind === 'circle'
   )
     return { ...o, x: o.x + delta.x, y: o.y + delta.y };
   if (o.kind === 'highlight') return mapHighlight(o, (p) => add(p, delta));
@@ -596,7 +597,8 @@ export function objectBounds(
       { x: g.labelPoint.x + w / 2, y: g.labelPoint.y + o.label.fontSize },
     ];
     if (drawing) points.push(...drawing.head);
-  } else if (o.kind === 'rectangle') return { x: o.x, y: o.y, width: o.width, height: o.height };
+  } else if (o.kind === 'rectangle' || o.kind === 'circle')
+    return { x: o.x, y: o.y, width: o.width, height: o.height };
   else if (o.kind === 'line') points = [o.start, o.end];
   else if (o.kind === 'wire') points = wirePoints(o, doc);
   else if (o.kind === 'loop-arrow') {

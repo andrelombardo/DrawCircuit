@@ -132,47 +132,49 @@ function CanvasContent({
         ? t('Drag to highlight all or part of wires and components · Esc returns to Select')
         : tool === 'rectangle'
           ? t('Drag to draw · Shift for a square · Option from center · Esc cancels')
-          : tool === 'line'
-            ? t('Drag a decorative line · Shift snaps to 45° · Esc cancels')
-            : tool === 'brace' || tool === 'bracket'
-              ? t('Drag to group · double-click to label · R rotates · Flip side in Properties')
-              : tool === 'preset'
-                ? t('{name} · click to place · R rotates · Esc cancels', {
-                    name: pendingPresetId
-                      ? presetRegistry[pendingPresetId]
-                        ? t(presetRegistry[pendingPresetId].name)
-                        : (personalName ?? t('Quick block'))
-                      : t('Quick block'),
-                  })
-                : tool === 'current'
-                  ? t('Current · click a highlighted wire · Esc cancels')
-                  : tool === 'polarity'
-                    ? t('Polarity · click a highlighted component · Esc cancels')
-                    : tool === 'voltage'
-                      ? interactions.voltageStart
-                        ? t('A selected · select the second point · Esc cancels')
-                        : t('Select the first point · click or drag to the second · Esc cancels')
-                      : tool === 'wire'
-                        ? draft
-                          ? t(
-                              'Click to add a bend · Backspace goes back · Enter finishes · Esc cancels',
-                            )
-                          : t('Click a terminal, junction, or wire to start')
-                        : tool === 'junction'
-                          ? t('Click to place junctions · Esc or V finishes')
-                          : tool === 'text'
-                            ? t('Click to place text · double-click to edit')
-                            : tool === 'loop-arrow'
-                              ? t('Drag an area for the loop · drag the tip handle to move it')
-                              : tool === 'arrow'
-                                ? t('Drag to draw · select to edit handles')
-                                : isComponent
-                                  ? t('{name} · click to place · R rotates · Esc finishes', {
-                                      name: t(catalog.find((c) => c.type === tool)?.name ?? ''),
-                                    })
-                                  : tool === 'pan'
-                                    ? t('Drag to pan the view')
-                                    : null;
+          : tool === 'circle'
+            ? t('Drag to draw a circle · Option from center · Esc cancels')
+            : tool === 'line'
+              ? t('Drag a decorative line · Shift snaps to 45° · Esc cancels')
+              : tool === 'brace' || tool === 'bracket'
+                ? t('Drag to group · double-click to label · R rotates · Flip side in Properties')
+                : tool === 'preset'
+                  ? t('{name} · click to place · R rotates · Esc cancels', {
+                      name: pendingPresetId
+                        ? presetRegistry[pendingPresetId]
+                          ? t(presetRegistry[pendingPresetId].name)
+                          : (personalName ?? t('Quick block'))
+                        : t('Quick block'),
+                    })
+                  : tool === 'current'
+                    ? t('Current · click a highlighted wire · Esc cancels')
+                    : tool === 'polarity'
+                      ? t('Polarity · click a highlighted component · Esc cancels')
+                      : tool === 'voltage'
+                        ? interactions.voltageStart
+                          ? t('A selected · select the second point · Esc cancels')
+                          : t('Select the first point · click or drag to the second · Esc cancels')
+                        : tool === 'wire'
+                          ? draft
+                            ? t(
+                                'Click to add a bend · Backspace goes back · Enter finishes · Esc cancels',
+                              )
+                            : t('Click a terminal, junction, or wire to start')
+                          : tool === 'junction'
+                            ? t('Click to place junctions · Esc or V finishes')
+                            : tool === 'text'
+                              ? t('Click to place text · double-click to edit')
+                              : tool === 'loop-arrow'
+                                ? t('Drag an area for the loop · drag the tip handle to move it')
+                                : tool === 'arrow'
+                                  ? t('Drag to draw · select to edit handles')
+                                  : isComponent
+                                    ? t('{name} · click to place · R rotates · Esc finishes', {
+                                        name: t(catalog.find((c) => c.type === tool)?.name ?? ''),
+                                      })
+                                    : tool === 'pan'
+                                      ? t('Drag to pan the view')
+                                      : null;
   return (
     <div className="editor-shell">
       <main className="editor" aria-label={t('Circuit editor')}>
@@ -380,7 +382,9 @@ function CanvasContent({
                 </>
               )}
               {overlay.arrow &&
-                (overlay.arrow.kind === 'rectangle' || overlay.arrow.kind === 'line' ? (
+                (overlay.arrow.kind === 'rectangle' ||
+                overlay.arrow.kind === 'circle' ||
+                overlay.arrow.kind === 'line' ? (
                   <GraphicView object={overlay.arrow} />
                 ) : overlay.arrow.kind === 'brace' ? (
                   <BraceView object={overlay.arrow} zoom={v.zoom} />

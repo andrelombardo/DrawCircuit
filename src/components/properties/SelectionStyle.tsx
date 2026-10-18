@@ -154,7 +154,7 @@ export function OpacityControl({
 }) {
   const value = commonValue(
     objects.map((o) =>
-      fillOpacity && o.kind === 'rectangle'
+      fillOpacity && (o.kind === 'rectangle' || o.kind === 'circle')
         ? (o.fillOpacity ?? 1)
         : labelOpacity && 'label' in o
           ? (o.label.opacity ?? 1)
@@ -173,7 +173,7 @@ export function OpacityControl({
       onCommit={(raw) => {
         const opacity = Number(raw) / 100;
         apply((o) =>
-          fillOpacity && o.kind === 'rectangle'
+          fillOpacity && (o.kind === 'rectangle' || o.kind === 'circle')
             ? { ...o, fillOpacity: opacity }
             : labelOpacity && 'label' in o
               ? { ...o, label: { ...o.label, opacity } }
@@ -201,14 +201,16 @@ export function SelectionStyle({
   const width = commonValue(
     objects.map((o) => ('strokeWidth' in o ? o.strokeWidth : 'width' in o ? o.width : 0)),
   );
-  const rectangles = objects.every((o) => o.kind === 'rectangle');
-  const fillObjects = objects.filter((o) => o.kind === 'rectangle' && o.fill !== 'none');
+  const shapes = objects.every((o) => o.kind === 'rectangle' || o.kind === 'circle');
+  const fillObjects = objects.filter(
+    (o) => (o.kind === 'rectangle' || o.kind === 'circle') && o.fill !== 'none',
+  );
   const symbolCaption =
     o?.kind === 'text'
       ? t('Text')
       : o?.kind === 'wire'
         ? t('Wire')
-        : o?.kind === 'rectangle' || o?.kind === 'line'
+        : o?.kind === 'rectangle' || o?.kind === 'circle' || o?.kind === 'line'
           ? t('Outline')
           : t('Symbol');
   return (
@@ -266,16 +268,20 @@ export function SelectionStyle({
           {typography && <SelectionTypography objects={objects} apply={apply} />}
         </div>
       )}
-      {rectangles && (
+      {shapes && (
         <PropertySelect
           label={t('Fill')}
           caption={t('Fill type')}
           value={commonValue(
-            objects.map((o) => (o.kind === 'rectangle' && o.fill !== 'none' ? 'color' : 'none')),
+            objects.map((o) =>
+              (o.kind === 'rectangle' || o.kind === 'circle') && o.fill !== 'none'
+                ? 'color'
+                : 'none',
+            ),
           )}
           onChange={(v) =>
             apply((o) =>
-              o.kind === 'rectangle'
+              o.kind === 'rectangle' || o.kind === 'circle'
                 ? {
                     ...o,
                     fill: v === 'none' ? 'none' : o.fill === 'none' ? COLORS.blue : o.fill,
@@ -288,11 +294,15 @@ export function SelectionStyle({
           <option value="color">{t('Color')}</option>
         </PropertySelect>
       )}
-      {rectangles && fillObjects.length === objects.length && (
+      {shapes && fillObjects.length === objects.length && (
         <ColorControl
           label={t('Fill')}
-          value={commonValue(fillObjects.map((o) => (o.kind === 'rectangle' ? o.fill : '')))}
-          onChange={(fill) => apply((o) => (o.kind === 'rectangle' ? { ...o, fill } : o))}
+          value={commonValue(
+            fillObjects.map((o) => (o.kind === 'rectangle' || o.kind === 'circle' ? o.fill : '')),
+          )}
+          onChange={(fill) =>
+            apply((o) => (o.kind === 'rectangle' || o.kind === 'circle' ? { ...o, fill } : o))
+          }
         >
           <OpacityControl
             objects={fillObjects}
@@ -344,6 +354,14 @@ export function SelectionTypography({
             28,
             32,
             40,
+            48,
+            56,
+            64,
+            72,
+            96,
+            120,
+            160,
+            200,
             ...(size === undefined ? [] : [size]),
           ]),
         ]
