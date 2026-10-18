@@ -1,44 +1,52 @@
 # Contributing to DrawCircuit
 
-Thanks for helping improve DrawCircuit. It is a browser-only circuit editor built with React, TypeScript, Vite, and Zustand.
+Thanks for your interest in improving DrawCircuit! Contributions of all kinds are welcome, from bug fixes and documentation improvements to new features.
 
-## Find a task
+## Before you start
 
-Check existing issues before opening a new one. Use the [bug report form](https://github.com/andrelombardo/DrawCircuit/issues/new?template=bug_report.yml) for reproducible problems and the [feature request form](https://github.com/andrelombardo/DrawCircuit/issues/new?template=feature_request.yml) for proposals.
+Take a look at the [existing issues](https://github.com/andrelombardo/DrawCircuit/issues) to see whether your idea or bug has already been discussed.
 
-Tasks labeled [good first issue](https://github.com/andrelombardo/DrawCircuit/labels/good%20first%20issue) are intended for newcomers. [help wanted](https://github.com/andrelombardo/DrawCircuit/labels/help%20wanted) marks work open to contributions. Leave a comment on the issue before starting a substantial change so we can agree on scope and avoid duplicate work.
+- [Good first issues](https://github.com/andrelombardo/DrawCircuit/labels/good%20first%20issue) are a good place to start.
+- [Help wanted](https://github.com/andrelombardo/DrawCircuit/labels/help%20wanted) highlights tasks open to contributions.
+- [Report a bug](https://github.com/andrelombardo/DrawCircuit/issues/new?template=bug_report.yml) or [suggest a feature](https://github.com/andrelombardo/DrawCircuit/issues/new?template=feature_request.yml) if you have something new to share.
 
-## Set up
+For larger changes, open an issue or leave a comment before writing code. This helps avoid duplicate work and keeps the scope clear.
 
-Fork the repository, clone your fork, and create a branch for your change. Use Node.js **26.5.0** from `.nvmrc`:
+## Run locally
+
+You'll need [Node.js](https://nodejs.org/) and npm. The recommended Node.js version is specified in [`.nvmrc`](.nvmrc).
+
+1. Fork the repository and clone your fork.
+2. Create a branch for your changes.
+3. Install dependencies and start the development server.
 
 ```sh
+git clone https://github.com/YOUR_USERNAME/DrawCircuit.git
+cd DrawCircuit
 nvm install
 nvm use
 npm ci
 npm run dev
 ```
 
-Open [http://127.0.0.1:5173](http://127.0.0.1:5173). Read the [architecture](docs/architecture.md) and [user guide](docs/guide.md) before changing editing behavior.
+Open [http://127.0.0.1:5173](http://127.0.0.1:5173) in your browser.
 
-## Language and translations
+For more context, see the [architecture documentation](docs/architecture.md) and [user guide](docs/guide.md).
 
-Use **English** for identifiers, source messages, comments, commit messages, issue titles and descriptions, pull requests, and primary documentation. Keep Italian text in `src/i18n/it.ts`, `README.it.md`, and `docs/it/`.
+## Development guidelines
 
-- Wrap UI messages with `t('English message')` from `src/i18n/index.ts` and add the corresponding Italian entry in `src/i18n/it.ts`.
-- Translate whole sentences, including accessible labels, hints, and errors. Use named placeholders: `t('Insert {name}', { name })`. Do not construct sentences from separately translated fragments.
-- Keep catalog and preset metadata in English. Translate it when displaying it; `searchText()` searches both languages.
-- English is the fallback when a translation is missing. Verify new messages in both languages before submitting.
-- Subscribe memoized components with translated UI to `useLanguage` so language changes update them immediately.
-- Never translate existing user-authored labels, block names, document IDs, or storage keys. Language selection is a separate browser preference.
+Keep changes focused and consistent with the existing codebase. In particular:
 
-Keep both READMEs aligned when changing documented features. The detailed Italian user guide is in `docs/it/guide.md`.
+- Preserve existing drawing, selection, editing, and undo/redo behavior unless your change intentionally updates it.
+- Avoid breaking saved documents, browser storage, or compatibility with the current JSON format.
+- Keep the interface accessible and usable on different screen sizes.
+- Update relevant documentation when changing how something works.
+- Preserve the bundled assets, their license notices, and the `/DrawCircuit/` deployment path.
+- If you're changing app installation or caching behavior, review [the PWA documentation](docs/pwa.md) first and avoid clearing unrelated user data.
 
-## Make and validate the change
+## Test your changes
 
-Keep pull requests focused. Preserve JSON v1 compatibility, browser data, undo/redo behavior, MIT and third-party notices, bundled Comic Relief fonts, and the `/DrawCircuit/` deployment path. Read [docs/pwa.md](docs/pwa.md) before changing legacy worker retirement; never clear unrelated caches or user storage.
-
-Run:
+Before submitting a pull request, run:
 
 ```sh
 npm run lint
@@ -47,16 +55,22 @@ npm run build
 npm run preview -- --base /DrawCircuit/
 ```
 
-Check [http://127.0.0.1:4173/DrawCircuit/](http://127.0.0.1:4173/DrawCircuit/) in the browser. The Node test suite uses Vite’s existing TypeScript loader and covers highlight erasure and its integration with document operations. Verify the behavior relevant to your change, including drawing, selection and editing, undo/redo, persistence after reload, and **Copy as image**. For UI changes, check English and Italian, keyboard access, and narrow layouts.
+Check the production preview at [http://127.0.0.1:4173/DrawCircuit/](http://127.0.0.1:4173/DrawCircuit/).
 
-Do not commit generated builds, local environment files, credentials, temporary checks, screenshots, or reports. Keep required app assets and deliberate documentation assets, such as the README demo. Review `git diff` and staged files before committing.
+Also test the behavior affected by your changes. When relevant, verify drawing and editing, undo/redo, saving after reload, copying as an image, keyboard interactions, and responsive layouts.
 
-## Open a pull request
+Review your changes with `git diff` before committing. Don't include secrets, generated build files, local configuration, or temporary debugging artifacts.
 
-Use a concise English title and explain the problem, resulting behavior, and how you verified it. Link the related issue and include screenshots only when they help explain a visible change. The pull request template provides a starting point.
+## Submit a pull request
 
-Pull requests run lint, tests, and the production build. Only pushes to `main` publish to GitHub Pages; contributors do not need deployment credentials. See the [deployment guide](docs/releases.md).
+Open a pull request against `main` and briefly describe:
+
+- **What changed** and why.
+- **How you tested it.**
+- **Related issues**, if any.
+
+Screenshots or short recordings are welcome when they help illustrate a visible change. Automated checks run on pull requests; deployment is handled separately. See the [deployment guide](docs/releases.md) for details.
 
 ## License
 
-Contributions are distributed under the repository’s [MIT License](LICENSE). Preserve the separate notices for third-party code and assets.
+By contributing, you agree that your contributions will be distributed under the project's [MIT License](LICENSE). Keep existing third-party license notices intact.
