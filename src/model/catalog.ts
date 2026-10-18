@@ -17,18 +17,6 @@ export const categories = [
   'Blocchi',
 ] as const;
 export type Category = (typeof categories)[number];
-export type TikzMapping =
-  | { kind: 'bipole'; symbol: string; extraAnchors?: Record<string, string>; text?: boolean }
-  | {
-      kind: 'node';
-      symbol: string;
-      anchors: Record<string, string>;
-      scale?: number;
-      bodyText?: string;
-      mirrorY?: boolean;
-    }
-  | { kind: 'reference'; symbol: string }
-  | { kind: 'geometry'; reason: string };
 export interface ComponentDefinition {
   type: ComponentType;
   name: string;
@@ -42,7 +30,6 @@ export interface ComponentDefinition {
   /** Unpadded body geometry, derived once from the rendered shapes without leads. */
   measurementBounds: { x: number; y: number; width: number; height: number };
   labelOffset: Point;
-  tikz: TikzMapping;
   internalText?: string;
 }
 const terminal = (id: string, x: number, y: number, direction: 'x' | 'y' = 'x'): Terminal => ({
@@ -77,28 +64,12 @@ const gateTerminals = [
   terminal('output', 40, 0),
 ];
 const unaryTerminals = [terminal('input', -40, 0), terminal('output', 40, 0)];
-const bi = (symbol: string, extraAnchors?: Record<string, string>, text = false): TikzMapping => ({
-  kind: 'bipole',
-  symbol,
-  extraAnchors,
-  text,
-});
-const nativeNode = (
-  symbol: string,
-  anchors: Record<string, string>,
-  scale = 0.7,
-  bodyText?: string,
-  mirrorY = false,
-): TikzMapping => ({ kind: 'node', symbol, anchors, scale, bodyText, mirrorY });
-const ref = (symbol: string): TikzMapping => ({ kind: 'reference', symbol });
-const fallback = (reason: string): TikzMapping => ({ kind: 'geometry', reason });
 const def = (
   type: ComponentType,
   name: string,
   group: Category,
   prefix: string,
   shapes: g.SymbolShape[],
-  tikz: TikzMapping,
   aliases: string[],
   terminals = two,
   internalText?: string,
@@ -116,7 +87,6 @@ const def = (
     group,
     prefix,
     shapes,
-    tikz,
     searchTerms: [type, ...aliases],
     terminals,
     bounds: { x, y, width: right - x, height: bottom - y },
@@ -132,17 +102,9 @@ const def = (
     ...(internalText !== undefined ? { internalText } : {}),
   };
 };
-const transAnchors = (bjt: boolean): Record<string, string> =>
-  bjt ? { base: 'B', collector: 'C', emitter: 'E' } : { gate: 'G', drain: 'D', source: 'S' };
-const logic = (symbol: string, unary = false) =>
-  nativeNode(
-    `${symbol} port`,
-    unary ? { input: 'in 1', output: 'out' } : { input1: 'in 1', input2: 'in 2', output: 'out' },
-    0.8,
-  );
-/** Authoritative registry: metadata, SVG geometry, semantic pins and verified TikZ strategy. */
+/** Authoritative registry: metadata, SVG geometry and semantic pins. */
 export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
-  resistor: def('resistor', 'Resistenza', 'Passivi', 'R', g.resistor, bi('R'), [
+  resistor: def('resistor', 'Resistenza', 'Passivi', 'R', g.resistor, [
     'resistor',
     'resistenza',
   ]),
@@ -152,10 +114,9 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Passivi',
     'R',
     g.americanResistor,
-    bi('R, american resistors'),
     ['american resistor', 'resistenza americana', 'resistor us', 'zig zag', 'zig-zag', 'usa'],
   ),
-  capacitor: def('capacitor', 'Condensatore', 'Passivi', 'C', g.capacitor, bi('C'), [
+  capacitor: def('capacitor', 'Condensatore', 'Passivi', 'C', g.capacitor, [
     'capacitor',
     'capacity',
   ]),
@@ -165,10 +126,9 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Passivi',
     'C',
     g.polarizedCapacitor,
-    bi('elko'),
     ['polarized capacitor', 'electrolytic', 'elettrolitico'],
   ),
-  inductor: def('inductor', 'Induttore', 'Passivi', 'L', g.inductor, bi('L'), [
+  inductor: def('inductor', 'Induttore', 'Passivi', 'L', g.inductor, [
     'inductor',
     'coil',
     'bobina',
@@ -179,7 +139,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Passivi',
     'R',
     [...g.resistor, ...g.variable],
-    bi('vR'),
     ['variable resistor', 'rheostat', 'reostato'],
   ),
   potentiometer: def(
@@ -188,7 +147,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Passivi',
     'P',
     [...g.resistor, g.leadPath('M0-40V-11'), ...g.auxiliary([g.head(0, -11, 90)])],
-    bi('pR', { w: 'wiper' }),
     ['potentiometer', 'pot'],
     [...two, terminal('w', 0, -40, 'y')],
   ),
@@ -198,7 +156,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Generatori',
     'V',
     g.source(g.voltage),
-    bi('american voltage source'),
     ['dc voltage source', 'tensione continua'],
   ),
   currentSource: def(
@@ -207,7 +164,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Generatori',
     'I',
     g.source(g.current),
-    bi('american current source'),
     ['dc current source', 'corrente continua'],
   ),
   battery: def(
@@ -216,7 +172,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Generatori',
     'E',
     [g.bodyPath('M-40 0H-12M12 0H40M-12-19V19M-4-10V10M4-19V19M12-10V10', [2, 5])],
-    bi('battery'),
     ['battery', 'multi-cell battery', 'batteria'],
   ),
   dependentVoltage: def(
@@ -225,7 +180,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Generatori',
     'V',
     g.source(g.voltage, true),
-    bi('american controlled voltage source'),
     ['dependent voltage source', 'controlled voltage'],
   ),
   dependentCurrent: def(
@@ -234,11 +188,10 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Generatori',
     'I',
     g.source(g.current, true),
-    bi('american controlled current source'),
     ['dependent current source', 'controlled current'],
   ),
-  diode: def('diode', 'Diodo', 'Diodi', 'D', g.diode, bi('D'), ['diode', 'standard diode']),
-  led: def('led', 'LED', 'Diodi', 'D', [...g.diode, ...g.lightRays()], bi('leD'), [
+  diode: def('diode', 'Diodo', 'Diodi', 'D', g.diode, ['diode', 'standard diode']),
+  led: def('led', 'LED', 'Diodi', 'D', [...g.diode, ...g.lightRays()], [
     'light emitting diode',
     'diodo luminoso',
   ]),
@@ -248,7 +201,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Diodi',
     'D',
     [g.diodeBody, g.diodeLeads, g.path('M6-18H12V14H18')],
-    bi('zD'),
     ['zener diode'],
   ),
   openSwitch: def(
@@ -257,7 +209,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Interruttori',
     'S',
     g.switchShape(),
-    bi('nos'),
     ['spst open switch'],
   ),
   closedSwitch: def(
@@ -266,7 +217,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Interruttori',
     'S',
     g.switchShape(true),
-    bi('ncs'),
     ['spst closed switch'],
   ),
   ground: def(
@@ -275,11 +225,10 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Riferimenti',
     '',
     g.earthGround,
-    ref('ground'),
     ['earth ground', 'ground', 'gnd', 'terra'],
     reference,
   ),
-  ammeter: def('ammeter', 'Amperometro', 'Misura', 'A', g.source([g.text('A')]), bi('ammeter'), [
+  ammeter: def('ammeter', 'Amperometro', 'Misura', 'A', g.source([g.text('A')]), [
     'ammeter',
   ]),
   voltmeter: def(
@@ -288,7 +237,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Misura',
     'V',
     g.source([g.text('V')]),
-    bi('voltmeter'),
     ['voltmeter'],
   ),
   transformer: def(
@@ -297,7 +245,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Trasformatori',
     'T',
     g.transformer,
-    fallback('Transformer: explicit four-terminal TikZ symbol; retains legacy terminal geometry.'),
     ['transformer'],
     transformerTerminals,
   ),
@@ -307,7 +254,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Blocchi',
     'Z',
     g.block(),
-    bi('generic', undefined, true),
     ['generic rectangle block', 'black box', 'blocco generico'],
     two,
     'BLACK BOX',
@@ -318,7 +264,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Passivi',
     'R',
     [...g.resistor, ...g.auxiliary([g.path('M-20 23L20-23H30'), g.text('T', 28, -10, 10)])],
-    bi('thR'),
     ['thermistor', 'ntc', 'ptc', 'resistor'],
   ),
   photoresistor: def(
@@ -327,7 +272,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Passivi',
     'R',
     [...g.resistor, ...g.lightRays(true)],
-    bi('phR'),
     ['photoresistor', 'ldr', 'resistenza'],
   ),
   variableCapacitor: def(
@@ -336,7 +280,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Passivi',
     'C',
     [...g.capacitor, ...g.variable],
-    bi('vC'),
     ['variable capacitor'],
   ),
   variableInductor: def(
@@ -345,7 +288,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Passivi',
     'L',
     [...g.inductor, ...g.variable],
-    bi('vL'),
     ['variable inductor'],
   ),
   acVoltageSource: def(
@@ -354,7 +296,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Generatori',
     'V',
     g.source([...g.sine, g.text('V', 0, 12, 9)]),
-    bi('sV'),
     ['ac voltage source', 'tensione alternata'],
   ),
   acCurrentSource: def(
@@ -363,7 +304,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Generatori',
     'I',
     g.source([...g.sine, g.text('I', 0, 12, 9)]),
-    bi('sI'),
     ['ac current source', 'corrente alternata'],
   ),
   genericVoltageSource: def(
@@ -372,7 +312,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Generatori',
     'V',
     g.source([g.text('V')]),
-    bi('esource', undefined, true),
     ['generic voltage source'],
   ),
   genericCurrentSource: def(
@@ -381,7 +320,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Generatori',
     'I',
     g.source([g.text('I')]),
-    bi('esource', undefined, true),
     ['generic current source'],
   ),
   singleCellBattery: def(
@@ -390,7 +328,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Generatori',
     'E',
     [g.bodyPath('M-40 0H-4M4 0H40M-4-19V19M4-10V10', [2, 3])],
-    bi('battery1'),
     ['single cell battery', 'battery', 'batteria'],
   ),
   photodiode: def(
@@ -399,7 +336,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Diodi',
     'D',
     [...g.diode, ...g.lightRays(true)],
-    bi('pD'),
     ['photodiode'],
   ),
   schottky: def(
@@ -408,7 +344,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Diodi',
     'D',
     [g.diodeBody, g.diodeLeads, g.path('M6-10V-16H12V16H18V10')],
-    bi('sD'),
     ['schottky diode'],
   ),
   varactor: def(
@@ -417,7 +352,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Diodi',
     'D',
     [g.diodeBody, g.bodyPath('M-40 0H-14M18 0H40M12-14V14M18-14V14', [2, 3])],
-    bi('VC'),
     ['varactor', 'varicap diode'],
   ),
   npn: def(
@@ -426,7 +360,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Transistor',
     'Q',
     g.bjt(),
-    nativeNode('npn', transAnchors(true)),
     ['bjt', 'npn transistor'],
     transistorTerminals('base', 'collector', 'emitter'),
   ),
@@ -436,7 +369,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Transistor',
     'Q',
     g.bjt(true),
-    nativeNode('pnp', transAnchors(true), 0.7, undefined, true),
     ['bjt', 'pnp transistor'],
     transistorTerminals('base', 'collector', 'emitter'),
   ),
@@ -446,7 +378,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Transistor',
     'Q',
     g.fet(),
-    nativeNode('nmos', transAnchors(false)),
     ['nmos', 'mosfet', 'n channel'],
     transistorTerminals('gate', 'drain', 'source'),
   ),
@@ -456,7 +387,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Transistor',
     'Q',
     g.fet(true),
-    nativeNode('pmos', transAnchors(false), 0.7, undefined, true),
     ['pmos', 'mosfet', 'p channel'],
     transistorTerminals('gate', 'drain', 'source'),
   ),
@@ -466,7 +396,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Transistor',
     'Q',
     g.fet(false, true),
-    nativeNode('njfet', transAnchors(false)),
     ['n channel jfet'],
     transistorTerminals('gate', 'drain', 'source'),
   ),
@@ -476,7 +405,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Transistor',
     'Q',
     g.fet(true, true),
-    nativeNode('pjfet', transAnchors(false), 0.7, undefined, true),
     ['p channel jfet'],
     transistorTerminals('gate', 'drain', 'source'),
   ),
@@ -486,7 +414,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Interruttori',
     'S',
     g.spdt(),
-    nativeNode('cute spdt up', { common: 'in', throw1: 'out 1', throw2: 'out 2' }, 0.8),
     ['spdt switch'],
     [terminal('common', -40, 0), terminal('throw1', 40, -20), terminal('throw2', 40, 20)],
   ),
@@ -496,7 +423,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Interruttori',
     'S',
     g.switchShape(false, true),
-    bi('nopb'),
     ['push button normally open', 'no pushbutton'],
   ),
   pushButtonNC: def(
@@ -505,7 +431,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Interruttori',
     'S',
     g.switchShape(true, true),
-    bi('ncpb'),
     ['push button normally closed', 'nc pushbutton'],
   ),
   dpst: def(
@@ -518,7 +443,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
       ...g.switchShape(false, false, 20),
       g.path('M0-27V13', undefined, true),
     ],
-    fallback('Mechanically linked DPST contacts: no reliable native equivalent.'),
     ['dpst switch'],
     [
       terminal('common1', -40, -20),
@@ -533,7 +457,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Interruttori',
     'S',
     [...g.spdt(-30), ...g.spdt(30), g.path('M0-40V20', undefined, true)],
-    fallback('Mechanically linked DPDT contacts: six stable terminals.'),
     ['dpdt switch'],
     [
       terminal('common1', -40, -30),
@@ -544,7 +467,7 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
       terminal('throw2b', 40, 50),
     ],
   ),
-  ohmmeter: def('ohmmeter', 'Ohmmetro', 'Misura', 'Ω', g.source([g.text('Ω')]), bi('ohmmeter'), [
+  ohmmeter: def('ohmmeter', 'Ohmmetro', 'Misura', 'Ω', g.source([g.text('Ω')]), [
     'ohmmeter',
     'ohm meter',
   ]),
@@ -554,7 +477,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Misura',
     'G',
     g.source([g.text('G')]),
-    fallback('Circular G meter: no documented dedicated galvanometer bipole.'),
     ['galvanometer'],
   ),
   signalGround: def(
@@ -563,7 +485,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Riferimenti',
     '',
     g.signalGround,
-    ref('sground'),
     ['signal ground', 'gnd'],
     reference,
   ),
@@ -573,7 +494,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Riferimenti',
     '',
     g.chassisGround,
-    ref('cground'),
     ['chassis ground', 'gnd'],
     reference,
   ),
@@ -583,7 +503,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Trasformatori',
     'T',
     [...g.transformer, g.leadPath('M20 0H60')],
-    fallback('Center-tap transformer with five exact semantic terminals.'),
     ['center tap transformer', 'centertap'],
     [...transformerTerminals, terminal('centerTap', 60, 0)],
   ),
@@ -593,7 +512,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Trasformatori',
     'L',
     [g.transformerWinding],
-    nativeNode('transformer', { a: 'A1', b: 'A2', c: 'B1', d: 'B2' }, 0.65),
     ['coupled inductors', 'coupled coils'],
     transformerTerminals,
   ),
@@ -603,7 +521,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Analogici',
     'U',
     g.analog(),
-    nativeNode('op amp', { inverting: '-', nonInverting: '+', output: 'out' }, 0.6),
     ['op amp', 'opamp', 'operational amplifier'],
     analogTerminals,
   ),
@@ -613,7 +530,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Analogici',
     'U',
     g.analog(true),
-    nativeNode('op amp', { inverting: '-', nonInverting: '+', output: 'out' }, 0.6, '>'),
     ['comparator'],
     analogTerminals,
   ),
@@ -623,7 +539,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Digitali',
     'U',
     g.gate('and'),
-    logic('and'),
     ['and gate', 'logic', 'logica'],
     gateTerminals,
   ),
@@ -633,7 +548,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Digitali',
     'U',
     g.gate('or'),
-    logic('or'),
     ['or gate', 'logic', 'logica'],
     gateTerminals,
   ),
@@ -643,7 +557,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Digitali',
     'U',
     g.gate('buffer', true),
-    logic('not', true),
     ['not gate', 'inverter', 'logic', 'logica'],
     unaryTerminals,
   ),
@@ -653,7 +566,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Digitali',
     'U',
     g.gate('and', true),
-    logic('nand'),
     ['nand gate', 'logic', 'logica'],
     gateTerminals,
   ),
@@ -663,7 +575,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Digitali',
     'U',
     g.gate('or', true),
-    logic('nor'),
     ['nor gate', 'logic', 'logica'],
     gateTerminals,
   ),
@@ -673,7 +584,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Digitali',
     'U',
     g.gate('xor'),
-    logic('xor'),
     ['xor gate', 'logic', 'logica'],
     gateTerminals,
   ),
@@ -683,7 +593,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Digitali',
     'U',
     g.gate('xor', true),
-    logic('xnor'),
     ['xnor gate', 'logic', 'logica'],
     gateTerminals,
   ),
@@ -693,7 +602,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Digitali',
     'U',
     g.gate('buffer'),
-    logic('buffer', true),
     ['buffer gate', 'logic', 'logica'],
     unaryTerminals,
   ),
@@ -703,7 +611,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Utilità',
     '',
     [g.leadPath('M-40 0H-5'), g.circle(0, 0, 5)],
-    ref('ocirc'),
     ['terminal', 'connection'],
     [terminal('a', -40, 0)],
   ),
@@ -713,7 +620,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Utilità',
     'TP',
     [g.leadPath('M0 40V5'), g.circle(0, 0, 5)],
-    ref('ocirc'),
     ['test point', 'testpoint'],
     [terminal('a', 0, 40, 'y')],
   ),
@@ -723,7 +629,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Utilità',
     'J',
     g.connector(2),
-    fallback('Connector socket with two exact, independent pins.'),
     ['connector 2 pin', 'connettore'],
     [terminal('pin1', -40, -20), terminal('pin2', -40, 20)],
   ),
@@ -733,7 +638,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Utilità',
     'J',
     g.connector(3),
-    fallback('Connector socket with three exact, independent pins.'),
     ['connector 3 pin', 'connettore'],
     [terminal('pin1', -40, -20), terminal('pin2', -40, 0), terminal('pin3', -40, 20)],
   ),
@@ -743,11 +647,10 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Utilità',
     '',
     [g.leadPath('M-40 0H-20'), g.path('M-20-12H10L22 0 10 12H-20Z', 'white')],
-    fallback('Single-connection diagram port outline.'),
     ['generic port', 'porta'],
     [terminal('connection', -40, 0)],
   ),
-  fuse: def('fuse', 'Fusibile', 'Utilità', 'F', [...g.resistor, g.path('M-20 0H20')], bi('fuse'), [
+  fuse: def('fuse', 'Fusibile', 'Utilità', 'F', [...g.resistor, g.path('M-20 0H20')], [
     'fuse',
   ]),
   lamp: def(
@@ -756,7 +659,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Utilità',
     'H',
     g.source([g.path('M-14-14L14 14M-14 14L14-14')]),
-    bi('lamp'),
     ['lamp', 'light bulb', 'lampadina'],
   ),
   motor: def(
@@ -765,7 +667,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Utilità',
     'M',
     g.source([g.text('M')]),
-    nativeNode('elmech', { a: 'west', b: 'east' }, 0.65, 'M'),
     ['motor'],
   ),
   speaker: def(
@@ -778,7 +679,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
       g.rect(-12, -7, 24, 14),
       g.path('M-12-7L-21-20H21L12-7Z', 'white'),
     ],
-    bi('loudspeaker'),
     ['speaker', 'loudspeaker'],
   ),
   buzzer: def(
@@ -791,9 +691,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
       g.rect(-20, -12, 40, 24),
       ...g.auxiliary([g.path('M-10-19Q0-29 10-19M-15-25Q0-40 15-25')]),
     ],
-    fallback(
-      'Buzzer: native symbol unavailable in the bundled CircuitikZ compiler; shared SVG-equivalent geometry.',
-    ),
     ['buzzer', 'cicalino'],
   ),
   circleBlock: def(
@@ -802,7 +699,6 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Blocchi',
     'Z',
     g.block(true),
-    bi('esource', undefined, true),
     ['generic circle block', 'blocco'],
     two,
     'BLOCK',

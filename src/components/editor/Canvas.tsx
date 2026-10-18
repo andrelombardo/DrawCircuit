@@ -38,6 +38,8 @@ type CanvasProps = {
   sidebarVisible?: boolean;
   onToggleSidebar?: () => void;
   onHelp?: () => void;
+  inspector: ReturnType<typeof useInspectorPreferences>;
+  onShowInspector: () => void;
 };
 export function Canvas(props: CanvasProps) {
   return (
@@ -46,7 +48,7 @@ export function Canvas(props: CanvasProps) {
     </SelectionActions>
   );
 }
-function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp }: CanvasProps) {
+function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp, inspector, onShowInspector }: CanvasProps) {
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;
@@ -54,15 +56,13 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp }: Canva
     key: number;
   } | null>(null);
   const { contextItems } = useEditActions(contextMenu?.canvasOnly);
-  const inspector = useInspectorPreferences();
-  const setInspectorPreferences = inspector.setPreferences;
   useEffect(
     () =>
       useEditorStore.subscribe((s, previous) => {
         if (s.tool === 'highlight' && previous.tool !== 'highlight')
-          setInspectorPreferences((p) => ({ ...p, visible: true }));
+          onShowInspector();
       }),
-    [setInspectorPreferences],
+    [onShowInspector],
   );
   const focusModality = useCanvasFocus();
   const svgRef = useRef<SVGSVGElement>(null),
@@ -117,7 +117,7 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp }: Canva
     previewPath = pointsPath(wirePoints(wire, doc));
   }
   const hint = tool === 'highlight'
-    ? 'Evidenzia componenti e fili · impostazioni in Proprietà · Esc torna a Selezione'
+    ? 'Trascina per evidenziare anche parte di fili e componenti · Esc torna a Selezione'
     : tool === 'rectangle'
       ? 'Trascina per disegnare · Shift quadrato · Option dal centro · Esc annulla'
       : tool === 'line'

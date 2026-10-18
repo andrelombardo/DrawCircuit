@@ -84,6 +84,8 @@ export function PropertiesContent() {
     (o) => o.kind === 'wire' || o.kind === 'line' || o.kind === 'rectangle',
   );
   const independentRotation = rotatables.length === objects.length;
+  const selectedIds = new Set(objects.map((object) => object.id));
+  const hasComponent = objects.some((object) => object.kind === 'component');
   const groupRotation =
     objects.every(
       (item) =>
@@ -99,15 +101,13 @@ export function PropertiesContent() {
           'line',
         ].includes(item.kind) &&
         !(
-          objects.some((o) => o.kind === 'component') && ['brace', 'rectangle'].includes(item.kind)
+          hasComponent && ['brace', 'rectangle'].includes(item.kind)
         ) &&
         (item.kind !== 'wire' ||
           [item.startEndpoint, item.endEndpoint].every(
             (ep) =>
               ep.kind === 'free' ||
-              objects.some(
-                (o) => o.id === (ep.kind === 'terminal' ? ep.componentId : ep.junctionId),
-              ),
+              selectedIds.has(ep.kind === 'terminal' ? ep.componentId : ep.junctionId),
           )),
     ) && objects.some((item) => !['wire', 'junction'].includes(item.kind));
   const electricalOnly = o?.kind === 'electrical' && !labelTarget;

@@ -3,6 +3,7 @@ import { COLORS, componentTypes, isRotation } from './types';
 import { componentRegistry, terminalsFor } from './catalog';
 import type { CircuitDocument } from './types';
 import { resolveEndpoint } from '../utils/geometry';
+import { MAX_COORDINATE, MAX_TEXT_LENGTH, MAX_DOCUMENT_OBJECTS, MAX_DOCUMENT_LENGTH } from './limits';
 const fail = (): never => {
   throw new Error('JSON non valido: controlla formato, oggetti e collegamenti.');
 };
@@ -10,8 +11,8 @@ function record(v: unknown): Record<string, unknown> {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return fail();
   return v as Record<string, unknown>;
 }
-const str = (v: unknown) => typeof v === 'string' && v.length <= 10000;
-const num = (v: unknown) => typeof v === 'number' && Number.isFinite(v) && Math.abs(v) <= 1e7;
+const str = (v: unknown) => typeof v === 'string' && v.length <= MAX_TEXT_LENGTH;
+const num = (v: unknown) => typeof v === 'number' && Number.isFinite(v) && Math.abs(v) <= MAX_COORDINATE;
 const color = (v: unknown) => typeof v === 'string' && /^#[a-fA-F0-9]{6}$/.test(v);
 const rotation = isRotation;
 const opacity = (v: unknown) => v === undefined || (num(v) && Number(v) >= 0 && Number(v) <= 1);
@@ -46,7 +47,7 @@ export function serializeDocument(doc: CircuitDocument): string {
   return JSON.stringify(doc, null, 2);
 }
 export function deserializeDocument(raw: string): CircuitDocument {
-  if (raw.length > 10_000_000) throw new Error('Il file supera il limite di 10 MB.');
+  if (raw.length > MAX_DOCUMENT_LENGTH) throw new Error('Il file supera il limite di 10 MB.');
   let parsed: unknown;
   try {
     parsed = JSON.parse(raw) as unknown;
@@ -58,7 +59,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
     root.version !== 1 ||
     !str(root.title) ||
     !Array.isArray(root.objects) ||
-    root.objects.length > 10000
+    root.objects.length > MAX_DOCUMENT_OBJECTS
   )
     fail();
   const ids = new Set<string>();

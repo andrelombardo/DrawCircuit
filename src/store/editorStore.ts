@@ -41,6 +41,16 @@ const documentStorage = localPersistence(
   demoDocument,
 );
 const initialDocument = documentStorage.load();
+function canCommit(document: CircuitDocument): boolean {
+  try {
+    // Validate a copy: import normalization must never mutate the live objects.
+    deserializeDocument(serializeDocument(document));
+    return true;
+  } catch {
+    return false;
+  }
+}
+const invalidEditNotice = 'Modifica non applicata: supera i limiti del documento o contiene dati non validi.';
 interface EditorState {
   document: CircuitDocument;
   selection: string[];
@@ -73,7 +83,7 @@ interface EditorState {
   setActiveLabel: (id: string | null) => void;
   setArrowType: (type: ArrowAnnotation['type']) => void;
   toggleGrid: () => void;
-  commit: (doc: CircuitDocument) => void;
+  commit: (doc: CircuitDocument) => boolean;
   add: (objects: CircuitObject[]) => void;
   updateSelection: (fn: (o: CircuitObject) => CircuitObject) => void;
   updateObjects: (ids: readonly string[], fn: (o: CircuitObject) => CircuitObject) => void;
@@ -164,20 +174,29 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   setActiveLabel: (activeLabel) => set({ activeLabel }),
   setArrowType: (arrowType) => set({ arrowType }),
   toggleGrid: () => set((s) => ({ grid: !s.grid })),
-  commit: (document) =>
-    set((s) => ({
-      document: reconcileHighlights(
-        s.gestureStart ?? s.document,
-        reconcileCurrentSegments(s.gestureStart ?? s.document, document),
-      ),
-      past: [...s.past, s.document].slice(-100),
+  commit: (document) => {
+    const s = get();
+    const next = reconcileHighlights(
+      s.gestureStart ?? s.document,
+      reconcileCurrentSegments(s.gestureStart ?? s.document, document),
+    );
+    if (!canCommit(next)) {
+      s.cancelGesture();
+      s.notify(invalidEditNotice);
+      return false;
+    }
+    set({
+      document: next,
+      past: [...s.past, s.gestureStart ?? s.document].slice(-100),
       future: [],
       gestureStart: null,
-    })),
+    });
+    return true;
+  },
   add: (objects) => {
     const s = get();
-    s.commit({ ...s.document, objects: [...s.document.objects, ...objects] });
-    s.select(objects.map((o) => o.id));
+    if (s.commit({ ...s.document, objects: [...s.document.objects, ...objects] }))
+      s.select(objects.map((o) => o.id));
   },
   updateSelection: (fn) => get().updateObjects(get().selection, fn),
   updateObjects: (objectIds, fn) => {
@@ -261,6 +280,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     })),
   endGesture: () => {
     const s = get();
+    if (s.gestureStart && s.gestureStart !== s.document && !canCommit(s.document)) {
+      s.cancelGesture();
+      s.notify(invalidEditNotice);
+      return;
+    }
     if (s.gestureStart && s.gestureStart !== s.document)
       set({ past: [...s.past, s.gestureStart].slice(-100), future: [], gestureStart: null });
     else set({ gestureStart: null });
@@ -363,21 +387,6 @@ useEditorStore.subscribe((state, previous) => {
     }
   }, 400);
 });
-
-/** Flush the committed document synchronously without saving an active gesture. */
-export function saveDocumentNow(): boolean {
-  const state = useEditorStore.getState();
-  if (state.gestureStart) return false;
-  try {
-    documentStorage.save(state.document);
-    clearTimeout(saveTimer);
-    if (state.storageError) useEditorStore.setState({ storageError: false });
-    return true;
-  } catch {
-    useEditorStore.setState({ storageError: true });
-    return false;
-  }
-}
 
 /** Closing/reloading must not outrun the autosave debounce. Save the committed state,
  * including when a pointer gesture was still previewing changes. */

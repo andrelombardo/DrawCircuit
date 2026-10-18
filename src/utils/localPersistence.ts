@@ -26,6 +26,9 @@ export function localPersistence<T>(
     },
     save(value: T) {
       const raw = serialize(value);
+      // Refuse values that this same application could not reopen. Validate
+      // before backing up or replacing anything already in storage.
+      parse(raw);
       if (unreadable !== null) {
         const prefix = `${key}.recovery.${Date.now()}`;
         let recoveryKey = prefix;

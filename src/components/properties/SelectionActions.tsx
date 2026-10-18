@@ -41,9 +41,10 @@ export function SelectionActions({ children }: { children: ReactNode }) {
         },
         replace: () => {
           const s = useEditorStore.getState();
+          const selected = new Set(s.selection);
           setComponents(
             s.document.objects.filter(
-              (o): o is CircuitComponent => o.kind === 'component' && s.selection.includes(o.id),
+              (o): o is CircuitComponent => o.kind === 'component' && selected.has(o.id),
             ),
           );
         },

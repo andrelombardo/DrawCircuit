@@ -72,7 +72,7 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
           </PropertySelect>
           <p className="inspector-geometry-note">
             {settings.mode === 'smart'
-              ? 'Clicca un componente oppure trascina lungo fili e componenti collegati.'
+              ? 'Trascina su fili e componenti: scegli tu dove iniziare e fermarti, anche a metà elemento.'
               : 'Trascina sul foglio per evidenziare a mano libera.'}
           </p>
         </div>

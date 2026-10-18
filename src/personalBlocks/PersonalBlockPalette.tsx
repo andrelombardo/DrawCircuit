@@ -1,6 +1,6 @@
 import { useEditorCommands } from '../components/properties/EditorCommandContext';
 import { useRef, useState } from 'react';
-import { ChevronDown, Pencil, Trash2 } from 'lucide-react';
+import { ChevronDown, Pencil, Trash2, Undo2 } from 'lucide-react';
 import { usePersonalBlocks } from './library';
 import { useEditorStore } from '../store/editorStore';
 import { BlockNameDialog } from '../components/toolbar/BlockNameDialog';
@@ -9,6 +9,7 @@ export function PersonalBlockPalette({ search }: { search: string }) {
   const selected = useEditorStore((s) => s.selection.length);
   const blocks = usePersonalBlocks((s) => s.blocks),
     error = usePersonalBlocks((s) => s.error);
+  const lastRemoved = usePersonalBlocks((s) => s.lastRemoved);
   const [renaming, setRenaming] = useState<string | null>(null),
     [open, setOpen] = useState(true);
   const file = useRef<HTMLInputElement>(null);
@@ -25,6 +26,22 @@ export function PersonalBlockPalette({ search }: { search: string }) {
         </span>
         <ChevronDown size={14} className={!open && !search ? 'collapsed' : ''} />
       </button>
+      {lastRemoved && (
+        <div className="personal-block-recovery" role="status">
+          <span>«{lastRemoved.block.name}» eliminato.</span>
+          <button
+            onClick={() => {
+              try {
+                usePersonalBlocks.getState().restoreRemoved();
+              } catch (error) {
+                useEditorStore.getState().notify(error instanceof Error ? error.message : 'Impossibile ripristinare il blocco.');
+              }
+            }}
+          >
+            <Undo2 size={14} /> Annulla eliminazione
+          </button>
+        </div>
+      )}
       {(open || !!search) && (
         <>
           {blocks

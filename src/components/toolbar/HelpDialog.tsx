@@ -98,9 +98,11 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
           undo. Distribuisci per centri o spazi liberi; la distanza esatta mantiene fermo il primo
           elemento. Scegli lo stile dei fili o Dividi filo per una continuazione tratteggiata.
           Rettangoli e linee decorative non creano connessioni elettriche.
-          Evidenziatore, nel menu Disegno e annotazioni, evidenzia un componente con un clic oppure attraversa fili, nodi e componenti collegati
-          in un solo trascinamento in modalità Intelligente oppure disegna ovunque in modalità Libera. Modalità, colore, opacità e
-          spessore si regolano in Proprietà. Gli estremi si modificano con gli handle;
+          Evidenziatore, nel menu Disegno e annotazioni, segue fili, nodi e componenti collegati
+          in un solo trascinamento in modalità Intelligente. Scegli tu dove iniziare e fermarti,
+          anche a metà componente; un clic non evidenzia l’intero elemento. In modalità Libera
+          disegni ovunque. Modalità, colore, opacità e
+          spessore si regolano in Proprietà. Gli estremi si modificano selezionando un tratto e trascinando gli handle.
           Le evidenziazioni seguono il componente o filo; il comando “Scollega” le rende indipendenti.
         </p>
         <p className="help-note">

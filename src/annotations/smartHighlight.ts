@@ -32,7 +32,8 @@ const edgeKey = (host: Host) => JSON.stringify('wireId' in host
   ? ['wire', host.wireId] : ['component', host.componentId, host.terminalId]);
 const terminalNode = (id: string, terminal: string) => JSON.stringify(['terminal', id, terminal]);
 
-/** Only model connections join edges. Coincident free ends and wire crossings stay separate. */
+/** Highlight continuity also follows touching endpoints, independently of electrical topology.
+ * Only endpoints meet here: crossing wire interiors never create a new branch. */
 function networkFor(doc: CircuitDocument): Network {
   const cached = networks.get(doc);
   if (cached) return cached;
@@ -40,7 +41,26 @@ function networkFor(doc: CircuitDocument): Network {
   const root = (node: string): string => {
     let current = node;
     while (aliases.has(current)) current = aliases.get(current)!;
+    if (current !== node) aliases.set(node, current);
     return current;
+  };
+  const contactTolerance = 1e-6;
+  const contacts = new Map<string, { point: Point; node: string }[]>();
+  const contact = (node: string, point: Point) => {
+    const x = Math.round(point.x / contactTolerance),
+      y = Math.round(point.y / contactTolerance);
+    for (let dx = -1; dx <= 1; dx++)
+      for (let dy = -1; dy <= 1; dy++)
+        for (const other of contacts.get(`${x + dx}:${y + dy}`) ?? []) {
+          if (distance(point, other.point) > contactTolerance) continue;
+          const a = root(node), b = root(other.node);
+          if (a !== b) aliases.set(a, b);
+          return;
+        }
+    const key = `${x}:${y}`;
+    const bucket = contacts.get(key) ?? [];
+    bucket.push({ point, node });
+    contacts.set(key, bucket);
   };
   const add = (host: Host, points: Point[], nodes: [string, string]) => {
     const length = routeLength(points);
@@ -54,16 +74,24 @@ function networkFor(doc: CircuitDocument): Network {
         JSON.stringify(['free', wireId, side]);
   for (const object of doc.objects) {
     if (object.kind === 'wire') {
-      add({ wireId: object.id }, wirePoints(object, doc), [
+      const points = wirePoints(object, doc);
+      const nodes: [string, string] = [
         endpoint(object.startEndpoint, object.id, 'start'),
         endpoint(object.endEndpoint, object.id, 'end'),
-      ]);
+      ];
+      contact(nodes[0], points[0]);
+      contact(nodes[1], points.at(-1)!);
+      add({ wireId: object.id }, points, nodes);
     } else if (object.kind === 'component') {
-      for (const terminal of object.terminals)
+      for (const terminal of object.terminals) {
+        const points = componentHighlightRoute(object, terminal.id);
+        const node = terminalNode(object.id, terminal.id);
+        contact(node, points[0]);
         add({ componentId: object.id, terminalId: terminal.id },
-          componentHighlightRoute(object, terminal.id), [
-            terminalNode(object.id, terminal.id), JSON.stringify(['body', object.id]),
+          points, [
+            node, JSON.stringify(['body', object.id]),
           ]);
+      }
     }
   }
   const network: Network = { edges: new Map(), adjacent: new Map(), bodyNodes: new Map() };
@@ -196,7 +224,8 @@ function advanceSample(trace: SmartHighlightTrace, point: Point, tolerance: numb
     return;
   }
   last.end = exit;
-  if (spans.length > 1 && last.start === exit) spans.pop();
+  // Also discard an untouched starting branch when the pointer chooses its neighbor.
+  if (last.start === exit) spans.pop();
   const previous = spans.at(-1);
   if (previous && edgeKey(previous) === next.key && previous.end === entry) previous.end = choice.projection.ratio;
   else if (spans.length < 1000) spans.push({ ...next.host, start: entry, end: choice.projection.ratio });

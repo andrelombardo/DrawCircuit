@@ -87,7 +87,7 @@ export const CircuitLayer = memo(function CircuitLayer({
               key={o.id}
               object={o}
               selected={selected.has(o.id) && activeLabel !== o.id}
-              terminals={terminals || selected.has(o.id) || nearby.has(o.id)}
+              terminals={terminals || (selection.length === 1 && selected.has(o.id)) || nearby.has(o.id)}
             />
           ) : null,
         )}

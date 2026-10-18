@@ -66,7 +66,7 @@ export function useKeyboardNudge(zoom = 1): DistanceGuide[] {
         e.isComposing ||
         focusConsumesArrows(e.target) ||
         focusConsumesArrows(document.activeElement) ||
-        document.querySelector('[role="dialog"], [role="menu"], .context-more[open], .file-menu')
+        document.querySelector('[role="dialog"], [role="menu"]')
       ) {
         finish();
         return;

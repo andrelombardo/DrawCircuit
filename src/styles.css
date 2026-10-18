@@ -608,40 +608,6 @@ svg {
   z-index: var(--layer-menu-backdrop);
   cursor: default;
 }
-.file-menu {
-  position: absolute;
-  left: 0;
-  top: 38px;
-  width: 240px;
-  border: 1px solid var(--ui-border);
-  border-radius: var(--ui-radius-md);
-  background: var(--ui-surface);
-  padding: var(--ui-space-1);
-  box-shadow: var(--ui-shadow-floating);
-  z-index: var(--layer-menu);
-}
-.file-menu button {
-  display: flex;
-  align-items: center;
-  gap: var(--ui-space-2);
-  width: 100%;
-  min-height: var(--ui-control-height);
-  padding: var(--ui-space-2);
-  font-size: 12px;
-  border-radius: var(--ui-radius-sm);
-  text-align: left;
-}
-.file-menu button:hover {
-  background: var(--ui-hover);
-}
-.file-menu button svg {
-  color: var(--ui-text-secondary);
-}
-.file-menu button span {
-  font-size: 10px;
-  color: #aaa;
-  margin-left: auto;
-}
 .menu-rule {
   height: 1px;
   background: var(--ui-border);
@@ -960,38 +926,6 @@ kbd {
 .tool-loop-arrow {
   cursor: crosshair;
 }
-.context-more {
-  position: relative;
-  margin-left: auto;
-}
-.context-more summary {
-  cursor: pointer;
-  list-style: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--ui-control-height);
-  height: var(--ui-control-height);
-  padding: 0;
-  border-radius: var(--ui-radius-sm);
-  color: var(--ui-text-secondary);
-}
-.context-popover {
-  position: absolute;
-  top: 40px;
-  right: 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--ui-space-2);
-  width: 256px;
-  max-width: min(256px, calc(100vw - 40px));
-  padding: var(--ui-space-3);
-  border: 1px solid var(--ui-border);
-  border-radius: var(--ui-radius-md);
-  background: var(--ui-surface);
-  box-shadow: var(--ui-shadow-floating);
-}
 .control-handle,
 .handle-line,
 .selection-box {
@@ -1063,41 +997,16 @@ kbd {
   white-space: nowrap;
   line-height: normal;
 }
-.math-label .katex,
-.latex-preview .katex {
+.math-label .katex {
   font-size: 1em;
 }
 /* KaTeX supplies the math layout; circuit glyphs use the same bundled font as plain labels. */
 .math-label-content .katex-html,
-.math-label-content .katex-html *,
-.latex-preview .katex-html,
-.latex-preview .katex-html * {
+.math-label-content .katex-html * {
   font-family: var(--circuit-font) !important;
 }
-.math-label-content .katex-html .mathnormal,
-.latex-preview .katex-html .mathnormal {
+.math-label-content .katex-html .mathnormal {
   font-style: normal;
-}
-.inline-latex-preview {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  padding: 7px 10px;
-  background: white;
-  border: 1px solid #e5e9f0;
-  border-radius: 4px;
-  color: #46505f;
-  font-size: 18px;
-  max-width: 360px;
-  overflow-x: auto;
-  white-space: nowrap;
-  pointer-events: none;
-}
-.latex-error {
-  font:
-    10px Inter,
-    sans-serif;
-  color: #a2653e;
 }
 .preset-section {
   border-bottom: 1px solid var(--border);
@@ -1239,8 +1148,7 @@ kbd {
 .property-control select {
   min-height: var(--ui-control-height);
 }
-.toolbar-color input,
-.context-popover input[type='color'] {
+.toolbar-color input {
   width: 28px;
   height: 28px;
   padding: 1px;
@@ -1406,7 +1314,6 @@ kbd {
 .group-heading:hover,
 .search-field button:hover,
 .zoom-number:hover,
-.context-more summary:hover,
 .secondary-property:hover,
 .arrow-tool-options button:hover,
 .placement-controls button:hover,
@@ -1433,24 +1340,13 @@ summary:focus-visible {
   outline: 2px solid var(--ui-accent);
   outline-offset: 2px;
 }
-.toolbar-color input,
-.context-popover input[type='color'] {
+.toolbar-color input {
   width: 28px;
   height: 28px;
   padding: 2px;
   border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-sm);
   background: var(--ui-bg);
-}
-.context-popover input[type='number'] {
-  width: 80px;
-  height: 32px;
-  padding: 0 8px;
-  border: 1px solid var(--ui-border);
-  border-radius: var(--ui-radius-sm);
-}
-.context-more summary::-webkit-details-marker {
-  display: none;
 }
 .sidebar-resizer::before {
   content: '';
@@ -1507,40 +1403,11 @@ summary:focus-visible {
 }
 
 /* Contextual cleanup: one short action row, compact menus and circular color choices. */
-.context-more {
-  margin-left: 0;
-}
-.context-more summary:hover {
-  background: var(--ui-hover);
-}
 .context-style summary {
   width: auto;
   gap: 5px;
   padding: 0 8px;
   font-size: 12px;
-}
-.context-popover {
-  top: calc(100% + 10px);
-  width: max-content;
-  max-width: min(300px, calc(100vw - 24px));
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 2px;
-  max-height: min(350px, 55vh);
-  overflow-y: auto;
-}
-.context-popover .secondary-property {
-  min-height: 32px;
-  border: 0;
-  background: transparent;
-  justify-content: flex-start;
-  gap: 8px;
-  font-size: 12px;
-}
-.context-popover .secondary-property:hover {
-  background: var(--ui-hover);
 }
 .style-popover {
   gap: 4px;
@@ -1592,16 +1459,6 @@ summary:focus-visible {
 }
 .color-choice:hover {
   background: var(--ui-hover);
-}
-.context-popover input.custom-color-choice[type='color'] {
-  appearance: none;
-  width: 28px;
-  height: 32px;
-  padding: 9px 7px;
-  border: 0;
-  border-radius: var(--ui-radius-sm);
-  background: transparent;
-  cursor: pointer;
 }
 .custom-color-choice::-webkit-color-swatch-wrapper {
   padding: 0;
@@ -1914,20 +1771,6 @@ summary:focus-visible {
   top: 64px;
   border-radius: 10px;
 }
-.context-more summary {
-  border-radius: 6px;
-}
-.context-popover,
-.file-menu {
-  border-radius: 10px;
-  animation: menu-appear 140ms ease-out;
-}
-.context-more[open] summary[data-tooltip]::after {
-  display: none;
-}
-.context-popover {
-  padding: 10px;
-}
 .style-popover {
   gap: 5px;
   max-width: min(300px, calc(100vw - 24px));
@@ -1960,16 +1803,6 @@ summary:focus-visible {
 }
 .rgb-swatch {
   background: conic-gradient(#ff5353, #ffcc36, #52ca65, #32bbdd, #5275ee, #b65bd7, #ff5353);
-}
-.context-popover .custom-color-choice input[type='color'] {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  margin: 0;
-  opacity: 0;
-  cursor: pointer;
 }
 .custom-color-choice:focus-within {
   outline: 2px solid var(--ui-accent);
@@ -2034,10 +1867,6 @@ summary:focus-visible {
   .component-sidebar,
   button {
     transition: none;
-  }
-  .context-popover,
-  .file-menu {
-    animation: none;
   }
 }
 
@@ -2206,10 +2035,6 @@ summary:focus-visible {
 .menu-backdrop {
   z-index: var(--layer-menu-backdrop);
 }
-.file-menu,
-.context-popover {
-  z-index: var(--layer-menu);
-}
 .electrical-tools-menu {
   left: auto;
   right: 0;
@@ -2284,8 +2109,7 @@ summary:focus-visible {
 
 /* Mathematical prime needs the glyph whose metrics KaTeX uses for its script
    position. Comic Relief and script sizing remain unchanged for every other glyph. */
-.math-label-content .katex-html .math-prime,
-.latex-preview .katex-html .math-prime {
+.math-label-content .katex-html .math-prime {
   font-family: KaTeX_Main !important;
   font-style: normal;
 }
@@ -3027,13 +2851,44 @@ summary:focus-visible {
   }
 }
 @media (max-width: 600px) {
+  .component-sidebar {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: min(300px, calc(100vw - 54px)) !important;
+    min-width: 0;
+    max-width: none;
+    z-index: var(--layer-floating);
+    box-shadow: var(--ui-shadow-floating);
+  }
+  .component-sidebar .palette {
+    width: 100%;
+    max-width: none;
+  }
+  .component-sidebar .sidebar-resizer {
+    display: none;
+  }
   .properties-inspector {
     width: min(var(--inspector-width), calc(100vw - 54px));
   }
-  .workspace:has(.properties-inspector:not([hidden])) .component-sidebar {
-    max-width: 35vw;
-    min-width: 140px;
-  }
+}
+
+.personal-block-recovery {
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  margin: 6px 0;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-sm);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.personal-block-recovery button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 0;
+  color: var(--ui-accent);
+  text-align: left;
 }
 /* Native titles avoid tooltip pseudo-elements widening the scrolling column. */
 .properties-inspector [data-tooltip]::after {

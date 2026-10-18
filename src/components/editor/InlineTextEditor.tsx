@@ -3,6 +3,7 @@ import { MathText } from '../../circuit/annotations/MathText';
 import { CIRCUIT_FONT } from '../../model/fonts';
 import type { Viewport } from '../../model/types';
 import type { InlineTextTarget } from '../../utils/labels';
+import { MAX_TEXT_LENGTH } from '../../model/limits';
 
 /** Native keyboard/IME editing over the same SVG/KaTeX renderer used by the document.
  * The input is transparent; only the rendered text, selection and caret are painted. */
@@ -143,6 +144,7 @@ export function InlineTextEditor({
         }}
         autoComplete="off"
         spellCheck={false}
+        maxLength={MAX_TEXT_LENGTH}
         value={text}
         onFocus={(event) => event.currentTarget.select()}
         onSelect={syncSelection}

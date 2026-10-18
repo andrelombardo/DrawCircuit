@@ -127,8 +127,3 @@ export function demoDocument(): CircuitDocument {
     ],
   };
 }
-export const emptyDocument = (): CircuitDocument => ({
-  version: 1,
-  title: 'Circuito senza titolo',
-  objects: [],
-});

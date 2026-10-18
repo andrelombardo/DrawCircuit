@@ -2,13 +2,14 @@ import { Children, isValidElement, useId, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { ActionMenu } from '../toolbar/ActionMenu';
+import { MAX_COORDINATE, MAX_TEXT_LENGTH } from '../../model/limits';
 function DraftInput({
   value,
   label,
   id,
   numeric,
-  min,
-  max,
+  min = -MAX_COORDINATE,
+  max = MAX_COORDINATE,
   unit,
   onCommit,
 }: {
@@ -50,6 +51,7 @@ function DraftInput({
       step={numeric ? 'any' : undefined}
       min={min}
       max={max}
+      maxLength={numeric ? undefined : MAX_TEXT_LENGTH}
       value={draft}
       aria-label={label}
       aria-valuetext={

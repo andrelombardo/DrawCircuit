@@ -148,9 +148,11 @@ export function instantiatePersonalBlock(
 interface LibraryState {
   blocks: PersonalBlock[];
   error: string;
+  lastRemoved: { block: PersonalBlock; index: number } | null;
   add: (block: PersonalBlock) => void;
   rename: (id: string, name: string) => void;
   remove: (id: string) => void;
+  restoreRemoved: () => void;
   import: (raw: string) => void;
 }
 function persist(blocks: PersonalBlock[]) {
@@ -167,6 +169,7 @@ function persist(blocks: PersonalBlock[]) {
 export const usePersonalBlocks = create<LibraryState>((set, get) => ({
   blocks: initialLibrary.value,
   error: initialLibrary.error,
+  lastRemoved: null,
   add: (block) => {
     const blocks = [...get().blocks, block];
     const error = persist(blocks);
@@ -178,9 +181,20 @@ export const usePersonalBlocks = create<LibraryState>((set, get) => ({
     set({ blocks, error });
   },
   remove: (id) => {
-    const blocks = get().blocks.filter((b) => b.id !== id);
+    const previous = get().blocks;
+    const index = previous.findIndex((b) => b.id === id);
+    if (index < 0) return;
+    const blocks = previous.filter((b) => b.id !== id);
     const error = persist(blocks);
-    set({ blocks, error });
+    set({ blocks, error, lastRemoved: { block: previous[index], index } });
+  },
+  restoreRemoved: () => {
+    const { blocks: previous, lastRemoved } = get();
+    if (!lastRemoved) return;
+    const blocks = [...previous];
+    blocks.splice(lastRemoved.index, 0, lastRemoved.block);
+    const error = persist(blocks);
+    set({ blocks, error, lastRemoved: null });
   },
   import: (raw) => {
     const incoming = parsePersonalBlocks(raw).map((b) => ({ ...b, id: makeId() }));

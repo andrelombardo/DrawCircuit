@@ -45,9 +45,8 @@ export function PropertiesInspector({
             if (key === 'y' || event.shiftKey) state.redo();
             else state.undo();
             const next = useEditorStore.getState();
-            const remaining = selection.filter((id) =>
-              next.document.objects.some((object) => object.id === id),
-            );
+            const existing = new Set(next.document.objects.map((object) => object.id));
+            const remaining = selection.filter((id) => existing.has(id));
             if (remaining.length) {
               next.select(remaining);
               if (activeLabel && remaining.includes(activeLabel)) next.setActiveLabel(activeLabel);
@@ -66,9 +65,11 @@ export function PropertiesInspector({
         <h2>Proprietà</h2>
         <SidebarToggle side="right" visible onToggle={toggle} />
       </div>
-      <div ref={scroll} className="inspector-scroll">
-        <PropertiesContent />
-      </div>
+      {preferences.visible && (
+        <div ref={scroll} className="inspector-scroll">
+          <PropertiesContent />
+        </div>
+      )}
       <div
         className="inspector-resizer"
         role="separator"

@@ -3,21 +3,6 @@ import { CIRCUIT_FONT } from '../../model/fonts';
 import type { Rotation } from '../../model/types';
 import { renderLatex } from '../../math/latex';
 
-export function LatexPreview({ text }: { text: string }) {
-  const result = renderLatex(text);
-  return result.kind === 'math' ? (
-    <span className="latex-preview" dangerouslySetInnerHTML={{ __html: result.html }} />
-  ) : (
-    <span
-      style={{ fontFamily: CIRCUIT_FONT }}
-      data-latex-error={result.kind === 'invalid' || undefined}
-    >
-      {text || '…'}
-      {result.kind === 'invalid' && <small className="latex-error"> · LaTeX da correggere</small>}
-    </span>
-  );
-}
-
 export const MathText = memo(function MathText({
   text,
   x = 0,

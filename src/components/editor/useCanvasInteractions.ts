@@ -72,7 +72,7 @@ import { isMac } from '../../utils/platform';
 import { clampZoom, readZoomPreference, saveZoomPreference } from './zoomPreferences';
 type Drag =
   | { type: 'highlight'; object: Highlight; points: Point[]; tolerance: number;
-      smart?: SmartHighlightTrace; componentStart?: Extract<Highlight, { mode: 'component' }> }
+      smart?: SmartHighlightTrace }
   | { type: 'pan'; screen: Point; view: Viewport }
   | {
       type: 'move' | 'label' | 'handle';
@@ -362,7 +362,12 @@ export function useCanvasInteractions(
     };
     const keydown = async (e: KeyboardEvent) => {
       if (e.isComposing || isEditing(e.target)) return;
-      if (e.key === 'Escape' && document.querySelector('.context-more[open]')) return;
+      // Buttons and other controls retain native Space/Enter activation and
+      // navigation keys. Explicit modifier shortcuts remain available.
+      if (!e.ctrlKey && !e.metaKey && e.key !== 'Escape' &&
+        e.target instanceof Element && e.target.closest(
+          'button, summary, [role="button"], [role="separator"], [role="slider"]',
+        )) return;
       modifierKey(e);
       const s = useEditorStore.getState(),
         mod = e.ctrlKey || e.metaKey;
@@ -377,7 +382,7 @@ export function useCanvasInteractions(
         !e.shiftKey &&
         e.key.toLowerCase() === 't'
       ) {
-        if (onToggleSidebar && !document.querySelector('[role="menu"], .context-more[open]')) {
+        if (onToggleSidebar && !document.querySelector('[role="menu"]')) {
           e.preventDefault();
           if (!e.repeat) onToggleSidebar();
         }
@@ -682,33 +687,25 @@ export function useCanvasInteractions(
           : null;
       const smart = settings.mode === 'smart'
         ? beginSmartHighlight(s.document, p, 14 / viewport.zoom, component?.id) : null;
-      if (settings.mode === 'smart' && !smart && !component) {
-        s.notify('Clicca un componente o inizia il tratto su un filo.');
+      if (settings.mode === 'smart' && !smart) {
+        s.notify('Inizia il tratto su un filo o un componente e trascina fino al punto desiderato.');
         return;
       }
-      const object: Highlight = component
+      const object: Highlight = smart
         ? {
             ...settings,
             kind: 'highlight',
             id: 'preview',
-            mode: 'component',
-            componentId: component.id,
+            mode: 'smart',
+            spans: smart.spans,
           }
-        : smart
-          ? {
-              ...settings,
-              kind: 'highlight',
-              id: 'preview',
-              mode: 'smart',
-              spans: smart.spans,
-            }
-          : {
-              ...settings,
-              kind: 'highlight',
-              id: 'preview',
-              mode: 'free',
-              points: [p],
-            };
+        : {
+            ...settings,
+            kind: 'highlight',
+            id: 'preview',
+            mode: 'free',
+            points: [p],
+          };
       svg.setPointerCapture(e.pointerId);
       s.select([]);
       s.beginGesture();
@@ -718,7 +715,6 @@ export function useCanvasInteractions(
         points: [p],
         tolerance: 0.65 / viewport.zoom,
         smart: smart ?? undefined,
-        componentStart: object.mode === 'component' ? object : undefined,
       };
       setOverlay({ ...blank, highlight: object });
       return;
@@ -880,11 +876,10 @@ export function useCanvasInteractions(
       const p = world(sample.clientX, sample.clientY);
       if (d.smart) {
         const spans = advanceSmartHighlight(d.smart, p, viewport.zoom, object.width);
-        if (object.mode !== 'component' || distance(d.smart.origin, p) >= 3 / viewport.zoom)
-          object = {
-            kind: 'highlight', id: object.id, mode: 'smart', color: object.color,
-            opacity: object.opacity, width: object.width, spans,
-          };
+        object = {
+          kind: 'highlight', id: object.id, mode: 'smart', color: object.color,
+          opacity: object.opacity, width: object.width, spans,
+        };
       } else if (object.mode === 'free' && distance(d.points.at(-1)!, p) >= 0.5 / viewport.zoom) {
         d.points.push(p);
         if (d.points.length > 2048) d.points = simplifyHighlight(d.points, d.tolerance);
@@ -907,7 +902,7 @@ export function useCanvasInteractions(
       const hovered =
         s.tool === 'select'
           ? s.document.objects.find((o) => {
-              if (!s.selection.includes(o.id) || (o.kind !== 'arrow' && o.kind !== 'loop-arrow'))
+              if ((o.kind !== 'arrow' && o.kind !== 'loop-arrow') || !s.selection.includes(o.id))
                 return false;
               const b = objectBounds(o, s.document),
                 margin = 28 / viewport.zoom;
@@ -1204,8 +1199,8 @@ export function useCanvasInteractions(
           ? highlightComponentAt(s.document, p, Math.min(6, 4 / viewport.zoom))
           : null;
       const near =
-        !component && s.highlightSettings.mode === 'smart'
-          ? nearestSmartHighlight(s.document, p, 14 / viewport.zoom)
+        s.highlightSettings.mode === 'smart'
+          ? nearestSmartHighlight(s.document, p, 14 / viewport.zoom, component?.id)
           : null;
       setOverlay({
         ...blank,
@@ -1315,15 +1310,8 @@ export function useCanvasInteractions(
             y: Math.round(p.y * 100) / 100,
           })),
         };
-      let points = highlightPoints(object, s.document);
-      if (d.componentStart && routeLength(points) < 1 / viewport.zoom) {
-        object = d.componentStart;
-        points = highlightPoints(object, s.document);
-      }
-      if (
-        object.mode === 'component' ||
-        (points.length >= 2 && routeLength(points) >= 1 / viewport.zoom)
-      ) {
+      const points = highlightPoints(object, s.document);
+      if (points.length >= 2 && routeLength(points) >= 1 / viewport.zoom) {
         s.add([{ ...object, id: makeId() }]);
         s.select([]);
       } else s.cancelGesture();

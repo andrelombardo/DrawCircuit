@@ -10,6 +10,7 @@ import {
   Scan,
 } from 'lucide-react';
 import { commonReplacements } from '../../model/replacement';
+import { useMemo } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import { useEditorCommands } from '../properties/EditorCommandContext';
 import { annotationsForHost, withHostAnnotation } from '../properties/annotationActions';
@@ -24,9 +25,16 @@ export function useEditActions(canvasOnly = false) {
     activeLabel = useEditorStore((s) => s.activeLabel);
   const commands = useEditorCommands();
   const state = () => useEditorStore.getState();
-  const objects = canvasOnly ? [] : document.objects.filter((o) => selection.includes(o.id));
+  const objects = useMemo(() => {
+    if (canvasOnly) return [];
+    const ids = new Set(selection);
+    return document.objects.filter((object) => ids.has(object.id));
+  }, [canvasOnly, document, selection]);
   const selected = !!objects.length;
-  const replaceable = commonReplacements(objects.filter((o) => o.kind === 'component')).length > 0;
+  const replaceable = useMemo(
+    () => commonReplacements(objects.filter((o) => o.kind === 'component')).length > 0,
+    [objects],
+  );
   const selectionItems: MenuAction[] = [
     {
       id: 'cut',

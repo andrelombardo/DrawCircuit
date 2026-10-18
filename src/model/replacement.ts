@@ -72,10 +72,17 @@ export function replaceComponent(
 
 export function commonReplacements(components: CircuitComponent[]): ComponentType[] {
   if (!components.length) return [];
-  return (Object.keys(componentRegistry) as ComponentType[]).filter(
-    (type) =>
-      components.some((c) => c.type !== type) &&
-      components.every((c) => c.type === type || compatibleReplacements(c).includes(type)),
+  const types = Object.keys(componentRegistry) as ComponentType[];
+  let candidates = new Set(types);
+  const originals = new Set<ComponentType>();
+  for (const component of components) {
+    originals.add(component.type);
+    const allowed = new Set([component.type, ...compatibleReplacements(component)]);
+    candidates = new Set([...candidates].filter((type) => allowed.has(type)));
+    if (!candidates.size) return [];
+  }
+  return types.filter(
+    (type) => candidates.has(type) && (originals.size > 1 || !originals.has(type)),
   );
 }
 
