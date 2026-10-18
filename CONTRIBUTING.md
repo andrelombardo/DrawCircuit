@@ -1,5 +1,9 @@
 # Contributing to DrawCircuit
 
+<p align="center">
+  <a href="CONTRIBUTING.it.md"><img src="assets/readme/italian.svg" alt="Read in Italian" width="100" height="28" /></a>
+</p>
+
 Thanks for your interest in improving DrawCircuit! Contributions of all kinds are welcome, from bug fixes and documentation improvements to new features.
 
 ## Before you start
