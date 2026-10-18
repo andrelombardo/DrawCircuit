@@ -408,20 +408,23 @@ function CanvasContent({
               zoom={v.zoom}
             />
             <PresetPlacementLayer point={overlay.mouse} zoom={v.zoom} />
-            {tool === 'highlight-eraser' && overlay.mouse && (
-              <circle
-                className="eraser-preview"
-                data-testid="eraser-preview"
-                cx={overlay.mouse.x}
-                cy={overlay.mouse.y}
-                r={eraserSize / 2}
-                fill="rgba(110, 110, 115, 0.06)"
-                stroke="#6e6e73"
-                strokeWidth={1 / v.zoom}
-                strokeDasharray={`${3 / v.zoom} ${2 / v.zoom}`}
-                pointerEvents="none"
-              />
-            )}
+            {tool === 'highlight-eraser' &&
+              !interactions.space &&
+              interactions.dragging !== 'pan' &&
+              overlay.mouse && (
+                <circle
+                  className="eraser-preview"
+                  data-testid="eraser-preview"
+                  cx={overlay.mouse.x}
+                  cy={overlay.mouse.y}
+                  r={eraserSize / 2}
+                  fill="rgba(110, 110, 115, 0.06)"
+                  stroke="#6e6e73"
+                  strokeWidth={1 / v.zoom}
+                  strokeDasharray={`${3 / v.zoom} ${2 / v.zoom}`}
+                  pointerEvents="none"
+                />
+              )}
           </g>
         </svg>
         {contextMenu && (
