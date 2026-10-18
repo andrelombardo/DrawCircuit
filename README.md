@@ -31,8 +31,6 @@
 - Copy circuits as transparent PNG images.
 - Save your work locally, without an account.
 
-Available in English and Italian. Switch languages at the bottom right of the app.
-
 ## Development
 
 Requires **Node.js 26.5.0**, pinned in [.nvmrc](.nvmrc).
@@ -43,8 +41,6 @@ cd DrawCircuit
 npm ci
 npm run dev
 ```
-
-Open [localhost:5173](http://127.0.0.1:5173).
 
 ## License
 
