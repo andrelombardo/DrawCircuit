@@ -30,8 +30,9 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
             trascinarlo. Ogni clic ne inserisce un altro; R ruota l’anteprima, Esc termina.
           </p>
           <p>
-            <b>02 · Collega</b>Premi W, clicca un terminale, un nodo o un filo: sul filo nasce un
-            nodo reale. I clic sul foglio aggiungono svolte; doppio clic o Enter termina su un punto
+            <b>02 · Collega</b>Premi W, clicca un terminale, un nodo o un filo per avviare il
+            collegamento. I nodi con pallino ed etichetta si inseriscono solo con N.
+            I clic sul foglio aggiungono svolte; doppio clic o Enter termina su un punto
             libero. Il filo si allinea al punto iniziale e all’ultima svolta, anche fuori griglia.
             Backspace rimuove l’ultima svolta. Scegli Ortogonale, 45° o Libero; Shift + W cambia
             routing. In Selezione puoi anche trascinare un morsetto o un estremo del filo per

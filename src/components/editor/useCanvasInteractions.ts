@@ -42,6 +42,7 @@ import {
   resolveEndpoint,
   safeWirePoints,
   wirePoints,
+  isLooseEndpoint,
 } from '../../utils/geometry';
 import { moveSelection } from '../../utils/operations';
 import { inlineTextTarget, moveLabel, replaceInlineText } from '../../utils/labels';
@@ -57,6 +58,7 @@ import {
   wireEndpointCandidate,
   wireEndAtPoint,
   wireExtensionCandidate,
+  resolveWireCandidate,
 } from '../../utils/wires';
 import type { WireCandidate, WireDraft } from '../../utils/wires';
 import {
@@ -858,7 +860,8 @@ export function useCanvasInteractions(
       const wire = objectMap.get(id);
       const segment =
         !handle && !labelId && ids.length === 1 && wire?.kind === 'wire' &&
-        (wire.startEndpoint.kind !== 'free' || wire.endEndpoint.kind !== 'free')
+        (!isLooseEndpoint(wire.startEndpoint, s.document) ||
+          !isLooseEndpoint(wire.endEndpoint, s.document))
           ? nearestWire(
               p,
               s.document,
@@ -1188,12 +1191,12 @@ export function useCanvasInteractions(
                       );
                       let startEndpoint = o.startEndpoint, endEndpoint = o.endEndpoint;
                       if (index === 0) {
-                        if (startEndpoint.kind === 'free')
+                        if (isLooseEndpoint(startEndpoint, d.doc))
                           startEndpoint = { kind: 'free', point: route[0] };
                         else route.unshift(points[0]);
                       }
                       if (index === points.length - 2) {
-                        if (endEndpoint.kind === 'free')
+                        if (isLooseEndpoint(endEndpoint, d.doc))
                           endEndpoint = { kind: 'free', point: route.at(-1)! };
                         else route.push(points.at(-1)!);
                       }
@@ -1385,19 +1388,16 @@ export function useCanvasInteractions(
             viewport.zoom,
           );
           if (candidate.kind === 'wire') {
-            const result = insertJunction(doc, candidate.point);
-            result.doc.objects = result.doc.objects.map((o) =>
+            const result = resolveWireCandidate(doc, candidate);
+            const objects = result.doc.objects.map((o) =>
               o.id === wire.id && o.kind === 'wire'
                 ? {
                     ...o,
-                    [d.handle === 'wireStart' ? 'startEndpoint' : 'endEndpoint']: {
-                      kind: 'junction',
-                      junctionId: result.junction.id,
-                    },
+                    [d.handle === 'wireStart' ? 'startEndpoint' : 'endEndpoint']: result.endpoint,
                   }
                 : o,
             );
-            s.preview(result.doc);
+            s.preview({ ...result.doc, objects });
           }
         }
       }

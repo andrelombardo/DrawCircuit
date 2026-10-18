@@ -10,7 +10,7 @@ import type {
 } from '../model/types';
 import { createWire } from '../model/factories';
 import { rotatePoint } from '../utils/geometry';
-import { insertJunction, normalizeDocumentWires, remapSplitWireCurrents } from '../utils/wires';
+import { resolveWireCandidate, normalizeDocumentWires, remapSplitWireCurrents } from '../utils/wires';
 import type { PlacementPreview } from './types';
 
 export function placementComponent(
@@ -84,9 +84,11 @@ export function smartPlacement(
     const c = preview.candidate;
     terminalId = c.terminalId;
     if (c.kind === 'wire') {
-      const split = insertJunction(doc, c.point);
-      result = split.doc;
-      target = { kind: 'junction', junctionId: split.junction.id };
+      const connection = resolveWireCandidate(doc, {
+        kind: 'wire', wireId: c.segment.wire.id, point: c.point,
+      });
+      result = connection.doc;
+      target = connection.endpoint;
     } else target = c.target.endpoint;
   } else if (preview.phase === 'anchored') {
     target = preview.target.endpoint;

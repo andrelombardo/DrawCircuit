@@ -1,4 +1,4 @@
-import type { CircuitDocument, Point, Wire } from '../model/types';
+import type { CircuitDocument, Endpoint, Point, Wire } from '../model/types';
 import { distance, resolveEndpoint, wirePoints } from './geometry';
 export interface WireCrossing extends Point {
   horizontal: Wire;
@@ -13,6 +13,17 @@ const cache = new WeakMap<CircuitDocument, WireCrossing[]>();
 const epsilon = 0.001;
 const quantize = (n: number) => Math.round(n * 1000);
 const key = (p: Point) => `${quantize(p.x)},${quantize(p.y)}`;
+const endpointKey = (ep: Endpoint): string | null =>
+  ep.kind === 'terminal' ? `t:${ep.componentId}:${ep.terminalId}` :
+    ep.kind === 'junction' ? `j:${ep.junctionId}` :
+      ep.connectionId ? `w:${ep.connectionId}` : null;
+function sharedConnectionAt(a: Wire, b: Wire, point: Point, doc: CircuitDocument) {
+  return [a.startEndpoint, a.endEndpoint].some((ep) => {
+    const id = endpointKey(ep);
+    return id && key(resolveEndpoint(ep, doc)) === key(point) &&
+      [b.startEndpoint, b.endEndpoint].some((other) => endpointKey(other) === id);
+  });
+}
 function rows(segments: Segment[], axis: 'x' | 'y') {
   const map = new Map<number, Interval[]>();
   for (const s of segments) {
@@ -105,20 +116,7 @@ export function wireCrossings(doc: CircuitDocument): WireCrossing[] {
           );
         const hNode = nodeAt(h.wire),
           vNode = nodeAt(v.wire);
-        const common = [h.wire.startEndpoint, h.wire.endEndpoint].some(
-          (e) =>
-            e.kind !== 'free' &&
-            key(resolveEndpoint(e, doc)) === id &&
-            [v.wire.startEndpoint, v.wire.endEndpoint].some(
-              (f) =>
-                (e.kind === 'terminal' &&
-                  f.kind === 'terminal' &&
-                  e.componentId === f.componentId &&
-                  e.terminalId === f.terminalId) ||
-                (e.kind === 'junction' && f.kind === 'junction' && e.junctionId === f.junctionId),
-            ),
-        );
-        if (common) continue;
+        if (sharedConnectionAt(h.wire, v.wire, p, doc)) continue;
         const hs = span(hRows.get(quantize(p.y)) ?? [], p.x),
           vs = span(vRows.get(quantize(p.x)) ?? [], p.y);
         if (!hs || !vs) continue;
@@ -177,7 +175,7 @@ export function wireCrossings(doc: CircuitDocument): WireCrossing[] {
             );
           const an = node(a.wire),
             bn = node(b.wire);
-          if (an && bn && JSON.stringify(an) === JSON.stringify(bn)) continue;
+          if (sharedConnectionAt(a.wire, b.wire, p, doc)) continue;
           const over = an && !bn ? b : a,
             under = over === a ? b : a;
           const room = Math.min(distance(p, over.a), distance(p, over.b));

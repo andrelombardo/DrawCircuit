@@ -7,11 +7,13 @@ export function Symbol({
   color = '#171a20',
   width = 2,
   bodyText,
+  rotation = 0,
 }: {
   type: ComponentType;
   color?: string;
   width?: number;
   bodyText?: string;
+  rotation?: number;
 }) {
   return (
     <g stroke={color} strokeWidth={width} fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -21,6 +23,7 @@ export function Symbol({
             <path
               key={i}
               d={shape.d}
+              transform={shape.fixedOrientation ? `rotate(${-rotation})` : undefined}
               fill={shape.fill ?? 'none'}
               strokeDasharray={shape.dashed ? '4 4' : undefined}
             />

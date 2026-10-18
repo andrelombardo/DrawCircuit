@@ -154,7 +154,7 @@ export function exportSVG(
       const shapes = componentRegistry[o.type].shapes
         .map((shape) => {
           if (shape.kind === 'path')
-            return `<path d="${attr(shape.d)}" fill="${shape.fill ?? 'none'}"${shape.dashed ? ' stroke-dasharray="4 4"' : ''}/>`;
+            return `<path d="${attr(shape.d)}" fill="${shape.fill ?? 'none'}"${shape.fixedOrientation ? ` transform="rotate(${-o.rotation})"` : ''}${shape.dashed ? ' stroke-dasharray="4 4"' : ''}/>`;
           if (shape.kind === 'circle')
             return `<circle cx="${shape.x}" cy="${shape.y}" r="${shape.r}" fill="${shape.fill === 'currentColor' ? o.color : (shape.fill ?? 'none')}"/>`;
           if (shape.kind === 'rect')

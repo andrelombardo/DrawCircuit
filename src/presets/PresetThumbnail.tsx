@@ -59,7 +59,8 @@ export const PresetThumbnail = memo(function PresetThumbnail({
         ))}
         {drawing.components.map((o, i) => (
           <g key={i} transform={`translate(${o.x} ${o.y}) rotate(${o.rotation})`}>
-            <Symbol type={o.type} width={1.2} bodyText={o.type === 'blackBox' ? '' : undefined} />
+            <Symbol type={o.type} width={1.2} bodyText={o.type === 'blackBox' ? '' : undefined}
+              rotation={o.rotation} />
           </g>
         ))}
         {drawing.nodes.map((node, i) => (

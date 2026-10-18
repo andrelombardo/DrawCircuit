@@ -2,6 +2,7 @@ import type { CircuitDocument, CircuitObject, Point } from '../model/types';
 import { measurementBounds } from './measurementGeometry';
 import { unionBounds } from './visualBounds';
 import { moveSelection } from './operations';
+import { isLooseEndpoint } from './geometry';
 export type Axis = 'x' | 'y';
 export type DistributionMode = 'centers' | 'gaps';
 export type Alignment = 'start' | 'center' | 'end';
@@ -17,7 +18,7 @@ export function layoutTargets(doc: CircuitDocument, ids: string[]) {
   return doc.objects.filter(
     (o) =>
       selected.has(o.id) &&
-      !(o.kind === 'wire' && (o.startEndpoint.kind !== 'free' || o.endEndpoint.kind !== 'free')) &&
+      !(o.kind === 'wire' && (!isLooseEndpoint(o.startEndpoint, doc) || !isLooseEndpoint(o.endEndpoint, doc))) &&
       !(o.kind === 'highlight' && o.mode !== 'free') &&
       !(o.kind === 'electrical' && (o.componentId || o.wireId)),
   );

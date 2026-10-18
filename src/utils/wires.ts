@@ -52,7 +52,7 @@ export function wireExtensionCandidate(
 ): WireCandidate {
   const endpoint = side === 'start' ? wire.startEndpoint : wire.endEndpoint;
   const point = resolveEndpoint(endpoint, doc);
-  // A free end needs a real shared node so the extension stays connected.
+  // Resolve a shared wire end only once dragging starts; clicks stay read-only.
   return endpoint.kind === 'free'
     ? { kind: 'wire', wireId: wire.id, point }
     : { kind: endpoint.kind, endpoint, point };
@@ -129,11 +129,23 @@ export function wireEndpointCandidate(
 /** A wire target is resolved only on begin/commit, so hover never changes topology. */
 export function resolveWireCandidate(doc: CircuitDocument, candidate: WireCandidate) {
   if (candidate.kind !== 'wire') return { doc, endpoint: candidate.endpoint };
-  const result = insertJunction(doc, candidate.point);
-  return {
-    doc: result.doc,
-    endpoint: { kind: 'junction', junctionId: result.junction.id } as Endpoint,
-  };
+  const wire = doc.objects.find((o) => o.id === candidate.wireId);
+  if (wire?.kind !== 'wire') throw new Error('Filo di collegamento inesistente.');
+  const points = wirePoints(wire, doc), point = candidate.point;
+  const side = distance(point, points[0]) < 0.001 ? 'startEndpoint'
+    : distance(point, points.at(-1)!) < 0.001 ? 'endEndpoint' : null;
+  if (side && (wire[side].kind !== 'free' || wire[side].connectionId))
+    return { doc, endpoint: wire[side] };
+  const endpoint: Endpoint = { kind: 'free', point: { ...point }, connectionId: makeId() };
+  if (side) {
+    return {
+      doc: { ...doc, objects: doc.objects.map((o) => o.id === wire.id ? { ...wire, [side]: endpoint } : o) },
+      endpoint,
+    };
+  }
+  const result = splitWireAtPoint(doc, wire.id, point, endpoint);
+  if (!result) throw new Error('Punto di collegamento esterno al filo.');
+  return { doc: result.doc, endpoint };
 }
 
 /** Shared by the multi-step tool and the quick terminal gesture. */
@@ -177,7 +189,7 @@ export function wirePreview(
   );
 }
 
-/** Commit all auto-created nodes/splits and the new wire as one document change. */
+/** Commit wire joins/splits and the new wire as one document change, without junctions. */
 export function commitWire(doc: CircuitDocument, draft: WireDraft, candidate: WireCandidate) {
   const resolved = resolveWireCandidate(doc, candidate),
     wire = routeNewWire(
@@ -446,6 +458,7 @@ export function splitWireAtPoint(
   doc: CircuitDocument,
   id: string,
   point: Point,
+  connection?: Endpoint,
 ): { doc: CircuitDocument; secondId: string } | null {
   const wire = doc.objects.find((o) => o.id === id);
   if (wire?.kind !== 'wire') return null;
@@ -455,9 +468,9 @@ export function splitWireAtPoint(
   );
   if (segment < 0 || distance(point, pts[0]) < 0.001 || distance(point, pts.at(-1)!) < 0.001)
     return null;
-  if (nearestTarget(point, doc, 0.01) || nearestWire(point, doc, 0.01, new Set([id]))) return null;
-  const junction = createJunction(point, ''),
-    ep: Endpoint = { kind: 'junction', junctionId: junction.id };
+  if (!connection &&
+    (nearestTarget(point, doc, 0.01) || nearestWire(point, doc, 0.01, new Set([id])))) return null;
+  const ep: Endpoint = connection ?? { kind: 'free', point: { ...point }, connectionId: makeId() };
   const first: Wire = { ...wire, endEndpoint: ep, vertices: pts.slice(1, segment + 1) };
   const second: Wire = {
     ...wire,
@@ -467,7 +480,7 @@ export function splitWireAtPoint(
   };
   const next = {
     ...doc,
-    objects: doc.objects.flatMap((o) => (o.id === id ? [first, second] : [o])).concat(junction),
+    objects: doc.objects.flatMap((o) => (o.id === id ? [first, second] : [o])),
   };
   return {
     doc: remapHighlightSpans(

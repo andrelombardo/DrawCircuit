@@ -22,7 +22,8 @@ export const ComponentView = memo(function ComponentView({
           opacity={o.opacity}
           data-selected={selected || undefined}
         >
-          <Symbol type={o.type} color={o.color} width={o.width} bodyText={o.bodyText} />
+          <Symbol type={o.type} color={o.color} width={o.width} bodyText={o.bodyText}
+            rotation={o.rotation} />
         </g>
       </g>
       <g className="terminal-handles" data-visible={terminals} aria-hidden="true">

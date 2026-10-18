@@ -4,7 +4,11 @@ export type SymbolShape = (
   | { kind: 'circle'; x: number; y: number; r: number; fill?: 'white' | 'currentColor' }
   | { kind: 'rect'; x: number; y: number; width: number; height: number; fill?: 'white' }
   | { kind: 'text'; x: number; y: number; text: string; size: number; body?: boolean }
-) & { measurement?: false | { segments: [number, number][] } };
+) & {
+  measurement?: false | { segments: [number, number][] };
+  /** Keep the source's identifying mark aligned to the page while its leads rotate. */
+  fixedOrientation?: boolean;
+};
 export const path = (d: string, fill?: 'white', dashed?: boolean): SymbolShape => ({
   kind: 'path',
   d,
@@ -66,8 +70,8 @@ export const inductor = [
 ];
 export const variable = auxiliary([path('M-21 22L23-23'), head(23, -23, -46)]);
 export const current = [path('M-12 0H12'), head(12, 0)];
-// Perpendicular to the terminal axis: horizontal when the source is vertical.
-export const currentBar = [path('M0-10V10')];
+export const currentBar = [{ ...path('M-10 0H10'), fixedOrientation: true }];
+export const voltageBar = [{ ...path('M0-10V10'), fixedOrientation: true }];
 export const voltage = [path('M-11-5V5M-16 0H-6M7 0H15')];
 export const source = (inside: SymbolShape[] = [], dependent = false) => [
   leads,

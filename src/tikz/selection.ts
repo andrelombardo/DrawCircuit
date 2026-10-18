@@ -17,6 +17,7 @@ export function getExportSelection(doc: CircuitDocument, ids: readonly string[])
       return `terminal:${ep.componentId}:${ep.terminalId}`;
     if (ep.kind === 'junction' && objectsById.get(ep.junctionId)?.kind === 'junction')
       return `junction:${ep.junctionId}`;
+    if (ep.kind === 'free' && ep.connectionId) return `connection:${ep.connectionId}`;
     return null;
   };
   for (const o of doc.objects) {
@@ -28,7 +29,7 @@ export function getExportSelection(doc: CircuitDocument, ids: readonly string[])
         if (ep.kind === 'junction' && objectsById.has(ep.junctionId)) {
           included.add(ep.junctionId);
           anchors.add(`junction:${ep.junctionId}`);
-        }
+        } else if (ep.kind === 'free' && ep.connectionId) anchors.add(`connection:${ep.connectionId}`);
   }
   // Prune dangling, unselected Junction branches from the induced connection
   // graph. Retain a region only when it joins at least two included endpoints.

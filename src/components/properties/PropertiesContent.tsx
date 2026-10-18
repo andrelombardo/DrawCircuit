@@ -1,5 +1,6 @@
 import { HighlightProperties } from './HighlightProperties';
 import { commonValue } from './commonValue';
+import { fixedWireConnection } from '../../utils/geometry';
 import { useShallow } from 'zustand/react/shallow';
 import {
   RotateCw,
@@ -106,7 +107,7 @@ export function PropertiesContent() {
         (item.kind !== 'wire' ||
           [item.startEndpoint, item.endEndpoint].every(
             (ep) =>
-              ep.kind === 'free' ||
+              ep.kind === 'free' ? !fixedWireConnection(ep, doc, selectedIds) :
               selectedIds.has(ep.kind === 'terminal' ? ep.componentId : ep.junctionId),
           )),
     ) && objects.some((item) => !['wire', 'junction'].includes(item.kind));

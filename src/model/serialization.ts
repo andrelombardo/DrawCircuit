@@ -1,8 +1,8 @@
 import { highlightSpanExists } from '../annotations/highlight';
 import { COLORS, componentTypes, isRotation } from './types';
 import { componentRegistry, terminalsFor } from './catalog';
-import type { CircuitDocument } from './types';
-import { resolveEndpoint } from '../utils/geometry';
+import type { CircuitDocument, Point } from './types';
+import { resolveEndpoint, distance } from '../utils/geometry';
 import { MAX_COORDINATE, MAX_TEXT_LENGTH, MAX_DOCUMENT_OBJECTS, MAX_DOCUMENT_LENGTH } from './limits';
 const fail = (): never => {
   throw new Error('JSON non valido: controlla formato, oggetti e collegamenti.');
@@ -36,7 +36,7 @@ function label(v: unknown): boolean {
 function endpoint(v: unknown): boolean {
   const e = record(v);
   return e.kind === 'free'
-    ? point(e.point)
+    ? point(e.point) && (e.connectionId === undefined || (str(e.connectionId) && !!e.connectionId))
     : e.kind === 'terminal'
       ? str(e.componentId) && str(e.terminalId)
       : e.kind === 'junction'
@@ -284,10 +284,17 @@ export function deserializeDocument(raw: string): CircuitDocument {
     if (o.kind === 'text') delete o.fontFamily;
   }
   const doc = root as unknown as CircuitDocument;
+  const connections = new Map<string, Point>();
   for (const o of doc.objects)
     if (o.kind === 'wire') {
       resolveEndpoint(o.startEndpoint, doc);
       resolveEndpoint(o.endEndpoint, doc);
+      for (const ep of [o.startEndpoint, o.endEndpoint]) {
+        if (ep.kind !== 'free' || !ep.connectionId) continue;
+        const previous = connections.get(ep.connectionId);
+        if (previous && distance(previous, ep.point) > 0.001) fail();
+        connections.set(ep.connectionId, ep.point);
+      }
     }
   for (const o of doc.objects)
     if (

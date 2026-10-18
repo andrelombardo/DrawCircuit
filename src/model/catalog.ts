@@ -155,7 +155,7 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Generatore di tensione DC',
     'Generatori',
     'V',
-    g.directedSource(g.voltage),
+    g.directedSource(g.voltageBar),
     ['dc voltage source', 'tensione continua'],
   ),
   currentSource: def(

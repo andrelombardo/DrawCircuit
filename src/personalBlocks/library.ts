@@ -69,7 +69,7 @@ export function instantiatePersonalBlock(
   const rp = (p: Point) => rotatePoint(p, rotation);
   const next = (r: Rotation) => ((r + rotation) % 360) as Rotation;
   const ep = (e: Endpoint): Endpoint =>
-    e.kind === 'free' ? { kind: 'free', point: rp(e.point) } : e;
+    e.kind === 'free' ? { ...e, point: rp(e.point) } : e;
   const doc = {
     ...block.document,
     objects: block.document.objects.map((o) => {

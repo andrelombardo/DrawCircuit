@@ -146,7 +146,8 @@ export function PlacementLayer({
             transform={`translate(${preview.position.x} ${preview.position.y}) rotate(${preview.rotation})`}
             opacity={preview.phase === 'free' || preview.phase === 'anchor-target' ? 0.4 : 0.7}
           >
-            <Symbol type={type} bodyText={componentRegistry[type].internalText} />
+            <Symbol type={type} bodyText={componentRegistry[type].internalText}
+              rotation={preview.rotation} />
           </g>
           {ts.map((t) => {
             const p = add(

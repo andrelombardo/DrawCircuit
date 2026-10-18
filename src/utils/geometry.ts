@@ -57,6 +57,31 @@ function objectIndex(doc: CircuitDocument) {
   }
   return index;
 }
+const wireConnections = new WeakMap<CircuitDocument, Map<string, Set<string>>>();
+export function connectionWires(endpoint: Endpoint, doc: CircuitDocument): ReadonlySet<string> {
+  if (endpoint.kind !== 'free' || !endpoint.connectionId) return new Set();
+  let index = wireConnections.get(doc);
+  if (!index) {
+    index = new Map();
+    for (const o of doc.objects) {
+      if (o.kind !== 'wire') continue;
+      for (const ep of [o.startEndpoint, o.endEndpoint]) {
+        if (ep.kind !== 'free' || !ep.connectionId) continue;
+        const wires = index.get(ep.connectionId) ?? new Set<string>();
+        wires.add(o.id);
+        index.set(ep.connectionId, wires);
+      }
+    }
+    wireConnections.set(doc, index);
+  }
+  return index.get(endpoint.connectionId) ?? new Set();
+}
+export function isLooseEndpoint(endpoint: Endpoint, doc: CircuitDocument): boolean {
+  return endpoint.kind === 'free' && connectionWires(endpoint, doc).size < 2;
+}
+export function fixedWireConnection(endpoint: Endpoint, doc: CircuitDocument, moved: Set<string>) {
+  return [...connectionWires(endpoint, doc)].some((id) => !moved.has(id));
+}
 export function resolveEndpoint(endpoint: Endpoint, doc: CircuitDocument): Point {
   if (endpoint.kind === 'free') return endpoint.point;
   if (endpoint.kind === 'junction') {
@@ -465,7 +490,7 @@ export function moveObject(o: CircuitObject, delta: Point, moved: Set<string>): 
       controlPoints: [add(o.controlPoints[0], delta), add(o.controlPoints[1], delta)],
     };
   const moveEp = (ep: Endpoint): Endpoint =>
-    ep.kind === 'free' ? { kind: 'free', point: add(ep.point, delta) } : ep;
+    ep.kind === 'free' ? { ...ep, point: add(ep.point, delta) } : ep;
   const attached = (ep: Endpoint) =>
     ep.kind === 'terminal'
       ? moved.has(ep.componentId)

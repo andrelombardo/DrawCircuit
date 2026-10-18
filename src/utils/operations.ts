@@ -10,6 +10,7 @@ import {
   rotatePoint,
   wirePoints,
   midpoint,
+  fixedWireConnection,
 } from './geometry';
 import type { CircuitDocument, CircuitObject, Endpoint, Point, Rotation } from '../model/types';
 export function extractSelection(doc: CircuitDocument, ids: string[]): CircuitDocument {
@@ -43,12 +44,15 @@ export function cloneObjects(
   existing: CircuitDocument = doc,
 ): CircuitObject[] {
   const ids = new Map(doc.objects.map((o) => [o.id, makeId()]));
-  const remap = (e: Endpoint): Endpoint =>
-    e.kind === 'terminal'
-      ? { ...e, componentId: ids.get(e.componentId)! }
-      : e.kind === 'junction'
-        ? { ...e, junctionId: ids.get(e.junctionId)! }
-        : e;
+  const connections = new Map<string, string>();
+  const remap = (e: Endpoint): Endpoint => {
+    if (e.kind === 'terminal') return { ...e, componentId: ids.get(e.componentId)! };
+    if (e.kind === 'junction') return { ...e, junctionId: ids.get(e.junctionId)! };
+    if (!e.connectionId) return e;
+    const id = connections.get(e.connectionId) ?? makeId();
+    connections.set(e.connectionId, id);
+    return { ...e, connectionId: id };
+  };
   const labels = new Set(
     existing.objects.filter((o) => o.kind === 'component').map((o) => o.label.text),
   );
@@ -165,19 +169,28 @@ export function moveSelection(doc: CircuitDocument, ids: string[], delta: Point)
         }
         return o;
       }
-      if (o.kind === 'wire' && !o.vertices.length) {
+      if (o.kind === 'wire') {
         const fixed = (ep: Endpoint) =>
           ep.kind === 'terminal'
             ? !selected.has(ep.componentId)
             : ep.kind === 'junction'
               ? !selected.has(ep.junctionId)
-              : false;
-        if (fixed(o.startEndpoint) || fixed(o.endEndpoint)) {
+              : fixedWireConnection(ep, doc, selected);
+        const startFixed = fixed(o.startEndpoint), endFixed = fixed(o.endEndpoint);
+        let source = o;
+        if (!o.vertices.length && (startFixed || endFixed)) {
           const pts = wirePoints(o, doc);
           const vertices =
             pts.length > 2 ? pts.slice(1, -1) : [midpoint(pts[0], pts[pts.length - 1])];
-          return moveObject({ ...o, vertices }, delta, selected);
+          source = { ...o, vertices };
         }
+        const moved = moveObject(source, delta, selected);
+        if (moved.kind !== 'wire') return moved;
+        return {
+          ...moved,
+          startEndpoint: startFixed ? o.startEndpoint : moved.startEndpoint,
+          endEndpoint: endFixed ? o.endEndpoint : moved.endEndpoint,
+        };
       }
       return moveObject(o, delta, selected);
     }),
@@ -228,7 +241,8 @@ export function rotateObjects(
     add(rotatePoint({ x: p.x - center.x, y: p.y - center.y }, angle), center);
   const next = (r: Rotation) => ((r + angle) % 360) as Rotation;
   const ep = (e: Endpoint): Endpoint =>
-    e.kind === 'free' ? { kind: 'free', point: rp(e.point) } : e;
+    e.kind === 'free' && !fixedWireConnection(e, doc, selected)
+      ? { ...e, point: rp(e.point) } : e;
   return {
     ...doc,
     objects: doc.objects.map((o) => {

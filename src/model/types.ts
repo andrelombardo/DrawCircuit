@@ -126,7 +126,12 @@ export interface Junction {
 export type Endpoint =
   | { kind: 'terminal'; componentId: string; terminalId: string }
   | { kind: 'junction'; junctionId: string }
-  | { kind: 'free'; point: Point };
+  | {
+      kind: 'free';
+      point: Point;
+      /** Shared wire ends connect without creating a visible junction object. */
+      connectionId?: string;
+    };
 export type WireRouting = 'orthogonal' | '45' | 'free';
 export type LineStyle = 'solid' | 'dashed' | 'dotted';
 export interface StrokeStyle {

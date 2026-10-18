@@ -1,4 +1,5 @@
 import { componentRegistry } from '../model/catalog';
+import { MAX_TEXT_LENGTH } from '../model/limits';
 import type { CircuitObject, Endpoint, Point } from '../model/types';
 import { isRotation } from '../model/types';
 import { validStroke } from '../utils/strokeStyle';
@@ -26,7 +27,8 @@ export function normalizeHex(color: string): string | null {
 
 const endpoint = (e: Endpoint) =>
   e?.kind === 'free'
-    ? finitePoint(e.point)
+    ? finitePoint(e.point) && (e.connectionId === undefined ||
+        (typeof e.connectionId === 'string' && e.connectionId.length > 0 && e.connectionId.length <= MAX_TEXT_LENGTH))
     : e?.kind === 'terminal'
       ? typeof e.componentId === 'string' && typeof e.terminalId === 'string'
       : e?.kind === 'junction' && typeof e.junctionId === 'string';
