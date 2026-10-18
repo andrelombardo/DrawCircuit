@@ -261,16 +261,27 @@ export interface HighlightStyle {
   opacity: number;
   width: number;
 }
+export interface HighlightCurve {
+  a: Point;
+  b: Point;
+}
 export type HighlightSpan = ({ wireId: string } | { componentId: string; terminalId: string }) & {
   /** Directed fractions of the resolved route's arc length, independent of vertices. */
   start: number;
   end: number;
 };
-export type Highlight = HighlightStyle & { kind: 'highlight'; id: string } & (
-  | { mode: 'smart'; spans: HighlightSpan[] }
-  | { mode: 'component'; componentId: string }
-  | { mode: 'free'; points: Point[]; smoothing?: boolean; breaks?: number[]; widthOffsets?: number[] }
-);
+export type Highlight = HighlightStyle & { kind: 'highlight'; id: string; paintGroup?: string } & (
+    | { mode: 'smart'; spans: HighlightSpan[] }
+    | { mode: 'component'; componentId: string }
+    | {
+        mode: 'free';
+        points: Point[];
+        smoothing?: boolean;
+        breaks?: number[];
+        widthOffsets?: number[];
+        curves?: HighlightCurve[];
+      }
+  );
 export interface HighlightSettings extends HighlightStyle {
   mode: 'smart' | 'free';
 }
@@ -294,6 +305,7 @@ export interface CircuitDocument {
 export type Tool =
   | 'select'
   | 'highlight'
+  | 'highlight-eraser'
   | 'rectangle'
   | 'line'
   | 'wire'

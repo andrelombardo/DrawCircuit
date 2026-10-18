@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import type { DistanceGuide } from '../../utils/smartGuides';
 export function DistanceGuideLayer({ guides, zoom }: { guides: DistanceGuide[]; zoom: number }) {
   return (
@@ -41,7 +42,7 @@ export function DistanceGuideLayer({ guides, zoom }: { guides: DistanceGuide[]; 
               rx={3 / zoom}
             />
             <title>
-              {g.measurement === 'centers' ? 'Distanza tra centri' : 'Spazio libero'}: {value} u
+              {g.measurement === 'centers' ? t('Center distance') : t('Clearance')}: {value} u
             </title>
             <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={11 / zoom}>
               {value}

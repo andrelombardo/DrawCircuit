@@ -1,3 +1,4 @@
+import { t, useLanguage } from '../../i18n';
 import { dashPattern } from '../../utils/strokeStyle';
 import { memo } from 'react';
 import type { Point, Wire } from '../../model/types';
@@ -12,6 +13,7 @@ export const WireView = memo(
     points: Point[];
     paths?: Point[][];
   }) {
+    useLanguage((state) => state.language);
     const hitPath = pointsPath(points);
     const d = (paths ?? [points]).map(pointsPath).join(' ');
     return (
@@ -35,9 +37,15 @@ export const WireView = memo(
         />
         {[points[0], points.at(-1)!].map((p, i) => (
           <g key={i} data-wire-endpoint={i ? 'end' : 'start'} className="wire-endpoint">
-            <title>Trascina per prolungare · Option/Alt trascina per ricollegare</title>
-            <circle cx={p.x} cy={p.y} r={0.01} stroke="transparent" strokeWidth={14}
-              vectorEffect="non-scaling-stroke" />
+            <title>{t('Drag to extend · Option/Alt-drag to reconnect')}</title>
+            <circle
+              cx={p.x}
+              cy={p.y}
+              r={0.01}
+              stroke="transparent"
+              strokeWidth={14}
+              vectorEffect="non-scaling-stroke"
+            />
             <circle cx={p.x} cy={p.y} r={3} className="terminal" pointerEvents="none" />
           </g>
         ))}

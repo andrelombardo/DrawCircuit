@@ -1,6 +1,12 @@
+import { t } from '../../i18n';
 import { Highlighter, Unlink } from 'lucide-react';
 import type { Highlight, HighlightStyle } from '../../model/types';
-import { detachHighlight, HIGHLIGHT_COLORS, highlightSpanPoints, routeLength } from '../../annotations/highlight';
+import {
+  detachHighlight,
+  HIGHLIGHT_COLORS,
+  highlightSpanPoints,
+  routeLength,
+} from '../../annotations/highlight';
 import { useEditorStore } from '../../store/editorStore';
 import { objectCenter } from '../../utils/selectionGeometry';
 import { commonValue } from './commonValue';
@@ -31,13 +37,15 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
       className="inspector-property-action"
       onClick={() => {
         const doc = state().document;
-        state().updateSelection((o) => o.kind === 'highlight' ? detachHighlight(o, doc) : o);
+        state().updateSelection((o) => (o.kind === 'highlight' ? detachHighlight(o, doc) : o));
       }}
     >
       <Unlink size={14} />
       {single?.mode === 'component'
-        ? 'Scollega dal componente'
-        : single?.mode === 'smart' ? 'Scollega dal percorso' : 'Scollega dai riferimenti'}
+        ? t('Detach from component')
+        : single?.mode === 'smart'
+          ? t('Detach from path')
+          : t('Detach from references')}
     </button>
   );
   return (
@@ -47,47 +55,59 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
           <Highlighter size={16} />
         </span>
         <div className="inspector-type">
-          <span>{objects.length > 1 ? `${objects.length} evidenziazioni` : 'Evidenziatore'}</span>
+          <span>
+            {objects.length > 1
+              ? t('{count} highlights', { count: objects.length })
+              : t('Highlighter')}
+          </span>
           <small>
             {!editing
-              ? 'Impostazioni del prossimo tratto'
+              ? t('Settings for the next stroke')
               : single?.mode === 'smart'
-                ? 'Associato al percorso'
+                ? t('Attached to path')
                 : single?.mode === 'component'
-                  ? 'Associato al componente'
-                  : single ? 'Tratto libero' : 'Proprietà comuni'}
+                  ? t('Attached to component')
+                  : single
+                    ? t('Freehand stroke')
+                    : t('Shared properties')}
           </small>
         </div>
       </div>
       {!editing && (
         <div className="inspector-general">
           <PropertySelect
-            label="Modalità evidenziatore"
-            caption="Modalità"
+            label={t('Highlighter mode')}
+            caption={t('Mode')}
             value={settings.mode}
-            onChange={(v) => state().setHighlightSettings({ mode: v === 'free' ? 'free' : 'smart' })}
+            onChange={(v) =>
+              state().setHighlightSettings({
+                mode: v === 'free' ? 'free' : 'smart',
+              })
+            }
           >
-            <option value="smart">Intelligente</option>
-            <option value="free">Libera</option>
+            <option value="smart">{t('Smart')}</option>
+            <option value="free">{t('Freehand')}</option>
           </PropertySelect>
           <p className="inspector-geometry-note">
             {settings.mode === 'smart'
-              ? 'Trascina su fili e componenti: scegli tu dove iniziare e fermarti, anche a metà elemento.'
-              : 'Trascina sul foglio per evidenziare a mano libera.'}
+              ? t(
+                  'Drag along wires and components: choose where to start and stop, even within an element.',
+                )
+              : t('Drag on the sheet to highlight freehand.')}
           </p>
         </div>
       )}
-      <InspectorSection title="Aspetto">
+      <InspectorSection title={t('Appearance')}>
         <div className="inspector-style">
           <ColorControl
-            label="Colore"
+            label={t('Color')}
             value={color}
             colors={HIGHLIGHT_COLORS}
             gesture={editing}
             onChange={(color) => apply({ color })}
           >
             <PropertyField
-              label="Opacità evidenziatore"
+              label={t('Highlighter opacity')}
               caption=""
               numeric
               unit="%"
@@ -98,8 +118,8 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
             />
           </ColorControl>
           <PropertyField
-            label="Spessore evidenziatore"
-            caption="Spessore"
+            label={t('Highlighter width')}
+            caption={t('Thickness')}
             numeric
             unit="u"
             min={1}
@@ -110,7 +130,7 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
         </div>
       </InspectorSection>
       {single && (
-        <InspectorSection title="Geometria">
+        <InspectorSection title={t('Geometry')}>
           {single.mode === 'smart' ? (
             <>
               {(['start', 'end'] as const).map((side) => {
@@ -120,8 +140,8 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
                 return (
                   <PropertyField
                     key={side}
-                    label={side === 'start' ? 'Inizio sul percorso' : 'Fine sul percorso'}
-                    caption={side === 'start' ? 'Inizio' : 'Fine'}
+                    label={side === 'start' ? t('Start on path') : t('End on path')}
+                    caption={side === 'start' ? t('Start') : t('End')}
                     numeric
                     min={0}
                     max={length}
@@ -148,14 +168,15 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
                 );
               })}
               <p className="inspector-geometry-note">
-                Segue fili e componenti collegati. Gli estremi mantengono la posizione proporzionale se
-                cambia la lunghezza.
+                {t(
+                  'Follows connected wires and components. Endpoints keep their proportional position when the length changes.',
+                )}{' '}
               </p>
             </>
           ) : single.mode === 'free' ? (
             <>
               <PropertyField
-                label="Posizione evidenziazione X"
+                label={t('Highlight position X')}
                 caption="X"
                 numeric
                 value={Math.min(...single.points.map((p) => p.x))}
@@ -169,7 +190,7 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
                 }
               />
               <PropertyField
-                label="Posizione evidenziazione Y"
+                label={t('Highlight position Y')}
                 caption="Y"
                 numeric
                 value={Math.min(...single.points.map((p) => p.y))}
@@ -185,21 +206,19 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
             </>
           ) : (
             <p className="inspector-geometry-note">
-              Segue il componente quando lo sposti o ruoti.
+              {t('Follows the component when you move or rotate it.')}{' '}
             </p>
           )}
           {single.mode !== 'free' && detachButton}
         </InspectorSection>
       )}
       {objects.length > 1 && objects.every((o) => o.mode === 'free') && (
-        <InspectorSection title="Geometria">
+        <InspectorSection title={t('Geometry')}>
           <SelectionGeometry objects={objects} />
         </InspectorSection>
       )}
       {objects.length > 1 && objects.some((o) => o.mode !== 'free') && (
-        <InspectorSection title="Geometria">
-          {detachButton}
-        </InspectorSection>
+        <InspectorSection title={t('Geometry')}>{detachButton}</InspectorSection>
       )}
     </div>
   );

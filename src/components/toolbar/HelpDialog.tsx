@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { useRef } from 'react';
 import { isMac, isStandalone, shortcut } from '../../utils/platform';
 import { X } from 'lucide-react';
@@ -16,70 +17,74 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
       >
         <button
           className="modal-close"
-          aria-label="Chiudi guida"
-          title="Chiudi guida"
+          aria-label={t('Close help')}
+          title={t('Close help')}
           onClick={onClose}
         >
           <X size={20} />
         </button>
-        <span className="eyebrow">POCHI GESTI, UN BEL CIRCUITO</span>
-        <h2 id="help-heading">Disegna. Collega. Annota.</h2>
+        <span className="eyebrow">{t('A FEW GESTURES, A CLEAR CIRCUIT')}</span>
+        <h2 id="help-heading">{t('Draw. Connect. Annotate.')}</h2>
         <div className="help-steps">
           <p>
-            <b>01 · Posiziona</b>Scegli un componente a sinistra, poi clicca sul foglio. Puoi anche
-            trascinarlo. Ogni clic ne inserisce un altro; R ruota l’anteprima, Esc termina.
+            <b>{t('01 · Place')}</b>
+            {t(
+              'Choose a component on the left, then click the sheet. You can also drag it. Each click places another component; R rotates the preview, Esc finishes.',
+            )}{' '}
           </p>
           <p>
-            <b>02 · Collega</b>Premi W, clicca un terminale, un nodo o un filo per avviare il
-            collegamento. I nodi con pallino ed etichetta si inseriscono solo con N.
-            I clic sul foglio aggiungono svolte; doppio clic o Enter termina su un punto
-            libero. Il filo si allinea al punto iniziale e all’ultima svolta, anche fuori griglia.
-            Backspace rimuove l’ultima svolta. Scegli Ortogonale, 45° o Libero; Shift + W cambia
-            routing. In Selezione puoi anche trascinare un morsetto o un estremo del filo per
-            creare un nuovo collegamento. Trascina il corpo del filo per spostarlo.
+            <b>{t('02 · Connect')}</b>
+            {t(
+              'Press W, then click a terminal, junction, or wire to start a connection. Use N to place labeled junction dots. Click the sheet to add bends; double-click or press Enter to finish at a free point. The wire aligns with its starting point and last bend, even off the grid. Backspace removes the last bend. Choose Orthogonal, 45°, or Free routing; Shift + W cycles routing modes. In Select mode, drag a terminal or wire endpoint to start a new connection. Drag the wire body to move it.',
+            )}{' '}
           </p>
           <p>
-            <b>03 · Annota</b>Premi N per un nodo, A per una freccia, L per una maglia. Usa Testo
-            nella toolbar per scrivere sul foglio. Trascina per disegnare una freccia o una maglia.
-            Doppio clic modifica direttamente testi ed etichette; Enter o clic esterno conferma, Esc
-            annulla. Nodo resta attivo fino a Esc, V o cambio strumento.
+            <b>{t('03 · Annotate')}</b>
+            {t(
+              'Press N for a junction, A for an arrow, L for a loop. Choose Text in the toolbar to write on the sheet. Drag to draw an arrow or loop. Double-click to edit text and labels; Enter or clicking outside confirms, Esc cancels. The Junction tool stays active until Esc, V, or a tool change.',
+            )}{' '}
           </p>
         </div>
+        <p className="help-note">
+          {t(
+            'Use Highlight eraser beside Highlighter to remove highlights only. Click to delete the topmost stroke or drag to erase part of every stroke you cross. Adjust its diameter in Properties; the outline shows the affected area in canvas units. Each drag is one undo step; Esc cancels an unfinished gesture and returns to Select.',
+          )}
+        </p>
         <div className="shortcut-grid">
           {[
-            ['Space + trascina', 'Sposta il foglio'],
-            ['Rotellina / trackpad', 'Zoom'],
-            ['↑ ↓ ← →', 'Sposta di precisione (1 unità)'],
-            ['Shift + ↑↓←→', 'Spostamento maggiore (10 unità)'],
-            ['Shift + clic', 'Selezione multipla'],
-            ['N · clic ripetuti', 'Inserisci più nodi · Esc termina'],
-            ['Shift + W', 'Cambia routing del filo'],
-            ['Alt/Option + clic label', 'Scegli tra label sovrapposte'],
-            ['Alt/Option + clic', 'Seleziona l’evidenziazione sotto al circuito'],
-            ['Shift + Alt/Option + clic', 'Seleziona più evidenziazioni sovrapposte'],
-            ['Shift + handle rotazione', 'Aggancia la freccia a multipli di 15°'],
-            ['Trascina sul foglio', 'Selezione a rettangolo'],
-            ['R', 'Ruota componente di 45° · graffa/staffa di 90°'],
-            ['Enter', 'Modifica nome o etichetta'],
-            ['Alt + clic handle', 'Rimuovi svolta filo'],
-            ['Option/Alt + trascina estremo', 'Ricollega un filo esistente'],
-            ['L', 'Disegna maglia ellittica'],
-            [shortcut('D'), 'Duplica'],
-            [`${shortcut('C')} / ${shortcut('X')} / ${shortcut('V')}`, 'Copia / taglia / incolla'],
-            ['Option/Alt + trascina', 'Disabilita snapping nello spostamento'],
-            ['Shift durante spostamento', 'Mostra altre quote'],
-            ['Delete / Backspace', 'Elimina selezione · su un’etichetta elimina solo il testo'],
-            ['Shift + Delete / Backspace', 'Da un’etichetta elimina anche l’oggetto'],
-            [shortcut('Z'), 'Annulla'],
-            [shortcut('Z', true), 'Ripeti'],
-            ['G', 'Mostra / nascondi griglia'],
-            ['T', 'Mostra/nascondi componenti'],
-            ['1', 'Adatta alla vista'],
-            ['+ / −', 'Zoom avanti / indietro'],
-            ['H · V', 'Pan / selezione'],
-            [shortcut('A'), 'Seleziona tutto'],
-            ['Esc', 'Selezione / annulla filo'],
-            ...(isStandalone() && isMac() ? [['⌘T', 'Mostra / nascondi Componenti']] : []),
+            [t('Space + drag'), t('Pan the sheet')],
+            [t('Mouse wheel / trackpad'), 'Zoom'],
+            ['↑ ↓ ← →', t('Nudge (1 unit)')],
+            ['Shift + ↑↓←→', t('Larger nudge (10 units)')],
+            [t('Shift + click'), t('Multiple selection')],
+            [t('N · repeated clicks'), t('Place multiple junctions · Esc finishes')],
+            ['Shift + W', t('Change wire routing')],
+            [t('Alt/Option + click label'), t('Cycle overlapping labels')],
+            [t('Alt/Option + click'), t('Select the highlight beneath the circuit')],
+            [t('Shift + Alt/Option + click'), t('Select multiple overlapping highlights')],
+            [t('Shift + rotation handle'), t('Snap the arrow to 15° increments')],
+            [t('Drag on the sheet'), t('Rectangle selection')],
+            ['R', t('Rotate component by 45° · brace/bracket by 90°')],
+            ['Enter', t('Edit name or label')],
+            [t('Alt + click handle'), t('Remove wire bend')],
+            [t('Option/Alt + drag endpoint'), t('Reconnect an existing wire')],
+            ['L', t('Draw an elliptical loop')],
+            [shortcut('D'), t('Duplicate')],
+            [`${shortcut('C')} / ${shortcut('X')} / ${shortcut('V')}`, t('Copy / cut / paste')],
+            [t('Option/Alt + drag'), t('Disable snapping while moving')],
+            [t('Shift while moving'), t('Show additional dimensions')],
+            ['Delete / Backspace', t('Delete selection · on a label, delete only the text')],
+            ['Shift + Delete / Backspace', t('Delete the object from its label')],
+            [shortcut('Z'), t('Undo')],
+            [shortcut('Z', true), t('Redo')],
+            ['G', t('Show / hide grid')],
+            ['T', t('Show / hide components')],
+            ['1', t('Fit to view')],
+            ['+ / −', t('Zoom in / out')],
+            ['H · V', t('Pan / select')],
+            [shortcut('A'), t('Select all')],
+            ['Esc', t('Select / cancel wire')],
+            ...(isStandalone() && isMac() ? [['⌘T', t('Show / hide Components')]] : []),
           ].map(([key, description]) => (
             <div key={key}>
               <span>{description}</span>
@@ -88,43 +93,20 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
           ))}
         </div>
         <p className="help-note">
-          Trascina le etichette per spostarle. Doppio clic su un filo aggiunge una svolta
-          modificabile. I punti tondi agli estremi prolungano il filo; Option/Alt + trascina
-          riposiziona l’estremo esistente. I punti quadrati modificano le svolte; Alt + clic ne
-          elimina una. Nelle
-          maglie trascina gli angoli per ridimensionare e il punto sulla punta per spostarla. Scrivi{' '}
-          <code>r_&#123;AB&#125;</code> per un pedice.
+          {t(
+            'Drag labels to move them. Double-click a wire to add an editable bend. Round endpoint handles extend a wire; Option/Alt-drag reconnects the existing endpoint. Square handles edit bends; Alt-click removes one. For loops, drag the corners to resize and the tip handle to move the arrowhead. Write',
+          )}{' '}
+          <code>r_&#123;AB&#125;</code> {t('for a subscript.')}{' '}
         </p>
         <p className="help-note">
-          La sidebar Proprietà regola colore e opacità, separatamente per simbolo e label, anche sui
-          gruppi. Seleziona più componenti e usa Sostituisci nel menu contestuale per cambiarli
-          insieme. L’inspector specchia frecce e maglie nei due assi; il piccolo handle che appare
-          vicino a una freccia selezionata permette di ruotarla liberamente. Ogni gesto ha un solo
-          undo. Distribuisci per centri o spazi liberi; la distanza esatta mantiene fermo il primo
-          elemento. Scegli lo stile dei fili o Dividi filo per una continuazione tratteggiata.
-          Rettangoli e linee decorative non creano connessioni elettriche.
-          Evidenziatore, nel menu Disegno e annotazioni, segue fili, nodi e componenti collegati
-          in un solo trascinamento in modalità Intelligente. Scegli tu dove iniziare e fermarti,
-          anche a metà componente; un clic non evidenzia l’intero elemento. In modalità Libera
-          disegni ovunque. Modalità, colore, opacità e
-          spessore si regolano in Proprietà. Gli estremi si modificano selezionando un tratto e trascinando gli handle.
-          Le evidenziazioni seguono il componente o filo; il comando “Scollega” le rende indipendenti.
+          {t(
+            'The Properties sidebar adjusts color and opacity separately for symbols and labels, including groups. Select multiple components and choose Replace in the context menu to change them together. Mirror arrows and loops on either axis; the small handle beside a selected arrow rotates it freely. Each gesture is one undo step. Distribute by centers or clearances; exact spacing keeps the first element fixed. Choose wire styles or Split wire for a dashed continuation. Rectangles and decorative lines do not create electrical connections. Highlighter, in Drawing and annotations, follows connected wires, junctions, and components in one drag in Smart mode. Choose where to start and stop, even within a component; a click does not highlight the whole element. In Freehand mode, draw anywhere. Adjust mode, color, opacity, and width in Properties. Select a stroke and drag its handles to change the endpoints. Highlights follow their component or wire; Detach makes them independent.',
+          )}{' '}
         </p>
         <p className="help-note">
-          L’anteprima Smart Placement indica aggancio e collegamento; Alt/Option li ignora.
-          “Inserisci in filo” è nel feedback in basso. La matita “Disegno e annotazioni” raccoglie
-          fili, nodi, frecce, maglie, rettangoli, linee decorative e annotazioni elettriche.
-          “Corrente sul filo” crea direttamente una freccia integrata; dal menu contestuale di un
-          filo selezionato si applica subito. “Polarità + / −” si applica direttamente anche dalle
-          proprietà dei componenti compatibili. “Graffa / Staffa” apre Graffa e Staffa: trascina per
-          raggruppare, poi aggiungi l’etichetta; R ruota di 90° e “Inverti lato” cambia lato. Clic
-          destro sul foglio o sugli elementi apre le azioni pertinenti; le scorciatoie mantengono
-          disponibili i comandi di modifica. Salva come blocco è anche nella libreria Blocchi
-          personali. Trascina il grip per spostare la toolbar: la posizione viene ricordata.
-          Per copiare il disegno, seleziona gli elementi e scegli “Copia come immagine” dal menu
-          del tasto destro. Per copiare tutto il circuito, usa prima Seleziona tutto.
-          Il circuito e il livello di zoom vengono salvati automaticamente
-          in questo browser.
+          {t(
+            'Smart Placement previews snapping and connections; Alt/Option bypasses them. Insert into wire appears in the bottom feedback. The Drawing and annotations pencil menu contains wires, junctions, arrows, loops, rectangles, decorative lines, and electrical annotations. Current on wire creates an integrated arrow; the context menu applies it directly to a selected wire. Polarity + / − is also available in the properties of compatible components. Brace / Bracket offers both tools: drag to group, then add a label; R rotates by 90° and Flip side changes the side. Right-click the sheet or an element for relevant actions; keyboard shortcuts also provide editing commands. Save as block is available in Personal blocks. Drag the grip to move the toolbar; its position is remembered. Select elements and choose Copy as image in the right-click menu to copy the drawing. Use Select all first to copy the whole circuit. The circuit and zoom level are saved automatically in this browser.',
+          )}{' '}
         </p>
       </section>
     </div>

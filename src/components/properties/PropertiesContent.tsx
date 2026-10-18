@@ -1,3 +1,5 @@
+import { EraserProperties } from './EraserProperties';
+import { t } from '../../i18n';
 import { HighlightProperties } from './HighlightProperties';
 import { commonValue } from './commonValue';
 import { fixedWireConnection } from '../../utils/geometry';
@@ -33,17 +35,17 @@ import { ComponentPreview } from '../palette/ComponentPreview';
 import { reverseLoop } from '../../utils/loops';
 import { InspectorSection, PropertyField, PropertySelect, PropertyRow } from './PropertyControls';
 const names: Record<CircuitObject['kind'], string> = {
-  component: 'Componente',
-  junction: 'Nodo',
-  wire: 'Filo elettrico',
-  text: 'Testo',
-  arrow: 'Freccia',
-  'loop-arrow': 'Maglia',
-  electrical: 'Annotazione elettrica',
-  brace: 'Graffa / Staffa',
-  rectangle: 'Rettangolo',
-  line: 'Linea decorativa',
-  highlight: 'Evidenziazione',
+  component: 'Component',
+  junction: 'Junction',
+  wire: 'Electrical wire',
+  text: 'Text',
+  arrow: 'Arrow',
+  'loop-arrow': 'Loop',
+  electrical: 'Electrical annotation',
+  brace: 'Brace / Bracket',
+  rectangle: 'Rectangle',
+  line: 'Decorative line',
+  highlight: 'Highlight',
 };
 export function PropertiesContent() {
   // Local input drafts live in the fields. Unrelated object edits preserve this selector's result.
@@ -101,14 +103,12 @@ export function PropertiesContent() {
           'rectangle',
           'line',
         ].includes(item.kind) &&
-        !(
-          hasComponent && ['brace', 'rectangle'].includes(item.kind)
-        ) &&
+        !(hasComponent && ['brace', 'rectangle'].includes(item.kind)) &&
         (item.kind !== 'wire' ||
-          [item.startEndpoint, item.endEndpoint].every(
-            (ep) =>
-              ep.kind === 'free' ? !fixedWireConnection(ep, doc, selectedIds) :
-              selectedIds.has(ep.kind === 'terminal' ? ep.componentId : ep.junctionId),
+          [item.startEndpoint, item.endEndpoint].every((ep) =>
+            ep.kind === 'free'
+              ? !fixedWireConnection(ep, doc, selectedIds)
+              : selectedIds.has(ep.kind === 'terminal' ? ep.componentId : ep.junctionId),
           )),
     ) && objects.some((item) => !['wire', 'junction'].includes(item.kind));
   const electricalOnly = o?.kind === 'electrical' && !labelTarget;
@@ -140,8 +140,8 @@ export function PropertiesContent() {
     absoluteRotation &&
     (labelTarget || rotatables.some((o) => o.kind === 'component' || o.kind === 'text') ? (
       <PropertySelect
-        label="Rotazione"
-        caption="Rotazione"
+        label={t('Rotation')}
+        caption={t('Rotation')}
         value={rotation}
         onChange={(v) => setRotation(Number(v))}
       >
@@ -153,24 +153,23 @@ export function PropertiesContent() {
       </PropertySelect>
     ) : (
       <PropertyField
-        label="Rotazione"
-        caption="Rotazione"
+        label={t('Rotation')}
+        caption={t('Rotation')}
         numeric
         unit="°"
         value={rotation === undefined ? undefined : Number(rotation.toFixed(2))}
         onCommit={(v) => setRotation(Number(v))}
       />
     ));
+  if (tool === 'highlight-eraser') return <EraserProperties />;
   if (tool === 'highlight') return <HighlightProperties key="highlight-tool" />;
   if (objects.length && objects.every((o) => o.kind === 'highlight'))
-    return (
-      <HighlightProperties key={objects.map((o) => o.id).join(',')} objects={objects} />
-    );
+    return <HighlightProperties key={objects.map((o) => o.id).join(',')} objects={objects} />;
   if (!objects.length)
     return (
       <div className="inspector-empty">
-        <p>Seleziona un elemento</p>
-        <span>Le proprietà del circuito appariranno qui.</span>
+        <p>{t('Select an element')}</p>
+        <span>{t('Circuit properties will appear here.')}</span>
       </div>
     );
   return (
@@ -198,14 +197,14 @@ export function PropertiesContent() {
         <div className="inspector-type">
           <span>
             {o?.kind === 'component'
-              ? componentRegistry[o.type].name
+              ? t(componentRegistry[o.type].name)
               : o
-                ? names[o.kind]
-                : objects.length + ' elementi selezionati'}
+                ? t(names[o.kind])
+                : t('{count} selected elements', { count: objects.length })}
           </span>
-          {activeLabel && <small>Etichetta selezionata</small>}
+          {activeLabel && <small>{t('Selected label')}</small>}
           {!o && !objects.every((item) => item.kind === objects[0].kind) && (
-            <small>Proprietà comuni</small>
+            <small>{t('Shared properties')}</small>
           )}
         </div>
       </div>
@@ -218,37 +217,37 @@ export function PropertiesContent() {
               <PropertyField
                 label={
                   o.kind === 'junction'
-                    ? 'Nome nodo'
+                    ? t('Junction name')
                     : o.kind === 'component'
-                      ? 'Etichetta componente'
+                      ? t('Component label')
                       : o.kind === 'text'
-                        ? 'Contenuto testo'
-                        : 'Etichetta annotazione'
+                        ? t('Text content')
+                        : t('Annotation label')
                 }
-                caption={o.kind === 'text' ? 'Contenuto' : 'Etichetta'}
+                caption={o.kind === 'text' ? t('Content') : t('Label')}
                 value={o.kind === 'text' ? o.text : 'label' in o ? o.label.text : ''}
                 onCommit={(text) => apply((o) => replaceInlineText(o, text))}
               />
             )}
             {objects.length > 1 && objects.every((o) => 'label' in o) && (
               <PropertyField
-                label="Etichetta comune"
-                caption="Etichetta"
+                label={t('Shared label')}
+                caption={t('Label')}
                 value={commonValue(objects.map((o) => ('label' in o ? o.label.text : '')))}
                 onCommit={(text) => apply((o) => replaceInlineText(o, text))}
               />
             )}
             {objects.length > 1 && objects.every((o) => o.kind === 'text') && (
               <PropertyField
-                label="Contenuto comune"
-                caption="Contenuto"
+                label={t('Shared content')}
+                caption={t('Content')}
                 value={commonValue(objects.map((o) => (o.kind === 'text' ? o.text : '')))}
                 onCommit={(text) => apply((o) => replaceInlineText(o, text))}
               />
             )}
             {o?.kind === 'component' && componentRegistry[o.type].internalText !== undefined && (
               <PropertyField
-                label="Testo interno"
+                label={t('Internal text')}
                 value={o.bodyText ?? '='}
                 onCommit={(bodyText) =>
                   apply((o) => (o.kind === 'component' ? { ...o, bodyText } : o))
@@ -257,12 +256,12 @@ export function PropertiesContent() {
             )}
           </div>
         )}
-      <InspectorSection title="Posizione">
+      <InspectorSection title={t('Position')}>
         <div className="inspector-pair">
           {(['x', 'y'] as const).map((axis) => (
             <PropertyField
               key={axis}
-              label={`Posizione ${axis.toUpperCase()}`}
+              label={t('Position {axis}', { axis: axis.toUpperCase() })}
               caption={axis.toUpperCase()}
               numeric
               value={Number(position(axis).toFixed(3))}
@@ -276,14 +275,16 @@ export function PropertiesContent() {
         {objects.length > 1 && (
           <p
             className="inspector-note"
-            title="Angolo superiore sinistro dei limiti geometrici della selezione, in unità canvas indipendenti dallo zoom."
+            title={t(
+              "Top-left corner of the selection's geometric bounds, in canvas units independent of zoom.",
+            )}
           >
-            X/Y: angolo superiore sinistro · u
+            {t('X/Y: top-left corner · u')}{' '}
           </p>
         )}
       </InspectorSection>
       {!electricalOnly && (
-        <InspectorSection title="Aspetto">
+        <InspectorSection title={t('Appearance')}>
           <SelectionStyle
             objects={objects}
             apply={apply}
@@ -292,7 +293,7 @@ export function PropertiesContent() {
           />
           {!labelTarget && lineObjects.length === objects.length && (
             <PropertySelect
-              label="Stile linea"
+              label={t('Line style')}
               value={commonValue(lineObjects.map((o) => o.lineStyle ?? 'solid'))}
               onChange={(v) =>
                 apply((o) =>
@@ -302,9 +303,9 @@ export function PropertiesContent() {
                 )
               }
             >
-              <option value="solid">Continua</option>
-              <option value="dashed">Tratteggiata</option>
-              <option value="dotted">Puntinata</option>
+              <option value="solid">{t('Solid')}</option>
+              <option value="dashed">{t('Dashed')}</option>
+              <option value="dotted">{t('Dotted')}</option>
             </PropertySelect>
           )}
           {!labelTarget &&
@@ -312,8 +313,8 @@ export function PropertiesContent() {
             lineObjects.every((o) => o.lineStyle === 'dashed') && (
               <div className="inspector-style-fields">
                 <PropertyField
-                  label="Lunghezza trattino"
-                  caption="Trattino"
+                  label={t('Dash length')}
+                  caption={t('Dash')}
                   numeric
                   min={0.1}
                   max={1000}
@@ -335,8 +336,8 @@ export function PropertiesContent() {
                   }
                 />
                 <PropertyField
-                  label="Spazio trattini"
-                  caption="Intervallo"
+                  label={t('Dash spacing')}
+                  caption={t('Gap')}
                   numeric
                   min={0.1}
                   max={1000}
@@ -362,41 +363,46 @@ export function PropertiesContent() {
       )}
       {((groupRotation && !absoluteRotation) ||
         objects.every((item) => item.kind === 'arrow' || item.kind === 'loop-arrow')) && (
-        <InspectorSection title="Trasformazioni">
+        <InspectorSection title={t('Transforms')}>
           {groupRotation && !absoluteRotation && (
             <div className="inspector-rotation">
               <button
                 className="inspector-property-action"
-                aria-label={`Ruota ${objects.length > 1 ? 'gruppo ' : ''}di ${rotatables.some((o) => o.kind === 'component') ? 45 : 90}° (R)`}
-                title="Ruota la selezione attorno al suo centro (R)"
+                aria-label={
+                  t(objects.length > 1 ? 'Rotate group by {angle}°' : 'Rotate by {angle}°', {
+                    angle: rotatables.some((o) => o.kind === 'component') ? 45 : 90,
+                  }) + ' (R)'
+                }
+                title={t('Rotate selection around its center (R)')}
                 onClick={() => state().rotate()}
               >
                 <RotateCw size={14} />
-                Ruota {objects.length > 1 ? 'gruppo ' : ''}di{' '}
-                {rotatables.some((o) => o.kind === 'component') ? 45 : 90}°
+                {t(objects.length > 1 ? 'Rotate group by {angle}°' : 'Rotate by {angle}°', {
+                  angle: rotatables.some((o) => o.kind === 'component') ? 45 : 90,
+                })}
               </button>
             </div>
           )}
           {objects.every((item) => item.kind === 'arrow' || item.kind === 'loop-arrow') && (
-            <PropertyRow caption="Specchia">
+            <PropertyRow caption={t('Mirror')}>
               <div className="inspector-segmented">
                 <button
                   className="inspector-property-action"
-                  aria-label="Specchia orizzontalmente"
-                  title="Specchia orizzontalmente"
+                  aria-label={t('Mirror horizontally')}
+                  title={t('Mirror horizontally')}
                   onClick={() => state().mirror('horizontal')}
                 >
                   <FlipHorizontal size={14} />
-                  Orizzontale
+                  {t('Horizontal')}{' '}
                 </button>
                 <button
                   className="inspector-property-action"
-                  aria-label="Specchia verticalmente"
-                  title="Specchia verticalmente"
+                  aria-label={t('Mirror vertically')}
+                  title={t('Mirror vertically')}
                   onClick={() => state().mirror('vertical')}
                 >
                   <FlipVertical size={14} />
-                  Verticale
+                  {t('Vertical')}{' '}
                 </button>
               </div>
             </PropertyRow>
@@ -408,9 +414,9 @@ export function PropertiesContent() {
           objects.some((o) =>
             ['rectangle', 'line', 'wire', 'arrow', 'loop-arrow', 'brace'].includes(o.kind),
           )) && (
-          <InspectorSection title="Geometria">
+          <InspectorSection title={t('Geometry')}>
             {objects.every((item) => item.kind === 'brace') && (
-              <PropertyRow caption="Lato">
+              <PropertyRow caption={t('Side')}>
                 <button
                   className="inspector-property-action"
                   onClick={() =>
@@ -419,12 +425,12 @@ export function PropertiesContent() {
                     )
                   }
                 >
-                  <FlipHorizontal size={14} /> Inverti lato
+                  <FlipHorizontal size={14} /> {t('Flip side')}{' '}
                 </button>
               </PropertyRow>
             )}
             {objects.every((item) => ['arrow', 'loop-arrow'].includes(item.kind)) && (
-              <PropertyRow caption="Direzione">
+              <PropertyRow caption={t('Direction')}>
                 <button
                   className="inspector-property-action"
                   onClick={() =>
@@ -437,7 +443,7 @@ export function PropertiesContent() {
                     )
                   }
                 >
-                  <ArrowLeftRight size={14} /> Inverti freccia
+                  <ArrowLeftRight size={14} /> {t('Reverse arrow')}{' '}
                 </button>
               </PropertyRow>
             )}
@@ -446,7 +452,7 @@ export function PropertiesContent() {
                 {(['width', 'height'] as const).map((dimension) => (
                   <PropertyField
                     key={dimension}
-                    label={dimension === 'width' ? 'Larghezza' : 'Altezza'}
+                    label={dimension === 'width' ? t('Width') : t('Height')}
                     caption={dimension === 'width' ? 'W' : 'H'}
                     numeric
                     min={1}
@@ -464,7 +470,7 @@ export function PropertiesContent() {
                 {(['width', 'height'] as const).map((dimension) => (
                   <PropertyField
                     key={dimension}
-                    label={dimension === 'width' ? 'Larghezza' : 'Altezza'}
+                    label={dimension === 'width' ? t('Width') : t('Height')}
                     caption={dimension === 'width' ? 'W' : 'H'}
                     numeric
                     min={1}
@@ -479,7 +485,7 @@ export function PropertiesContent() {
             )}
             {objects.every((o) => o.kind === 'wire') && (
               <PropertySelect
-                label="Routing filo"
+                label={t('Wire routing')}
                 value={commonValue(
                   objects.flatMap((o) => (o.kind === 'wire' ? [o.routing ?? 'orthogonal'] : [])),
                 )}
@@ -487,15 +493,15 @@ export function PropertiesContent() {
                   apply((o) => (o.kind === 'wire' ? { ...o, routing: v as WireRouting } : o))
                 }
               >
-                <option value="orthogonal">Ortogonale</option>
+                <option value="orthogonal">{t('Orthogonal')}</option>
                 <option value="45">45°</option>
-                <option value="free">Libero</option>
+                <option value="free">{t('Free')}</option>
               </PropertySelect>
             )}
             {o?.kind === 'arrow' && (
               <PropertySelect
-                label="Tipo freccia"
-                caption="Forma"
+                label={t('Arrow type')}
+                caption={t('Shape')}
                 value={o.type}
                 onChange={(v) =>
                   apply((o) =>
@@ -503,9 +509,9 @@ export function PropertiesContent() {
                   )
                 }
               >
-                <option value="straight">Dritta</option>
-                <option value="curve">Curva</option>
-                <option value="arc">Maglia</option>
+                <option value="straight">{t('Straight')}</option>
+                <option value="curve">{t('Curved')}</option>
+                <option value="arc">{t('Loop')}</option>
               </PropertySelect>
             )}
             {o?.kind === 'line' &&
@@ -514,7 +520,7 @@ export function PropertiesContent() {
                   {(['x', 'y'] as const).map((axis) => (
                     <PropertyField
                       key={axis}
-                      label={`${end === 'start' ? 'Inizio' : 'Fine'} ${axis.toUpperCase()}`}
+                      label={`${end === 'start' ? t('Start') : t('End')} ${axis.toUpperCase()}`}
                       numeric
                       value={o[end][axis]}
                       onCommit={(v) =>
@@ -538,7 +544,7 @@ export function PropertiesContent() {
             objects[0].kind === 'electrical' &&
             item.mode === objects[0].mode,
         ) && (
-          <InspectorSection title="Annotazioni elettriche">
+          <InspectorSection title={t('Electrical annotations')}>
             <button
               className="inspector-property-action"
               onClick={() =>
@@ -549,10 +555,10 @@ export function PropertiesContent() {
             >
               <ArrowLeftRight size={14} />{' '}
               {objects[0].kind === 'electrical' && objects[0].mode === 'polarity'
-                ? 'Inverti polarità'
+                ? t('Reverse polarity')
                 : objects[0].kind === 'electrical' && objects[0].mode === 'current'
-                  ? 'Inverti verso corrente'
-                  : 'Inverti freccia tensione'}
+                  ? t('Reverse current direction')
+                  : t('Reverse voltage arrow')}
             </button>
           </InspectorSection>
         )}

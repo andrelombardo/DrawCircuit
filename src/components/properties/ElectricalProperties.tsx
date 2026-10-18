@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { ArrowLeftRight } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { supportsPolarity } from '../../model/capabilities';
@@ -27,8 +28,8 @@ function AnnotationFields({ annotation }: { annotation: ElectricalAnnotation }) 
     <>
       <div className="inspector-annotation-label">
         <PropertyField
-          label={current ? 'Etichetta corrente' : 'Etichetta tensione'}
-          caption={current ? 'Etichetta corrente' : 'Etichetta tensione'}
+          label={current ? t('Current label') : t('Voltage label')}
+          caption={current ? t('Current label') : t('Voltage label')}
           value={annotation.label.text}
           onCommit={(text) => update((o) => ({ ...o, label: { ...o.label, text } }))}
         />
@@ -38,17 +39,17 @@ function AnnotationFields({ annotation }: { annotation: ElectricalAnnotation }) 
         >
           <ArrowLeftRight size={14} />{' '}
           {annotation.mode === 'polarity'
-            ? 'Inverti polarità'
+            ? t('Reverse polarity')
             : current
-              ? 'Inverti verso corrente'
-              : 'Inverti freccia tensione'}
+              ? t('Reverse current direction')
+              : t('Reverse voltage arrow')}
         </button>
       </div>
       {current && segments > 0 && (
         <>
           {segments > 1 && (
             <PropertySelect
-              label="Riferimento corrente"
+              label={t('Current reference')}
               value={annotation.wireSegment?.index ?? ''}
               onChange={(v) =>
                 update((o) => ({
@@ -56,22 +57,25 @@ function AnnotationFields({ annotation }: { annotation: ElectricalAnnotation }) 
                   wireSegment:
                     v === ''
                       ? undefined
-                      : { index: Number(v), ratio: o.wireSegment?.ratio ?? o.ratio },
+                      : {
+                          index: Number(v),
+                          ratio: o.wireSegment?.ratio ?? o.ratio,
+                        },
                   offset: { x: 0, y: 0 },
                 }))
               }
             >
-              <option value="">Lungo il filo</option>
+              <option value="">{t('Along the wire')}</option>
               {Array.from({ length: segments }, (_, i) => (
                 <option key={i} value={i}>
-                  Tratto {i + 1}
+                  {t('Segment')} {i + 1}
                 </option>
               ))}
             </PropertySelect>
           )}
           <PropertyField
-            label={annotation.wireSegment ? 'Posizione sul tratto' : 'Posizione sul filo'}
-            caption={annotation.wireSegment ? 'Sul tratto' : 'Sul filo'}
+            label={annotation.wireSegment ? t('Position on segment') : t('Position on wire')}
+            caption={annotation.wireSegment ? t('On segment') : t('On wire')}
             numeric
             min={0}
             max={100}
@@ -82,7 +86,9 @@ function AnnotationFields({ annotation }: { annotation: ElectricalAnnotation }) 
                 ...o,
                 ratio: Number(v) / 100,
                 ...(o.wireSegment
-                  ? { wireSegment: { ...o.wireSegment, ratio: Number(v) / 100 } }
+                  ? {
+                      wireSegment: { ...o.wireSegment, ratio: Number(v) / 100 },
+                    }
                   : {}),
                 offset: { x: 0, y: 0 },
               }))
@@ -91,36 +97,39 @@ function AnnotationFields({ annotation }: { annotation: ElectricalAnnotation }) 
         </>
       )}
       {(!current || !annotation.wireId) && (
-        <div className="inspector-offsets" role="group" aria-label="Posizione annotazione">
-          <h4 title="Spostamento rispetto al componente o alla geometria di riferimento, in unità canvas.">
-            Offset annotazione
+        <div className="inspector-offsets" role="group" aria-label={t('Annotation position')}>
+          <h4 title={t('Offset from the component or reference geometry, in canvas units.')}>
+            {t('Annotation offset')}{' '}
           </h4>
           <div className="inspector-pair">
             {(['x', 'y'] as const).map((axis) => (
               <PropertyField
                 key={axis}
-                label={`Offset annotazione ${axis.toUpperCase()}`}
+                label={t('Annotation offset {axis}', {
+                  axis: axis.toUpperCase(),
+                })}
                 caption={axis.toUpperCase()}
                 numeric
                 unit="u"
                 value={annotation.offset[axis]}
                 onCommit={(v) =>
-                  update((o) => ({ ...o, offset: { ...o.offset, [axis]: Number(v) } }))
+                  update((o) => ({
+                    ...o,
+                    offset: { ...o.offset, [axis]: Number(v) },
+                  }))
                 }
               />
             ))}
           </div>
         </div>
       )}
-      <div className="inspector-offsets" role="group" aria-label="Posizione etichetta">
-        <h4 title="Spostamento del testo rispetto all’annotazione, in unità canvas.">
-          Offset etichetta
-        </h4>
+      <div className="inspector-offsets" role="group" aria-label={t('Label position')}>
+        <h4 title={t('Text offset from the annotation, in canvas units.')}>{t('Label offset')} </h4>
         <div className="inspector-pair">
           {(['x', 'y'] as const).map((axis) => (
             <PropertyField
               key={axis}
-              label={`Offset etichetta ${axis.toUpperCase()}`}
+              label={t('Label offset {axis}', { axis: axis.toUpperCase() })}
               caption={axis.toUpperCase()}
               numeric
               unit="u"
@@ -128,7 +137,10 @@ function AnnotationFields({ annotation }: { annotation: ElectricalAnnotation }) 
               onCommit={(v) =>
                 update((o) => ({
                   ...o,
-                  label: { ...o.label, offset: { ...o.label.offset, [axis]: Number(v) } },
+                  label: {
+                    ...o.label,
+                    offset: { ...o.label.offset, [axis]: Number(v) },
+                  },
                 }))
               }
             />
@@ -136,7 +148,7 @@ function AnnotationFields({ annotation }: { annotation: ElectricalAnnotation }) 
         </div>
       </div>
       <InspectorDisclosure
-        title="Stile annotazione"
+        title={t('Annotation style')}
         preview={
           <>
             <span className="inspector-swatch" style={{ backgroundColor: annotation.color }} />
@@ -161,9 +173,9 @@ export function ElectricalProperties({ object }: { object: CircuitObject }) {
   );
   const hosted = object.kind !== 'electrical';
   if (hosted && object.kind !== 'wire' && !supportsPolarity(object)) return null;
-  const title = object.kind === 'wire' ? 'Corrente' : 'Polarità e tensione';
+  const title = object.kind === 'wire' ? t('Current') : t('Polarity and voltage');
   return (
-    <InspectorSection title="Annotazioni elettriche">
+    <InspectorSection title={t('Electrical annotations')}>
       {!annotations.length && (
         <label className="inspector-check inspector-enable">
           <span>{title}</span>
@@ -182,7 +194,7 @@ export function ElectricalProperties({ object }: { object: CircuitObject }) {
         <div
           className="inspector-annotation"
           role="group"
-          aria-label={`${annotation.mode === 'current' ? 'Corrente' : 'Polarità e tensione'}${annotations.length > 1 ? ` ${index + 1}` : ''}`}
+          aria-label={`${annotation.mode === 'current' ? t('Current') : t('Polarity and voltage')}${annotations.length > 1 ? ` ${index + 1}` : ''}`}
           key={annotation.id}
         >
           {hosted ? (
@@ -204,13 +216,13 @@ export function ElectricalProperties({ object }: { object: CircuitObject }) {
               />
             </label>
           ) : (
-            <PropertyRow caption="Tipo">
+            <PropertyRow caption={t('Type')}>
               <span>
                 {annotation.mode === 'polarity'
-                  ? 'Polarità + / −'
+                  ? t('Polarity + / −')
                   : annotation.mode === 'current'
-                    ? 'Corrente'
-                    : 'Tensione'}
+                    ? t('Current')
+                    : t('Voltage')}
               </span>
             </PropertyRow>
           )}

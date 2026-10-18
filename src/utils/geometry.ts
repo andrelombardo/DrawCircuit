@@ -1,4 +1,5 @@
-import { highlightBounds } from '../annotations/highlight';
+import { t } from '../i18n';
+import { highlightBounds, mapHighlight } from '../annotations/highlight';
 import { braceGeometry } from '../annotations/brace';
 import { electricalDrawingGeometry, electricalGeometry } from '../annotations/electrical';
 import { componentRegistry } from '../model/catalog';
@@ -94,7 +95,7 @@ export function resolveEndpoint(endpoint: Endpoint, doc: CircuitDocument): Point
       if (t) return localToWorld(c, { x: t.localX, y: t.localY });
     }
   }
-  throw new Error('Collegamento a un terminale o nodo inesistente.');
+  throw new Error(t('Connection refers to an unknown terminal or junction.'));
 }
 export function endpointDirection(ep: Endpoint, doc: CircuitDocument): 'x' | 'y' {
   if (ep.kind !== 'terminal') return 'x';
@@ -232,7 +233,12 @@ function terminalSafeRoute(
     nodes = ys.flatMap((y) => xs.map((x) => ({ x, y }))),
     first = nodes.findIndex((p) => p.x === start.x && p.y === start.y),
     last = nodes.findIndex((p) => p.x === end.x && p.y === end.y);
-  type State = { node: number; axis: 'x' | 'y' | ''; cost: number; path: number[] };
+  type State = {
+    node: number;
+    axis: 'x' | 'y' | '';
+    cost: number;
+    path: number[];
+  };
   const pending: State[] = [{ node: first, axis: '', cost: 0, path: [first] }],
     visited = new Set<string>();
   while (pending.length) {
@@ -306,7 +312,10 @@ function routeWire(wire: Wire, doc: CircuitDocument, protectTerminals: boolean):
         dy = b.y - a.y;
       const diagonal = Math.min(Math.abs(dx), Math.abs(dy));
       if (diagonal > 0.001 && Math.abs(Math.abs(dx) - Math.abs(dy)) > 0.001)
-        result.push({ x: a.x + Math.sign(dx) * diagonal, y: a.y + Math.sign(dy) * diagonal });
+        result.push({
+          x: a.x + Math.sign(dx) * diagonal,
+          y: a.y + Math.sign(dy) * diagonal,
+        });
       if (distance(result.at(-1)!, b) > 0.001) result.push(b);
     }
     return result;
@@ -409,7 +418,10 @@ export function nearestTarget(
       const d = distance(p, o);
       if (d < closest) {
         closest = d;
-        best = { point: { x: o.x, y: o.y }, endpoint: { kind: 'junction', junctionId: o.id } };
+        best = {
+          point: { x: o.x, y: o.y },
+          endpoint: { kind: 'junction', junctionId: o.id },
+        };
       }
     }
     if (o.kind === 'component')
@@ -418,7 +430,10 @@ export function nearestTarget(
           d = distance(p, point);
         if (d < closest) {
           closest = d;
-          best = { point, endpoint: { kind: 'terminal', componentId: o.id, terminalId: t.id } };
+          best = {
+            point,
+            endpoint: { kind: 'terminal', componentId: o.id, terminalId: t.id },
+          };
         }
       }
   }
@@ -471,8 +486,7 @@ export function moveObject(o: CircuitObject, delta: Point, moved: Set<string>): 
     o.kind === 'rectangle'
   )
     return { ...o, x: o.x + delta.x, y: o.y + delta.y };
-  if (o.kind === 'highlight')
-    return o.mode === 'free' ? { ...o, points: o.points.map((p) => add(p, delta)) } : o;
+  if (o.kind === 'highlight') return mapHighlight(o, (p) => add(p, delta));
   if (o.kind === 'electrical') {
     const attached =
       (o.wireId && !moved.has(o.wireId)) || (o.componentId && !moved.has(o.componentId));
@@ -512,8 +526,14 @@ export function moveObject(o: CircuitObject, delta: Point, moved: Set<string>): 
       : {}),
   };
 }
-export const add = (a: Point, b: Point): Point => ({ x: a.x + b.x || 0, y: a.y + b.y || 0 });
-export const midpoint = (a: Point, b: Point): Point => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+export const add = (a: Point, b: Point): Point => ({
+  x: a.x + b.x || 0,
+  y: a.y + b.y || 0,
+});
+export const midpoint = (a: Point, b: Point): Point => ({
+  x: (a.x + b.x) / 2,
+  y: (a.y + b.y) / 2,
+});
 export function arrowPath(a: ArrowAnnotation): string {
   if (a.type === 'straight') return pointsPath([a.start, a.end]);
   if (a.type === 'curve')
@@ -583,7 +603,12 @@ export function objectBounds(
     const angle = ((o.rotation ?? 0) * Math.PI) / 180;
     const width = Math.hypot(o.width * Math.cos(angle), o.height * Math.sin(angle));
     const height = Math.hypot(o.width * Math.sin(angle), o.height * Math.cos(angle));
-    return { x: o.x + (o.width - width) / 2, y: o.y + (o.height - height) / 2, width, height };
+    return {
+      x: o.x + (o.width - width) / 2,
+      y: o.y + (o.height - height) / 2,
+      width,
+      height,
+    };
   } else if (o.kind === 'arrow') {
     if (o.type === 'arc') {
       const r = Math.max(20, distance(o.start, o.end) / 2),

@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { usePersonalBlocks } from '../../personalBlocks/library';
 import { PersonalBlockPalette } from '../../personalBlocks/PersonalBlockPalette';
 import { useState } from 'react';
@@ -20,9 +21,9 @@ export function Palette({ onHide }: { onHide: () => void }) {
     pendingPresetId = useEditorStore((s) => s.pendingPresetId),
     selectPreset = useEditorStore((s) => s.selectPreset);
   return (
-    <aside className="palette" aria-label="Libreria componenti">
+    <aside className="palette" aria-label={t('Component library')}>
       <div className="palette-heading">
-        <span>Componenti</span>
+        <span>{t('Components')}</span>
         <SidebarToggle side="left" visible onToggle={onHide} />
       </div>
       <div className="search-field">
@@ -30,25 +31,29 @@ export function Palette({ onHide }: { onHide: () => void }) {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Cerca componenti…"
-          aria-label="Cerca componenti"
-          title="Cerca componenti e blocchi"
+          placeholder={t('Search components…')}
+          aria-label={t('Search components')}
+          title={t('Search components and blocks')}
         />
         {search && (
-          <button aria-label="Svuota ricerca" title="Svuota ricerca" onClick={() => setSearch('')}>
+          <button
+            aria-label={t('Clear search')}
+            title={t('Clear search')}
+            onClick={() => setSearch('')}
+          >
             <X size={14} />
           </button>
         )}
       </div>
       <div className="palette-scroll">
-        <section className="preset-section" aria-label="Blocchi rapidi">
+        <section className="preset-section" aria-label={t('Quick blocks')}>
           <button
             className="group-heading preset-heading"
             aria-expanded={presetsOpen || !!search}
             onClick={() => setPresetsOpen((open) => !open)}
           >
             <span>
-              Blocchi rapidi <span className="count">{circuitPresets.length}</span>
+              {t('Quick blocks')} <span className="count">{circuitPresets.length}</span>
             </span>
             <ChevronDown size={14} className={!presetsOpen && !search ? 'collapsed' : ''} />
           </button>
@@ -72,7 +77,7 @@ export function Palette({ onHide }: { onHide: () => void }) {
                       )
                     }
                   >
-                    {category}
+                    {t(category)}
                     <ChevronDown size={14} className={closed ? 'collapsed' : ''} />
                   </button>
                   {!closed && (
@@ -81,13 +86,17 @@ export function Palette({ onHide }: { onHide: () => void }) {
                         <button
                           key={item.id}
                           className={`preset-card${tool === 'preset' && pendingPresetId === item.id ? ' chosen' : ''}`}
-                          title={`${item.name} · clicca e posiziona · R ruota`}
-                          aria-label={`Inserisci blocco: ${item.name}`}
+                          title={t('{name} · click to place · R rotates', {
+                            name: t(item.name),
+                          })}
+                          aria-label={t('Insert block: {name}', {
+                            name: t(item.name),
+                          })}
                           aria-pressed={tool === 'preset' && pendingPresetId === item.id}
                           onClick={() => selectPreset(item.id)}
                         >
                           <PresetThumbnail preset={item} />
-                          <span>{item.shortName}</span>
+                          <span>{t(item.shortName)}</span>
                         </button>
                       ))}
                     </div>
@@ -112,7 +121,7 @@ export function Palette({ onHide }: { onHide: () => void }) {
                   )
                 }
               >
-                {group}
+                {t(group)}
                 <ChevronDown size={14} className={closed ? 'collapsed' : ''} />
               </button>
               {!closed && (
@@ -121,15 +130,21 @@ export function Palette({ onHide }: { onHide: () => void }) {
                     <button
                       key={c.type}
                       className={`component-card${tool === c.type ? ' chosen' : ''}`}
-                      title={`${c.name} · clicca e posiziona, oppure trascina`}
-                      aria-label={`Inserisci ${c.name.toLowerCase()}`}
+                      title={t('{name} · click to place, or drag', {
+                        name: t(c.name),
+                      })}
+                      aria-label={t('Insert {name}', {
+                        name: t(c.name).toLocaleLowerCase(),
+                      })}
                       aria-pressed={tool === c.type}
                       draggable
                       onDragStart={(e) => {
                         e.dataTransfer.setData('application/drawcircuit-component', c.type);
                         e.dataTransfer.effectAllowed = 'copy';
                         window.dispatchEvent(
-                          new CustomEvent('drawcircuit:component-drag-start', { detail: c.type }),
+                          new CustomEvent('drawcircuit:component-drag-start', {
+                            detail: c.type,
+                          }),
                         );
                       }}
                       onDragEnd={() =>
@@ -138,7 +153,7 @@ export function Palette({ onHide }: { onHide: () => void }) {
                       onClick={() => setTool(c.type)}
                     >
                       <ComponentPreview component={c} />
-                      <span>{c.shortName}</span>
+                      <span>{t(c.shortName)}</span>
                     </button>
                   ))}
                 </div>
@@ -150,7 +165,7 @@ export function Palette({ onHide }: { onHide: () => void }) {
           !circuitPresets.some((item) => matchesPreset(item, search)) &&
           !personalBlocks.some((b) =>
             b.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
-          ) && <p className="no-results">Nessun componente o blocco trovato.</p>}
+          ) && <p className="no-results">{t('No components or blocks found.')}</p>}
       </div>
     </aside>
   );

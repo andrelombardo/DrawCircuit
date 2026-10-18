@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { Children, isValidElement, useId, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
@@ -55,9 +56,9 @@ function DraftInput({
       value={draft}
       aria-label={label}
       aria-valuetext={
-        numeric ? (value === undefined ? 'Valori misti' : `${value}${unit ?? ''}`) : undefined
+        numeric ? (value === undefined ? t('Mixed values') : `${value}${unit ?? ''}`) : undefined
       }
-      placeholder={value === undefined ? (numeric ? 'Misto' : 'Valori misti') : label}
+      placeholder={value === undefined ? (numeric ? t('Mixed') : t('Mixed values')) : label}
       onFocus={() => {
         cancelled.current = false;
       }}
@@ -143,7 +144,13 @@ export function PropertySelect({
 }) {
   const id = useId();
   const options = Children.toArray(children).flatMap((child) => {
-    if (!isValidElement<{ value: string | number; children: ReactNode; disabled?: boolean }>(child))
+    if (
+      !isValidElement<{
+        value: string | number;
+        children: ReactNode;
+        disabled?: boolean;
+      }>(child)
+    )
       return [];
     return [
       {
@@ -154,7 +161,7 @@ export function PropertySelect({
     ];
   });
   const selected = options.find((option) => option.value === String(value));
-  const description = selected?.label ?? 'Valori misti';
+  const description = selected?.label ?? t('Mixed values');
   return (
     <PropertyRow caption={caption ?? label} htmlFor={id}>
       <ActionMenu

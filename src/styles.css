@@ -3093,3 +3093,67 @@ summary:focus-visible {
 .drawing-surface.tool-highlight * {
   cursor: crosshair;
 }
+
+.language-control {
+  position: absolute;
+  right: 60px;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 8px;
+  color: var(--muted);
+  z-index: var(--layer-floating);
+}
+.language-control select {
+  min-width: 72px;
+  border: 0;
+  background: transparent;
+  color: var(--ui-text);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.language-control select:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+/* Reserve room for the language selector beside the help control. */
+.editor-bottom {
+  right: 194px;
+}
+@container (max-width: 580px) {
+  .editor-bottom {
+    right: 66px;
+  }
+  .language-control {
+    right: 14px;
+    bottom: 68px;
+  }
+  .editor-bottom:has(.has-placement-controls) {
+    max-width: calc(100% - 156px);
+    right: auto;
+  }
+}
+
+/* The eraser footprint is a vector overlay and never intercepts circuit input. */
+.drawing-surface.tool-highlight-eraser,
+.drawing-surface.tool-highlight-eraser * {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='white' stroke='%236e6e73' stroke-width='1.5' stroke-linejoin='round'%3E%3Cpath d='m5 13 9-9a2 2 0 0 1 3 0l4 4a2 2 0 0 1 0 3l-9 9H8l-3-3a3 3 0 0 1 0-4Z'/%3E%3Cpath d='m9 9 9 9M8 20h13'/%3E%3C/svg%3E") 5 19, crosshair;
+}
+.eraser-size-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--ui-text-secondary);
+}
+.eraser-size-label output {
+  font-variant-numeric: tabular-nums;
+}
+.eraser-size {
+  width: 100%;
+  margin: 12px 0;
+  accent-color: var(--ui-accent);
+}

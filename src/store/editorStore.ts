@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { DEFAULT_HIGHLIGHT, reconcileHighlights } from '../annotations/highlight';
 import type { HighlightSettings } from '../model/types';
 import { usePersonalBlocks, instantiatePersonalBlock } from '../personalBlocks/library';
@@ -50,7 +51,8 @@ function canCommit(document: CircuitDocument): boolean {
     return false;
   }
 }
-const invalidEditNotice = 'Modifica non applicata: supera i limiti del documento o contiene dati non validi.';
+const invalidEditNotice =
+  'Change not applied: it exceeds document limits or contains invalid data.';
 interface EditorState {
   document: CircuitDocument;
   selection: string[];
@@ -65,6 +67,8 @@ interface EditorState {
   rotatePlacement: () => void;
   arrowType: ArrowAnnotation['type'];
   highlightSettings: HighlightSettings;
+  eraserSize: number;
+  setEraserSize: (size: number) => void;
   setHighlightSettings: (settings: Partial<HighlightSettings>) => void;
   wireRouting: WireRouting;
   setWireRouting: (routing: WireRouting) => void;
@@ -145,6 +149,10 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     })),
   arrowType: 'straight',
   highlightSettings: { ...DEFAULT_HIGHLIGHT },
+  eraserSize: 24,
+  setEraserSize: (size) => {
+    if (Number.isFinite(size)) set({ eraserSize: Math.max(6, Math.min(160, size)) });
+  },
   setHighlightSettings: (settings) =>
     set((s) => ({
       highlightSettings: { ...s.highlightSettings, ...settings },
@@ -182,7 +190,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     );
     if (!canCommit(next)) {
       s.cancelGesture();
-      s.notify(invalidEditNotice);
+      s.notify(t(invalidEditNotice));
       return false;
     }
     set({
@@ -242,7 +250,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const result = copySelection(s.document, s.selection, clipboardData);
     if (!result) return false;
     await result;
-    s.notify('Selezione copiata');
+    s.notify(t('Selection copied'));
     return true;
   },
   cut: async (clipboardData) => {
@@ -251,11 +259,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     // can resolve after a selection change, so never delete from an async continuation.
     const result = copySelection(s.document, s.selection, clipboardData);
     if (!result) {
-      s.notify('Impossibile copiare la selezione.');
+      s.notify(t('Unable to copy the selection.'));
       return false;
     }
     s.remove(true);
-    s.notify('Selezione tagliata');
+    s.notify(t('Selection cut'));
     await result;
     return true;
   },
@@ -264,11 +272,14 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (!copied) return;
     const s = get();
     s.add(cloneObjects(copied, { x: 40, y: 40 }, s.document));
-    s.notify('Selezione incollata');
+    s.notify(t('Selection pasted'));
   },
   update: (id, fn) => {
     const s = get();
-    s.commit({ ...s.document, objects: s.document.objects.map((o) => (o.id === id ? fn(o) : o)) });
+    s.commit({
+      ...s.document,
+      objects: s.document.objects.map((o) => (o.id === id ? fn(o) : o)),
+    });
   },
   beginGesture: () => set((s) => ({ gestureStart: s.gestureStart ?? s.document })),
   preview: (document) =>
@@ -282,11 +293,15 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const s = get();
     if (s.gestureStart && s.gestureStart !== s.document && !canCommit(s.document)) {
       s.cancelGesture();
-      s.notify(invalidEditNotice);
+      s.notify(t(invalidEditNotice));
       return;
     }
     if (s.gestureStart && s.gestureStart !== s.document)
-      set({ past: [...s.past, s.gestureStart].slice(-100), future: [], gestureStart: null });
+      set({
+        past: [...s.past, s.gestureStart].slice(-100),
+        future: [],
+        gestureStart: null,
+      });
     else set({ gestureStart: null });
   },
   cancelGesture: () => {
@@ -297,7 +312,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const s = get();
     if (s.gestureStart) {
       s.cancelGesture();
-      set({ selection: [], activeLabel: null, tool: 'select', pendingPresetId: null });
+      set({
+        selection: [],
+        activeLabel: null,
+        tool: 'select',
+        pendingPresetId: null,
+      });
       return;
     }
     if (!s.past.length) return;
@@ -317,7 +337,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const s = get();
     if (s.gestureStart) {
       s.cancelGesture();
-      set({ selection: [], activeLabel: null, tool: 'select', pendingPresetId: null });
+      set({
+        selection: [],
+        activeLabel: null,
+        tool: 'select',
+        pendingPresetId: null,
+      });
       return;
     }
     if (!s.future.length) return;
@@ -363,7 +388,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   replace: (document) => {
     get().cancelGesture();
     get().commit(document);
-    set({ selection: [], activeLabel: null, tool: 'select', pendingPresetId: null });
+    set({
+      selection: [],
+      activeLabel: null,
+      tool: 'select',
+      pendingPresetId: null,
+    });
   },
   notify: (notice) => set({ notice }),
 }));

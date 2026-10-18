@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { Palette } from './Palette';
@@ -24,20 +25,23 @@ export function ComponentSidebar({
       className="component-sidebar"
       hidden={!preferences.visible}
       style={
-        { width: preferences.width, '--sidebar-width': `${preferences.width}px` } as CSSProperties
+        {
+          width: preferences.width,
+          '--sidebar-width': `${preferences.width}px`,
+        } as CSSProperties
       }
     >
       <Palette onHide={toggleSidebar} />
       <div
         className="sidebar-resizer"
         role="separator"
-        aria-label="Ridimensiona barra componenti"
+        aria-label={t('Resize component sidebar')}
         aria-orientation="vertical"
         tabIndex={0}
         aria-valuemin={SIDEBAR_MIN_WIDTH}
         aria-valuemax={SIDEBAR_MAX_WIDTH}
         aria-valuenow={preferences.width}
-        title="Trascina per ridimensionare · doppio clic per ripristinare"
+        title={t('Drag to resize · double-click to reset')}
         onPointerDown={(e) => {
           if (e.button !== 0) return;
           e.preventDefault();

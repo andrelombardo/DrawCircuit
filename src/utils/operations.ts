@@ -1,4 +1,9 @@
-import { detachHighlight, highlightPoints, highlightSpanHost } from '../annotations/highlight';
+import {
+  detachHighlight,
+  highlightPoints,
+  highlightSpanHost,
+  mapHighlight,
+} from '../annotations/highlight';
 import { detachElectrical } from '../annotations/electrical';
 import { rotateArrow } from './arrows';
 import { makeId } from '../model/catalog';
@@ -30,7 +35,8 @@ export function extractSelection(doc: CircuitDocument, ids: string[]): CircuitDo
           (o.mode === 'component' && !selected.has(o.componentId)))
           ? detachHighlight(o, doc)
           : o.kind === 'electrical' &&
-              ((o.wireId && !selected.has(o.wireId)) || (o.componentId && !selected.has(o.componentId)))
+              ((o.wireId && !selected.has(o.wireId)) ||
+                (o.componentId && !selected.has(o.componentId)))
             ? detachElectrical(o, doc)
             : o.kind === 'wire'
               ? detachWireEndpoints(o, ep, doc)
@@ -45,6 +51,7 @@ export function cloneObjects(
 ): CircuitObject[] {
   const ids = new Map(doc.objects.map((o) => [o.id, makeId()]));
   const connections = new Map<string, string>();
+  const paintGroups = new Map<string, string>();
   const remap = (e: Endpoint): Endpoint => {
     if (e.kind === 'terminal') return { ...e, componentId: ids.get(e.componentId)! };
     if (e.kind === 'junction') return { ...e, junctionId: ids.get(e.junctionId)! };
@@ -59,6 +66,11 @@ export function cloneObjects(
   return doc.objects.map((o) => {
     const copy = structuredClone(o);
     copy.id = ids.get(o.id)!;
+    if (copy.kind === 'highlight' && copy.paintGroup) {
+      const group = paintGroups.get(copy.paintGroup) ?? makeId();
+      paintGroups.set(copy.paintGroup, group);
+      copy.paintGroup = group;
+    }
     if (copy.kind === 'component') {
       const auto = /^(.*?)([_]?)(\d+)$/.exec(copy.label.text);
       if (auto) {
@@ -69,9 +81,11 @@ export function cloneObjects(
       }
     }
     if (copy.kind === 'highlight' && copy.mode === 'smart')
-      copy.spans = copy.spans.map((s) => 'wireId' in s
-        ? { ...s, wireId: ids.get(s.wireId)! }
-        : { ...s, componentId: ids.get(s.componentId)! });
+      copy.spans = copy.spans.map((s) =>
+        'wireId' in s
+          ? { ...s, wireId: ids.get(s.wireId)! }
+          : { ...s, componentId: ids.get(s.componentId)! },
+      );
     if (copy.kind === 'highlight' && copy.mode === 'component')
       copy.componentId = ids.get(copy.componentId)!;
     if (copy.kind === 'electrical') {
@@ -102,8 +116,7 @@ export function removeObjects(doc: CircuitDocument, ids: string[]): CircuitDocum
           (o.mode === 'component' && removed.has(o.componentId)))
           ? detachHighlight(o, doc)
           : o.kind === 'electrical' &&
-              ((o.wireId && removed.has(o.wireId)) ||
-                (o.componentId && removed.has(o.componentId)))
+              ((o.wireId && removed.has(o.wireId)) || (o.componentId && removed.has(o.componentId)))
             ? detachElectrical(o, doc)
             : o.kind === 'wire'
               ? detachWireEndpoints(o, ep, doc)
@@ -176,7 +189,8 @@ export function moveSelection(doc: CircuitDocument, ids: string[], delta: Point)
             : ep.kind === 'junction'
               ? !selected.has(ep.junctionId)
               : fixedWireConnection(ep, doc, selected);
-        const startFixed = fixed(o.startEndpoint), endFixed = fixed(o.endEndpoint);
+        const startFixed = fixed(o.startEndpoint),
+          endFixed = fixed(o.endEndpoint);
         let source = o;
         if (!o.vertices.length && (startFixed || endFixed)) {
           const pts = wirePoints(o, doc);
@@ -216,10 +230,7 @@ export function rotateObjects(
         ? { x: o.x + o.width / 2, y: o.y + o.height / 2 }
         : { x: o.x, y: o.y };
     if (o.kind === 'wire')
-      return midpoint(
-        resolveEndpoint(o.startEndpoint, doc),
-        resolveEndpoint(o.endEndpoint, doc),
-      );
+      return midpoint(resolveEndpoint(o.startEndpoint, doc), resolveEndpoint(o.endEndpoint, doc));
     if (o.kind === 'highlight') {
       const p = highlightPoints(o, doc);
       return midpoint(p[0], p.at(-1)!);
@@ -241,8 +252,7 @@ export function rotateObjects(
     add(rotatePoint({ x: p.x - center.x, y: p.y - center.y }, angle), center);
   const next = (r: Rotation) => ((r + angle) % 360) as Rotation;
   const ep = (e: Endpoint): Endpoint =>
-    e.kind === 'free' && !fixedWireConnection(e, doc, selected)
-      ? { ...e, point: rp(e.point) } : e;
+    e.kind === 'free' && !fixedWireConnection(e, doc, selected) ? { ...e, point: rp(e.point) } : e;
   return {
     ...doc,
     objects: doc.objects.map((o) => {
@@ -267,10 +277,11 @@ export function rotateObjects(
         return o;
       }
       if (o.kind === 'highlight') {
-        if (o.mode === 'smart' && o.spans.every((s) => selected.has(highlightSpanHost(s)))) return o;
+        if (o.mode === 'smart' && o.spans.every((s) => selected.has(highlightSpanHost(s))))
+          return o;
         if (o.mode === 'component' && selected.has(o.componentId)) return o;
         const free = detachHighlight(o, doc);
-        return free.mode === 'free' ? { ...free, points: free.points.map(rp) } : free;
+        return mapHighlight(free, rp);
       }
       if (o.kind === 'component')
         return {

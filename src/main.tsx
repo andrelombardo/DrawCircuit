@@ -1,3 +1,4 @@
+import { t } from './i18n';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import '@fontsource/inter/latin-400.css';
@@ -22,5 +23,7 @@ async function start() {
 }
 void start().catch((error) => {
   const root = document.getElementById('root')!;
-  root.textContent = `Impossibile aprire DrawCircuit. ${String(error)}`;
+  root.textContent = t('Unable to open DrawCircuit. {error}', {
+    error: String(error),
+  });
 });

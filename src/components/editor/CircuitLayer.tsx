@@ -1,3 +1,4 @@
+import { highlightPaintGroups } from '../../annotations/highlight';
 import { HighlightView } from '../../circuit/annotations/HighlightView';
 import type { Highlight } from '../../model/types';
 import { GraphicView } from '../../circuit/annotations/GraphicView';
@@ -53,9 +54,13 @@ export const CircuitLayer = memo(function CircuitLayer({
   return (
     <>
       <g data-layer="highlights">
-        {doc.objects.map((o) =>
-          o.kind === 'highlight' ? <HighlightView key={o.id} object={o} doc={doc} /> : null,
-        )}
+        {highlightPaintGroups(doc).map((group) => (
+          <g key={group[0].id} opacity={group[0].opacity}>
+            {group.map((object) => (
+              <HighlightView key={object.id} object={object} doc={doc} grouped />
+            ))}
+          </g>
+        ))}
         {highlightDraft && (
           <g pointerEvents="none">
             <HighlightView object={highlightDraft} doc={doc} interactive={false} />
@@ -87,7 +92,9 @@ export const CircuitLayer = memo(function CircuitLayer({
               key={o.id}
               object={o}
               selected={selected.has(o.id) && activeLabel !== o.id}
-              terminals={terminals || (selection.length === 1 && selected.has(o.id)) || nearby.has(o.id)}
+              terminals={
+                terminals || (selection.length === 1 && selected.has(o.id)) || nearby.has(o.id)
+              }
             />
           ) : null,
         )}

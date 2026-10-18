@@ -1,0 +1,32 @@
+name: Feature request
+description: Suggest an improvement to the web circuit editor.
+title: '[Feature]: '
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: Please write in English and check existing proposals before opening a new one.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe your workflow and where the current editor gets in the way.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Explain what you would like to do, with a concrete example.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Mention existing tools or workarounds you tried.
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add sketches or examples that are safe to share publicly, if helpful.

@@ -69,7 +69,7 @@ export function demoDocument(): CircuitDocument {
   connect('r-AC', 'b', 'C', [{ x: 240, y: -160 }]);
   return {
     version: 1,
-    title: 'Rete resistiva · quattro nodi',
+    title: 'Resistive network · four junctions',
     objects: [
       ...wires,
       ...components,
@@ -93,7 +93,7 @@ export function demoDocument(): CircuitDocument {
         id: 'loop-label',
         x: -120,
         y: 117,
-        text: 'maglia 1',
+        text: 'loop 1',
         color: COLORS.red,
         fontSize: 20,
         align: 'middle',

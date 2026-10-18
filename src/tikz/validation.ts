@@ -27,8 +27,11 @@ export function normalizeHex(color: string): string | null {
 
 const endpoint = (e: Endpoint) =>
   e?.kind === 'free'
-    ? finitePoint(e.point) && (e.connectionId === undefined ||
-        (typeof e.connectionId === 'string' && e.connectionId.length > 0 && e.connectionId.length <= MAX_TEXT_LENGTH))
+    ? finitePoint(e.point) &&
+      (e.connectionId === undefined ||
+        (typeof e.connectionId === 'string' &&
+          e.connectionId.length > 0 &&
+          e.connectionId.length <= MAX_TEXT_LENGTH))
     : e?.kind === 'terminal'
       ? typeof e.componentId === 'string' && typeof e.terminalId === 'string'
       : e?.kind === 'junction' && typeof e.junctionId === 'string';
@@ -111,32 +114,52 @@ export function isExportableObject(o: CircuitObject): boolean {
         o.opacity !== undefined &&
         (o.mode === 'free'
           ? (o.smoothing === undefined || typeof o.smoothing === 'boolean') &&
-            (o.widthOffsets === undefined || (Array.isArray(o.widthOffsets) &&
-              o.widthOffsets.length === (o.breaks?.length ?? 0) + 1 &&
-              o.widthOffsets.every((width) => Number.isFinite(width) && width >= 0 && width <= 1000))) &&
+            (o.widthOffsets === undefined ||
+              (Array.isArray(o.widthOffsets) &&
+                o.widthOffsets.length === (o.breaks?.length ?? 0) + 1 &&
+                o.widthOffsets.every(
+                  (width) => Number.isFinite(width) && width >= 0 && width <= 1000,
+                ))) &&
+            (o.curves === undefined ||
+              (Array.isArray(o.curves) &&
+                o.curves.length === (Array.isArray(o.points) ? o.points.length - 1 : -1) &&
+                o.curves.every(
+                  (curve) => !!curve && finitePoint(curve.a) && finitePoint(curve.b),
+                ))) &&
             Array.isArray(o.points) &&
             o.points.length >= 2 &&
             o.points.every(finitePoint) &&
             (o.breaks === undefined ||
-              (Array.isArray(o.breaks) && o.breaks.every((index, i, all) =>
-                Number.isInteger(index) && index > 0 && index < o.points.length &&
-                (!i || index > all[i - 1]))))
-          : o.mode === 'component' ? typeof o.componentId === 'string' && !!o.componentId
-          : o.mode === 'smart' &&
-            Array.isArray(o.spans) &&
-            o.spans.length > 0 &&
-            o.spans.every(
-              (s) =>
-                !!s && typeof s === 'object' &&
-                ('wireId' in s ? typeof s.wireId === 'string' && !!s.wireId :
-                  typeof s.componentId === 'string' && !!s.componentId && typeof s.terminalId === 'string' && !!s.terminalId) &&
-                Number.isFinite(s.start) &&
-                Number.isFinite(s.end) &&
-                s.start >= 0 &&
-                s.start <= 1 &&
-                s.end >= 0 &&
-                s.end <= 1,
-            ))
+              (Array.isArray(o.breaks) &&
+                o.breaks.every(
+                  (index, i, all) =>
+                    Number.isInteger(index) &&
+                    index > 0 &&
+                    index < o.points.length &&
+                    (!i || index > all[i - 1]),
+                )))
+          : o.mode === 'component'
+            ? typeof o.componentId === 'string' && !!o.componentId
+            : o.mode === 'smart' &&
+              Array.isArray(o.spans) &&
+              o.spans.length > 0 &&
+              o.spans.every(
+                (s) =>
+                  !!s &&
+                  typeof s === 'object' &&
+                  ('wireId' in s
+                    ? typeof s.wireId === 'string' && !!s.wireId
+                    : typeof s.componentId === 'string' &&
+                      !!s.componentId &&
+                      typeof s.terminalId === 'string' &&
+                      !!s.terminalId) &&
+                  Number.isFinite(s.start) &&
+                  Number.isFinite(s.end) &&
+                  s.start >= 0 &&
+                  s.start <= 1 &&
+                  s.end >= 0 &&
+                  s.end <= 1,
+              ))
       );
     case 'junction':
       return finitePoint(o);

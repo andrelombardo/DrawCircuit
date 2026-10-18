@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { componentRegistry, terminalsFor } from './catalog';
 import type { CircuitComponent, CircuitDocument, ComponentType } from './types';
 export function compatibleReplacements(c: CircuitComponent): ComponentType[] {
@@ -32,7 +33,7 @@ export function replaceComponent(
 ): CircuitDocument {
   const old = doc.objects.find((o) => o.id === id);
   if (old?.kind !== 'component' || !compatibleReplacements(old).includes(type))
-    throw new Error('Sostituzione incompatibile.');
+    throw new Error(t('Incompatible replacement.'));
   const pins = terminalsFor(type);
   const mapping = new Map(old.terminals.map((t, i) => [t.id, pins[i].id]));
   const component: CircuitComponent = { ...old, type, terminals: pins };
@@ -54,18 +55,24 @@ export function replaceComponent(
               ),
             }
           : o.kind === 'wire'
-          ? {
-              ...o,
-              startEndpoint:
-                o.startEndpoint.kind === 'terminal' && o.startEndpoint.componentId === id
-                  ? { ...o.startEndpoint, terminalId: mapping.get(o.startEndpoint.terminalId)! }
-                  : o.startEndpoint,
-              endEndpoint:
-                o.endEndpoint.kind === 'terminal' && o.endEndpoint.componentId === id
-                  ? { ...o.endEndpoint, terminalId: mapping.get(o.endEndpoint.terminalId)! }
-                  : o.endEndpoint,
-            }
-          : o,
+            ? {
+                ...o,
+                startEndpoint:
+                  o.startEndpoint.kind === 'terminal' && o.startEndpoint.componentId === id
+                    ? {
+                        ...o.startEndpoint,
+                        terminalId: mapping.get(o.startEndpoint.terminalId)!,
+                      }
+                    : o.startEndpoint,
+                endEndpoint:
+                  o.endEndpoint.kind === 'terminal' && o.endEndpoint.componentId === id
+                    ? {
+                        ...o.endEndpoint,
+                        terminalId: mapping.get(o.endEndpoint.terminalId)!,
+                      }
+                    : o.endEndpoint,
+              }
+            : o,
     ),
   };
 }
@@ -97,7 +104,9 @@ export function replaceComponents(
   );
   if (!commonReplacements(components).includes(type))
     throw new Error(
-      'Nessuna sostituzione compatibile con tutti i componenti selezionati: i terminali hanno geometrie o funzioni diverse.',
+      t(
+        'No replacement is compatible with all selected components: terminal geometry or functions differ.',
+      ),
     );
   return components.reduce(
     (next, c) => (c.type === type ? next : replaceComponent(next, c.id, type)),

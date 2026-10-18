@@ -1,0 +1,54 @@
+name: Bug report
+description: Report a reproducible problem in DrawCircuit.
+title: '[Bug]: '
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Please write in English and check existing issues first. Do not include private circuit data or credentials.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the problem and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Start from opening the app. Include tools, selections, and shortcuts involved.
+      placeholder: |
+        1. Open DrawCircuit.
+        2. Choose…
+        3. Observe…
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser, version, and operating system
+      placeholder: e.g. Chrome 140 on Windows 11, Safari on iPadOS
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: Interface language
+      options:
+        - English
+        - Italian
+        - Both
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: App URL or local commit
+      description: Include whether you use a browser tab or an installed web app.
+      placeholder: https://andrelombardo.github.io/DrawCircuit/
+  - type: textarea
+    id: context
+    attributes:
+      label: Screenshots and additional context
+      description: Add an image or minimal example that is safe to share publicly, if helpful.

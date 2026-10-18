@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { useState } from 'react';
 import {
   AlignHorizontalJustifyStart,
@@ -19,24 +20,24 @@ import { PropertySelect } from './PropertyControls';
 const axes = [
   {
     axis: 'x',
-    name: 'Orizzontale',
-    distribute: 'Distribuisci orizzontalmente',
+    name: 'Horizontal',
+    distribute: 'Distribute horizontally',
     Icon: AlignHorizontalDistributeCenter,
   },
   {
     axis: 'y',
-    name: 'Verticale',
-    distribute: 'Distribuisci verticalmente',
+    name: 'Vertical',
+    distribute: 'Distribute vertically',
     Icon: AlignVerticalDistributeCenter,
   },
 ] as const;
 const alignments = [
-  ['x', 'start', 'Sinistra', 'Allinea a sinistra', AlignHorizontalJustifyStart],
-  ['x', 'center', 'Centro', 'Allinea al centro orizzontalmente', AlignHorizontalJustifyCenter],
-  ['x', 'end', 'Destra', 'Allinea a destra', AlignHorizontalJustifyEnd],
-  ['y', 'start', 'Alto', 'Allinea in alto', AlignVerticalJustifyStart],
-  ['y', 'center', 'Centro', 'Allinea al centro verticalmente', AlignVerticalJustifyCenter],
-  ['y', 'end', 'Basso', 'Allinea in basso', AlignVerticalJustifyEnd],
+  ['x', 'start', 'Left', 'Align left', AlignHorizontalJustifyStart],
+  ['x', 'center', 'Center', 'Align horizontal centers', AlignHorizontalJustifyCenter],
+  ['x', 'end', 'Right', 'Align right', AlignHorizontalJustifyEnd],
+  ['y', 'start', 'Top', 'Align top', AlignVerticalJustifyStart],
+  ['y', 'center', 'Center', 'Align vertical centers', AlignVerticalJustifyCenter],
+  ['y', 'end', 'Bottom', 'Align bottom', AlignVerticalJustifyEnd],
 ] as const;
 
 export function SelectionGeometry({ objects }: { objects: CircuitObject[] }) {
@@ -49,7 +50,7 @@ export function SelectionGeometry({ objects }: { objects: CircuitObject[] }) {
   const targets = layoutTargets(document, ids);
   const exactReason = (axis: Axis) =>
     !spacing[axis].trim()
-      ? 'Inserisci una distanza.'
+      ? t('Enter a distance.')
       : distributionPlan(document, ids, axis, spacingMode, Number(spacing[axis])).reason;
   const exact = (axis: Axis) => {
     if (!exactReason(axis)) state().distribute(axis, spacingMode, Number(spacing[axis]));
@@ -57,8 +58,9 @@ export function SelectionGeometry({ objects }: { objects: CircuitObject[] }) {
   if (targets.length < 2)
     return (
       <p className="inspector-note inspector-scope">
-        Seleziona almeno due elementi indipendenti da disporre. Fili e annotazioni seguono i loro
-        riferimenti.
+        {t(
+          'Select at least two independent elements to arrange. Wires and annotations follow their references.',
+        )}{' '}
       </p>
     );
   return (
@@ -66,18 +68,25 @@ export function SelectionGeometry({ objects }: { objects: CircuitObject[] }) {
       {targets.length !== objects.length && (
         <p
           className="inspector-note inspector-scope"
-          title="Fili e annotazioni collegati seguono i loro riferimenti; non vengono spostati una seconda volta."
+          title={t(
+            'Connected wires and annotations follow their references; they are not moved a second time.',
+          )}
         >
           {targets.length
-            ? `Disposizione: ${targets.length} elementi su ${objects.length}.`
-            : 'Seleziona i componenti o i nodi da disporre: questi elementi sono vincolati ai collegamenti.'}
+            ? t('Arrange: {count} of {total} elements.', {
+                count: targets.length,
+                total: objects.length,
+              })
+            : t(
+                'Select the components or junctions to arrange: these elements are constrained by their connections.',
+              )}
         </p>
       )}
-      <div className="inspector-geometry-group" role="group" aria-label="Allineamento">
-        <h4>Allineamento</h4>
+      <div className="inspector-geometry-group" role="group" aria-label={t('Alignment')}>
+        <h4>{t('Alignment')}</h4>
         {axes.map(({ axis, name }) => (
           <div className="inspector-axis-group" key={axis}>
-            <span className="inspector-field-caption">{name}</span>
+            <span className="inspector-field-caption">{t(name)}</span>
             <div className="inspector-alignment-buttons">
               {alignments
                 .filter(([a]) => a === axis)
@@ -85,29 +94,33 @@ export function SelectionGeometry({ objects }: { objects: CircuitObject[] }) {
                   <button
                     key={label}
                     className="inspector-property-action"
-                    aria-label={label}
-                    title={targets.length < 2 ? 'Servono almeno due elementi indipendenti.' : label}
+                    aria-label={t(label)}
+                    title={
+                      targets.length < 2
+                        ? t('At least two independent elements are required.')
+                        : t(label)
+                    }
                     disabled={targets.length < 2}
                     onClick={() => state().align(a, alignment)}
                   >
                     <Icon size={16} />
-                    <span>{caption}</span>
+                    <span>{t(caption)}</span>
                   </button>
                 ))}
             </div>
           </div>
         ))}
       </div>
-      <div className="inspector-geometry-group" role="group" aria-label="Distribuzione">
-        <h4>Distribuzione</h4>
+      <div className="inspector-geometry-group" role="group" aria-label={t('Distribution')}>
+        <h4>{t('Distribution')}</h4>
         <PropertySelect
-          label="Criterio distribuzione"
-          caption="Misura"
+          label={t('Distribution criterion')}
+          caption={t('Measurement')}
           value={distribution}
           onChange={(v) => setDistribution(v as DistributionMode)}
         >
-          <option value="centers">Distanza tra i centri</option>
-          <option value="gaps">Spazio libero tra i bordi</option>
+          <option value="centers">{t('Distance between centers')}</option>
+          <option value="gaps">{t('Clearance between edges')}</option>
         </PropertySelect>
         <div className="inspector-axis-actions">
           {axes.map(({ axis, name, distribute, Icon }) => {
@@ -116,64 +129,75 @@ export function SelectionGeometry({ objects }: { objects: CircuitObject[] }) {
               <span
                 key={axis}
                 title={
-                  reason ?? 'Rende uguali le distanze mantenendo fermi i due elementi estremi.'
+                  reason ?? t('Equalize distances while keeping the two outermost elements fixed.')
                 }
               >
                 <button
                   className="inspector-property-action"
-                  aria-label={distribute}
+                  aria-label={t(distribute)}
                   disabled={!!reason}
-                  title={reason ?? `${distribute} · i due estremi restano fermi`}
+                  title={
+                    reason ??
+                    t('{action} · outermost elements stay fixed', {
+                      action: t(distribute),
+                    })
+                  }
                   onClick={() => state().distribute(axis, distribution)}
                 >
                   <Icon size={16} />
-                  {name} ({axis.toUpperCase()})
+                  {t(name)} ({axis.toUpperCase()})
                 </button>
               </span>
             );
           })}
         </div>
       </div>
-      <div className="inspector-geometry-group" role="group" aria-label="Spaziatura">
+      <div className="inspector-geometry-group" role="group" aria-label={t('Spacing')}>
         <h4>
-          Spaziatura esatta{' '}
+          {t('Exact spacing')}{' '}
           <span
             className="inspector-field-caption"
-            title="Unità del documento, indipendenti dallo zoom. La griglia misura 20 u."
+            title={t('Document units, independent of zoom. The grid measures 20 u.')}
           >
-            · unità canvas (u)
+            {t('· canvas units (u)')}{' '}
           </span>
         </h4>
         <PropertySelect
-          label="Misura spaziatura"
-          caption="Misura"
+          label={t('Spacing measurement')}
+          caption={t('Measurement')}
           value={spacingMode}
           onChange={(v) => setSpacingMode(v as DistributionMode)}
         >
-          <option value="centers">Distanza tra i centri</option>
-          <option value="gaps">Spazio libero tra i bordi</option>
+          <option value="centers">{t('Distance between centers')}</option>
+          <option value="gaps">{t('Clearance between edges')}</option>
         </PropertySelect>
         {axes.map(({ axis, name }) => {
           const reason = exactReason(axis);
           const hint =
             reason ??
-            `Resta fermo l’elemento più ${axis === 'x' ? 'a sinistra' : 'in alto'}; gli altri mantengono il loro ordine.`;
+            t(
+              axis === 'x'
+                ? 'The leftmost element stays fixed; the others keep their order.'
+                : 'The topmost element stays fixed; the others keep their order.',
+            );
           return (
             <div className="inspector-exact-spacing" key={axis}>
               <label className="inspector-field-caption" htmlFor={`spacing-${axis}`}>
-                {name} ({axis.toUpperCase()})
+                {t(name)} ({axis.toUpperCase()})
               </label>
               <span className="inspector-input">
                 <input
                   id={`spacing-${axis}`}
                   type="number"
-                  aria-label={`Spaziatura ${axis === 'x' ? 'orizzontale' : 'verticale'} (u)`}
+                  aria-label={t(axis === 'x' ? 'Horizontal spacing (u)' : 'Vertical spacing (u)')}
                   min={0}
                   max={1e7}
                   step="any"
                   value={spacing[axis]}
-                  placeholder="Distanza"
-                  title="Distanza da applicare, in unità canvas. Il campo non rappresenta una misura attuale della selezione."
+                  placeholder={t('Distance')}
+                  title={t(
+                    "Distance to apply, in canvas units. This field does not show the selection's current measurement.",
+                  )}
                   onChange={(e) => setSpacing((p) => ({ ...p, [axis]: e.target.value }))}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -188,7 +212,9 @@ export function SelectionGeometry({ objects }: { objects: CircuitObject[] }) {
               <span title={hint}>
                 <button
                   className="inspector-property-action"
-                  aria-label={`Applica spaziatura ${axis === 'x' ? 'orizzontale' : 'verticale'}`}
+                  aria-label={t(
+                    axis === 'x' ? 'Apply horizontal spacing' : 'Apply vertical spacing',
+                  )}
                   title={hint}
                   disabled={!!reason}
                   onClick={() => exact(axis)}

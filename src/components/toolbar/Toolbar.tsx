@@ -1,9 +1,11 @@
+import { t } from '../../i18n';
 import {
   ArrowRight,
   CircleDot,
   GripVertical,
   Hand,
   Highlighter,
+  Eraser,
   MousePointer2,
   Pencil,
   Redo2,
@@ -28,11 +30,7 @@ import {
   VoltageIcon,
 } from './DrawingIcons';
 
-export function DrawingToolbar({
-  sidebarVisible = true,
-}: {
-  sidebarVisible?: boolean;
-}) {
+export function DrawingToolbar({ sidebarVisible = true }: { sidebarVisible?: boolean }) {
   const {
     ref: toolbarRef,
     style,
@@ -50,6 +48,7 @@ export function DrawingToolbar({
   const drawingTools = [
     'wire',
     'highlight',
+    'highlight-eraser',
     'rectangle',
     'line',
     'junction',
@@ -62,30 +61,45 @@ export function DrawingToolbar({
     'current',
   ];
   const items: MenuAction[] = [
-    { id: 'wire', label: 'Filo', icon: <Spline size={18} />, onSelect: () => setTool('wire') },
+    {
+      id: 'wire',
+      label: t('Wire'),
+      icon: <Spline size={18} />,
+      onSelect: () => setTool('wire'),
+    },
     {
       id: 'junction',
-      label: 'Nodo',
+      label: t('Junction'),
       icon: <CircleDot size={18} />,
       onSelect: () => setTool('junction'),
     },
     {
       id: 'arrow',
-      label: 'Freccia',
+      label: t('Arrow'),
       icon: <ArrowRight size={18} />,
       separatorBefore: true,
       onSelect: () => setTool('arrow'),
     },
-    { id: 'loop', label: 'Maglia', icon: <LoopPathIcon />, onSelect: () => setTool('loop-arrow') },
+    {
+      id: 'loop',
+      label: t('Loop'),
+      icon: <LoopPathIcon />,
+      onSelect: () => setTool('loop-arrow'),
+    },
     {
       id: 'brace',
-      label: 'Graffa / Staffa',
+      label: t('Brace / Bracket'),
       icon: <BraceToolIcon />,
       children: [
-        { id: 'brace', label: 'Graffa', icon: <BraceToolIcon />, onSelect: () => setTool('brace') },
+        {
+          id: 'brace',
+          label: t('Brace'),
+          icon: <BraceToolIcon />,
+          onSelect: () => setTool('brace'),
+        },
         {
           id: 'bracket',
-          label: 'Staffa',
+          label: t('Bracket'),
           icon: <BracketToolIcon />,
           onSelect: () => setTool('bracket'),
         },
@@ -93,39 +107,46 @@ export function DrawingToolbar({
     },
     {
       id: 'polarity',
-      label: 'Polarità + / -',
+      label: t('Polarity + / -'),
       icon: <PolarityIcon />,
       separatorBefore: true,
       onSelect: () => setTool('polarity'),
     },
     {
       id: 'voltage',
-      label: 'Tensione tra due punti',
+      label: t('Voltage between two points'),
       icon: <VoltageIcon />,
       onSelect: () => setTool('voltage'),
     },
     {
       id: 'current',
-      label: 'Corrente sul filo',
+      label: t('Current on wire'),
       icon: <CurrentInlineIcon />,
       onSelect: () => setTool('current'),
     },
     {
       id: 'highlight',
-      label: 'Evidenziatore',
+      label: t('Highlighter'),
       icon: <Highlighter size={18} />,
       separatorBefore: true,
       onSelect: () => setTool('highlight'),
     },
     {
+      id: 'highlight-eraser',
+      label: t('Highlight eraser'),
+      icon: <Eraser size={18} />,
+      onSelect: () => setTool('highlight-eraser'),
+    },
+    {
       id: 'rectangle',
-      label: 'Rettangolo',
+      separatorBefore: true,
+      label: t('Rectangle'),
       icon: <Square size={18} />,
       onSelect: () => setTool('rectangle'),
     },
     {
       id: 'line',
-      label: 'Linea decorativa',
+      label: t('Decorative line'),
       icon: <Minus size={18} />,
       onSelect: () => setTool('line'),
     },
@@ -135,7 +156,7 @@ export function DrawingToolbar({
       ref={toolbarRef}
       className="main-tools floating-surface"
       role="toolbar"
-      aria-label="Strumenti di disegno"
+      aria-label={t('Drawing tools')}
       style={style}
       data-dragging={dragging || undefined}
       data-menu-above={menuAbove || undefined}
@@ -144,25 +165,25 @@ export function DrawingToolbar({
       <button
         type="button"
         className="toolbar-grip"
-        aria-label="Sposta toolbar"
-        title="Trascina per spostare gli strumenti"
-        data-tooltip="Sposta toolbar"
+        aria-label={t('Move toolbar')}
+        title={t('Drag to move the tools')}
+        data-tooltip={t('Move toolbar')}
         {...handle}
       >
         <GripVertical size={16} />
       </button>
       <IconButton
-        label="Selezione (V)"
+        label={t('Select (V)')}
         active={tool === 'select'}
         onClick={() => setTool('select')}
       >
         <MousePointer2 size={18} />
       </IconButton>
-      <IconButton label="Testo" active={tool === 'text'} onClick={() => setTool('text')}>
+      <IconButton label={t('Text')} active={tool === 'text'} onClick={() => setTool('text')}>
         <Type size={19} />
       </IconButton>
       <ActionMenu
-        label="Disegno e annotazioni"
+        label={t('Drawing and annotations')}
         icon={items.find((item) => item.id === tool)?.icon ?? <Pencil size={18} />}
         items={items}
         active={drawingTools.includes(tool)}
@@ -170,14 +191,14 @@ export function DrawingToolbar({
       />
       <div className="toolbar-divider" />
       <IconButton
-        label={`Annulla (${shortcut('Z')})`}
+        label={`${t('Undo')} (${shortcut('Z')})`}
         disabled={!past.length && !gestureStart}
         onClick={undo}
       >
         <Undo2 size={18} />
       </IconButton>
       <IconButton
-        label={`Ripeti (${shortcut('Z', true)})`}
+        label={`${t('Redo')} (${shortcut('Z', true)})`}
         disabled={!future.length}
         onClick={redo}
       >
@@ -185,7 +206,7 @@ export function DrawingToolbar({
       </IconButton>
       <div className="toolbar-divider" />
       <IconButton
-        label="Sposta vista (H o Space)"
+        label={t('Pan view (H or Space)')}
         active={tool === 'pan'}
         onClick={() => setTool('pan')}
       >

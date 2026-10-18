@@ -1,3 +1,4 @@
+import { t, useLanguage } from './i18n';
 import { useCallback, useEffect, useState } from 'react';
 import { SelectionActions } from './components/properties/SelectionActions';
 import { X } from 'lucide-react';
@@ -8,6 +9,10 @@ import { HelpDialog } from './components/toolbar/HelpDialog';
 import { useEditorStore } from './store/editorStore';
 import { useInspectorPreferences } from './components/properties/useInspectorPreferences';
 export default function App() {
+  const language = useLanguage((state) => state.language);
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
   const sidebar = useSidebarPreferences();
   const inspector = useInspectorPreferences();
   const [compact, setCompact] = useState(() => window.matchMedia('(max-width: 600px)').matches);
@@ -15,11 +20,11 @@ export default function App() {
   const setInspectorPreferences = inspector.setPreferences;
   const toggleDesktopLibrary = sidebar.toggleSidebar;
   const toggleLibrary = useCallback(() => {
-    if (compact) setMobilePanel((panel) => panel === 'library' ? null : 'library');
+    if (compact) setMobilePanel((panel) => (panel === 'library' ? null : 'library'));
     else toggleDesktopLibrary();
   }, [compact, toggleDesktopLibrary]);
   const toggleInspector = useCallback(() => {
-    if (compact) setMobilePanel((panel) => panel === 'inspector' ? null : 'inspector');
+    if (compact) setMobilePanel((panel) => (panel === 'inspector' ? null : 'inspector'));
     else setInspectorPreferences((p) => ({ ...p, visible: !p.visible }));
   }, [compact, setInspectorPreferences]);
   const showInspector = useCallback(() => {
@@ -41,7 +46,7 @@ export default function App() {
     if (!compact) return;
     return useEditorStore.subscribe((s, previous) => {
       if (s.tool !== previous.tool || s.pendingPresetId !== previous.pendingPresetId)
-        setMobilePanel((panel) => panel === 'library' ? null : panel);
+        setMobilePanel((panel) => (panel === 'library' ? null : panel));
     });
   }, [compact]);
   const [helpOpen, setHelpOpen] = useState(false),
@@ -67,7 +72,10 @@ export default function App() {
             onShowInspector={showInspector}
             inspector={{
               ...inspector,
-              preferences: { ...inspector.preferences, visible: inspectorVisible },
+              preferences: {
+                ...inspector.preferences,
+                visible: inspectorVisible,
+              },
               toggle: toggleInspector,
             }}
           />
@@ -77,8 +85,8 @@ export default function App() {
           <div className="toast" role="status">
             {notice}
             <button
-              aria-label="Chiudi notifica"
-              title="Chiudi notifica"
+              aria-label={t('Dismiss notification')}
+              title={t('Dismiss notification')}
               onClick={() => useEditorStore.getState().notify('')}
             >
               <X size={15} />

@@ -9,7 +9,7 @@ const RELEASE_PX = 20;
 const SWITCH_PX = 4;
 export function needsTerminalChoice(type: ComponentType): boolean {
   const d = componentRegistry[type];
-  return d.terminals.length > 2 || d.group === 'Digitali' || type === 'connector2';
+  return d.terminals.length > 2 || d.group === 'Digital' || type === 'connector2';
 }
 export function inlineCompatible(type: ComponentType): boolean {
   const ts = componentRegistry[type].terminals;
@@ -168,7 +168,10 @@ export function findInlineCandidate(
     )
       return [];
     const span = distance(cuts[0], cuts[1]),
-      midpoint = { x: (cuts[0].x + cuts[1].x) / 2, y: (cuts[0].y + cuts[1].y) / 2 };
+      midpoint = {
+        x: (cuts[0].x + cuts[1].x) / 2,
+        y: (cuts[0].y + cuts[1].y) / 2,
+      };
     // Refuse to cut through a branch, crossing, or another terminal.
     if (
       index

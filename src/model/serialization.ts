@@ -1,18 +1,25 @@
+import { t } from '../i18n';
 import { highlightSpanExists } from '../annotations/highlight';
 import { COLORS, componentTypes, isRotation } from './types';
 import { componentRegistry, terminalsFor } from './catalog';
 import type { CircuitDocument, Point } from './types';
 import { resolveEndpoint, distance } from '../utils/geometry';
-import { MAX_COORDINATE, MAX_TEXT_LENGTH, MAX_DOCUMENT_OBJECTS, MAX_DOCUMENT_LENGTH } from './limits';
+import {
+  MAX_COORDINATE,
+  MAX_TEXT_LENGTH,
+  MAX_DOCUMENT_OBJECTS,
+  MAX_DOCUMENT_LENGTH,
+} from './limits';
 const fail = (): never => {
-  throw new Error('JSON non valido: controlla formato, oggetti e collegamenti.');
+  throw new Error(t('Invalid JSON: check the format, objects, and connections.'));
 };
 function record(v: unknown): Record<string, unknown> {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return fail();
   return v as Record<string, unknown>;
 }
 const str = (v: unknown) => typeof v === 'string' && v.length <= MAX_TEXT_LENGTH;
-const num = (v: unknown) => typeof v === 'number' && Number.isFinite(v) && Math.abs(v) <= MAX_COORDINATE;
+const num = (v: unknown) =>
+  typeof v === 'number' && Number.isFinite(v) && Math.abs(v) <= MAX_COORDINATE;
 const color = (v: unknown) => typeof v === 'string' && /^#[a-fA-F0-9]{6}$/.test(v);
 const rotation = isRotation;
 const opacity = (v: unknown) => v === undefined || (num(v) && Number(v) >= 0 && Number(v) <= 1);
@@ -47,7 +54,7 @@ export function serializeDocument(doc: CircuitDocument): string {
   return JSON.stringify(doc, null, 2);
 }
 export function deserializeDocument(raw: string): CircuitDocument {
-  if (raw.length > MAX_DOCUMENT_LENGTH) throw new Error('Il file supera il limite di 10 MB.');
+  if (raw.length > MAX_DOCUMENT_LENGTH) throw new Error(t('The file exceeds the 10 MB limit.'));
   let parsed: unknown;
   try {
     parsed = JSON.parse(raw) as unknown;
@@ -119,7 +126,13 @@ export function deserializeDocument(raw: string): CircuitDocument {
           fail();
       });
     } else if (o.kind === 'highlight') {
-      if (!color(o.color) || !positive(o.width, o.mode === 'component' ? 200 : 1000) || o.opacity === undefined) fail();
+      if (o.paintGroup !== undefined && (!str(o.paintGroup) || !o.paintGroup)) fail();
+      if (
+        !color(o.color) ||
+        !positive(o.width, o.mode === 'component' ? 200 : 1000) ||
+        o.opacity === undefined
+      )
+        fail();
       if (o.mode === 'free') {
         if (
           (o.smoothing !== undefined && typeof o.smoothing !== 'boolean') ||
@@ -130,15 +143,37 @@ export function deserializeDocument(raw: string): CircuitDocument {
         )
           fail();
         if (
+          o.curves !== undefined &&
+          (!Array.isArray(o.curves) ||
+            o.curves.length !== (o.points as unknown[]).length - 1 ||
+            !o.curves.every((curve) => {
+              const c = record(curve);
+              return point(c.a) && point(c.b);
+            }))
+        )
+          fail();
+        if (
           o.breaks !== undefined &&
-          (!Array.isArray(o.breaks) || o.breaks.length > 1000 ||
-            !o.breaks.every((index, i, all) =>
-              Number.isInteger(index) && index > 0 && index < (o.points as unknown[]).length &&
-              (!i || index > all[i - 1])))
-        ) fail();
-        if (o.widthOffsets !== undefined &&
-          (!Array.isArray(o.widthOffsets) || o.widthOffsets.length !== ((o.breaks as unknown[] | undefined)?.length ?? 0) + 1 ||
-            !o.widthOffsets.every((width) => num(width) && Number(width) >= 0 && Number(width) <= 1000))) fail();
+          (!Array.isArray(o.breaks) ||
+            o.breaks.length > 1000 ||
+            !o.breaks.every(
+              (index, i, all) =>
+                Number.isInteger(index) &&
+                index > 0 &&
+                index < (o.points as unknown[]).length &&
+                (!i || index > all[i - 1]),
+            ))
+        )
+          fail();
+        if (
+          o.widthOffsets !== undefined &&
+          (!Array.isArray(o.widthOffsets) ||
+            o.widthOffsets.length !== ((o.breaks as unknown[] | undefined)?.length ?? 0) + 1 ||
+            !o.widthOffsets.every(
+              (width) => num(width) && Number(width) >= 0 && Number(width) <= 1000,
+            ))
+        )
+          fail();
       } else if (o.mode === 'component') {
         if (!str(o.componentId) || !o.componentId) fail();
       } else if (o.mode === 'smart') {
@@ -146,8 +181,17 @@ export function deserializeDocument(raw: string): CircuitDocument {
         for (const entry of o.spans as unknown[]) {
           const span = record(entry);
           if (
-            !((str(span.wireId) && !!span.wireId && span.componentId === undefined && span.terminalId === undefined) ||
-              (span.wireId === undefined && str(span.componentId) && !!span.componentId && str(span.terminalId) && !!span.terminalId)) ||
+            !(
+              (str(span.wireId) &&
+                !!span.wireId &&
+                span.componentId === undefined &&
+                span.terminalId === undefined) ||
+              (span.wireId === undefined &&
+                str(span.componentId) &&
+                !!span.componentId &&
+                str(span.terminalId) &&
+                !!span.terminalId)
+            ) ||
             !num(span.start) ||
             !num(span.end) ||
             Number(span.start) < 0 ||
@@ -299,9 +343,9 @@ export function deserializeDocument(raw: string): CircuitDocument {
   for (const o of doc.objects)
     if (
       o.kind === 'highlight' &&
-      ((o.mode === 'smart' &&
-        o.spans.some((s) => !highlightSpanExists(s, doc))) ||
-        (o.mode === 'component' && !doc.objects.some((c) => c.id === o.componentId && c.kind === 'component')))
+      ((o.mode === 'smart' && o.spans.some((s) => !highlightSpanExists(s, doc))) ||
+        (o.mode === 'component' &&
+          !doc.objects.some((c) => c.id === o.componentId && c.kind === 'component')))
     )
       fail();
   for (const o of doc.objects)

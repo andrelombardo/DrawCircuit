@@ -1,4 +1,8 @@
-# DrawCircuit
+# Guida utente DrawCircuit
+
+[English guide](../guide.md) · [README italiano](../../README.it.md)
+
+Scegli **Italiano** nel selettore in basso a destra per usare l’interfaccia e la guida integrata in italiano. La scelta viene ricordata nel browser; circuito, etichette e blocchi personali restano invariati. L’inglese è la lingua predefinita.
 
 Un editor di circuiti elettrici per appunti e materiale didattico. React, TypeScript, Vite, Zustand e SVG: componenti, fili e annotazioni sono oggetti vettoriali modificabili. Funziona interamente nel browser, con font Inter per la UI e KaTeX per la matematica inclusi nel bundle. La libreria comprende **72 simboli generici** in 12 categorie. Comic Relief 1.210 è incluso nel sito nei pesi normale e grassetto: tutti i visitatori scaricano gli stessi file WOFF2, senza dipendere dai font di sistema. La licenza SIL OFL 1.1 e la fonte sono conservate in `src/fonts/comic-relief/`.
 
@@ -18,7 +22,7 @@ npm run build
 npm run preview
 ```
 
-Verifica il codice con `npm run lint` e `npm run build`, poi prova disegno, modifica, salvataggio e copia immagine nel browser con `npm run preview`.
+Verifica il codice con `npm run lint`, `npm test` e `npm run build`, poi prova disegno, modifica, salvataggio e copia immagine nel browser con `npm run preview`.
 
 ## Uso
 
@@ -127,7 +131,7 @@ Per copiare tutto il circuito come immagine seleziona prima tutti gli oggetti; p
 
 **T** mostra/nasconde Componenti usando lo stesso comando del pulsante sidebar. Non agisce durante la scrittura in input, ricerca, etichette, testo, contenteditable o dialoghi. Testo si seleziona dalla toolbar e non ha una nuova shortcut. Il precedente ⌘/Ctrl T resta compatibile quando ricevuto dall’app.
 
-Gli hint di placement omettono Alt/Option, che continua a disattivare temporaneamente le assistenze. La precedente toolbar contestuale è stata sostituita dall’inspector delle proprietà. Il branding usa un unico [master XNOR vettoriale trasparente](../assets/brand/drawcircuit-logo.svg); favicon, PNG e icone PWA derivano dal master, senza branding nel workspace.
+Gli hint di placement omettono Alt/Option, che continua a disattivare temporaneamente le assistenze. La precedente toolbar contestuale è stata sostituita dall’inspector delle proprietà. Il branding usa un unico [master XNOR vettoriale trasparente](../../assets/brand/drawcircuit-logo.svg); favicon, PNG e icone PWA derivano dal master, senza branding nel workspace.
 
 ## Proprietà, precisione e annotazioni
 
@@ -170,6 +174,14 @@ I valori iniziali sono giallo `#FACC15`, opacità 40% e spessore 12 u. Il menu c
 Seleziona un tratto sul suo bordo o con **Alt/Option + clic** quando è coperto dal circuito; **Shift + Alt/Option + clic** aggiunge o rimuove evidenziazioni sovrapposte dalla multiselezione. Le proprietà comuni modificano colore, opacità e spessore. Le evidenziazioni dei componenti seguono corpo, posizione e rotazione del simbolo. **Scollega dal componente** congela il tratto per spostarlo liberamente. Il gesto può attraversare più componenti, cambiare direzione nei nodi e tornare indietro per accorciare il percorso. Alle biforcazioni segue il ramo indicato dal puntatore; gli estremi che si toccano permettono di continuare anche fra fili separati o fra filo e terminale, senza dover rilasciare il puntatore. Questo vale per l’evidenziazione e non modifica i collegamenti elettrici del disegno. Gli incroci interni senza nodo e i fili separati da uno spazio restano distinti. Anche movimenti rapidi attraversano più elementi nello stesso gesto. Gli handle modificano gli estremi dei tratti liberi o intelligenti; **Inizio/Fine** regolano le posizioni esatte sul primo e sull’ultimo elemento del percorso. Gli estremi sono proporzionali alla lunghezza dell’elemento di riferimento: seguono spostamenti, rotazioni, vertici e cambi di routing. Il tratto può continuare dai fili al corpo dei componenti, mantenendo soltanto la porzione percorsa, con lo stesso spessore scelto e senza giunture più scure. Le precedenti evidenziazioni dell’intero componente restano visibili. Un filo diviso mantiene i riferimenti sui rami risultanti; eliminando un riferimento il tratto resta libero sul foglio con lo stesso aspetto. **Scollega dal percorso** permette di spostare liberamente una copia geometrica dell’intera evidenziazione. I percorsi liberi si spostano anche con i tasti freccia.
 
 Copia, taglia, incolla, duplicazione, eliminazione, blocchi personali e Undo/Redo usano il normale sistema degli oggetti. Copiare soltanto un’evidenziazione intelligente produce un percorso indipendente; copiarla con i suoi fili o componenti rimappa i riferimenti. Il JSON v1 continua a leggere i documenti precedenti e valida le nuove geometrie. La copia immagine include le evidenziazioni della selezione, usando lo stesso percorso vettoriale del canvas prima della rasterizzazione.
+
+### Gomma delle evidenziazioni
+
+Scegli **Disegno e annotazioni → Gomma evidenziazioni**, accanto a Evidenziatore. Un clic elimina l’intero tratto: fra evidenziazioni sovrapposte ha priorità quella visibile più in alto. Trascinando, cancelli soltanto le porzioni attraversate di tutte le evidenziazioni interessate. Una soglia di 4 pixel distingue il clic dal trascinamento, senza cancellazioni anticipate. Anche i movimenti rapidi coprono l’intero percorso fra i campioni del puntatore.
+
+In **Proprietà → Dimensione**, lo slider regola il diametro da 6 a 160 unità del foglio. La scelta resta durante la sessione e influenza soltanto la cancellazione parziale. Il contorno del cursore mostra l’area effettiva e segue la scala del canvas a ogni zoom. Le parti rimaste diventano tratti vettoriali indipendenti, conservando curve, colore, opacità e spessore. Dopo un taglio, le evidenziazioni intelligenti interessate non seguono più i precedenti riferimenti.
+
+Ogni trascinamento è una sola operazione Annulla/Ripeti; Esc, cambio strumento o interruzione del puntatore annullano il gesto in corso. La gomma non modifica mai componenti, fili, etichette o annotazioni elettriche. Rimane disponibile la selezione normale: usa Alt/Option + clic se il tratto è coperto dal circuito, poi premi Delete/Backspace per eliminare soltanto l’evidenziazione selezionata.
 
 ### Taglia e appunti
 

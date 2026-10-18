@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { SidebarIcon } from './SidebarIcon';
 
 /** Both workspace panels share the same control, including their floating reopen buttons. */
@@ -12,7 +13,15 @@ export function SidebarToggle({
   onToggle?: () => void;
   floating?: boolean;
 }) {
-  const label = `${visible ? 'Nascondi' : 'Mostra'} ${side === 'left' ? 'componenti' : 'proprietà'}`;
+  const label = t(
+    side === 'left'
+      ? visible
+        ? 'Hide components'
+        : 'Show components'
+      : visible
+        ? 'Hide properties'
+        : 'Show properties',
+  );
   const title = `${label}${side === 'left' ? ' (T)' : ''}`;
   return (
     <button

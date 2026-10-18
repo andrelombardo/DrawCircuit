@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { createComponent } from '../model/catalog';
 import { createJunction, createTextAnnotation, createWire } from '../model/factories';
 import type { CircuitDocument, CircuitObject, Endpoint, Point, Rotation } from '../model/types';
@@ -81,12 +82,20 @@ export function instantiatePreset(
         component?.kind !== 'component' ||
         !component.terminals.some((t) => t.id === spec.terminal)
       )
-        throw new Error(`Terminale del blocco inesistente: ${spec.component}.${spec.terminal}`);
-      return { kind: 'terminal', componentId: component.id, terminalId: spec.terminal };
+        throw new Error(
+          t('Unknown block terminal: {terminal}', {
+            terminal: `${spec.component}.${spec.terminal}`,
+          }),
+        );
+      return {
+        kind: 'terminal',
+        componentId: component.id,
+        terminalId: spec.terminal,
+      };
     }
     const id = ids.get(spec.junction);
     if (!id || !objects.some((o) => o.id === id && o.kind === 'junction'))
-      throw new Error(`Nodo del blocco inesistente: ${spec.junction}`);
+      throw new Error(t('Unknown block junction: {junction}', { junction: spec.junction }));
     return { kind: 'junction', junctionId: id };
   };
   for (const wire of preset.wires)
@@ -94,6 +103,9 @@ export function instantiatePreset(
       createWire(endpoint(wire.start), endpoint(wire.end), (wire.vertices ?? []).map(position)),
     );
   for (const text of preset.annotations ?? [])
-    objects.push({ ...createTextAnnotation(position(text), text.text), rotation });
+    objects.push({
+      ...createTextAnnotation(position(text), text.text),
+      rotation,
+    });
   return objects;
 }

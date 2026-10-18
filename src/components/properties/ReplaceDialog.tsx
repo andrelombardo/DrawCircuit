@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { createPortal } from 'react-dom';
 import { useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
@@ -32,24 +33,28 @@ export function ReplaceDialog({
         ref={ref}
         role="dialog"
         aria-modal="true"
-        aria-label="Sostituisci componente"
+        aria-label={t('Replace component')}
       >
         <button
           className="modal-close"
-          aria-label="Chiudi sostituzione"
-          title="Chiudi sostituzione"
+          aria-label={t('Close replacement dialog')}
+          title={t('Close replacement dialog')}
           onClick={onClose}
         >
           <X size={20} />
         </button>
-        <h2>Sostituisci {components.length > 1 ? `${components.length} componenti` : 'con'}</h2>
+        <h2>
+          {components.length > 1
+            ? t('Replace {count} components', { count: components.length })
+            : t('Replace with')}
+        </h2>
         <div className="replace-search-field">
           <Search size={15} />
           <input
             className="replace-search"
             autoFocus
-            aria-label="Cerca sostituzione"
-            placeholder="Cerca componente…"
+            aria-label={t('Search replacements')}
+            placeholder={t('Search component…')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -61,8 +66,8 @@ export function ReplaceDialog({
               .filter((c) => c.group === group);
             if (!entries.length) return null;
             return (
-              <section key={group} aria-label={group}>
-                {items.length > 6 && <h3>{group}</h3>}
+              <section key={group} aria-label={t(group)}>
+                {items.length > 6 && <h3>{t(group)}</h3>}
                 {entries.map((c) => (
                   <button
                     key={c.type}
@@ -76,7 +81,7 @@ export function ReplaceDialog({
                     }}
                   >
                     <ComponentPreview component={c} />
-                    <span>{c.name}</span>
+                    <span>{t(c.name)}</span>
                   </button>
                 ))}
               </section>
@@ -86,8 +91,10 @@ export function ReplaceDialog({
         {!items.length && (
           <p>
             {search
-              ? 'Nessun risultato per questa ricerca.'
-              : 'Nessuna destinazione comune: i terminali dei componenti selezionati hanno geometrie o funzioni incompatibili.'}
+              ? t('No results for this search.')
+              : t(
+                  'No shared replacement: the selected components have incompatible terminal geometry or functions.',
+                )}
           </p>
         )}
       </div>

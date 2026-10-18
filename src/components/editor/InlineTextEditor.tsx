@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { useLayoutEffect, useRef, useState, type RefObject } from 'react';
 import { MathText } from '../../circuit/annotations/MathText';
 import { CIRCUIT_FONT } from '../../model/fonts';
@@ -65,14 +66,23 @@ export function InlineTextEditor({
           old.width === bounds.width &&
           old.height === bounds.height
             ? old
-            : { x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height },
+            : {
+                x: bounds.x,
+                y: bounds.y,
+                width: bounds.width,
+                height: bounds.height,
+              },
         );
     };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(element);
     const mutation = new MutationObserver(measure);
-    mutation.observe(element, { subtree: true, attributes: true, childList: true });
+    mutation.observe(element, {
+      subtree: true,
+      attributes: true,
+      childList: true,
+    });
     return () => {
       observer.disconnect();
       mutation.disconnect();
@@ -133,7 +143,7 @@ export function InlineTextEditor({
       <input
         ref={input}
         autoFocus
-        aria-label="Modifica testo sul foglio"
+        aria-label={t('Edit text on the sheet')}
         style={{
           fontFamily: CIRCUIT_FONT,
           fontSize: target.fontSize,

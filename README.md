@@ -1,78 +1,51 @@
 <p align="center">
-  <img src="assets/brand/drawcircuit-logo.svg" alt="DrawCircuit logo" width="96" />
+  <img src="assets/brand/drawcircuit-logo.svg" alt="DrawCircuit logo" width="88" />
 </p>
 
 <h1 align="center">DrawCircuit</h1>
 
-<p align="center">Draw electrical circuits for notes, lessons, and publications.</p>
+<p align="center">Draw clear electrical circuits for your notes and lessons.</p>
 
 <p align="center">
-  <a href="https://andrelombardo.github.io/DrawCircuit/">Open in your browser</a>
-  ·
-  <a href="docs/manuale.md">User guide</a>
+  <a href="https://andrelombardo.github.io/DrawCircuit/"><strong>Open DrawCircuit →</strong></a>
 </p>
 
-Place components, connect them, and add mathematical labels and electrical annotations. Select the diagram and choose **Copia come immagine** from the right-click menu to paste it into your documents.
+<p align="center">
+  <a href="README.it.md"><img src="assets/readme/italian.svg" alt="Read in Italian" width="100" height="28" /></a>
+</p>
 
-DrawCircuit is a web editor that saves your work in your browser and requires no account. It loads from the network and can be installed as a standalone web app in supporting browsers. Local circuits, personal blocks, and preferences remain in the browser between visits.
+<p align="center">
+  <img src="assets/readme/demo.gif" alt="Place a circuit, edit a mathematical label, and copy it as an image in DrawCircuit" width="960" />
+</p>
 
-Circuit labels and formulas use **Comic Relief**, bundled with the app so visitors see the same font without installing it. Copied PNG images preserve the font without requiring it to be installed. The interface keeps Inter. See the font's [source and SIL Open Font License](src/fonts/comic-relief/README.md).
+<p align="center">
+  <a href="docs/guide.md">User guide</a> · <a href="CONTRIBUTING.md">Contributing</a>
+</p>
 
-## Get started
+## Features
 
-1. Open the [browser app](https://andrelombardo.github.io/DrawCircuit/).
-2. Choose a component from **Componenti**, then click the sheet to place it.
-3. Connect terminals with wires and edit the selection in **Proprietà**.
-4. Select the elements, right-click and choose **Copia come immagine**. Use **Select all** first to copy the whole circuit.
+- Draw and edit electrical circuits.
+- Add mathematical labels, electrical annotations, and editable highlights.
+- Place, align, and space elements precisely.
+- Reuse preset and personal blocks.
+- Copy circuits as transparent PNG images.
+- Save your work locally, without an account.
 
-The canonical public URL is `/DrawCircuit/`. The lowercase [address `/drawcircuit/`](https://andrelombardo.github.io/drawcircuit/) redirects to it through the separate [Pages entry-point repository](https://github.com/andrelombardo/andrelombardo.github.io); the app repository remains `DrawCircuit`. Browser data stays on the same origin; open the current URL to retire the previous installation. Existing PWA shortcuts may need to be installed again from the canonical address.
+Available in English and Italian. Switch languages at the bottom right of the app.
 
-The interface and [user guide](docs/manuale.md) are in Italian. See the [web app guide](docs/pwa.md) for installation, local data, and browser differences.
+## Development
 
-## What you can do
-
-- **Draw circuits:** searchable electrical symbols, editable wires, and junctions, with snapping and placement guides.
-- **Annotate diagrams:** LaTeX labels, current and voltage arrows, polarity signs, loop arrows, text, and decorative shapes.
-- **Reuse arrangements:** start from quick blocks or save a selection as a personal block.
-- **Edit precisely:** move, rotate, replace, align, and distribute components; adjust numeric spacing, colours, and styles with undo and redo.
-- **Copy as an image:** transparent PNG from the selection’s right-click menu, including internal wires and associated annotations.
-- **Keep your work:** automatic browser saving and a personal block library with support for importing existing libraries.
-
-## Run locally
-
-Use Node.js **26.5.0**, pinned in `.nvmrc`. With [nvm](https://github.com/nvm-sh/nvm) installed:
+Requires **Node.js 26.5.0**, pinned in [.nvmrc](.nvmrc).
 
 ```sh
 git clone https://github.com/andrelombardo/DrawCircuit.git
 cd DrawCircuit
-nvm install
-nvm use
 npm ci
 npm run dev
 ```
 
-Open [http://127.0.0.1:5173](http://127.0.0.1:5173).
-
-## Development
-
-The editor uses React, TypeScript, Vite, and Zustand. Diagrams render as SVG; KaTeX handles mathematical labels. The app is entirely static, with no backend or native runtime. See the [architecture](docs/architecture.md).
-
-| Command                | Purpose                               |
-| ---------------------- | ------------------------------------- |
-| `npm run dev`          | Start the local development server.   |
-| `npm run lint`         | Check the source with ESLint.         |
-| `npm run build`        | Build the browser app in `dist/`.     |
-| `npm run preview`      | Preview the browser production build. |
-
-Pushes to `main` run lint and the production build before publishing to GitHub Pages. Pull requests run the same checks without publishing. Check drawing, editing, local persistence, and image copying in the browser before publishing. See the [deployment guide](docs/releases.md).
-
-## Documentation
-
-- [User guide](docs/manuale.md): drawing, editing, shortcuts, image copying, and technical details.
-- [Web app guide](docs/pwa.md): installation, local data, and migration from old offline installations.
-- [Architecture](docs/architecture.md): modules, persistence, rendering, and build.
-- [Deployment guide](docs/releases.md): quality checks, GitHub Pages, and verification.
+Open [localhost:5173](http://127.0.0.1:5173).
 
 ## License
 
-DrawCircuit is licensed under the [MIT License](LICENSE), copyright © 2026 Andrea Lombardo. Third-party dependencies and bundled assets retain their respective licenses, including Comic Relief under the [SIL Open Font License 1.1](src/fonts/comic-relief/OFL.txt).
+[MIT](LICENSE) © 2026 Andrea Lombardo. Third-party assets retain their licenses, including Comic Relief under the [SIL Open Font License](src/fonts/comic-relief/OFL.txt).

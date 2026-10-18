@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { makeId } from './catalog';
 import { COLORS } from './types';
 import type {
@@ -17,7 +18,13 @@ export function createJunction(point: Point, text: string): Junction {
     id: makeId(),
     ...point,
     color: COLORS.ink,
-    label: { text, offset: { x: 0, y: -24 }, color: COLORS.red, fontSize: 24, rotation: 0 },
+    label: {
+      text,
+      offset: { x: 0, y: -24 },
+      color: COLORS.red,
+      fontSize: 24,
+      rotation: 0,
+    },
   };
 }
 
@@ -39,7 +46,7 @@ export function createWire(
   };
 }
 
-export function createTextAnnotation(point: Point, text = 'Testo'): TextAnnotation {
+export function createTextAnnotation(point: Point, text = t('Text')): TextAnnotation {
   return {
     kind: 'text',
     id: makeId(),
@@ -67,5 +74,12 @@ export function createRectangle(a: Point, b: Point): RectangleAnnotation {
   };
 }
 export function createLine(start: Point, end: Point): LineAnnotation {
-  return { kind: 'line', id: makeId(), start, end, color: COLORS.ink, width: 2 };
+  return {
+    kind: 'line',
+    id: makeId(),
+    start,
+    end,
+    color: COLORS.ink,
+    width: 2,
+  };
 }

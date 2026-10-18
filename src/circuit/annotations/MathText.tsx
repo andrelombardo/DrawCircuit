@@ -1,3 +1,4 @@
+import { t, useLanguage } from '../../i18n';
 import { memo, useLayoutEffect, useRef, useState } from 'react';
 import { CIRCUIT_FONT } from '../../model/fonts';
 import type { Rotation } from '../../model/types';
@@ -26,6 +27,7 @@ export const MathText = memo(function MathText({
   labelId?: string;
   selected?: boolean;
 }) {
+  useLanguage((state) => state.language);
   const result = renderLatex(text);
   const content = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 1, height: 1 });
@@ -97,7 +99,7 @@ export const MathText = memo(function MathText({
       data-source={text}
       data-latex-error={result.kind === 'invalid' || undefined}
     >
-      {result.kind === 'invalid' && <title>LaTeX da correggere · doppio clic per modificare</title>}
+      {result.kind === 'invalid' && <title>{t('Invalid LaTeX · double-click to edit')}</title>}
       {text.split('\n').map((line, index) => (
         <tspan key={index} x={x} dy={index ? fontSize * 1.35 : 0}>
           {line}

@@ -1,4 +1,9 @@
-import { highlightPath, highlightPoints, highlightEndpointIndices } from '../../annotations/highlight';
+import { t } from '../../i18n';
+import {
+  highlightPath,
+  highlightPoints,
+  highlightEndpointIndices,
+} from '../../annotations/highlight';
 import { arrowCenter, rotationHandle } from '../../utils/arrows';
 import { braceGeometry } from '../../annotations/brace';
 import { electricalDrawingGeometry } from '../../annotations/electrical';
@@ -46,11 +51,14 @@ function Handle({
   return (
     <g data-handle={name} className={`handle-hit handle-${name.split(':')[0]}`}>
       {(name === 'wireStart' || name === 'wireEnd') && (
-        <title>Trascina per prolungare · Option/Alt trascina per ricollegare</title>
+        <title>{t('Drag to extend · Option/Alt-drag to reconnect')}</title>
       )}
-      <circle cx={p.x} cy={p.y}
+      <circle
+        cx={p.x}
+        cy={p.y}
         r={(name === 'wireStart' || name === 'wireEnd' ? WIRE_ENDPOINT_HIT_PX : 11) / zoom}
-        fill="transparent" />
+        fill="transparent"
+      />
       {square ? (
         <rect
           x={p.x - 4 / zoom}
@@ -119,7 +127,8 @@ export function SelectionLayer({
             ) : null}
             {single && (
               <>
-                {o.kind === 'highlight' && o.mode !== 'component' &&
+                {o.kind === 'highlight' &&
+                  o.mode !== 'component' &&
                   (() => {
                     const points = highlightPoints(o, doc);
                     const indices =
@@ -210,7 +219,10 @@ export function SelectionLayer({
                   </>
                 )}
                 {(o.kind === 'arrow' || o.kind === 'loop-arrow') && hoveredArrow === o.id && (
-                  <g className="rotation-control" aria-label="Ruota freccia · Shift aggancia a 15°">
+                  <g
+                    className="rotation-control"
+                    aria-label={t('Rotate arrow · Shift snaps to 15°')}
+                  >
                     <path
                       d={pointsPath([arrowCenter(o), rotationHandle(o, zoom)])}
                       className="handle-line"

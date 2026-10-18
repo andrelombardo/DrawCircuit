@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 /** Keep an unreadable saved value intact until a recovery copy can be written.
  * A failed read/parse must never silently destroy the previous user's data. */
 export function localPersistence<T>(
@@ -19,8 +20,10 @@ export function localPersistence<T>(
           value: fallback(),
           error:
             raw === null
-              ? 'Salvataggio locale non disponibile. Mantieni aperta la pagina.'
-              : 'Salvataggio locale non leggibile. I dati originali saranno conservati prima di salvare nuove modifiche. Mantieni aperta la pagina.',
+              ? t('Local saving is unavailable. Keep this page open.')
+              : t(
+                  'Local data cannot be read. The original data will be preserved before saving new changes. Keep this page open.',
+                ),
         };
       }
     },

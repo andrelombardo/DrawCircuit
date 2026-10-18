@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { CircuitDocument, CircuitComponent } from '../../model/types';
@@ -13,9 +14,10 @@ import { getExportSelection } from '../../tikz/selection';
  * Capture the command's selection before focus moves into a dialog. */
 export function SelectionActions({ children }: { children: ReactNode }) {
   const parent = useContext(EditorCommandContext);
-  const [block, setBlock] = useState<{ document: CircuitDocument; selection: string[] } | null>(
-    null,
-  );
+  const [block, setBlock] = useState<{
+    document: CircuitDocument;
+    selection: string[];
+  } | null>(null);
   const [components, setComponents] = useState<CircuitComponent[] | null>(null);
   const [imageBusy, setImageBusy] = useState(false);
   if (parent) return children;
@@ -32,9 +34,9 @@ export function SelectionActions({ children }: { children: ReactNode }) {
           setImageBusy(true);
           try {
             await copyPNG(subset);
-            notify('Immagine copiata');
+            notify(t('Image copied'));
           } catch (error) {
-            notify(error instanceof Error ? error.message : 'Impossibile copiare l’immagine.');
+            notify(error instanceof Error ? error.message : t('Unable to copy the image.'));
           } finally {
             setImageBusy(false);
           }

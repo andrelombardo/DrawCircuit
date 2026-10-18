@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { useLayoutEffect, useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { PropertiesContent } from './PropertiesContent';
@@ -28,11 +29,11 @@ export function PropertiesInspector({
       id="properties-inspector"
       className="properties-inspector"
       role="region"
-      aria-label="Proprietà"
+      aria-label={t('Properties')}
       onKeyDown={(event) => {
         const target = event.target as HTMLElement;
         const editingText = target.matches(
-          'textarea, input:not([type="checkbox"]):not([type="color"]), [contenteditable="true"]',
+          'textarea, input:not([type="checkbox"]):not([type="color"]):not([type="range"]), [contenteditable="true"]',
         );
         if ((event.ctrlKey || event.metaKey) && !event.altKey && !editingText) {
           const key = event.key.toLowerCase();
@@ -62,7 +63,7 @@ export function PropertiesInspector({
       style={{ '--inspector-width': `${preferences.width}px` } as CSSProperties}
     >
       <div className="inspector-header">
-        <h2>Proprietà</h2>
+        <h2>{t('Properties')}</h2>
         <SidebarToggle side="right" visible onToggle={toggle} />
       </div>
       {preferences.visible && (
@@ -73,7 +74,7 @@ export function PropertiesInspector({
       <div
         className="inspector-resizer"
         role="separator"
-        aria-label="Ridimensiona proprietà"
+        aria-label={t('Resize properties')}
         aria-orientation="vertical"
         aria-valuemin={INSPECTOR_MIN_WIDTH}
         aria-valuemax={INSPECTOR_MAX_WIDTH}
@@ -83,7 +84,11 @@ export function PropertiesInspector({
           if (e.button !== 0) return;
           e.preventDefault();
           e.currentTarget.setPointerCapture(e.pointerId);
-          drag.current = { x: e.clientX, width: preferences.width, pointer: e.pointerId };
+          drag.current = {
+            x: e.clientX,
+            width: preferences.width,
+            pointer: e.pointerId,
+          };
         }}
         onPointerMove={(e) => {
           if (drag.current?.pointer === e.pointerId)

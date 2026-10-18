@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { useCallback, useEffect, useRef } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { useEditorStore } from '../../store/editorStore';
@@ -7,7 +8,13 @@ import type { CircuitObject } from '../../model/types';
 import { ActionMenu } from '../toolbar/ActionMenu';
 import { PropertyField, PropertySelect, PropertyRow } from './PropertyControls';
 
-const colorNames = { ink: 'Nero', blue: 'Blu', red: 'Rosso', green: 'Verde', purple: 'Viola' };
+const colorNames = {
+  ink: 'Black',
+  blue: 'Blue',
+  red: 'Red',
+  green: 'Green',
+  purple: 'Purple',
+};
 const labeled = (o: CircuitObject) => 'label' in o;
 const stroked = (o: CircuitObject) => 'width' in o || 'strokeWidth' in o;
 
@@ -26,7 +33,8 @@ export function ColorControl({
   colors?: Readonly<Record<string, string>>;
   gesture?: boolean;
 }) {
-  const colorLabel = label === 'Colore' ? label : 'Colore ' + label.toLowerCase();
+  const colorLabel =
+    label === t('Color') ? label : t('{label} color', { label: label.toLocaleLowerCase() });
   const lastColor = useRef(value);
   const ownsGesture = useRef(false);
   const picker = useRef<HTMLInputElement>(null);
@@ -71,7 +79,7 @@ export function ColorControl({
     }
   };
   return (
-    <PropertyRow caption={label} secondary={children} secondaryCaption="Opacità">
+    <PropertyRow caption={label} secondary={children} secondaryCaption={t('Opacity')}>
       <div className="inspector-color">
         <ActionMenu
           label={colorLabel}
@@ -83,20 +91,20 @@ export function ColorControl({
                 style={{ backgroundColor: value }}
               />
               <span className="inspector-hex">
-                {value === undefined ? 'Misto' : value.toUpperCase()}
+                {value === undefined ? t('Mixed') : value.toUpperCase()}
               </span>
             </>
           }
           items={[
             ...Object.entries(colors).map(([name, color]) => ({
               id: name,
-              label: colorNames[name as keyof typeof colorNames] ?? name,
+              label: t(colorNames[name as keyof typeof colorNames] ?? name),
               icon: <span className="inspector-swatch" style={{ backgroundColor: color }} />,
               onSelect: () => onChange(color),
             })),
             {
               id: 'custom',
-              label: 'Colore personalizzato…',
+              label: t('Custom color…'),
               separatorBefore: true,
               onSelect: () => {
                 begin();
@@ -111,7 +119,9 @@ export function ColorControl({
           type="color"
           tabIndex={-1}
           value={value ?? COLORS.ink}
-          aria-label={colorLabel + ' personalizzato'}
+          aria-label={t('Custom {label}', {
+            label: colorLabel.toLocaleLowerCase(),
+          })}
           onPointerDown={begin}
           onInput={chooseCustom}
           onChange={chooseCustom}
@@ -195,14 +205,14 @@ export function SelectionStyle({
   const fillObjects = objects.filter((o) => o.kind === 'rectangle' && o.fill !== 'none');
   const symbolCaption =
     o?.kind === 'text'
-      ? 'Testo'
+      ? t('Text')
       : o?.kind === 'wire'
-        ? 'Filo'
+        ? t('Wire')
         : o?.kind === 'rectangle' || o?.kind === 'line'
-          ? 'Contorno'
-          : 'Simbolo';
+          ? t('Outline')
+          : t('Symbol');
   return (
-    <div className="inspector-style" role="group" aria-label="Stile selezione">
+    <div className="inspector-style" role="group" aria-label={t('Selection style')}>
       {!labelOnly && (
         <ColorControl
           label={symbolCaption}
@@ -212,27 +222,27 @@ export function SelectionStyle({
           <OpacityControl
             objects={objects}
             apply={apply}
-            label={o?.kind === 'text' ? 'Opacità testo' : 'Opacità simbolo'}
+            label={o?.kind === 'text' ? t('Text opacity') : t('Symbol opacity')}
           />
         </ColorControl>
       )}
       {hasLabel && (
         <ColorControl
-          label="Etichetta"
+          label={t('Label')}
           value={commonValue(objects.map((o) => ('label' in o ? o.label.color : '')))}
           onChange={(color) =>
             apply((o) => ('label' in o ? { ...o, label: { ...o.label, color } } : o))
           }
         >
-          <OpacityControl objects={objects} apply={apply} label="Opacità etichetta" labelOpacity />
+          <OpacityControl objects={objects} apply={apply} label={t('Label opacity')} labelOpacity />
         </ColorControl>
       )}
       {(hasStroke || typography) && (
         <div className="inspector-style-fields">
           {hasStroke && (
             <PropertySelect
-              label="Spessore linea"
-              caption="Spessore"
+              label={t('Line width')}
+              caption={t('Thickness')}
               value={width}
               onChange={(v) =>
                 apply((o) =>
@@ -258,33 +268,36 @@ export function SelectionStyle({
       )}
       {rectangles && (
         <PropertySelect
-          label="Riempimento"
-          caption="Tipo riempimento"
+          label={t('Fill')}
+          caption={t('Fill type')}
           value={commonValue(
             objects.map((o) => (o.kind === 'rectangle' && o.fill !== 'none' ? 'color' : 'none')),
           )}
           onChange={(v) =>
             apply((o) =>
               o.kind === 'rectangle'
-                ? { ...o, fill: v === 'none' ? 'none' : o.fill === 'none' ? COLORS.blue : o.fill }
+                ? {
+                    ...o,
+                    fill: v === 'none' ? 'none' : o.fill === 'none' ? COLORS.blue : o.fill,
+                  }
                 : o,
             )
           }
         >
-          <option value="none">Nessuno</option>
-          <option value="color">Colore</option>
+          <option value="none">{t('None')}</option>
+          <option value="color">{t('Color')}</option>
         </PropertySelect>
       )}
       {rectangles && fillObjects.length === objects.length && (
         <ColorControl
-          label="Riempimento"
+          label={t('Fill')}
           value={commonValue(fillObjects.map((o) => (o.kind === 'rectangle' ? o.fill : '')))}
           onChange={(fill) => apply((o) => (o.kind === 'rectangle' ? { ...o, fill } : o))}
         >
           <OpacityControl
             objects={fillObjects}
             apply={apply}
-            label="Opacità riempimento"
+            label={t('Fill opacity')}
             fillOpacity
           />
         </ColorControl>
@@ -306,8 +319,8 @@ export function SelectionTypography({
   return (
     <>
       <PropertySelect
-        label="Dimensione testo"
-        caption="Dimensione testo"
+        label={t('Text size')}
+        caption={t('Text size')}
         value={size}
         onChange={(v) =>
           apply((o) =>
@@ -343,16 +356,16 @@ export function SelectionTypography({
       </PropertySelect>
       {objects.every((o) => o.kind === 'text') && (
         <PropertySelect
-          label="Allineamento testo"
-          caption="Allineamento"
+          label={t('Text alignment')}
+          caption={t('Alignment')}
           value={commonValue(objects.map((o) => (o.kind === 'text' ? o.align : 'start')))}
           onChange={(v) =>
             apply((o) => (o.kind === 'text' ? { ...o, align: v as 'start' | 'middle' | 'end' } : o))
           }
         >
-          <option value="start">Sinistra</option>
-          <option value="middle">Centro</option>
-          <option value="end">Destra</option>
+          <option value="start">{t('Left')}</option>
+          <option value="middle">{t('Center')}</option>
+          <option value="end">{t('Right')}</option>
         </PropertySelect>
       )}
     </>

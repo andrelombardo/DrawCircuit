@@ -1,6 +1,6 @@
 import type { ComponentType, Point, Rotation } from '../model/types';
 
-export const presetCategories = ['Resistenze', 'Circuiti base', 'RLC', 'Reti'] as const;
+export const presetCategories = ['Resistors', 'Basic circuits', 'RLC', 'Networks'] as const;
 export type PresetCategory = (typeof presetCategories)[number];
 export interface PresetComponent extends Point {
   key: string;

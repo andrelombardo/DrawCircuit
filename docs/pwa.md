@@ -1,35 +1,35 @@
-# Installazione web e dati locali
+# Web app and persistence
 
-DrawCircuit si carica dalla rete e conserva circuiti, libreria personale e preferenze nel browser. Non registra service worker, non precachea risorse e non ha un sistema di aggiornamento: a una nuova apertura il browser carica normalmente il sito. La normale cache HTTP del browser resta governata dall’host; non è una cache offline gestita dall’app. Un editor già aperto può continuare a lavorare con le risorse già in memoria, ma l’avvio senza rete non è garantito.
+DrawCircuit loads from the network and stores circuits, personal blocks, and preferences in the browser. It does not register service workers, precache resources, or implement an update system. Opening the app loads the site normally. The host controls ordinary HTTP caching; this is separate from an app-managed offline cache. An already open editor may continue working with resources in memory, but offline startup is not guaranteed.
 
-`public/manifest.webmanifest` mantiene nome, icone, colori e avvio standalone. La rinomina del repository cambia il percorso pubblico in `/DrawCircuit/`, sensibile alle maiuscole. `start_url` e `scope` sono relativi e funzionano sul nuovo percorso. I dati locali appartengono all’origine `https://andrelombardo.github.io`, che resta invariata. La PWA installata al vecchio indirizzo può richiedere una nuova installazione dal nuovo URL.
+`public/manifest.webmanifest` preserves the name, icons, colors, and standalone launch. The repository rename changes the public path to case-sensitive `/DrawCircuit/`. Relative `start_url` and `scope` work under the new path. Local data belongs to the unchanged origin `https://andrelombardo.github.io`. An app installed from the old address may need to be installed again from the new URL. The manifest defaults to English; the in-app language selector remembers English or Italian independently of circuit data.
 
-## Browser
+## Browsers
 
-| Browser                             | Installazione                                                                                         |
-| ----------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| Chrome / Edge compatibili           | Menu nativo di installazione del sito; presentazione del pulsante dipendente da browser e piattaforma |
-| Safari su macOS Sonoma o successivi | File → Aggiungi al Dock                                                                               |
-| Safari su iPhone / iPad             | Condividi → Aggiungi alla schermata Home; scegliere l’apertura come app web dove proposta             |
-| Firefox                             | Supporto e menu dipendono dalla piattaforma; il manifest non assicura un prompt di installazione      |
+| Browser                         | Installation                                                                                   |
+| ------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Compatible Chrome / Edge        | Native site installation menu; button availability depends on browser and platform             |
+| Safari on macOS Sonoma or later | File → Add to Dock                                                                             |
+| Safari on iPhone / iPad         | Share → Add to Home Screen; choose web app launch where offered                                |
+| Firefox                         | Support and menus depend on the platform; a manifest does not guarantee an installation prompt |
 
-Un service worker non è necessario per installare il sito nei browser supportati. Chrome ha rimosso il requisito del fetch handler per l’installazione dal menu (Android 108, desktop 112); l’installazione non implica che venga mostrato un prompt automatico. Safari può aggiungere siti al Dock anche senza worker. Non sono stati introdotti pulsanti o flussi di installazione personalizzati.
+A service worker is not required for installation in supported browsers. Chrome removed the fetch-handler requirement for menu installation in Android 108 and desktop 112. Installation support does not imply an automatic prompt. Safari can add sites to the Dock without a worker. The app adds no custom installation flow.
 
-Fonti consultate il 15 ottobre 2026: [MDN: installabilità](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable), [Chrome: criteri d’installazione](https://developer.chrome.com/blog/update-install-criteria), [WebKit: web app su Mac](https://webkit.org/blog/15443/news-from-wwdc24-webkit-in-safari-18-beta/). La verifica locale del manifest e degli asset non certifica l’installazione su ogni dispositivo fisico.
+Reference documentation, consulted October 15, 2026: [MDN: installability](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable), [Chrome: installation criteria](https://developer.chrome.com/blog/update-install-criteria), and [WebKit: Mac web apps](https://webkit.org/blog/15443/news-from-wwdc24-webkit-in-safari-18-beta/). Local manifest and asset checks do not certify installation on every physical device.
 
-## Dismissione delle vecchie copie offline
+## Retiring legacy offline copies
 
-Sono necessari due punti d’ingresso, perché una vecchia shell in cache può impedire l’esecuzione del nuovo JavaScript:
+Two entry points are needed because an old cached shell may prevent the new JavaScript from running:
 
-- `public/sw.js`: al vecchio URL del worker, il browser trova un sostituto che si attiva subito, acquisisce i client senza gestire fetch, elimina il vecchio precache e si disinstalla. Non ricarica le finestre: modifiche in corso e stato in memoria restano intatti.
-- `src/pwa/retireLegacyOffline.ts`: quando si carica il nuovo sito in produzione, rimuove le registrazioni con **scope esatto dell’app o dell’alias storico `/drawcircuit/`** e **script `sw.js` esatto**, poi elimina gli eventuali precache orfani. Fallimenti di accesso non bloccano l’editor e saranno ritentati alla visita successiva, senza timer o flag persistenti.
+- `public/sw.js`: at the old worker URL, the browser finds a replacement that activates immediately, claims clients without intercepting fetches, removes the old precache, and unregisters itself. It does not reload windows, preserving ongoing edits and memory state.
+- `src/pwa/retireLegacyOffline.ts`: when the new production site loads, it removes registrations with the **exact app scope or historical `/drawcircuit/` alias** and the **exact `sw.js` script**, then removes orphaned precaches. Access failures do not block the editor and are retried on the next visit, without timers or persistent flags.
 
-Le cache rimosse corrispondono esclusivamente al nome storico Workbox `workbox-precache-v<numero>-<scope esatto>`. Non vengono eliminate cache di altri scope, cache con prefissi diversi, localStorage, IndexedDB, documenti, blocchi, preferenze o copie di recupero. Nessun uso di `Clear-Site-Data`, nessuna cancellazione generale e nessuna modifica della struttura dei documenti.
+Only historical Workbox names matching `workbox-precache-v<number>-<exact scope>` are removed. Other scopes, different cache prefixes, localStorage, IndexedDB, documents, blocks, preferences, and recovery copies are preserved. There is no `Clear-Site-Data`, blanket deletion, or document-structure change.
 
-La rinomina GitHub Pages non crea automaticamente un redirect dal vecchio percorso. Il repository separato [andrelombardo.github.io](https://github.com/andrelombardo/andrelombardo.github.io) ora pubblica il solo ingresso `/drawcircuit/`, che rimanda al sito canonico `/DrawCircuit/` sulla stessa origine. Non contiene una copia dell’app né un service worker. Se `/drawcircuit/sw.js` non è più raggiungibile, il browser non può scaricarvi il file di dismissione: aprire [il nuovo sito](https://andrelombardo.github.io/DrawCircuit/) esegue la pulizia anche del vecchio scope, senza cambiare i dati locali. Un worker sul nuovo scope non può acquisire le finestre del vecchio scope; una vecchia shell ancora servita dalla propria cache può quindi richiedere l’apertura diretta dell’indirizzo canonico.
+GitHub Pages does not automatically redirect a renamed path. The separate [andrelombardo.github.io repository](https://github.com/andrelombardo/andrelombardo.github.io) publishes only the `/drawcircuit/` entry point, redirecting to canonical `/DrawCircuit/` on the same origin. It contains neither an app copy nor a worker. If `/drawcircuit/sw.js` is unreachable, the browser cannot fetch its retirement worker; opening the [new site](https://andrelombardo.github.io/DrawCircuit/) also cleans the old scope without changing local data. A worker on the new scope cannot claim old-scope windows; an old cached shell may require opening the canonical address directly.
 
-La rimozione non può raggiungere una vecchia installazione che rimane completamente senza rete. Alla successiva connessione, il controllo aggiornamenti del browser può raggiungere `sw.js`. Tempi e controlli del browser non sono forzabili dal sito; il codice già in esecuzione in una vecchia finestra resta quello caricato fino alla sua normale riapertura. Dopo il subentro del worker di dismissione, non vengono più servite risorse dal vecchio precache.
+Retirement cannot reach an installation that stays completely offline. On reconnection, browser update checks may reach `sw.js`. The site cannot force browser update timing; code already running in an old window stays loaded until the window is normally reopened. Once the retirement worker takes over, resources are no longer served from the old precache.
 
-### Durata della migrazione
+### Migration lifetime
 
-Introduzione: 15 ottobre 2026. Prima revisione della necessità: 15 ottobre 2027. Il codice nel main può essere rimosso quando non occorre più ripulire i profili legacy. Per il piccolo endpoint `sw.js`, non esiste una scadenza universale sicura: un’installazione può restare inattiva per anni. Conservarlo finché si intende recuperare quei profili; rimuoverlo solo accettando esplicitamente che i profili mai riaperti possano mantenere il vecchio worker. Non registra alcuna nuova installazione e non dipende da Workbox.
+Introduced October 15, 2026. First necessity review: October 15, 2027. The main-thread cleanup can be removed when legacy profile cleanup is no longer needed. There is no universally safe expiration for the small `sw.js` endpoint: an installation may remain inactive for years. Keep it while those profiles should remain recoverable; removal requires explicitly accepting that never-reopened profiles may retain the old worker. It registers no new installation and does not depend on Workbox.

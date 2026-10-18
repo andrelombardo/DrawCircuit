@@ -1,3 +1,5 @@
+import { mapHighlight } from '../annotations/highlight';
+import { t } from '../i18n';
 import { create } from 'zustand';
 import { makeId, componentRegistry } from '../model/catalog';
 import { deserializeDocument } from '../model/serialization';
@@ -15,7 +17,7 @@ export interface PersonalBlock {
 }
 const validName = (s: string) => {
   const name = s.trim();
-  if (!name || name.length > 80) throw new Error('Inserisci un nome da 1 a 80 caratteri.');
+  if (!name || name.length > 80) throw new Error(t('Enter a name between 1 and 80 characters.'));
   return name;
 };
 export function createPersonalBlock(
@@ -24,7 +26,7 @@ export function createPersonalBlock(
   name: string,
 ): PersonalBlock {
   const subset = selectionDocument(doc, selection);
-  if (!subset.objects.length) throw new Error('Seleziona almeno un elemento del circuito.');
+  if (!subset.objects.length) throw new Error(t('Select at least one circuit element.'));
   return {
     id: makeId(),
     name: validName(name),
@@ -32,22 +34,22 @@ export function createPersonalBlock(
   };
 }
 export function parsePersonalBlocks(raw: string): PersonalBlock[] {
-  if (raw.length > 10_000_000) throw new Error('Il file supera il limite di 10 MB.');
+  if (raw.length > 10_000_000) throw new Error(t('The file exceeds the 10 MB limit.'));
   let root;
   try {
     root = JSON.parse(raw);
   } catch {
-    throw new Error('Libreria blocchi non valida: il file JSON non è leggibile.');
+    throw new Error(t('Invalid block library: the JSON file cannot be read.'));
   }
   if (!root || root.version !== 1 || !Array.isArray(root.blocks) || root.blocks.length > 100)
-    throw new Error('Libreria blocchi non valida.');
+    throw new Error(t('Invalid block library.'));
   const ids = new Set<string>();
   return root.blocks.map((b: PersonalBlock) => {
     if (!b || typeof b.id !== 'string' || !b.id || ids.has(b.id) || typeof b.name !== 'string')
-      throw new Error('Blocco non valido.');
+      throw new Error(t('Invalid block.'));
     ids.add(b.id);
     const document = deserializeDocument(JSON.stringify(b.document));
-    if (!document.objects.length) throw new Error('Un blocco non può essere vuoto.');
+    if (!document.objects.length) throw new Error(t('A block cannot be empty.'));
     return { id: b.id, name: validName(b.name), document };
   });
 }
@@ -68,8 +70,7 @@ export function instantiatePersonalBlock(
 ) {
   const rp = (p: Point) => rotatePoint(p, rotation);
   const next = (r: Rotation) => ((r + rotation) % 360) as Rotation;
-  const ep = (e: Endpoint): Endpoint =>
-    e.kind === 'free' ? { ...e, point: rp(e.point) } : e;
+  const ep = (e: Endpoint): Endpoint => (e.kind === 'free' ? { ...e, point: rp(e.point) } : e);
   const doc = {
     ...block.document,
     objects: block.document.objects.map((o) => {
@@ -81,16 +82,25 @@ export function instantiatePersonalBlock(
           label: { ...o.label, offset: rp(o.label.offset) },
         };
       if (o.kind === 'junction')
-        return { ...o, ...rp(o), label: { ...o.label, offset: rp(o.label.offset) } };
+        return {
+          ...o,
+          ...rp(o),
+          label: { ...o.label, offset: rp(o.label.offset) },
+        };
       if (o.kind === 'text') return { ...o, ...rp(o), rotation: next(o.rotation) };
       if (o.kind === 'rectangle') {
         const center = rp({ x: o.x + o.width / 2, y: o.y + o.height / 2 });
         const width = rotation % 180 === 90 ? o.height : o.width,
           height = rotation % 180 === 90 ? o.width : o.height;
-        return { ...o, x: center.x - width / 2, y: center.y - height / 2, width, height };
+        return {
+          ...o,
+          x: center.x - width / 2,
+          y: center.y - height / 2,
+          width,
+          height,
+        };
       }
-      if (o.kind === 'highlight')
-        return o.mode === 'free' ? { ...o, points: o.points.map(rp) } : o;
+      if (o.kind === 'highlight') return mapHighlight(o, rp);
       if (o.kind === 'line') return { ...o, start: rp(o.start), end: rp(o.end) };
       if (o.kind === 'wire')
         return {
@@ -156,14 +166,14 @@ interface LibraryState {
   import: (raw: string) => void;
 }
 function persist(blocks: PersonalBlock[]) {
-  if (blocks.length > 100) throw new Error('La libreria può contenere al massimo 100 blocchi.');
+  if (blocks.length > 100) throw new Error(t('The library can contain at most 100 blocks.'));
   const raw = serializePersonalBlocks(blocks);
-  if (raw.length > 10_000_000) throw new Error('Libreria troppo grande.');
+  if (raw.length > 10_000_000) throw new Error(t('Library too large.'));
   try {
     blockPersistence.save(blocks);
     return '';
   } catch {
-    return 'Salvataggio dei blocchi non disponibile. Mantieni aperta la pagina.';
+    return t('Block saving is unavailable. Keep this page open.');
   }
 }
 export const usePersonalBlocks = create<LibraryState>((set, get) => ({
@@ -197,7 +207,10 @@ export const usePersonalBlocks = create<LibraryState>((set, get) => ({
     set({ blocks, error, lastRemoved: null });
   },
   import: (raw) => {
-    const incoming = parsePersonalBlocks(raw).map((b) => ({ ...b, id: makeId() }));
+    const incoming = parsePersonalBlocks(raw).map((b) => ({
+      ...b,
+      id: makeId(),
+    }));
     const blocks = [...get().blocks, ...incoming];
     const error = persist(blocks);
     set({ blocks, error });

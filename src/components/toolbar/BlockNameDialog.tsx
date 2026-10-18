@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { createPortal } from 'react-dom';
 import { useRef, useState } from 'react';
 import { X } from 'lucide-react';
@@ -22,18 +23,18 @@ export function BlockNameDialog({
         className="confirm-dialog"
         role="dialog"
         aria-modal="true"
-        aria-label={initial ? 'Rinomina blocco' : 'Salva come blocco'}
+        aria-label={initial ? t('Rename block') : t('Save as block')}
       >
         <button
           className="modal-close"
-          aria-label="Chiudi blocco"
-          title="Chiudi blocco"
+          aria-label={t('Close block dialog')}
+          title={t('Close block dialog')}
           onClick={onClose}
         >
           <X size={20} />
         </button>
-        <h2>{initial ? 'Rinomina blocco' : 'Salva come blocco'}</h2>
-        <p>Il blocco resta disponibile nella tua libreria personale su questo browser.</p>
+        <h2>{initial ? t('Rename block') : t('Save as block')}</h2>
+        <p>{t('The block stays in your personal library in this browser.')}</p>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -41,15 +42,15 @@ export function BlockNameDialog({
               onSave(name);
               onClose();
             } catch (err) {
-              setError(err instanceof Error ? err.message : 'Impossibile salvare il blocco.');
+              setError(err instanceof Error ? err.message : t('Unable to save the block.'));
             }
           }}
         >
           <label className="block-name">
-            Nome
+            {t('Name')}{' '}
             <input
               autoFocus
-              aria-label="Nome blocco"
+              aria-label={t('Block name')}
               maxLength={80}
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -59,10 +60,10 @@ export function BlockNameDialog({
           {error && <p role="alert">{error}</p>}
           <div className="dialog-actions">
             <button type="button" className="secondary-button" onClick={onClose}>
-              Annulla
+              {t('Cancel')}{' '}
             </button>
             <button className="primary-button" type="submit">
-              Salva blocco
+              {t('Save block')}{' '}
             </button>
           </div>
         </form>

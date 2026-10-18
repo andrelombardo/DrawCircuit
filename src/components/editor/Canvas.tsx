@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { GraphicView } from '../../circuit/annotations/GraphicView';
 import { BraceView } from '../../circuit/annotations/BraceView';
 import { ElectricalView } from '../../circuit/annotations/ElectricalView';
@@ -24,6 +25,7 @@ import { SidebarToggle } from '../toolbar/SidebarToggle';
 import { useCanvasInteractions } from './useCanvasInteractions';
 import { PropertiesInspector } from '../properties/PropertiesInspector';
 import { useInspectorPreferences } from '../properties/useInspectorPreferences';
+import { LanguageSwitcher } from '../toolbar/LanguageSwitcher';
 import { IconButton } from '../toolbar/IconButton';
 import logoUrl from '../../../assets/brand/drawcircuit-logo.svg?url';
 import { LoopArrowView } from '../../circuit/annotations/LoopArrowView';
@@ -48,7 +50,13 @@ export function Canvas(props: CanvasProps) {
     </SelectionActions>
   );
 }
-function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp, inspector, onShowInspector }: CanvasProps) {
+function CanvasContent({
+  sidebarVisible = true,
+  onToggleSidebar,
+  onHelp,
+  inspector,
+  onShowInspector,
+}: CanvasProps) {
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;
@@ -59,7 +67,7 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp, inspect
   useEffect(
     () =>
       useEditorStore.subscribe((s, previous) => {
-        if (s.tool === 'highlight' && previous.tool !== 'highlight')
+        if (['highlight', 'highlight-eraser'].includes(s.tool) && s.tool !== previous.tool)
           onShowInspector();
       }),
     [onShowInspector],
@@ -74,7 +82,8 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp, inspect
     gestureActive = useEditorStore((s) => Boolean(s.gestureStart)),
     wireRouting = useEditorStore((s) => s.wireRouting),
     arrowType = useEditorStore((s) => s.arrowType),
-    storageError = useEditorStore((s) => s.storageError);
+    storageError = useEditorStore((s) => s.storageError),
+    eraserSize = useEditorStore((s) => s.eraserSize);
   const personalBlocks = usePersonalBlocks((s) => s.blocks);
   const personalName = personalBlocks.find((b) => b.id === pendingPresetId)?.name;
   const interactions = useCanvasInteractions(svgRef, onToggleSidebar),
@@ -102,13 +111,13 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp, inspect
   );
   const smartHint =
     smart.preview?.phase === 'anchor-target'
-      ? 'Clic per ancorare · poi sposta e clicca per inserire'
+      ? t('Click to anchor · then move and click to place')
       : smart.preview?.phase === 'anchored'
-        ? 'Ancorato · clic per inserire e collegare · R ruota'
+        ? t('Anchored · click to place and connect · R rotates')
         : smart.preview?.phase === 'snapped'
-          ? 'Clic per inserire e collegare'
+          ? t('Click to place and connect')
           : smart.preview?.phase === 'inline-candidate'
-            ? 'Clic per inserire nel filo · una sola operazione Annulla'
+            ? t('Click to insert into the wire · one undo step')
             : null;
   let previewPath = '';
   if (draft && overlay.mouse) {
@@ -116,44 +125,57 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp, inspect
     const wire = wirePreview(draft, candidate, doc);
     previewPath = pointsPath(wirePoints(wire, doc));
   }
-  const hint = tool === 'highlight'
-    ? 'Trascina per evidenziare anche parte di fili e componenti · Esc torna a Selezione'
-    : tool === 'rectangle'
-      ? 'Trascina per disegnare · Shift quadrato · Option dal centro · Esc annulla'
-      : tool === 'line'
-        ? 'Trascina una linea decorativa · Shift aggancia a 45° · Esc annulla'
-        : tool === 'brace' || tool === 'bracket'
-          ? 'Trascina per raggruppare · doppio clic per l’etichetta · R ruota · Inverti lato nelle proprietà'
-          : tool === 'preset'
-            ? `${pendingPresetId ? (presetRegistry[pendingPresetId]?.name ?? personalName) : 'Blocco rapido'} · clicca per inserire · R ruota · Esc annulla`
-            : tool === 'current'
-              ? 'Corrente · clicca un filo evidenziato · Esc annulla'
-              : tool === 'polarity'
-                ? 'Polarità · clicca un componente evidenziato · Esc annulla'
-                : tool === 'voltage'
-                  ? interactions.voltageStart
-                    ? 'A selezionato · seleziona il secondo punto · Esc annulla'
-                    : 'Seleziona il primo punto · clicca o trascina verso il secondo · Esc annulla'
-                  : tool === 'wire'
-                    ? draft
-                      ? 'Clic per una svolta · Backspace torna indietro · Enter termina · Esc annulla'
-                      : 'Clicca un terminale, un nodo o un filo per iniziare'
-                    : tool === 'junction'
-                      ? 'Clicca per inserire nodi · Esc o V termina'
-                      : tool === 'text'
-                        ? 'Clicca per inserire Testo · doppio clic per modificarlo'
-                        : tool === 'loop-arrow'
-                          ? 'Trascina un’area per la maglia · handle sulla punta per spostarla'
-                          : tool === 'arrow'
-                            ? 'Trascina per disegnare · seleziona per modificare gli handle'
-                            : isComponent
-                              ? `${catalog.find((c) => c.type === tool)?.name} · clicca per inserire · R ruota · Esc termina`
-                              : tool === 'pan'
-                                ? 'Trascina per spostare la vista'
-                                : null;
+  const hint =
+    tool === 'highlight-eraser'
+      ? t('Click a highlight to delete it · drag to erase part · Esc returns to Select')
+      : tool === 'highlight'
+        ? t('Drag to highlight all or part of wires and components · Esc returns to Select')
+        : tool === 'rectangle'
+          ? t('Drag to draw · Shift for a square · Option from center · Esc cancels')
+          : tool === 'line'
+            ? t('Drag a decorative line · Shift snaps to 45° · Esc cancels')
+            : tool === 'brace' || tool === 'bracket'
+              ? t('Drag to group · double-click to label · R rotates · Flip side in Properties')
+              : tool === 'preset'
+                ? t('{name} · click to place · R rotates · Esc cancels', {
+                    name: pendingPresetId
+                      ? presetRegistry[pendingPresetId]
+                        ? t(presetRegistry[pendingPresetId].name)
+                        : (personalName ?? t('Quick block'))
+                      : t('Quick block'),
+                  })
+                : tool === 'current'
+                  ? t('Current · click a highlighted wire · Esc cancels')
+                  : tool === 'polarity'
+                    ? t('Polarity · click a highlighted component · Esc cancels')
+                    : tool === 'voltage'
+                      ? interactions.voltageStart
+                        ? t('A selected · select the second point · Esc cancels')
+                        : t('Select the first point · click or drag to the second · Esc cancels')
+                      : tool === 'wire'
+                        ? draft
+                          ? t(
+                              'Click to add a bend · Backspace goes back · Enter finishes · Esc cancels',
+                            )
+                          : t('Click a terminal, junction, or wire to start')
+                        : tool === 'junction'
+                          ? t('Click to place junctions · Esc or V finishes')
+                          : tool === 'text'
+                            ? t('Click to place text · double-click to edit')
+                            : tool === 'loop-arrow'
+                              ? t('Drag an area for the loop · drag the tip handle to move it')
+                              : tool === 'arrow'
+                                ? t('Drag to draw · select to edit handles')
+                                : isComponent
+                                  ? t('{name} · click to place · R rotates · Esc finishes', {
+                                      name: t(catalog.find((c) => c.type === tool)?.name ?? ''),
+                                    })
+                                  : tool === 'pan'
+                                    ? t('Drag to pan the view')
+                                    : null;
   return (
     <div className="editor-shell">
-      <main className="editor" aria-label="Editor circuito">
+      <main className="editor" aria-label={t('Circuit editor')}>
         <DrawingToolbar sidebarVisible={sidebarVisible} />
         {!sidebarVisible && (
           <SidebarToggle side="left" visible={false} onToggle={onToggleSidebar} />
@@ -161,36 +183,36 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp, inspect
         {storageError && (
           <div className="persistence-error floating-surface" role="alert">
             <CircleAlert size={12} />
-            Salvataggio locale non disponibile. Mantieni aperta la pagina e usa “Copia come immagine”.
+            {t('Local saving is unavailable. Keep this page open and use “Copy as image”.')}{' '}
           </div>
         )}
         {!inspector.preferences.visible && (
           <SidebarToggle side="right" visible={false} onToggle={inspector.toggle} />
         )}
         {tool === 'wire' && (
-          <div className="arrow-tool-options" role="group" aria-label="Routing fili">
+          <div className="arrow-tool-options" role="group" aria-label={t('Wire routing')}>
             {(['orthogonal', '45', 'free'] as const).map((routing, i) => (
               <button
                 key={routing}
                 aria-pressed={wireRouting === routing}
                 className={wireRouting === routing ? 'selected' : ''}
                 onClick={() => useEditorStore.getState().setWireRouting(routing)}
-                title="Shift+W cambia routing"
+                title={t('Shift+W changes routing')}
               >
-                {['Ortogonale', '45°', 'Libero'][i]}
+                {[t('Orthogonal'), '45°', t('Free')][i]}
               </button>
             ))}
           </div>
         )}
         {tool === 'arrow' && (
-          <div className="arrow-tool-options" aria-label="Forma freccia">
+          <div className="arrow-tool-options" aria-label={t('Arrow shape')}>
             {(['straight', 'curve'] as const).map((type, i) => (
               <button
                 key={type}
                 className={arrowType === type ? 'selected' : ''}
                 onClick={() => useEditorStore.getState().setArrowType(type)}
               >
-                {['Dritta', 'Curva'][i]}
+                {[t('Straight'), t('Curved')][i]}
               </button>
             ))}
           </div>
@@ -199,7 +221,7 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp, inspect
           ref={svgRef}
           tabIndex={0}
           className={`drawing-surface tool-${isComponent ? 'component' : tool}${interactions.space ? ' space-pan' : ''}${interactions.dragging ? ` dragging-${interactions.dragging}` : ''}${isComponent && smartHint ? (smart.preview?.phase === 'inline-candidate' ? ' smart-inline' : ' smart-connect') : ''}`}
-          aria-label="Foglio SVG del circuito"
+          aria-label={t('Circuit SVG sheet')}
           data-testid="circuit-canvas"
           data-focus-modality={focusModality}
           onKeyDown={(e) => {
@@ -248,7 +270,12 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp, inspect
               // A body click targets the object; a selected label retains its subtarget.
               else if (!(e.target as Element).closest('[data-label]')) s.setActiveLabel(null);
             }
-            setContextMenu({ x: e.clientX, y: e.clientY, canvasOnly: !id, key: Date.now() });
+            setContextMenu({
+              x: e.clientX,
+              y: e.clientY,
+              canvasOnly: !id,
+              key: Date.now(),
+            });
           }}
         >
           <defs>
@@ -268,14 +295,18 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp, inspect
             {!doc.objects.length && (
               <foreignObject x={-175} y={-110} width={350} height={250} pointerEvents="none">
                 <div className="empty-sheet">
-                  <div className="empty-circuit" aria-hidden="true"
-                    style={{ maskImage: `url("${logoUrl}")` }} />
-                  <h2>Le idee iniziano da un foglio.</h2>
+                  <div
+                    className="empty-circuit"
+                    aria-hidden="true"
+                    style={{ maskImage: `url("${logoUrl}")` }}
+                  />
+                  <h2>{t('Ideas start with a blank sheet.')}</h2>
                   <p>
-                    Scegli un componente dalla palette.<br />
-                    Un clic, e il tuo circuito prende forma.
+                    {t('Choose a component from the palette.')}
+                    <br />
+                    {t('One click brings your circuit to life.')}{' '}
                   </p>
-                  <span>Circuiti elettrici · appunti a mano</span>
+                  <span>{t('Electrical circuits · handwritten notes')}</span>
                 </div>
               </foreignObject>
             )}
@@ -377,12 +408,26 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp, inspect
               zoom={v.zoom}
             />
             <PresetPlacementLayer point={overlay.mouse} zoom={v.zoom} />
+            {tool === 'highlight-eraser' && overlay.mouse && (
+              <circle
+                className="eraser-preview"
+                data-testid="eraser-preview"
+                cx={overlay.mouse.x}
+                cy={overlay.mouse.y}
+                r={eraserSize / 2}
+                fill="rgba(110, 110, 115, 0.06)"
+                stroke="#6e6e73"
+                strokeWidth={1 / v.zoom}
+                strokeDasharray={`${3 / v.zoom} ${2 / v.zoom}`}
+                pointerEvents="none"
+              />
+            )}
           </g>
         </svg>
         {contextMenu && (
           <ActionMenu
             key={contextMenu.key}
-            label={contextMenu.canvasOnly ? 'Comandi canvas' : 'Comandi selezione'}
+            label={contextMenu.canvasOnly ? t('Canvas actions') : t('Selection actions')}
             items={contextItems}
             context={{
               ...contextMenu,
@@ -406,26 +451,26 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp, inspect
         )}
         <div className="editor-bottom">
           <div className="zoom-controls floating-surface">
-            <IconButton label="Riduci zoom" onClick={() => interactions.zoomAt(1 / 1.2)}>
+            <IconButton label={t('Zoom out')} onClick={() => interactions.zoomAt(1 / 1.2)}>
               <Minus size={15} />
             </IconButton>
             <button
               className="zoom-number"
-              aria-label="Adatta circuito alla vista"
-              title="Adatta circuito alla vista"
+              aria-label={t('Fit circuit to view')}
+              title={t('Fit circuit to view')}
               onClick={() => interactions.fit()}
             >
               {Math.round(v.zoom * 100)}%
             </button>
-            <IconButton label="Aumenta zoom" onClick={() => interactions.zoomAt(1.2)}>
+            <IconButton label={t('Zoom in')} onClick={() => interactions.zoomAt(1.2)}>
               <Plus size={15} />
             </IconButton>
             <div className="toolbar-divider" />
-            <IconButton label="Adatta alla vista (1)" onClick={() => interactions.fit()}>
+            <IconButton label={t('Fit to view (1)')} onClick={() => interactions.fit()}>
               <Maximize size={15} />
             </IconButton>
             <IconButton
-              label="Griglia (G)"
+              label={t('Grid (G)')}
               active={grid}
               onClick={() => useEditorStore.getState().toggleGrid()}
             >
@@ -435,13 +480,17 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp, inspect
           {hint && (
             <div className={`placement-feedback${isComponent ? ' has-placement-controls' : ''}`}>
               {isComponent && inlineCompatible(tool as ComponentType) && (
-                <div className="placement-controls" role="group" aria-label="Assistenze placement">
+                <div
+                  className="placement-controls"
+                  role="group"
+                  aria-label={t('Placement assistance')}
+                >
                   <button
                     aria-pressed={smart.session.kind === 'inline'}
                     onClick={smart.toggleInline}
-                    title="Attiva l’inserimento solo quando l’anteprima mostra il taglio del filo"
+                    title={t('Enable insertion only when the preview shows the wire being split')}
                   >
-                    Inserisci in filo
+                    {t('Insert into wire')}{' '}
                   </button>
                 </div>
               )}
@@ -451,7 +500,8 @@ function CanvasContent({ sidebarVisible = true, onToggleSidebar, onHelp, inspect
             </div>
           )}
         </div>
-        <IconButton label="Aiuto" className="help-control floating-surface" onClick={onHelp}>
+        <LanguageSwitcher />
+        <IconButton label={t('Help')} className="help-control floating-surface" onClick={onHelp}>
           <HelpCircle size={18} />
         </IconButton>
       </main>

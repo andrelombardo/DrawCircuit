@@ -1,4 +1,4 @@
-import { highlightDrawing } from '../annotations/highlight';
+import { highlightDrawing, highlightPaintGroups } from '../annotations/highlight';
 import { dashPattern } from '../utils/strokeStyle';
 import type { StrokeStyle } from '../model/types';
 import { drawingWireGaps, translucentCrossing } from '../utils/wireRendering';
@@ -86,14 +86,17 @@ export function exportSVG(
   };
   const path = (d: string, color: string, width: number, cap = 'round', style: StrokeStyle = {}) =>
     `<path d="${attr(d)}" fill="none" stroke="${color}" stroke-width="${f(width)}" stroke-linecap="${cap}" stroke-linejoin="round"${dashPattern(style, width) ? ` stroke-dasharray="${dashPattern(style, width)!.map(f).join(' ')}"` : ''}/>`;
-  for (const o of doc.objects)
-    if (o.kind === 'highlight') {
-      const drawing = highlightDrawing(o, doc);
-      if (drawing.length) {
-        boxes.push(visualBounds(o, doc));
-        parts.push(`<g opacity="${f(o.opacity)}">${drawing.map((stroke) => path(stroke.d, o.color, stroke.width)).join('')}</g>`);
-      }
-    }
+  for (const group of highlightPaintGroups(doc)) {
+    const content = group
+      .map((object) => {
+        boxes.push(visualBounds(object, doc));
+        return highlightDrawing(object, doc)
+          .map((stroke) => path(stroke.d, object.color, stroke.width))
+          .join('');
+      })
+      .join('');
+    if (content) parts.push(`<g opacity="${f(group[0].opacity)}">${content}</g>`);
+  }
   for (const o of doc.objects) {
     if (o.kind === 'rectangle') {
       boxes.push({
@@ -145,8 +148,7 @@ export function exportSVG(
   }
   for (const o of doc.objects.filter(
     (o) =>
-      o.kind !== 'highlight' &&
-      o.kind !== 'wire' && o.kind !== 'rectangle' && o.kind !== 'line',
+      o.kind !== 'highlight' && o.kind !== 'wire' && o.kind !== 'rectangle' && o.kind !== 'line',
   )) {
     const firstPart = parts.length;
     if (o.kind !== 'text' && o.kind !== 'electrical') boxes.push(visualBounds(o, doc));

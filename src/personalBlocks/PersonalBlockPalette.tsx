@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useEditorCommands } from '../components/properties/EditorCommandContext';
 import { useRef, useState } from 'react';
 import { ChevronDown, Pencil, Trash2, Undo2 } from 'lucide-react';
@@ -15,30 +16,34 @@ export function PersonalBlockPalette({ search }: { search: string }) {
   const file = useRef<HTMLInputElement>(null);
   const pending = useEditorStore((s) => s.pendingPresetId);
   return (
-    <section className="personal-blocks" aria-label="Blocchi personali">
+    <section className="personal-blocks" aria-label={t('Personal blocks')}>
       <button
         className="group-heading"
         aria-expanded={open || !!search}
         onClick={() => setOpen((v) => !v)}
       >
         <span>
-          Blocchi personali <span className="count">{blocks.length}</span>
+          {t('Personal blocks')} <span className="count">{blocks.length}</span>
         </span>
         <ChevronDown size={14} className={!open && !search ? 'collapsed' : ''} />
       </button>
       {lastRemoved && (
         <div className="personal-block-recovery" role="status">
-          <span>«{lastRemoved.block.name}» eliminato.</span>
+          <span>{t('“{name}” deleted.', { name: lastRemoved.block.name })}</span>
           <button
             onClick={() => {
               try {
                 usePersonalBlocks.getState().restoreRemoved();
               } catch (error) {
-                useEditorStore.getState().notify(error instanceof Error ? error.message : 'Impossibile ripristinare il blocco.');
+                useEditorStore
+                  .getState()
+                  .notify(
+                    error instanceof Error ? error.message : t('Unable to restore the block.'),
+                  );
               }
             }}
           >
-            <Undo2 size={14} /> Annulla eliminazione
+            <Undo2 size={14} /> {t('Undo deletion')}{' '}
           </button>
         </div>
       )}
@@ -50,23 +55,27 @@ export function PersonalBlockPalette({ search }: { search: string }) {
               <div className="personal-block-row" key={b.id}>
                 <button
                   className={pending === b.id ? 'chosen' : ''}
-                  aria-label={`Inserisci blocco personale: ${b.name}`}
-                  title={`${b.name} · clicca e posiziona · R ruota`}
+                  aria-label={t('Insert personal block: {name}', {
+                    name: b.name,
+                  })}
+                  title={t('{name} \u00b7 click to place \u00b7 R rotates', {
+                    name: b.name,
+                  })}
                   onClick={() => useEditorStore.getState().selectPreset(b.id)}
                 >
                   {b.name}
                 </button>
                 <button
-                  aria-label={`Rinomina blocco ${b.name}`}
-                  title="Rinomina"
+                  aria-label={t('Rename block {name}', { name: b.name })}
+                  title={t('Rename')}
                   onClick={() => setRenaming(b.id)}
                 >
                   <Pencil size={14} />
                 </button>
                 <button
                   className="destructive-button"
-                  aria-label={`Elimina blocco ${b.name}`}
-                  title="Elimina dalla libreria"
+                  aria-label={t('Delete block {name}', { name: b.name })}
+                  title={t('Delete from library')}
                   onClick={() => {
                     usePersonalBlocks.getState().remove(b.id);
                     if (pending === b.id) useEditorStore.getState().setTool('select');
@@ -78,7 +87,7 @@ export function PersonalBlockPalette({ search }: { search: string }) {
             ))}
           {!blocks.length && (
             <p className="personal-empty">
-              Seleziona elementi sul foglio e scegli “Salva come blocco”.
+              {t('Select elements on the sheet and choose “Save as block”.')}{' '}
             </p>
           )}
           <button
@@ -86,10 +95,10 @@ export function PersonalBlockPalette({ search }: { search: string }) {
             disabled={!selected}
             onClick={commands.saveBlock}
           >
-            Salva selezione come blocco
+            {t('Save selection as block')}{' '}
           </button>
           <div className="personal-library-actions">
-            <button onClick={() => file.current?.click()}>Importa blocchi</button>
+            <button onClick={() => file.current?.click()}>{t('Import blocks')}</button>
           </div>
         </>
       )}
@@ -103,18 +112,18 @@ export function PersonalBlockPalette({ search }: { search: string }) {
         ref={file}
         type="file"
         accept=".json,application/json"
-        aria-label="Importa blocchi personali"
+        aria-label={t('Import personal blocks')}
         onChange={async (e) => {
           const f = e.currentTarget.files?.[0];
           e.currentTarget.value = '';
           if (!f) return;
           try {
-            if (f.size > 10_000_000) throw new Error('Il file supera 10 MB.');
+            if (f.size > 10_000_000) throw new Error(t('The file exceeds 10 MB.'));
             usePersonalBlocks.getState().import(await f.text());
           } catch (err) {
             useEditorStore
               .getState()
-              .notify(err instanceof Error ? err.message : 'Libreria non valida.');
+              .notify(err instanceof Error ? err.message : t('Invalid library.'));
           }
         }}
       />

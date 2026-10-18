@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { useMemo } from 'react';
 import { componentRegistry } from '../model/catalog';
 import type { CircuitDocument, ComponentType, Endpoint, Point, Viewport } from '../model/types';
@@ -146,8 +147,11 @@ export function PlacementLayer({
             transform={`translate(${preview.position.x} ${preview.position.y}) rotate(${preview.rotation})`}
             opacity={preview.phase === 'free' || preview.phase === 'anchor-target' ? 0.4 : 0.7}
           >
-            <Symbol type={type} bodyText={componentRegistry[type].internalText}
-              rotation={preview.rotation} />
+            <Symbol
+              type={type}
+              bodyText={componentRegistry[type].internalText}
+              rotation={preview.rotation}
+            />
           </g>
           {ts.map((t) => {
             const p = add(
@@ -194,7 +198,7 @@ export function PlacementLayer({
           textAnchor="middle"
           fill="#21795d"
         >
-          Inserisci nel filo · clic per confermare
+          {t('Insert into wire · click to confirm')}{' '}
         </text>
       )}
     </g>

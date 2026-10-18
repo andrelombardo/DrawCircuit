@@ -1,4 +1,11 @@
-import type { CircuitComponent, CircuitDocument, Highlight, HighlightSpan, Point } from '../model/types';
+import type {
+  CircuitComponent,
+  CircuitDocument,
+  Highlight,
+  HighlightSpan,
+  HighlightCurve,
+  Point,
+} from '../model/types';
 import { componentRegistry } from '../model/catalog';
 import {
   distance,
@@ -16,12 +23,12 @@ export const DEFAULT_HIGHLIGHT = {
   width: 12,
 } as const;
 export const HIGHLIGHT_COLORS = {
-  Giallo: '#FACC15',
-  Arancione: '#FDBA74',
-  Rosa: '#F9A8D4',
-  Verde: '#86EFAC',
-  Azzurro: '#7DD3FC',
-  Viola: '#C4B5FD',
+  Yellow: '#FACC15',
+  Orange: '#FDBA74',
+  Pink: '#F9A8D4',
+  Green: '#86EFAC',
+  'Sky blue': '#7DD3FC',
+  Purple: '#C4B5FD',
 };
 export const routeLength = (points: Point[]) =>
   points.slice(1).reduce((sum, point, i) => sum + distance(points[i], point), 0);
@@ -35,7 +42,6 @@ function hostById(doc: CircuitDocument, id: string) {
   return index.get(id);
 }
 
-
 /** Target the symbol body, leaving wire gestures on its leads available. */
 export function highlightComponentAt(doc: CircuitDocument, point: Point, tolerance: number) {
   return [...doc.objects].reverse().find((o) => {
@@ -43,8 +49,10 @@ export function highlightComponentAt(doc: CircuitDocument, point: Point, toleran
     const p = rotatePoint({ x: point.x - o.x, y: point.y - o.y }, -o.rotation);
     const b = componentRegistry[o.type].measurementBounds;
     return (
-      p.x >= b.x - tolerance && p.x <= b.x + b.width + tolerance &&
-      p.y >= b.y - tolerance && p.y <= b.y + b.height + tolerance
+      p.x >= b.x - tolerance &&
+      p.x <= b.x + b.width + tolerance &&
+      p.y >= b.y - tolerance &&
+      p.y <= b.y + b.height + tolerance
     );
   });
 }
@@ -76,11 +84,14 @@ export function componentHighlightRoute(component: CircuitComponent, terminalId:
   const b = componentRegistry[component.type].measurementBounds;
   const local = [
     { x: terminal.localX, y: terminal.localY },
-    { x: Math.max(b.x, Math.min(b.x + b.width, terminal.localX)),
-      y: Math.max(b.y, Math.min(b.y + b.height, terminal.localY)) },
+    {
+      x: Math.max(b.x, Math.min(b.x + b.width, terminal.localX)),
+      y: Math.max(b.y, Math.min(b.y + b.height, terminal.localY)),
+    },
     { x: b.x + b.width / 2, y: b.y + b.height / 2 },
   ];
-  return local.filter((p, i) => !i || distance(p, local[i - 1]) > 1e-7)
+  return local
+    .filter((p, i) => !i || distance(p, local[i - 1]) > 1e-7)
     .map((p) => localToWorld(component, p));
 }
 export function highlightSpanPoints(span: HighlightSpan, doc: CircuitDocument): Point[] {
@@ -90,15 +101,17 @@ export function highlightSpanPoints(span: HighlightSpan, doc: CircuitDocument): 
 }
 export function highlightSpanExists(span: HighlightSpan, doc: CircuitDocument) {
   const host = hostById(doc, highlightSpanHost(span));
-  return 'wireId' in span ? host?.kind === 'wire' :
-    host?.kind === 'component' && host.terminals.some((t) => t.id === span.terminalId);
+  return 'wireId' in span
+    ? host?.kind === 'wire'
+    : host?.kind === 'component' && host.terminals.some((t) => t.id === span.terminalId);
 }
 
 /** Legacy detached body patches do not take the main route's endpoint handles. */
 export function highlightEndpointIndices(object: Extract<Highlight, { mode: 'free' }>) {
   const ends = [...(object.breaks ?? []), object.points.length];
   const main = ends.map((_, i) => i).filter((i) => !object.widthOffsets?.[i]);
-  const first = main[0] ?? 0, last = main.at(-1) ?? ends.length - 1;
+  const first = main[0] ?? 0,
+    last = main.at(-1) ?? ends.length - 1;
   return [first ? ends[first - 1] : 0, ends[last] - 1];
 }
 
@@ -229,43 +242,103 @@ function freehandCurves(points: Point[]) {
     return { start, end, a: control(i, true), b: control(i + 1, false) };
   });
 }
-function smoothPath(points: Point[]) {
-  if (points.length < 3) return pointsPath(points);
-  return (
-    pointsPath([points[0]]) +
-    freehandCurves(points)
-      .map(({ a, b, end }) => ` C ${a.x} ${a.y} ${b.x} ${b.y} ${end.x} ${end.y}`)
-      .join('')
-  );
+export interface HighlightBezier extends HighlightCurve {
+  start: Point;
+  end: Point;
 }
-/** Every route uses the chosen width, including legacy detached body patches.
- * The renderer groups opacity so overlapping routes cannot create dark seams. */
+/** Resolve both legacy strokes and exact fragments through one vector geometry path. */
+export function highlightCurves(object: Highlight, doc: CircuitDocument): HighlightBezier[][] {
+  let offset = 0;
+  return highlightRoutes(object, doc).map((points) => {
+    const curves =
+      object.mode === 'free' && object.curves
+        ? points
+            .slice(1)
+            .map((end, i) => ({ start: points[i], end, ...object.curves![offset + i] }))
+        : object.mode === 'free' && object.smoothing !== false
+          ? freehandCurves(points)
+          : points.slice(1).map((end, i) => ({
+              start: points[i],
+              end,
+              a: {
+                x: points[i].x + (end.x - points[i].x) / 3,
+                y: points[i].y + (end.y - points[i].y) / 3,
+              },
+              b: {
+                x: points[i].x + ((end.x - points[i].x) * 2) / 3,
+                y: points[i].y + ((end.y - points[i].y) * 2) / 3,
+              },
+            }));
+    offset += points.length;
+    return curves;
+  });
+}
+/** Every route uses the chosen width; a single opacity group prevents dark seams. */
 export function highlightDrawing(object: Highlight, doc: CircuitDocument) {
-  return highlightRoutes(object, doc).map((points) => ({
-    points,
-    d: object.mode === 'free' && object.smoothing !== false ? smoothPath(points) : pointsPath(points),
+  return highlightCurves(object, doc).map((curves) => ({
+    points: curves.length ? [curves[0].start, ...curves.map((c) => c.end)] : [],
+    d: curves.length
+      ? pointsPath([curves[0].start]) +
+        curves.map(({ a, b, end }) => ` C ${a.x} ${a.y} ${b.x} ${b.y} ${end.x} ${end.y}`).join('')
+      : '',
     width: object.width,
   }));
 }
 export function highlightBounds(object: Highlight, doc: CircuitDocument) {
-  let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
-  for (const { points, width } of highlightDrawing(object, doc)) {
-    const include = (p: Point) => {
-      left = Math.min(left, p.x - width / 2);
-      top = Math.min(top, p.y - width / 2);
-      right = Math.max(right, p.x + width / 2);
-      bottom = Math.max(bottom, p.y + width / 2);
-    };
-    points.forEach(include);
-    if (object.mode === 'free' && object.smoothing !== false)
-      for (const { a, b } of freehandCurves(points)) { include(a); include(b); }
+  let left = Infinity,
+    top = Infinity,
+    right = -Infinity,
+    bottom = -Infinity;
+  for (const curves of highlightCurves(object, doc)) {
+    for (const curve of curves)
+      for (const p of [curve.start, curve.a, curve.b, curve.end]) {
+        left = Math.min(left, p.x - object.width / 2);
+        top = Math.min(top, p.y - object.width / 2);
+        right = Math.max(right, p.x + object.width / 2);
+        bottom = Math.max(bottom, p.y + object.width / 2);
+      }
   }
   return Number.isFinite(left)
     ? { x: left, y: top, width: right - left, height: bottom - top }
     : { x: 0, y: 0, width: 0, height: 0 };
 }
+/** Transform anchors and explicit controls together for move, rotate, copy, and blocks. */
+export function mapHighlight(object: Highlight, transform: (point: Point) => Point): Highlight {
+  return object.mode === 'free'
+    ? {
+        ...object,
+        points: object.points.map(transform),
+        ...(object.curves
+          ? { curves: object.curves.map(({ a, b }) => ({ a: transform(a), b: transform(b) })) }
+          : {}),
+      }
+    : object;
+}
+export function moveHighlightEndpoint(
+  object: Extract<Highlight, { mode: 'free' }>,
+  first: boolean,
+  point: Point,
+): Highlight {
+  const index = highlightEndpointIndices(object)[first ? 0 : 1];
+  const delta = { x: point.x - object.points[index].x, y: point.y - object.points[index].y };
+  const move = (p: Point) => ({ x: p.x + delta.x, y: p.y + delta.y });
+  return {
+    ...object,
+    points: object.points.map((p, i) => (i === index ? point : p)),
+    ...(object.curves
+      ? {
+          curves: object.curves.map((curve, i) => ({
+            a: i === index ? move(curve.a) : curve.a,
+            b: i + 1 === index ? move(curve.b) : curve.b,
+          })),
+        }
+      : {}),
+  };
+}
 export const highlightPath = (object: Highlight, doc: CircuitDocument) =>
-  highlightDrawing(object, doc).map((stroke) => stroke.d).join(' ');
+  highlightDrawing(object, doc)
+    .map((stroke) => stroke.d)
+    .join(' ');
 
 export function detachHighlight(object: Highlight, doc: CircuitDocument): Highlight {
   if (object.mode === 'free') return object;
@@ -273,8 +346,13 @@ export function detachHighlight(object: Highlight, doc: CircuitDocument): Highli
   let count = 0;
   const breaks = drawing.slice(0, -1).map((stroke) => (count += stroke.points.length));
   return {
-    kind: 'highlight', id: object.id, mode: 'free', color: object.color,
-    width: object.width, opacity: object.opacity, smoothing: false,
+    kind: 'highlight',
+    id: object.id,
+    mode: 'free',
+    color: object.color,
+    width: object.width,
+    opacity: object.opacity,
+    smoothing: false,
     points: drawing.flatMap((stroke) => stroke.points),
     ...(breaks.length ? { breaks } : {}),
   };
@@ -291,7 +369,9 @@ export function reconcileHighlights(
     if (
       o.kind !== 'highlight' ||
       o.mode === 'free' ||
-      (o.mode === 'smart' ? o.spans.every((s) => highlightSpanExists(s, next)) : components.has(o.componentId))
+      (o.mode === 'smart'
+        ? o.spans.every((s) => highlightSpanExists(s, next))
+        : components.has(o.componentId))
     )
       return o;
     const original = previous.objects.find((p) => p.id === o.id);
@@ -348,4 +428,18 @@ export function remapHighlightSpans(
       return spans.length ? { ...o, spans } : detachHighlight(o, previous);
     }),
   };
+}
+
+/** Fragments remain independently editable but share their original paint opacity.
+ * This keeps untouched self-overlaps from darkening after a stroke is split. */
+export function highlightPaintGroups(doc: CircuitDocument): Highlight[][] {
+  const groups = new Map<string, Highlight[]>();
+  for (const object of doc.objects) {
+    if (object.kind !== 'highlight') continue;
+    const key = `${object.paintGroup ?? object.id}:${object.color}:${object.opacity}`;
+    const group = groups.get(key);
+    if (group) group.push(object);
+    else groups.set(key, [object]);
+  }
+  return [...groups.values()];
 }

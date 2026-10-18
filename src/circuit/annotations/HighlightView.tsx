@@ -4,10 +4,12 @@ export function HighlightView({
   object,
   doc,
   interactive = true,
+  grouped = false,
 }: {
   object: Highlight;
   doc: CircuitDocument;
   interactive?: boolean;
+  grouped?: boolean;
 }) {
   return (
     <g
@@ -15,7 +17,7 @@ export function HighlightView({
       className="circuit-object highlight-stroke"
       fill="none"
       stroke={object.color}
-      opacity={object.opacity}
+      opacity={grouped ? undefined : object.opacity}
       strokeLinecap="round"
       strokeLinejoin="round"
     >

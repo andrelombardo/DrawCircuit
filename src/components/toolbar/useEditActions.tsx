@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import {
   BookmarkPlus,
   ClipboardPaste,
@@ -38,7 +39,7 @@ export function useEditActions(canvasOnly = false) {
   const selectionItems: MenuAction[] = [
     {
       id: 'cut',
-      label: 'Taglia',
+      label: t('Cut'),
       shortcut: shortcut('X'),
       icon: <Scissors size={15} />,
       disabled: !selected,
@@ -46,7 +47,7 @@ export function useEditActions(canvasOnly = false) {
     },
     {
       id: 'copy',
-      label: 'Copia',
+      label: t('Copy'),
       shortcut: shortcut('C'),
       icon: <Copy size={15} />,
       disabled: !selected,
@@ -54,7 +55,7 @@ export function useEditActions(canvasOnly = false) {
     },
     {
       id: 'duplicate',
-      label: 'Duplica',
+      label: t('Duplicate'),
       shortcut: shortcut('D'),
       icon: <CopyPlus size={15} />,
       disabled: !selected,
@@ -64,7 +65,7 @@ export function useEditActions(canvasOnly = false) {
     // cannot reliably predict availability, so keep Paste reachable on every canvas.
     {
       id: 'paste',
-      label: 'Incolla',
+      label: t('Paste'),
       shortcut: shortcut('V'),
       icon: <ClipboardPaste size={15} />,
       onSelect: () => void state().paste(),
@@ -72,7 +73,7 @@ export function useEditActions(canvasOnly = false) {
   ];
   const remove: MenuAction = {
     id: 'delete',
-    label: activeLabel && selected ? 'Elimina etichetta' : 'Elimina',
+    label: activeLabel && selected ? t('Delete label') : t('Delete'),
     shortcut: isMac() ? '⌫' : 'Delete',
     icon: <Trash2 size={15} />,
     disabled: !selected,
@@ -81,7 +82,7 @@ export function useEditActions(canvasOnly = false) {
   };
   const selectAll: MenuAction = {
     id: 'all',
-    label: 'Seleziona tutto',
+    label: t('Select all'),
     shortcut: shortcut('A'),
     icon: <Scan size={15} />,
     disabled: !document.objects.length,
@@ -95,8 +96,8 @@ export function useEditActions(canvasOnly = false) {
       contextItems.push({
         id: 'replace',
         label: objects.every((o) => o.kind === 'component')
-          ? 'Sostituisci…'
-          : 'Sostituisci componenti…',
+          ? t('Replace…')
+          : t('Replace components…'),
         icon: <Replace size={15} />,
         separatorBefore: true,
         onSelect: commands.replace,
@@ -107,7 +108,7 @@ export function useEditActions(canvasOnly = false) {
       if (!hasCurrent)
         contextItems.push({
           id: 'current',
-          label: 'Corrente sul filo',
+          label: t('Current on wire'),
           icon: <CurrentInlineIcon size={15} />,
           separatorBefore: true,
           onSelect: () => {
@@ -118,18 +119,18 @@ export function useEditActions(canvasOnly = false) {
         });
       contextItems.push({
         id: 'split',
-        label: 'Dividi filo…',
+        label: t('Split wire…'),
         separatorBefore: hasCurrent,
         onSelect: () => {
           state().setSplitWire(wire.id);
-          state().notify('Clicca il filo nel punto da dividere · Esc annulla.');
+          state().notify(t('Click the wire where you want to split it · Esc cancels.'));
         },
       });
     }
     contextItems.push(
       {
         id: 'image',
-        label: 'Copia come immagine',
+        label: t('Copy as image'),
         icon: <ClipboardCopy size={15} />,
         separatorBefore: true,
         disabled: commands.imageBusy,
@@ -137,7 +138,7 @@ export function useEditActions(canvasOnly = false) {
       },
       {
         id: 'block',
-        label: 'Salva come blocco',
+        label: t('Save as block'),
         icon: <BookmarkPlus size={15} />,
         onSelect: commands.saveBlock,
       },

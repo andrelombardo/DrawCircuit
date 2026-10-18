@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import { remapHighlightSpans } from '../annotations/highlight';
 import { createCurrent, currentWireAnchor } from '../annotations/electrical';
 import { placeNodeLabel } from './nodeLabels';
@@ -40,7 +41,8 @@ export function wireEndAtPoint(p: Point, wire: Wire, doc: CircuitDocument, zoom:
   const points = wirePoints(wire, doc);
   const length = points.slice(1).reduce((sum, point, i) => sum + distance(points[i], point), 0);
   const radius = Math.min(WIRE_ENDPOINT_HIT_PX / zoom, length / 4);
-  const start = distance(p, points[0]), end = distance(p, points.at(-1)!);
+  const start = distance(p, points[0]),
+    end = distance(p, points.at(-1)!);
   if (Math.min(start, end) > radius) return null;
   return start <= end ? 'start' : 'end';
 }
@@ -130,21 +132,33 @@ export function wireEndpointCandidate(
 export function resolveWireCandidate(doc: CircuitDocument, candidate: WireCandidate) {
   if (candidate.kind !== 'wire') return { doc, endpoint: candidate.endpoint };
   const wire = doc.objects.find((o) => o.id === candidate.wireId);
-  if (wire?.kind !== 'wire') throw new Error('Filo di collegamento inesistente.');
-  const points = wirePoints(wire, doc), point = candidate.point;
-  const side = distance(point, points[0]) < 0.001 ? 'startEndpoint'
-    : distance(point, points.at(-1)!) < 0.001 ? 'endEndpoint' : null;
+  if (wire?.kind !== 'wire') throw new Error(t('Wire connection does not exist.'));
+  const points = wirePoints(wire, doc),
+    point = candidate.point;
+  const side =
+    distance(point, points[0]) < 0.001
+      ? 'startEndpoint'
+      : distance(point, points.at(-1)!) < 0.001
+        ? 'endEndpoint'
+        : null;
   if (side && (wire[side].kind !== 'free' || wire[side].connectionId))
     return { doc, endpoint: wire[side] };
-  const endpoint: Endpoint = { kind: 'free', point: { ...point }, connectionId: makeId() };
+  const endpoint: Endpoint = {
+    kind: 'free',
+    point: { ...point },
+    connectionId: makeId(),
+  };
   if (side) {
     return {
-      doc: { ...doc, objects: doc.objects.map((o) => o.id === wire.id ? { ...wire, [side]: endpoint } : o) },
+      doc: {
+        ...doc,
+        objects: doc.objects.map((o) => (o.id === wire.id ? { ...wire, [side]: endpoint } : o)),
+      },
       endpoint,
     };
   }
   const result = splitWireAtPoint(doc, wire.id, point, endpoint);
-  if (!result) throw new Error('Punto di collegamento esterno al filo.');
+  if (!result) throw new Error(t('Connection point is outside the wire.'));
   return { doc: result.doc, endpoint };
 }
 
@@ -223,7 +237,10 @@ export function commitWire(doc: CircuitDocument, draft: WireDraft, candidate: Wi
   )
     return null;
   return {
-    doc: normalizeDocumentWires({ ...resolved.doc, objects: [...resolved.doc.objects, wire] }),
+    doc: normalizeDocumentWires({
+      ...resolved.doc,
+      objects: [...resolved.doc.objects, wire],
+    }),
     wireId: wire.id,
   };
 }
@@ -254,7 +271,10 @@ export function wireCandidate(
   if (terminal) return terminal;
   const target = nearestTarget(p, doc, 14 / zoom, excluded);
   if (target)
-    return { ...target, kind: target.endpoint.kind === 'terminal' ? 'terminal' : 'junction' };
+    return {
+      ...target,
+      kind: target.endpoint.kind === 'terminal' ? 'terminal' : 'junction',
+    };
   const hit = nearestWire(p, doc, 12 / zoom, excluded);
   if (hit) {
     const a = hit.points[hit.segment],
@@ -301,7 +321,10 @@ export function normalizeWire(wire: Wire, doc: CircuitDocument): Wire {
   const route = JSON.stringify(simplifyPolyline(wirePoints(wire, doc)));
   // Removing a stored point is safe only if the routed geometry remains identical.
   for (let i = result.vertices.length - 1; i >= 0; i--) {
-    const candidate = { ...result, vertices: result.vertices.filter((_, n) => n !== i) };
+    const candidate = {
+      ...result,
+      vertices: result.vertices.filter((_, n) => n !== i),
+    };
     if (JSON.stringify(simplifyPolyline(wirePoints(candidate, doc))) === route) result = candidate;
   }
   return result;
@@ -351,7 +374,13 @@ export function insertJunction(
     const key = JSON.stringify(endpoint);
     if (linked.has(key)) return;
     linked.add(key);
-    objects.push({ ...wire, id: makeId(), startEndpoint: endpoint, endEndpoint: ep, vertices: [] });
+    objects.push({
+      ...wire,
+      id: makeId(),
+      startEndpoint: endpoint,
+      endEndpoint: ep,
+      vertices: [],
+    });
   };
   const splitIds = new Map<string, string[]>();
   for (const o of doc.objects) {
@@ -388,8 +417,17 @@ export function insertJunction(
       bridge(o.endEndpoint, o);
       objects.push({ ...o, endEndpoint: ep });
     } else {
-      objects.push({ ...o, endEndpoint: ep, vertices: pts.slice(1, segment + 1) });
-      objects.push({ ...o, id: makeId(), startEndpoint: ep, vertices: pts.slice(segment + 1, -1) });
+      objects.push({
+        ...o,
+        endEndpoint: ep,
+        vertices: pts.slice(1, segment + 1),
+      });
+      objects.push({
+        ...o,
+        id: makeId(),
+        startEndpoint: ep,
+        vertices: pts.slice(segment + 1, -1),
+      });
     }
     splitIds.set(
       o.id,
@@ -468,10 +506,21 @@ export function splitWireAtPoint(
   );
   if (segment < 0 || distance(point, pts[0]) < 0.001 || distance(point, pts.at(-1)!) < 0.001)
     return null;
-  if (!connection &&
-    (nearestTarget(point, doc, 0.01) || nearestWire(point, doc, 0.01, new Set([id])))) return null;
-  const ep: Endpoint = connection ?? { kind: 'free', point: { ...point }, connectionId: makeId() };
-  const first: Wire = { ...wire, endEndpoint: ep, vertices: pts.slice(1, segment + 1) };
+  if (
+    !connection &&
+    (nearestTarget(point, doc, 0.01) || nearestWire(point, doc, 0.01, new Set([id])))
+  )
+    return null;
+  const ep: Endpoint = connection ?? {
+    kind: 'free',
+    point: { ...point },
+    connectionId: makeId(),
+  };
+  const first: Wire = {
+    ...wire,
+    endEndpoint: ep,
+    vertices: pts.slice(1, segment + 1),
+  };
   const second: Wire = {
     ...wire,
     id: makeId(),

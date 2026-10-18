@@ -1,10 +1,16 @@
-import { beginSmartHighlight, advanceSmartHighlight, nearestSmartHighlight } from '../../annotations/smartHighlight';
+import { HighlightEraserGesture } from '../../annotations/eraseHighlight';
+import { t } from '../../i18n';
+import {
+  beginSmartHighlight,
+  advanceSmartHighlight,
+  nearestSmartHighlight,
+} from '../../annotations/smartHighlight';
 import type { SmartHighlightTrace } from '../../annotations/smartHighlight';
 import {
   highlightPoints,
   highlightComponentAt,
   highlightSpanPoints,
-  highlightEndpointIndices,
+  moveHighlightEndpoint,
   projectHighlight,
   routeLength,
   simplifyHighlight,
@@ -75,8 +81,14 @@ import { useSmartPlacement } from '../../smartPlacement/useSmartPlacement';
 import { isMac } from '../../utils/platform';
 import { clampZoom, readZoomPreference, saveZoomPreference } from './zoomPreferences';
 type Drag =
-  | { type: 'highlight'; object: Highlight; points: Point[]; tolerance: number;
-      smart?: SmartHighlightTrace }
+  | { type: 'highlight-eraser'; session: HighlightEraserGesture }
+  | {
+      type: 'highlight';
+      object: Highlight;
+      points: Point[];
+      tolerance: number;
+      smart?: SmartHighlightTrace;
+    }
   | { type: 'pan'; screen: Point; view: Viewport }
   | {
       type: 'move' | 'label' | 'handle';
@@ -131,7 +143,11 @@ export function useCanvasInteractions(
   onToggleSidebar?: () => void,
 ) {
   const [initialZoom] = useState(readZoomPreference);
-  const [viewport, setViewport] = useState<Viewport>({ x: 600, y: 340, zoom: initialZoom ?? 1 });
+  const [viewport, setViewport] = useState<Viewport>({
+    x: 600,
+    y: 340,
+    zoom: initialZoom ?? 1,
+  });
   useEffect(() => saveZoomPreference(viewport.zoom), [viewport.zoom]);
   const [surfaceSize, setSurfaceSize] = useState({ width: 1200, height: 700 });
   const previousSurface = useRef<{ width: number; height: number } | null>(null);
@@ -369,12 +385,25 @@ export function useCanvasInteractions(
       // Buttons and other controls retain native Space/Enter activation and
       // navigation keys. Drawing shortcuts also work immediately after choosing
       // a palette/tool button, without requiring a first click on the sheet.
-      if (!e.ctrlKey && !e.metaKey &&
-        [' ', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
-          'Home', 'End', 'PageUp', 'PageDown'].includes(e.key) &&
-        e.target instanceof Element && e.target.closest(
-          'button, summary, [role="button"], [role="separator"], [role="slider"]',
-        )) return;
+      if (
+        !e.ctrlKey &&
+        !e.metaKey &&
+        [
+          ' ',
+          'Enter',
+          'ArrowLeft',
+          'ArrowRight',
+          'ArrowUp',
+          'ArrowDown',
+          'Home',
+          'End',
+          'PageUp',
+          'PageDown',
+        ].includes(e.key) &&
+        e.target instanceof Element &&
+        e.target.closest('button, summary, [role="button"], [role="separator"], [role="slider"]')
+      )
+        return;
       modifierKey(e);
       const s = useEditorStore.getState(),
         mod = e.ctrlKey || e.metaKey;
@@ -535,8 +564,11 @@ export function useCanvasInteractions(
         if (
           s.tool !== prev.tool ||
           s.pendingPresetId !== prev.pendingPresetId ||
-          (prev.gestureStart && !s.gestureStart &&
-            (draftRef.current || drag.current?.type === 'highlight')) ||
+          (prev.gestureStart &&
+            !s.gestureStart &&
+            (draftRef.current ||
+              drag.current?.type === 'highlight' ||
+              drag.current?.type === 'highlight-eraser')) ||
           (s.document !== prev.document &&
             drag.current?.type === 'terminal-wire' &&
             !drag.current.started)
@@ -637,7 +669,11 @@ export function useCanvasInteractions(
     if (e.button === 1 || spaceDown.current || s.tool === 'pan') {
       svg.setPointerCapture(e.pointerId);
       setDragging('pan');
-      drag.current = { type: 'pan', screen: { x: e.clientX, y: e.clientY }, view: viewport };
+      drag.current = {
+        type: 'pan',
+        screen: { x: e.clientX, y: e.clientY },
+        view: viewport,
+      };
       return;
     }
     if (s.splittingWireId) {
@@ -651,7 +687,7 @@ export function useCanvasInteractions(
           s.commit(result.doc);
           s.select([result.secondId]);
           s.setSplitWire(null);
-        } else s.notify('Scegli un punto interno al filo, lontano da incroci e terminali.');
+        } else s.notify(t('Choose a point inside the wire, away from crossings and terminals.'));
       }
       return;
     }
@@ -686,16 +722,29 @@ export function useCanvasInteractions(
       });
       return;
     }
+    if (s.tool === 'highlight-eraser') {
+      svg.setPointerCapture(e.pointerId);
+      s.select([]);
+      s.beginGesture();
+      drag.current = {
+        type: 'highlight-eraser',
+        session: new HighlightEraserGesture(s.document, p, s.eraserSize, viewport.zoom),
+      };
+      setOverlay({ ...blank, mouse: p });
+      return;
+    }
     if (s.tool === 'highlight') {
       const settings = s.highlightSettings;
       const component =
         settings.mode === 'smart'
           ? highlightComponentAt(s.document, p, Math.min(6, 4 / viewport.zoom))
           : null;
-      const smart = settings.mode === 'smart'
-        ? beginSmartHighlight(s.document, p, 14 / viewport.zoom, component?.id) : null;
+      const smart =
+        settings.mode === 'smart'
+          ? beginSmartHighlight(s.document, p, 14 / viewport.zoom, component?.id)
+          : null;
       if (settings.mode === 'smart' && !smart) {
-        s.notify('Inizia il tratto su un filo o un componente e trascina fino al punto desiderato.');
+        s.notify(t('Start on a wire or component and drag to the desired point.'));
         return;
       }
       const object: Highlight = smart
@@ -731,7 +780,7 @@ export function useCanvasInteractions(
       if (near) {
         s.add([createCurrent(near.wire, near.point, s.document)]);
         s.setTool('select');
-      } else s.notify('Clicca un filo per associare la freccia di corrente.');
+      } else s.notify(t('Click a wire to attach the current arrow.'));
       return;
     }
     if (s.tool === 'polarity') {
@@ -740,7 +789,7 @@ export function useCanvasInteractions(
       if (annotation) {
         s.add([annotation]);
         s.setTool('select');
-      } else s.notify('Scegli un componente a due terminali, oppure usa Freccia tensione.');
+      } else s.notify(t('Choose a two-terminal component, or use the Voltage arrow tool.'));
       return;
     }
     if (s.tool === 'junction') {
@@ -794,15 +843,20 @@ export function useCanvasInteractions(
       component = id ? objectMap.get(id) : null;
     const groupDrag = !!id && s.selection.length > 1 && s.selection.includes(id);
     const wireSide =
-      component?.kind === 'wire' && !labelId &&
+      component?.kind === 'wire' &&
+      !labelId &&
       (!hitHandle || hitHandle === 'wireStart' || hitHandle === 'wireEnd')
         ? wireEndAtPoint(p, component, s.document, viewport.zoom)
         : null;
-    const handle = wireSide && !groupDrag
-      ? (wireSide === 'start' ? 'wireStart' : 'wireEnd')
-      : hitHandle === 'wireStart' || hitHandle === 'wireEnd' ? undefined : hitHandle;
-    const quickWire = s.tool === 'select' && !e.shiftKey && !e.altKey &&
-      !groupDrag;
+    const handle =
+      wireSide && !groupDrag
+        ? wireSide === 'start'
+          ? 'wireStart'
+          : 'wireEnd'
+        : hitHandle === 'wireStart' || hitHandle === 'wireEnd'
+          ? undefined
+          : hitHandle;
+    const quickWire = s.tool === 'select' && !e.shiftKey && !e.altKey && !groupDrag;
     if (quickWire && wireSide && component?.kind === 'wire') {
       s.select([component.id]);
       setActiveLabel(null);
@@ -830,7 +884,11 @@ export function useCanvasInteractions(
               component,
               rotatePoint({ x: terminal.localX, y: terminal.localY }, component.rotation),
             ),
-            endpoint: { kind: 'terminal', componentId: component.id, terminalId },
+            endpoint: {
+              kind: 'terminal',
+              componentId: component.id,
+              terminalId,
+            },
           },
           started: false,
         };
@@ -841,7 +899,10 @@ export function useCanvasInteractions(
       if (e.altKey && handle?.startsWith('vertex:')) {
         s.update(id, (o) =>
           o.kind === 'wire'
-            ? { ...o, vertices: o.vertices.filter((_, i) => i !== Number(handle.split(':')[1])) }
+            ? {
+                ...o,
+                vertices: o.vertices.filter((_, i) => i !== Number(handle.split(':')[1])),
+              }
             : o,
         );
         return;
@@ -859,7 +920,10 @@ export function useCanvasInteractions(
       s.beginGesture();
       const wire = objectMap.get(id);
       const segment =
-        !handle && !labelId && ids.length === 1 && wire?.kind === 'wire' &&
+        !handle &&
+        !labelId &&
+        ids.length === 1 &&
+        wire?.kind === 'wire' &&
         (!isLooseEndpoint(wire.startEndpoint, s.document) ||
           !isLooseEndpoint(wire.endEndpoint, s.document))
           ? nearestWire(
@@ -910,8 +974,13 @@ export function useCanvasInteractions(
       if (d.smart) {
         const spans = advanceSmartHighlight(d.smart, p, viewport.zoom, object.width);
         object = {
-          kind: 'highlight', id: object.id, mode: 'smart', color: object.color,
-          opacity: object.opacity, width: object.width, spans,
+          kind: 'highlight',
+          id: object.id,
+          mode: 'smart',
+          color: object.color,
+          opacity: object.opacity,
+          width: object.width,
+          spans,
         };
       } else if (object.mode === 'free' && distance(d.points.at(-1)!, p) >= 0.5 / viewport.zoom) {
         d.points.push(p);
@@ -949,6 +1018,18 @@ export function useCanvasInteractions(
             })
           : null;
       setHoveredArrow(hovered?.id ?? null);
+    }
+    if (d?.type === 'highlight-eraser') {
+      const samples = e.nativeEvent.getCoalescedEvents?.() ?? [];
+      for (const sample of [...samples, e])
+        d.session.advance(world(sample.clientX, sample.clientY));
+      if (d.session.document !== s.document) s.preview(d.session.document);
+      setOverlay({ ...blank, mouse: p });
+      return;
+    }
+    if (s.tool === 'highlight-eraser' && !d) {
+      setOverlay({ ...blank, mouse: p });
+      return;
     }
     if (d?.type === 'highlight') {
       setOverlay({ ...blank, highlight: advanceHighlight(d, e) });
@@ -1002,7 +1083,10 @@ export function useCanvasInteractions(
       setOverlay({
         ...blank,
         target: point,
-        arrow: { ...createElectrical('voltage', d.origin, point, 'V_{AB}'), id: 'preview' },
+        arrow: {
+          ...createElectrical('voltage', d.origin, point, 'V_{AB}'),
+          id: 'preview',
+        },
       });
       return;
     }
@@ -1032,7 +1116,10 @@ export function useCanvasInteractions(
     if (d?.type === 'brace' || d?.type === 'bracket') {
       setOverlay({
         ...blank,
-        arrow: { ...createBrace(d.type, d.origin, snapPoint(p)), id: 'preview' },
+        arrow: {
+          ...createBrace(d.type, d.origin, snapPoint(p)),
+          id: 'preview',
+        },
       });
       return;
     }
@@ -1069,8 +1156,14 @@ export function useCanvasInteractions(
           start,
           end,
           controlPoints: [
-            { x: start.x + dx / 3 - dy * 0.45, y: start.y + dy / 3 + dx * 0.45 },
-            { x: start.x + (dx * 2) / 3 - dy * 0.45, y: start.y + (dy * 2) / 3 + dx * 0.45 },
+            {
+              x: start.x + dx / 3 - dy * 0.45,
+              y: start.y + dy / 3 + dx * 0.45,
+            },
+            {
+              x: start.x + (dx * 2) / 3 - dy * 0.45,
+              y: start.y + (dy * 2) / 3 + dx * 0.45,
+            },
           ],
           color: COLORS.red,
           width: 2,
@@ -1121,23 +1214,13 @@ export function useCanvasInteractions(
                     );
                   if (o.kind === 'highlight') {
                     const first = d.handle === 'highlightStart';
-                    if (o.mode === 'free')
-                      return {
-                        ...o,
-                        points: o.points.map((q, i) =>
-                          i === highlightEndpointIndices(o)[first ? 0 : 1] ? p : q,
-                        ),
-                      };
+                    if (o.mode === 'free') return moveHighlightEndpoint(o, first, p);
                     if (o.mode === 'component') return o;
                     const index = first ? 0 : o.spans.length - 1,
                       span = o.spans[index];
                     const route = highlightSpanPoints(span, d.doc);
                     if (!route.length) return o;
-                    const ratio = projectHighlight(
-                      route,
-                      p,
-                      first ? span.start : span.end,
-                    ).ratio;
+                    const ratio = projectHighlight(route, p, first ? span.start : span.end).ratio;
                     return {
                       ...o,
                       spans: o.spans.map((s, i) =>
@@ -1189,7 +1272,8 @@ export function useCanvasInteractions(
                       const route = points.map((point, i) =>
                         i === index || i === index + 1 ? add(point, shift) : point,
                       );
-                      let startEndpoint = o.startEndpoint, endEndpoint = o.endEndpoint;
+                      let startEndpoint = o.startEndpoint,
+                        endEndpoint = o.endEndpoint;
                       if (index === 0) {
                         if (isLooseEndpoint(startEndpoint, d.doc))
                           startEndpoint = { kind: 'free', point: route[0] };
@@ -1200,7 +1284,12 @@ export function useCanvasInteractions(
                           endEndpoint = { kind: 'free', point: route.at(-1)! };
                         else route.push(points.at(-1)!);
                       }
-                      const moved = { ...o, startEndpoint, endEndpoint, vertices: route.slice(1, -1) };
+                      const moved = {
+                        ...o,
+                        startEndpoint,
+                        endEndpoint,
+                        vertices: route.slice(1, -1),
+                      };
                       return !o.routing || o.routing === 'orthogonal'
                         ? {
                             ...moved,
@@ -1250,7 +1339,9 @@ export function useCanvasInteractions(
         ...blank,
         target: near?.point ?? null,
         wireTarget: near && 'wireId' in near.edge.host ? near.edge.host.wireId : null,
-        componentTarget: component?.id ?? (near && 'componentId' in near.edge.host ? near.edge.host.componentId : null),
+        componentTarget:
+          component?.id ??
+          (near && 'componentId' in near.edge.host ? near.edge.host.componentId : null),
       });
       return;
     }
@@ -1304,7 +1395,7 @@ export function useCanvasInteractions(
           s.commit(result.doc);
           s.select([result.secondId]);
           s.setSplitWire(null);
-        } else s.notify('Scegli un punto interno al filo, lontano da incroci e terminali.');
+        } else s.notify(t('Choose a point inside the wire, away from crossings and terminals.'));
       }
       return;
     }
@@ -1344,6 +1435,13 @@ export function useCanvasInteractions(
     setDragging(null);
     if (svgRef.current?.hasPointerCapture(e.pointerId))
       svgRef.current.releasePointerCapture(e.pointerId);
+    if (d?.type === 'highlight-eraser') {
+      const next = d.session.finish(world(e.clientX, e.clientY));
+      if (next !== s.document) s.preview(next);
+      s.endGesture();
+      setOverlay({ ...blank, mouse: world(e.clientX, e.clientY) });
+      return;
+    }
     if (d?.type === 'highlight') {
       let object = advanceHighlight(d, e);
       if (object.mode === 'free')
@@ -1422,9 +1520,7 @@ export function useCanvasInteractions(
         const ids = s.document.objects
           .filter((o) => {
             const b = objectBounds(o, s.document);
-            return (
-              b.x >= x && b.y >= y && b.x + b.width <= x + w && b.y + b.height <= y + h
-            );
+            return b.x >= x && b.y >= y && b.x + b.width <= x + w && b.y + b.height <= y + h;
           })
           .map((o) => o.id);
         s.select(d.additive ? [...new Set([...s.selection, ...ids])] : ids);
@@ -1564,7 +1660,7 @@ export function useCanvasInteractions(
     doubleClick,
     drop,
     lostCapture: () => {
-      if (drag.current?.type === 'highlight') {
+      if (drag.current?.type === 'highlight' || drag.current?.type === 'highlight-eraser') {
         drag.current = null;
         useEditorStore.getState().cancelGesture();
         setOverlay(blank);

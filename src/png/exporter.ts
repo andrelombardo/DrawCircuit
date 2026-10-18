@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import type { CircuitDocument } from '../model/types';
 import { exportSVG } from '../svg/exporter';
 import { CIRCUIT_FONT } from '../model/fonts';
@@ -17,7 +18,7 @@ const dataURL = (blob: Blob) =>
   new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(new Error('Impossibile leggere il font.'));
+    reader.onerror = () => reject(new Error(t('Unable to read the font.')));
     reader.readAsDataURL(blob);
   });
 
@@ -31,7 +32,7 @@ export async function embedSVGFonts(svg: string): Promise<string> {
       if (!data) {
         data = fetch(url)
           .then((response) => {
-            if (!response.ok) throw new Error('Impossibile caricare i font per il PNG.');
+            if (!response.ok) throw new Error(t('Unable to load fonts for the PNG.'));
             return response.blob();
           })
           .then(dataURL);
@@ -47,14 +48,14 @@ export async function embedSVGFonts(svg: string): Promise<string> {
 export function pngDimensions(svg: string, scale = PNG_SCALE) {
   const bounds = /viewBox="([^"]+)"/.exec(svg)?.[1].trim().split(/\s+/).map(Number);
   if (!bounds || !Number.isFinite(scale) || scale <= 0)
-    throw new Error('Dimensioni PNG non valide.');
+    throw new Error(t('Invalid PNG dimensions.'));
   if (
     bounds.length !== 4 ||
     bounds.some((n) => !Number.isFinite(n)) ||
     bounds[2] <= 0 ||
     bounds[3] <= 0
   )
-    throw new Error('Dimensioni PNG non valide.');
+    throw new Error(t('Invalid PNG dimensions.'));
   const [, , sourceWidth, sourceHeight] = bounds;
   // Keep normal drawings at 4×. Large drawings share one reduced scale, preserving
   // their aspect ratio while bounding the RGBA allocation (128 MB at most).
@@ -65,7 +66,7 @@ export function pngDimensions(svg: string, scale = PNG_SCALE) {
     Math.sqrt(PNG_MAX_PIXELS / (sourceWidth * sourceHeight)),
   );
   if (effectiveScale < Math.min(1, scale))
-    throw new Error('Immagine troppo grande: copia una selezione più piccola.');
+    throw new Error(t('Image too large: copy a smaller selection.'));
   let width = Math.min(PNG_MAX_DIMENSION, Math.max(1, Math.ceil(sourceWidth * effectiveScale)));
   let height = Math.min(PNG_MAX_DIMENSION, Math.max(1, Math.ceil(sourceHeight * effectiveScale)));
   // Ceil can cross the pixel budget; leave space for that final pixel on each axis.
@@ -139,14 +140,14 @@ export async function rasterizeSVG(svg: string, scale = PNG_SCALE): Promise<Blob
     const image = new Image();
     await new Promise<void>((resolve, reject) => {
       image.onload = () => resolve();
-      image.onerror = () => reject(new Error('Impossibile rasterizzare il circuito.'));
+      image.onerror = () => reject(new Error(t('Unable to rasterize the circuit.')));
       image.src = url;
     });
     canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
     const context = canvas.getContext('2d');
-    if (!context) throw new Error('Canvas PNG non disponibile.');
+    if (!context) throw new Error(t('PNG canvas unavailable.'));
     context.imageSmoothingEnabled = true;
     context.imageSmoothingQuality = 'high';
     context.drawImage(image, 0, 0, width, height);
@@ -156,13 +157,13 @@ export async function rasterizeSVG(svg: string, scale = PNG_SCALE): Promise<Blob
     trimmed.width = frame.width;
     trimmed.height = frame.height;
     const output = trimmed.getContext('2d');
-    if (!output) throw new Error('Canvas PNG non disponibile.');
+    if (!output) throw new Error(t('PNG canvas unavailable.'));
     // Integer translation preserves every original antialiased pixel.
     output.drawImage(canvas, -frame.x, -frame.y);
     canvas.width = canvas.height = 0;
     return await new Promise<Blob>((resolve, reject) =>
       trimmed!.toBlob(
-        (blob) => (blob ? resolve(blob) : reject(new Error('Impossibile creare il PNG.'))),
+        (blob) => (blob ? resolve(blob) : reject(new Error(t('Unable to create the PNG.')))),
         'image/png',
       ),
     );
@@ -211,7 +212,7 @@ export async function copyPNG(doc: CircuitDocument) {
     !navigator.clipboard?.write ||
     (ClipboardItem.supports && !ClipboardItem.supports('image/png'))
   )
-    throw new Error('Questo browser non consente la copia di immagini negli appunti.');
+    throw new Error(t('This browser cannot copy images to the clipboard.'));
   const png = exportPNG(doc);
   // A denied clipboard can reject before the image promise settles.
   void png.catch(() => {});

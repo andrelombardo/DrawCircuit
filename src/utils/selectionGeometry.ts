@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 import type { CircuitDocument, CircuitObject, Point } from '../model/types';
 import { measurementBounds } from './measurementGeometry';
 import { unionBounds } from './visualBounds';
@@ -18,7 +19,10 @@ export function layoutTargets(doc: CircuitDocument, ids: string[]) {
   return doc.objects.filter(
     (o) =>
       selected.has(o.id) &&
-      !(o.kind === 'wire' && (!isLooseEndpoint(o.startEndpoint, doc) || !isLooseEndpoint(o.endEndpoint, doc))) &&
+      !(
+        o.kind === 'wire' &&
+        (!isLooseEndpoint(o.startEndpoint, doc) || !isLooseEndpoint(o.endEndpoint, doc))
+      ) &&
       !(o.kind === 'highlight' && o.mode !== 'free') &&
       !(o.kind === 'electrical' && (o.componentId || o.wireId)),
   );
@@ -84,7 +88,10 @@ export function alignSelection(
               : e.c[axis];
         return [
           e.o.id,
-          { x: axis === 'x' ? target - from : 0, y: axis === 'y' ? target - from : 0 },
+          {
+            x: axis === 'x' ? target - from : 0,
+            y: axis === 'y' ? target - from : 0,
+          },
         ];
       }),
     ),
@@ -106,13 +113,18 @@ export function distributionPlan(
       (mode === 'gaps' ? a.b[axis] - b.b[axis] : a.c[axis] - b.c[axis]) ||
       a.o.id.localeCompare(b.o.id),
   );
-  const blocked = (reason: string) => ({ moves: new Map<string, Point>(), reason });
+  const blocked = (reason: string) => ({
+    moves: new Map<string, Point>(),
+    reason,
+  });
   if (selected.length < (spacing === undefined ? 3 : 2))
     return blocked(
-      `Servono almeno ${spacing === undefined ? 'tre' : 'due'} elementi indipendenti.`,
+      t('At least {count} independent elements are required.', {
+        count: spacing === undefined ? 3 : 2,
+      }),
     );
   if (spacing !== undefined && (!Number.isFinite(spacing) || spacing < 0 || spacing > 1e7))
-    return blocked('Inserisci una distanza da 0 a 10000000 u.');
+    return blocked(t('Enter a distance from 0 to 10000000 u.'));
   const size = axis === 'x' ? 'width' : 'height',
     first = selected[0],
     last = selected.at(-1)!;
@@ -137,11 +149,16 @@ export function distributionPlan(
     if (start < previousEnd - 0.001)
       return blocked(
         spacing === undefined
-          ? 'Spazio insufficiente tra gli estremi. Aumenta la distanza o usa la spaziatura esatta.'
-          : 'Questa distanza sovrappone gli elementi. Aumentala o scegli lo spazio libero tra i bordi.',
+          ? t(
+              'Not enough space between the outermost elements. Increase the distance or use exact spacing.',
+            )
+          : t('This distance overlaps elements. Increase it or choose clearance between edges.'),
       );
     previousEnd = start + e.b[size];
-    moves.set(e.o.id, { x: axis === 'x' ? delta : 0, y: axis === 'y' ? delta : 0 });
+    moves.set(e.o.id, {
+      x: axis === 'x' ? delta : 0,
+      y: axis === 'y' ? delta : 0,
+    });
     cursor += step + (mode === 'gaps' ? e.b[size] : 0);
   }
   return { moves };
