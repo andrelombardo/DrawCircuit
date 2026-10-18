@@ -44,6 +44,8 @@ Choose **Line style → Solid / Dashed / Dotted** in Properties for wires, decor
 
 The **Properties** sidebar shows the selected type or number of elements. It offers only shared properties for mixed selections. Different values appear as **Mixed values**, **Mixed**, or a dash. Confirm text and numeric changes with Enter or by leaving the field; Esc discards the draft. A shared edit changes the whole selection in one undo step.
 
+**Text size**, **Thickness**, and **Rotation** combine editable values with their usual presets. Type a custom number, then press Enter or leave the field to apply it; use the arrow button or Up/Down to browse presets. Esc discards the draft. Decimal points, decimal commas, and pasted units are accepted. Invalid values show an error and leave the drawing unchanged. Text size must be greater than 0 and at most 200 px; line width must be greater than 0 and at most 20 px. Component, text, and label rotations retain their 45° increments (0–315°); arrows and loops allow custom angles. Distances, coordinates, and other numeric fields remain directly editable.
+
 - **Label / Content:** edit object text or a shared value. **Internal text** edits the text inside generic blocks.
 - **Position:** X/Y describe an object’s position or the top-left geometric bounds of a multiple selection. Editing a group coordinate translates the entire selection. Rotation applies to the object or selected label.
 - **Appearance:** adjust symbol/text and label colors and opacity independently; change line width, styles, text size (up to 200 px)/alignment, and shape fill where relevant. Click a color for preset swatches or **Custom color…**. Native color-picker previews form one gesture.

@@ -4,6 +4,8 @@ import type { ReactNode } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { ActionMenu } from '../toolbar/ActionMenu';
 import { MAX_COORDINATE, MAX_TEXT_LENGTH } from '../../model/limits';
+import { NumericCombobox } from './NumericCombobox';
+import type { NumericLimits } from '../../utils/numericValue';
 function DraftInput({
   value,
   label,
@@ -135,12 +137,14 @@ export function PropertySelect({
   value,
   children,
   onChange,
+  numeric,
 }: {
   label: string;
   caption?: ReactNode;
   value: string | number | undefined;
   children: ReactNode;
   onChange: (value: string) => void;
+  numeric?: NumericLimits;
 }) {
   const id = useId();
   const options = Children.toArray(children).flatMap((child) => {
@@ -162,6 +166,19 @@ export function PropertySelect({
   });
   const selected = options.find((option) => option.value === String(value));
   const description = selected?.label ?? t('Mixed values');
+  if (numeric)
+    return (
+      <PropertyRow caption={caption ?? label} htmlFor={id}>
+        <NumericCombobox
+          id={id}
+          label={label}
+          value={typeof value === 'number' ? value : undefined}
+          options={options.map((option) => ({ ...option, value: Number(option.value) }))}
+          limits={numeric}
+          onCommit={(number) => onChange(String(number))}
+        />
+      </PropertyRow>
+    );
   return (
     <PropertyRow caption={caption ?? label} htmlFor={id}>
       <ActionMenu

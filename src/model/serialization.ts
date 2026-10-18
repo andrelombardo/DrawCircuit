@@ -9,6 +9,8 @@ import {
   MAX_TEXT_LENGTH,
   MAX_DOCUMENT_OBJECTS,
   MAX_DOCUMENT_LENGTH,
+  MAX_FONT_SIZE,
+  MAX_LINE_WIDTH,
 } from './limits';
 const fail = (): never => {
   throw new Error(t('Invalid JSON: check the format, objects, and connections.'));
@@ -35,7 +37,7 @@ function label(v: unknown): boolean {
     point(l.offset) &&
     color(l.color) &&
     opacity(l.opacity) &&
-    positive(l.fontSize, 200) &&
+    positive(l.fontSize, MAX_FONT_SIZE) &&
     rotation(l.rotation) &&
     (l.fontFamily === undefined || str(l.fontFamily))
   );
@@ -108,7 +110,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
             componentRegistry[o.type as (typeof componentTypes)[number]]?.internalText ===
               undefined)) ||
         !color(o.color) ||
-        !positive(o.width, 20) ||
+        !positive(o.width, MAX_LINE_WIDTH) ||
         !Array.isArray(o.terminals)
       )
         fail();
@@ -210,13 +212,14 @@ export function deserializeDocument(raw: string): CircuitDocument {
         !positive(o.height, 1e7) ||
         (o.kind === 'circle' && o.width !== o.height) ||
         !color(o.color) ||
-        !positive(o.strokeWidth, 20) ||
+        !positive(o.strokeWidth, MAX_LINE_WIDTH) ||
         (o.fill !== 'none' && !color(o.fill)) ||
         !opacity(o.fillOpacity)
       )
         fail();
     } else if (o.kind === 'line') {
-      if (!point(o.start) || !point(o.end) || !color(o.color) || !positive(o.width, 20)) fail();
+      if (!point(o.start) || !point(o.end) || !color(o.color) || !positive(o.width, MAX_LINE_WIDTH))
+        fail();
     } else if (o.kind === 'junction') {
       if (!num(o.x) || !num(o.y) || !label(o.label) || !color(o.color)) fail();
     } else if (o.kind === 'wire') {
@@ -228,7 +231,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
         o.vertices.length > 1000 ||
         !o.vertices.every(point) ||
         !color(o.color) ||
-        !positive(o.width, 20)
+        !positive(o.width, MAX_LINE_WIDTH)
       )
         fail();
     } else if (o.kind === 'brace') {
@@ -239,7 +242,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
         (o.side !== 1 && o.side !== -1) ||
         !label(o.label) ||
         !color(o.color) ||
-        !positive(o.width, 20) ||
+        !positive(o.width, MAX_LINE_WIDTH) ||
         (record(o.start).x !== record(o.end).x && record(o.start).y !== record(o.end).y)
       )
         fail();
@@ -255,7 +258,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
         Number(o.ratio) > 1 ||
         typeof o.reversed !== 'boolean' ||
         !color(o.color) ||
-        !positive(o.width, 20) ||
+        !positive(o.width, MAX_LINE_WIDTH) ||
         (o.wireId !== undefined && (o.mode !== 'current' || !str(o.wireId) || !o.wireId)) ||
         (o.currentPlacement !== undefined &&
           (o.mode !== 'current' || !['external', 'inline'].includes(String(o.currentPlacement)))) ||
@@ -278,7 +281,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
         !num(o.y) ||
         !str(o.text) ||
         !color(o.color) ||
-        !positive(o.fontSize, 200) ||
+        !positive(o.fontSize, MAX_FONT_SIZE) ||
         (o.fontFamily !== undefined && !str(o.fontFamily)) ||
         !['start', 'middle', 'end'].includes(String(o.align)) ||
         !rotation(o.rotation)
@@ -296,7 +299,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
         Number(o.arrowPosition) < 0 ||
         Number(o.arrowPosition) >= 1 ||
         !color(o.color) ||
-        !positive(o.strokeWidth, 20)
+        !positive(o.strokeWidth, MAX_LINE_WIDTH)
       )
         fail();
     } else if (o.kind === 'arrow') {
@@ -313,7 +316,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
         o.controlPoints.length !== 2 ||
         !o.controlPoints.every(point) ||
         !color(o.color) ||
-        !positive(o.width, 20) ||
+        !positive(o.width, MAX_LINE_WIDTH) ||
         typeof o.reversed !== 'boolean'
       )
         fail();

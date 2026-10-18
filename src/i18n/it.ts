@@ -226,6 +226,12 @@ export const italian: Readonly<Record<string, string>> = {
   Properties: 'Proprietà',
   'Resize properties': 'Ridimensiona proprietà',
   'Mixed values': 'Valori misti',
+  'Enter a valid number.': 'Inserisci un numero valido.',
+  'Use increments of {step}{unit}.': 'Usa incrementi di {step}{unit}.',
+  'Enter a value greater than {min} and up to {max}{unit}.':
+    'Inserisci un valore maggiore di {min} e fino a {max}{unit}.',
+  'Enter a value from {min} to {max}{unit}.': 'Inserisci un valore da {min} a {max}{unit}.',
+  'Show suggested values for {label}': 'Mostra i valori suggeriti per {label}',
   Mixed: 'Misto',
   'Replace component': 'Sostituisci componente',
   'Close replacement dialog': 'Chiudi sostituzione',

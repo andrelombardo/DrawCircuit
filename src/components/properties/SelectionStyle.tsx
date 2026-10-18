@@ -4,6 +4,7 @@ import type { FormEvent, ReactNode } from 'react';
 import { useEditorStore } from '../../store/editorStore';
 import { commonValue } from './commonValue';
 import { COLORS } from '../../model/types';
+import { MAX_FONT_SIZE, MAX_LINE_WIDTH } from '../../model/limits';
 import type { CircuitObject } from '../../model/types';
 import { ActionMenu } from '../toolbar/ActionMenu';
 import { PropertyField, PropertySelect, PropertyRow } from './PropertyControls';
@@ -245,6 +246,7 @@ export function SelectionStyle({
             <PropertySelect
               label={t('Line width')}
               caption={t('Thickness')}
+              numeric={{ min: 0, exclusiveMin: true, max: MAX_LINE_WIDTH, unit: 'px' }}
               value={width}
               onChange={(v) =>
                 apply((o) =>
@@ -331,6 +333,7 @@ export function SelectionTypography({
       <PropertySelect
         label={t('Text size')}
         caption={t('Text size')}
+        numeric={{ min: 0, exclusiveMin: true, max: MAX_FONT_SIZE, unit: 'px' }}
         value={size}
         onChange={(v) =>
           apply((o) =>

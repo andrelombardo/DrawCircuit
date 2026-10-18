@@ -2574,6 +2574,46 @@ summary:focus-visible {
   padding: 0 6px 0 2px;
   flex: none;
 }
+.numeric-combobox {
+  min-width: 0;
+}
+.numeric-combobox .inspector-unit {
+  padding-right: 2px;
+}
+.numeric-combobox-toggle {
+  display: grid;
+  place-items: center;
+  flex: 0 0 28px;
+  align-self: stretch;
+  padding: 0;
+  border: 0;
+  color: var(--property-muted);
+  background: transparent;
+}
+.numeric-combobox-toggle:hover {
+  background: var(--ui-hover);
+}
+.numeric-combobox-toggle[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+.numeric-combobox-options {
+  max-height: min(300px, calc(100vh - 16px));
+}
+.numeric-combobox-options [data-active] {
+  background: var(--ui-hover);
+}
+.numeric-combobox-options [aria-selected='true'] {
+  color: var(--ui-accent);
+}
+.numeric-combobox .inspector-input[data-invalid] {
+  border-color: var(--ui-danger);
+}
+.numeric-combobox-error {
+  margin: 5px 0 0;
+  color: var(--ui-danger);
+  font-size: 11px;
+  line-height: 1.4;
+}
 .inspector-pair {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

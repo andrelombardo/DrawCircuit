@@ -21,6 +21,7 @@ import {
 import { useEditorStore } from '../../store/editorStore';
 import { componentRegistry } from '../../model/catalog';
 import { ROTATIONS } from '../../model/types';
+import { MAX_COORDINATE } from '../../model/limits';
 import type { CircuitObject, Rotation, WireRouting, LineStyle } from '../../model/types';
 import { unionBounds } from '../../utils/visualBounds';
 import { measurementBounds } from '../../utils/measurementGeometry';
@@ -139,31 +140,27 @@ export function PropertiesContent() {
       return o;
     });
   };
-  const rotationControl =
-    absoluteRotation &&
-    (labelTarget || rotatables.some((o) => o.kind === 'component' || o.kind === 'text') ? (
-      <PropertySelect
-        label={t('Rotation')}
-        caption={t('Rotation')}
-        value={rotation}
-        onChange={(v) => setRotation(Number(v))}
-      >
-        {ROTATIONS.map((r) => (
-          <option key={r} value={r}>
-            {r}°
-          </option>
-        ))}
-      </PropertySelect>
-    ) : (
-      <PropertyField
-        label={t('Rotation')}
-        caption={t('Rotation')}
-        numeric
-        unit="°"
-        value={rotation === undefined ? undefined : Number(rotation.toFixed(2))}
-        onCommit={(v) => setRotation(Number(v))}
-      />
-    ));
+  const steppedRotation =
+    !!labelTarget || rotatables.some((o) => o.kind === 'component' || o.kind === 'text');
+  const rotationControl = absoluteRotation && (
+    <PropertySelect
+      label={t('Rotation')}
+      caption={t('Rotation')}
+      value={rotation === undefined ? undefined : Number(rotation.toFixed(2))}
+      numeric={
+        steppedRotation
+          ? { min: 0, max: 315, step: 45, unit: '°' }
+          : { min: -MAX_COORDINATE, max: MAX_COORDINATE, unit: '°' }
+      }
+      onChange={(v) => setRotation(Number(v))}
+    >
+      {ROTATIONS.map((r) => (
+        <option key={r} value={r}>
+          {r}°
+        </option>
+      ))}
+    </PropertySelect>
+  );
   if (tool === 'highlight-eraser') return <EraserProperties />;
   if (tool === 'highlight') return <HighlightProperties key="highlight-tool" />;
   if (objects.length && objects.every((o) => o.kind === 'highlight'))
