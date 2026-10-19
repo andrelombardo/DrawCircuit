@@ -89,6 +89,7 @@ export function PropertiesContent() {
   const lineObjects = objects.filter(
     (o) => o.kind === 'wire' || o.kind === 'line' || o.kind === 'rectangle' || o.kind === 'circle',
   );
+  const arrows = objects.filter((o) => o.kind === 'arrow' || o.kind === 'loop-arrow');
   const independentRotation = rotatables.length === objects.length;
   const selectedIds = new Set(objects.map((object) => object.id));
   const hasComponent = objects.some((object) => object.kind === 'component');
@@ -293,6 +294,22 @@ export function PropertiesContent() {
             labelOnly={!!labelTarget}
             typography={objects.every((o) => 'label' in o || o.kind === 'text')}
           />
+          {!labelTarget && arrows.length === objects.length && (
+            <PropertySelect
+              label={t('Arrowhead')}
+              value={commonValue(arrows.map((arrow) => (arrow.headFilled ? 'filled' : 'open')))}
+              onChange={(value) =>
+                apply((arrow) =>
+                  arrow.kind === 'arrow' || arrow.kind === 'loop-arrow'
+                    ? { ...arrow, headFilled: value === 'filled' }
+                    : arrow,
+                )
+              }
+            >
+              <option value="open">{t('Open arrowhead')}</option>
+              <option value="filled">{t('Filled arrowhead')}</option>
+            </PropertySelect>
+          )}
           {!labelTarget && lineObjects.length === objects.length && (
             <PropertySelect
               label={t('Line style')}

@@ -78,6 +78,12 @@ export function deserializeDocument(raw: string): CircuitDocument {
     ids.add(String(o.id));
     if (!opacity(o.opacity)) fail();
     if (
+      (o.kind === 'arrow' || o.kind === 'loop-arrow') &&
+      o.headFilled !== undefined &&
+      typeof o.headFilled !== 'boolean'
+    )
+      fail();
+    if (
       ['wire', 'rectangle', 'circle', 'line'].includes(String(o.kind)) &&
       ((o.lineStyle !== undefined &&
         !['solid', 'dashed', 'dotted'].includes(String(o.lineStyle))) ||

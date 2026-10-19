@@ -84,8 +84,15 @@ export function exportSVG(
       })
       .join('');
   };
-  const path = (d: string, color: string, width: number, cap = 'round', style: StrokeStyle = {}) =>
-    `<path d="${attr(d)}" fill="none" stroke="${color}" stroke-width="${f(width)}" stroke-linecap="${cap}" stroke-linejoin="round"${dashPattern(style, width) ? ` stroke-dasharray="${dashPattern(style, width)!.map(f).join(' ')}"` : ''}/>`;
+  const path = (
+    d: string,
+    color: string,
+    width: number,
+    cap = 'round',
+    style: StrokeStyle = {},
+    fill = 'none',
+  ) =>
+    `<path d="${attr(d)}" fill="${fill}" stroke="${color}" stroke-width="${f(width)}" stroke-linecap="${cap}" stroke-linejoin="round"${dashPattern(style, width) ? ` stroke-dasharray="${dashPattern(style, width)!.map(f).join(' ')}"` : ''}/>`;
   for (const group of highlightPaintGroups(doc)) {
     const content = group
       .map((object) => {
@@ -218,7 +225,7 @@ export function exportSVG(
       );
       parts.push(
         path(o.kind === 'arrow' ? arrowPath(o) : loopPath(o), o.color, width),
-        path(canvasArrowHeadPath(o), o.color, width),
+        path(canvasArrowHeadPath(o), o.color, width, 'round', {}, o.headFilled ? o.color : 'none'),
       );
     } else if (o.kind === 'brace') {
       const g = braceGeometry(o);

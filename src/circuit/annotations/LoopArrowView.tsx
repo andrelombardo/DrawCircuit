@@ -27,7 +27,7 @@ export const LoopArrowView = memo(function LoopArrowView({
         strokeLinejoin="round"
       >
         <path d={loopPath(o)} />
-        <path d={canvasArrowHeadPath(o)} />
+        <path d={canvasArrowHeadPath(o)} fill={o.headFilled ? o.color : 'none'} />
       </g>
     </g>
   );

@@ -181,6 +181,8 @@ export interface ArrowAnnotation {
   opacity?: number;
   width: number;
   reversed: boolean;
+  /** Missing in existing documents means an open arrowhead. */
+  headFilled?: boolean;
 }
 export interface LoopArrow {
   kind: 'loop-arrow';
@@ -198,6 +200,8 @@ export interface LoopArrow {
   /** Independent of HEX color; missing means fully opaque. */
   opacity?: number;
   strokeWidth: number;
+  /** Missing in existing documents means an open arrowhead. */
+  headFilled?: boolean;
 }
 export interface ElectricalAnnotation {
   kind: 'electrical';

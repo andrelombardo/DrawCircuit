@@ -27,7 +27,7 @@ export const ArrowView = memo(function ArrowView({
         strokeLinejoin="round"
       >
         <path d={arrowPath(o)} />
-        <path d={canvasArrowHeadPath(o)} />
+        <path d={canvasArrowHeadPath(o)} fill={o.headFilled ? o.color : 'none'} />
       </g>
     </g>
   );

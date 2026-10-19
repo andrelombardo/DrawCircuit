@@ -67,5 +67,5 @@ export function canvasArrowHead(arrow: ArrowAnnotation | LoopArrow): Point[] {
 /** Shared by the editor, placement previews and SVG/PNG output. */
 export function canvasArrowHeadPath(arrow: ArrowAnnotation | LoopArrow): string {
   const [start, upper, tip, lower, end] = canvasArrowHead(arrow);
-  return `M ${start.x} ${start.y} Q ${upper.x} ${upper.y} ${tip.x} ${tip.y} Q ${lower.x} ${lower.y} ${end.x} ${end.y}`;
+  return `M ${start.x} ${start.y} Q ${upper.x} ${upper.y} ${tip.x} ${tip.y} Q ${lower.x} ${lower.y} ${end.x} ${end.y}${arrow.headFilled ? ' Z' : ''}`;
 }

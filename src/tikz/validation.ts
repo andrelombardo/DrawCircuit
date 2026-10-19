@@ -39,6 +39,12 @@ const endpoint = (e: Endpoint) =>
 export function isExportableObject(o: CircuitObject): boolean {
   if (!o || typeof o.id !== 'string' || !o.id || !normalizeHex(o.color)) return false;
   if (!opacity(o.opacity) || ('label' in o && o.label && !opacity(o.label.opacity))) return false;
+  if (
+    (o.kind === 'arrow' || o.kind === 'loop-arrow') &&
+    o.headFilled !== undefined &&
+    typeof o.headFilled !== 'boolean'
+  )
+    return false;
   switch (o.kind) {
     case 'component': {
       if (
