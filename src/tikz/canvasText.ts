@@ -1,4 +1,5 @@
 import { renderLatex } from '../math/latex';
+import { layoutCircuitMath } from '../math/layout';
 import { primeGlyphPaths } from '../math/primeGlyph';
 import { CIRCUIT_FONT } from '../model/fonts';
 import { formatNumber as fmt } from './units';
@@ -57,7 +58,7 @@ export function canvasTextLayout(
     const content = document.createElement('div');
     content.className = 'math-label-content';
     content.style.fontSize = `${size}px`;
-    content.innerHTML = result.html;
+    content.innerHTML = layoutCircuitMath(result.html, size);
     host.append(content);
     const root = content.querySelector('.katex-html');
     if (!root) return null;

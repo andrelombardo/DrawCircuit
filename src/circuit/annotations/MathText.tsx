@@ -3,6 +3,7 @@ import { memo, useLayoutEffect, useRef, useState } from 'react';
 import { CIRCUIT_FONT } from '../../model/fonts';
 import type { Rotation } from '../../model/types';
 import { renderLatex } from '../../math/latex';
+import { layoutCircuitMath } from '../../math/layout';
 
 export const MathText = memo(function MathText({
   text,
@@ -37,6 +38,10 @@ export const MathText = memo(function MathText({
     let active = true;
     const measure = () => {
       if (!active) return;
+      if (result.kind === 'math') {
+        const html = layoutCircuitMath(result.html, fontSize);
+        if (el.innerHTML !== html) el.innerHTML = html;
+      }
       const width = Math.max(1, el.offsetWidth),
         height = Math.max(1, el.offsetHeight);
       setSize((previous) =>
@@ -51,7 +56,7 @@ export const MathText = memo(function MathText({
       active = false;
       observer.disconnect();
     };
-  }, [text, fontSize, result.kind]);
+  }, [text, fontSize, result.kind, result.html]);
   if (result.kind === 'math') {
     return (
       <g
