@@ -1017,6 +1017,10 @@ kbd {
 .math-label-content .katex-html .mathnormal {
   font-style: normal;
 }
+.math-label-content .katex .frac-line {
+  min-height: 0;
+  border-radius: 999px;
+}
 .preset-section {
   border-bottom: 1px solid var(--border);
   margin-bottom: 8px;

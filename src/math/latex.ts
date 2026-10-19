@@ -160,6 +160,8 @@ export function renderLatex(source: string, forceMath = false): LatexResult {
           throwOnError: true,
           trust: false,
           strict: 'ignore',
+          // Match Comic Relief's pen weight and let KaTeX reserve the right clearance.
+          minRuleThickness: 0.08,
           maxExpand: 1000,
           maxSize: 20,
         }),

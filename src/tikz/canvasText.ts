@@ -118,7 +118,7 @@ export function canvasTextLayout(
         const width = parseFloat(css[`border${edge}Width`]);
         if (width > 0 && css[`border${edge}Style`] !== 'none')
           chunks.push(
-            `<rect x="${fmt(rect.x - origin.x)}" y="${fmt((edge === 'Top' ? rect.y : rect.bottom - width) - origin.y)}" width="${fmt(rect.width)}" height="${fmt(width)}"${colorAttribute(element)}/>`,
+            `<rect x="${fmt(rect.x - origin.x)}" y="${fmt((edge === 'Top' ? rect.y : rect.bottom - width) - origin.y)}" width="${fmt(rect.width)}" height="${fmt(width)}"${element.classList.contains('frac-line') ? ` rx="${fmt(width / 2)}"` : ''}${colorAttribute(element)}/>`,
           );
       }
     }
