@@ -9,7 +9,7 @@ import { bridgePaths, wireCrossings } from '../utils/crossings';
 import type { CircuitDocument, Point, Rotation } from '../model/types';
 import { canvasTextLayout, xmlText } from '../tikz/canvasText';
 import { isExportableObject } from '../tikz/validation';
-import { canvasArrowHead } from '../tikz/arrowheads';
+import { canvasArrowHead, canvasArrowHeadPath } from '../tikz/arrowheads';
 import { arrowPath, pointsPath, wirePoints } from '../utils/geometry';
 import { loopPath } from '../utils/loops';
 import { visualBounds, unionBounds } from '../utils/visualBounds';
@@ -218,7 +218,7 @@ export function exportSVG(
       );
       parts.push(
         path(o.kind === 'arrow' ? arrowPath(o) : loopPath(o), o.color, width),
-        path(pointsPath(canvasArrowHead(o)), o.color, width),
+        path(canvasArrowHeadPath(o), o.color, width),
       );
     } else if (o.kind === 'brace') {
       const g = braceGeometry(o);

@@ -154,7 +154,8 @@ export function renderLatex(source: string, forceMath = false): LatexResult {
       kind: 'math',
       source,
       html: markMathPrimes(
-        katex.renderToString(mathContent(normalizeLatex(source, forceMath)), {
+        // Circuit formulas need full-size fractions; KaTeX still scales nested scripts.
+        katex.renderToString(`\\displaystyle ${mathContent(normalizeLatex(source, forceMath))}`, {
           output: 'htmlAndMathml',
           throwOnError: true,
           trust: false,

@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import type { LoopArrow } from '../../model/types';
 import { loopPath } from '../../utils/loops';
+import { canvasArrowHeadPath } from '../../tikz/arrowheads';
 export const LoopArrowView = memo(function LoopArrowView({
   object: o,
   zoom = 1,
@@ -8,30 +9,8 @@ export const LoopArrowView = memo(function LoopArrowView({
   object: LoopArrow;
   zoom?: number;
 }) {
-  const markerId = `loop-${o.id}`;
   return (
     <g data-object={o.id} className="circuit-object">
-      <defs>
-        <marker
-          id={markerId}
-          viewBox="0 -4 9 8"
-          refX={8}
-          refY={0}
-          markerWidth={9}
-          markerHeight={8}
-          orient="auto"
-          markerUnits="userSpaceOnUse"
-        >
-          <path
-            d="M0-3.5L8 0 0 3.5"
-            fill="none"
-            stroke={o.color}
-            strokeWidth={o.strokeWidth}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </marker>
-      </defs>
       <path
         d={loopPath(o)}
         stroke="transparent"
@@ -39,14 +18,17 @@ export const LoopArrowView = memo(function LoopArrowView({
         vectorEffect="non-scaling-stroke"
         fill="none"
       />
-      <path
-        d={loopPath(o)}
+      <g
         opacity={o.opacity}
         stroke={o.color}
         strokeWidth={o.strokeWidth}
         fill="none"
-        markerEnd={`url(#${markerId})`}
-      />
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d={loopPath(o)} />
+        <path d={canvasArrowHeadPath(o)} />
+      </g>
     </g>
   );
 });
