@@ -120,21 +120,24 @@ export type LatexResult =
   | { kind: 'math'; source: string; html: string };
 const cache = new Map<string, LatexResult>();
 
-/** The Comic Relief override cannot use KaTeX's prime metrics. Restore only the
- * mathematical prime glyph; text-command contents and every other glyph remain
- * untouched. The same HTML is measured by editor and vector export. */
-function markMathPrimes(html: string): string {
+/** Keep KaTeX's prime metrics and a distinct mathematical alpha: Comic Relief's
+ * alpha resembles a Latin a. Text commands retain the circuit font. The same
+ * marked HTML is measured by the editor and vector export. */
+function markMathGlyphs(html: string): string {
   const spans: string[][] = [];
-  return html.replace(/<span\b[^>]*>|<\/span>/gu, (tag, index: number) => {
+  return html.replace(/<[^>]*>|[^<]+/gu, (tag, index: number) => {
     if (tag === '</span>') {
       spans.pop();
       return tag;
     }
-    const classes = /\bclass="([^"]*)"/u.exec(tag)?.[1].split(/\s/u) ?? [];
     const math = spans.some((parent) => parent.includes('katex-html'));
     const text = spans.some(
       (parent) => parent.includes('text') || parent.includes('mtext') || parent.includes('mop'),
     );
+    if (!tag.startsWith('<'))
+      return math && !text ? tag.replace(/α+/gu, '<span class="math-alpha">$&</span>') : tag;
+    if (!tag.startsWith('<span')) return tag;
+    const classes = /\bclass="([^"]*)"/u.exec(tag)?.[1].split(/\s/u) ?? [];
     spans.push(classes);
     return math && !text && /^′+<\/span>/u.test(html.slice(index + tag.length))
       ? tag.replace(/\bclass="([^"]*)"/u, 'class="$1 math-prime"')
@@ -153,7 +156,7 @@ export function renderLatex(source: string, forceMath = false): LatexResult {
     result = {
       kind: 'math',
       source,
-      html: markMathPrimes(
+      html: markMathGlyphs(
         // Circuit formulas need full-size fractions; KaTeX still scales nested scripts.
         katex.renderToString(`\\displaystyle ${mathContent(normalizeLatex(source, forceMath))}`, {
           output: 'htmlAndMathml',

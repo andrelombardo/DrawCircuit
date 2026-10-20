@@ -2127,6 +2127,12 @@ summary:focus-visible {
   font-style: normal;
 }
 
+/* Comic Relief's alpha looks like a Latin a; keep the mathematical glyph distinct. */
+.math-label-content .katex-html .math-alpha {
+  font-family: KaTeX_Math !important;
+  font-style: italic;
+}
+
 /* The pencil and contextual actions share a compact, viewport-aware menu tree. */
 .action-menu-root {
   position: relative;

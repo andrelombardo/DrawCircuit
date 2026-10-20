@@ -1,6 +1,7 @@
 import { renderLatex } from '../math/latex';
 import { layoutCircuitMath } from '../math/layout';
 import { primeGlyphPaths } from '../math/primeGlyph';
+import { alphaGlyphPaths } from '../math/alphaGlyph';
 import { CIRCUIT_FONT } from '../model/fonts';
 import { formatNumber as fmt } from './units';
 
@@ -98,11 +99,13 @@ export function canvasTextLayout(
       const metrics = context.measureText(value);
       const descent = metrics.fontBoundingBoxDescent;
       if (!Number.isFinite(descent)) return null;
-      if (parent.classList.contains('math-prime')) {
+      const prime = parent.classList.contains('math-prime');
+      const alpha = parent.classList.contains('math-alpha');
+      if (prime || alpha) {
         const size = parseFloat(css.fontSize);
         const bold = Number(css.fontWeight) >= 600 || css.fontWeight === 'bold';
         chunks.push(
-          `<g data-math-prime="${value.length}" transform="translate(${fmt(rect.x - origin.x)} ${fmt(rect.bottom - descent - origin.y)}) scale(${size / 1000})"${colorAttribute(parent)}>${primeGlyphPaths(value.length, bold)}</g>`,
+          `<g data-math-${prime ? 'prime' : 'alpha'}="${value.length}" transform="translate(${fmt(rect.x - origin.x)} ${fmt(rect.bottom - descent - origin.y)}) scale(${size / 1000})"${colorAttribute(parent)}>${(prime ? primeGlyphPaths : alphaGlyphPaths)(value.length, bold)}</g>`,
         );
         continue;
       }
