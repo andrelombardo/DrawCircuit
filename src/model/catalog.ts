@@ -180,7 +180,7 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Dependent voltage source',
     'Sources',
     'V',
-    g.directedSource(g.voltage, true),
+    g.directedSource(g.voltageBar, true),
     ['dependent voltage source', 'controlled voltage'],
   ),
   dependentCurrent: def(
@@ -188,7 +188,7 @@ export const componentRegistry: Record<ComponentType, ComponentDefinition> = {
     'Dependent current source',
     'Sources',
     'I',
-    g.directedSource(g.current, true),
+    g.directedSource(g.currentBar, true),
     ['dependent current source', 'controlled current'],
   ),
   diode: def('diode', 'Diode', 'Diodes', 'D', g.diode, ['diode', 'standard diode']),
