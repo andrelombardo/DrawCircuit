@@ -68,7 +68,7 @@ For an exact distance, choose **Geometry → Exact spacing**, select centers or 
 
 ## Labels, math, and annotations
 
-Labels and text support LaTeX: for example, `r_{AB}`, `V_{in}`, and `\frac{V}{R}`. They retain the original source, color, position, and size. Double-click editing uses the same SVG/KaTeX rendering as the circuit. Invalid formulas show a hint for correction. Comic Relief regular and bold load before editor measurements; copied PNGs preserve the bundled font.
+Labels and text support LaTeX: for example, `r_{AB}`, `V_{in}`, and `\frac{V}{R}`. They retain the original source, color, position, and size. Double-click editing uses the same SVG/KaTeX rendering as the circuit. Invalid formulas show a hint for correction. Comic Relief regular and bold, its local handwriting supplement for missing mathematical symbols, and matching large delimiters load before editor measurements. Copied PNGs preserve these fonts and the weight of fraction bars, radicals, accents and other mathematical rules.
 
 New junction labels avoid nearby objects where possible. Existing moved labels stay where you place them. **Alt/Option-click** cycles overlapping labels.
 

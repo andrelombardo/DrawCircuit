@@ -80,7 +80,7 @@ export function exportSVG(
         const content =
           layout?.svg ??
           `<text text-anchor="middle" dominant-baseline="middle" font-family="${attr(CIRCUIT_FONT)}" font-size="${f(size)}">${xmlText(line)}</text>`;
-        return `<g opacity="${f(opacity)}" transform="translate(${f(p.x)} ${f(p.y)}) rotate(${rotation})" fill="${color}"><g transform="translate(${f(shift)} ${f(y)})">${content}</g></g>`;
+        return `<g opacity="${f(opacity)}" transform="translate(${f(p.x)} ${f(p.y)}) rotate(${rotation})" fill="${color}" color="${color}"><g transform="translate(${f(shift)} ${f(y)})">${content}</g></g>`;
       })
       .join('');
   };

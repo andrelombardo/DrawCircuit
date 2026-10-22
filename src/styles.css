@@ -1,5 +1,5 @@
 :root {
-  --circuit-font: 'Comic Relief', cursive;
+  --circuit-font: 'Comic Relief', 'DrawCircuit Symbols', 'DrawCircuit Blackboard', 'DrawCircuit Script', 'DrawCircuit Fraktur', cursive;
   font-family: -apple-system, BlinkMacSystemFont, Inter, 'Segoe UI', sans-serif;
   color: var(--ui-text);
   background: var(--ui-bg);
@@ -1026,9 +1026,12 @@ kbd {
 .math-label-content .katex-html .mathnormal {
   font-style: normal;
 }
-.math-label-content .katex .frac-line {
+.math-label-content .katex :is(.frac-line, .overline-line, .underline-line) {
   min-height: 0;
   border-radius: 999px;
+}
+.math-label-content .katex svg path[stroke='currentColor'] {
+  stroke: currentColor;
 }
 .preset-section {
   border-bottom: 1px solid var(--border);
@@ -2131,17 +2134,37 @@ summary:focus-visible {
   outline-offset: -2px;
 }
 
-/* Mathematical prime needs the glyph whose metrics KaTeX uses for its script
-   position. Comic Relief and script sizing remain unchanged for every other glyph. */
+/* Same Comic Relief prime outline, aligned to the math baseline. */
 .math-label-content .katex-html .math-prime {
-  font-family: KaTeX_Main !important;
+  font-family: 'DrawCircuit Symbols' !important;
   font-style: normal;
 }
 
-/* Comic Relief's alpha looks like a Latin a; keep the mathematical glyph distinct. */
-.math-label-content .katex-html .math-alpha {
-  font-family: KaTeX_Math !important;
-  font-style: italic;
+/* Explicit mathematical alphabets keep their meaning (e.g. R versus ℝ), with
+   the same local pen treatment instead of silently flattening them to Latin. */
+.math-label-content .katex-html :is(.mathbb, .textbb) {
+  font-family: 'DrawCircuit Blackboard', var(--circuit-font) !important;
+}
+.math-label-content .katex-html :is(.mathcal, .mathscr, .textscr) {
+  font-family: 'DrawCircuit Script', var(--circuit-font) !important;
+}
+.math-label-content .katex-html :is(.mathfrak, .textfrak, .mathboldfrak, .textboldfrak) {
+  font-family: 'DrawCircuit Fraktur', var(--circuit-font) !important;
+}
+
+/* Keep the reserved TeX dimensions for large operators and delimiters while
+   drawing with the local handwriting outlines, including stacked pieces. */
+.math-label-content .katex-html :is(.delimsizing.size1, .delimsizing.size1 *, .delim-size1 > span, .op-symbol.small-op) {
+  font-family: 'DrawCircuit Size1' !important;
+}
+.math-label-content .katex-html :is(.delimsizing.size2, .delimsizing.size2 *, .op-symbol.large-op) {
+  font-family: 'DrawCircuit Size2' !important;
+}
+.math-label-content .katex-html :is(.delimsizing.size3, .delimsizing.size3 *) {
+  font-family: 'DrawCircuit Size3' !important;
+}
+.math-label-content .katex-html :is(.delimsizing.size4, .delimsizing.size4 *, .delim-size4 > span) {
+  font-family: 'DrawCircuit Size4' !important;
 }
 
 /* The pencil and contextual actions share a compact, viewport-aware menu tree. */

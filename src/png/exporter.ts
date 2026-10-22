@@ -1,49 +1,12 @@
 import { t } from '../i18n';
 import type { CircuitDocument } from '../model/types';
 import { exportSVG } from '../svg/exporter';
-import { CIRCUIT_FONT } from '../model/fonts';
-import { isMathSource } from '../math/latex';
+import { prepareCircuitFonts } from '../model/fonts';
 
 export const PNG_SCALE = 4;
 export const PNG_MAX_DIMENSION = 16_384;
 export const PNG_MAX_PIXELS = 32_000_000;
 export const PNG_PADDING = 8;
-const fontURLs = import.meta.glob<string>('/node_modules/katex/dist/fonts/*.woff2', {
-  eager: true,
-  query: '?url',
-  import: 'default',
-});
-const fontData = new Map<string, Promise<string>>();
-const dataURL = (blob: Blob) =>
-  new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(new Error(t('Unable to read the font.')));
-    reader.readAsDataURL(blob);
-  });
-
-/** SVG images have an isolated font context: embed the same local KaTeX fonts. */
-export async function embedSVGFonts(svg: string): Promise<string> {
-  const rules = await Promise.all(
-    Object.entries(fontURLs).map(async ([path, url]) => {
-      const match = /\/(KaTeX_[^-]+)-(Regular|Bold|Italic|BoldItalic)\.woff2$/.exec(path);
-      if (!match || !svg.includes(match[1])) return '';
-      let data = fontData.get(url);
-      if (!data) {
-        data = fetch(url)
-          .then((response) => {
-            if (!response.ok) throw new Error(t('Unable to load fonts for the PNG.'));
-            return response.blob();
-          })
-          .then(dataURL);
-        fontData.set(url, data);
-        data.catch(() => fontData.delete(url));
-      }
-      return `@font-face{font-family:${match[1]};font-style:${match[2].includes('Italic') ? 'italic' : 'normal'};font-weight:${match[2].includes('Bold') ? '700' : '400'};src:url(${await data}) format('woff2');}`;
-    }),
-  );
-  return svg.replace('</title>', `</title><style>${rules.join('')}</style>`);
-}
 
 export function pngDimensions(svg: string, scale = PNG_SCALE) {
   const bounds = /viewBox="([^"]+)"/.exec(svg)?.[1].trim().split(/\s+/).map(Number);
@@ -175,34 +138,15 @@ export async function rasterizeSVG(svg: string, scale = PNG_SCALE): Promise<Blob
   }
 }
 
-/** Loading after layout is too late: KaTeX first requests glyph faces when its
- * temporary measurement nodes are inserted. Prime them before exportSVG measures. */
-export async function preparePNGFonts(doc: CircuitDocument): Promise<void> {
-  if (!document.fonts) return;
-  const sources = doc.objects.flatMap((o) =>
-    o.kind === 'text' ? [o.text] : 'label' in o ? [o.label.text] : [],
-  );
-  const text = sources.join(' ');
-  const requests = [
-    document.fonts.load(`400 22px ${CIRCUIT_FONT}`, text || 'DrawCircuit'),
-    document.fonts.load(`700 22px ${CIRCUIT_FONT}`, text || 'DrawCircuit'),
-  ];
-  if (sources.some((source) => isMathSource(source))) {
-    for (const path of Object.keys(fontURLs)) {
-      const match = /\/(KaTeX_[^-]+)-(Regular|Bold|Italic|BoldItalic)\.woff2$/.exec(path);
-      if (!match) continue;
-      const style = match[2].includes('Italic') ? 'italic' : 'normal';
-      const weight = match[2].includes('Bold') ? '700' : '400';
-      requests.push(document.fonts.load(`${style} ${weight} 22px ${match[1]}`, text));
-    }
-  }
-  await Promise.all(requests);
+/** Export uses exactly the fonts embedded by exportSVG, loaded before layout. */
+export async function preparePNGFonts(): Promise<void> {
+  await prepareCircuitFonts();
   await document.fonts.ready;
 }
 
 export async function exportPNG(doc: CircuitDocument): Promise<Blob> {
-  await preparePNGFonts(doc);
-  return rasterizeSVG(await embedSVGFonts(exportSVG(doc, { transparent: true })));
+  await preparePNGFonts();
+  return rasterizeSVG(exportSVG(doc, { transparent: true }));
 }
 
 /** Pass the promise immediately to preserve clipboard user activation on Safari. */

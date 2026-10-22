@@ -1,0 +1,85 @@
+/* Local handwriting supplement. Sources and OFL notices: README.md, OFL.txt. */
+@font-face {
+  font-family: 'DrawCircuit Blackboard';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('./DrawCircuitBlackboard-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DrawCircuit Blackboard';
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url('./DrawCircuitBlackboard-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DrawCircuit Script';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('./DrawCircuitScript-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DrawCircuit Script';
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url('./DrawCircuitScript-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DrawCircuit Fraktur';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('./DrawCircuitFraktur-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DrawCircuit Fraktur';
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url('./DrawCircuitFraktur-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DrawCircuit Symbols';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('./DrawCircuitSymbols-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DrawCircuit Symbols';
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url('./DrawCircuitSymbols-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DrawCircuit Size1';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('./DrawCircuitSize1-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DrawCircuit Size2';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('./DrawCircuitSize2-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DrawCircuit Size3';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('./DrawCircuitSize3-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'DrawCircuit Size4';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('./DrawCircuitSize4-Regular.woff2') format('woff2');
+}

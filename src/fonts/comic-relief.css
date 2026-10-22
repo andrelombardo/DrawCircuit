@@ -1,4 +1,6 @@
 /* Comic Relief 1.210, Jeff Davis. SIL OFL 1.1: comic-relief/OFL.txt. */
+@import './math-symbols/fonts.css';
+
 @font-face {
   font-family: 'Comic Relief';
   font-style: normal;

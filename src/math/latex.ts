@@ -120,11 +120,11 @@ export type LatexResult =
   | { kind: 'math'; source: string; html: string };
 const cache = new Map<string, LatexResult>();
 
-/** Keep KaTeX's prime metrics and a distinct mathematical alpha: Comic Relief's
- * alpha resembles a Latin a. Text commands retain the circuit font. The same
- * marked HTML is measured by the editor and vector export. */
+/** Mark mathematical primes and reinforce stretchy geometry in the shared HTML.
+ * Prose keeps Comic Relief's original, already-raised prime punctuation. */
 function markMathGlyphs(html: string): string {
   const spans: string[][] = [];
+  let svgRuleWidth = 0;
   return html.replace(/<[^>]*>|[^<]+/gu, (tag, index: number) => {
     if (tag === '</span>') {
       spans.pop();
@@ -134,8 +134,24 @@ function markMathGlyphs(html: string): string {
     const text = spans.some(
       (parent) => parent.includes('text') || parent.includes('mtext') || parent.includes('mop'),
     );
-    if (!tag.startsWith('<'))
-      return math && !text ? tag.replace(/α+/gu, '<span class="math-alpha">$&</span>') : tag;
+    if (!tag.startsWith('<')) return tag;
+    if (tag.startsWith('<svg')) {
+      const height = Number(/\bheight="([\d.]+)em"/u.exec(tag)?.[1]);
+      const units = Number(/\bviewBox="[\d.]+ [\d.]+ [\d.]+ ([\d.]+)"/u.exec(tag)?.[1]);
+      // Radicals already reserve the 0.08em rule in KaTeX. Other stretchy
+      // drawings have 0.04em hairlines; give them the same rounded pen weight.
+      svgRuleWidth =
+        !spans.some((parent) => parent.includes('sqrt')) && height && units
+          ? (units / height) * 0.03
+          : 0;
+    } else if (tag.startsWith('</svg')) svgRuleWidth = 0;
+    else if (tag.startsWith('<path') && svgRuleWidth)
+      return tag.replace(
+        '<path',
+        `<path stroke="currentColor" stroke-width="${svgRuleWidth}" stroke-linecap="round" stroke-linejoin="round" paint-order="stroke fill"`,
+      );
+    else if (tag.startsWith('<line'))
+      return tag.replace(/stroke-width="[^"]*"/u, 'stroke-width="0.08em"');
     if (!tag.startsWith('<span')) return tag;
     const classes = /\bclass="([^"]*)"/u.exec(tag)?.[1].split(/\s/u) ?? [];
     spans.push(classes);
