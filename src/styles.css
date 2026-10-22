@@ -184,7 +184,8 @@ svg {
   font-size: 12px;
   color: var(--ui-text);
 }
-.search-field input::placeholder {
+.search-field input::placeholder,
+.replace-search::placeholder {
   color: var(--ui-text-secondary);
 }
 .search-field button {
@@ -1503,7 +1504,8 @@ summary:focus-visible {
 }
 .replace-dialog h2 {
   margin-bottom: 12px;
-  font-size: 16px;
+  font-size: 15px;
+  letter-spacing: -0.1px;
 }
 .replace-search-field {
   position: relative;
@@ -1516,6 +1518,7 @@ summary:focus-visible {
 }
 .replace-search {
   padding-left: 30px;
+  font-size: 12px;
 }
 .replace-list {
   display: block;
