@@ -5,23 +5,23 @@
 <h1 align="center">DrawCircuit</h1>
 
 <p align="center">Electrical diagrams, made simple.</p>
+
+<p align="center">
+  <a href="docs/guide.md">User guide</a> · <a href="CONTRIBUTING.md">Contributing</a>
+</p>
+
+
+
+<p align="center">
+  <img src="assets/readme/screenshot.png" alt="DrawCircuit editor showing an annotated circuit diagram, the component library, and the properties panel" width="960" />
+</p>
+
 <p align="center">A focused, open-source editor for creating clean circuit diagrams in your browser.</p>
 
 <p align="center">
   <a href="https://andrelombardo.github.io/DrawCircuit/"><strong>Open DrawCircuit →</strong></a>
 </p>
 
-<p align="center">
-  <a href="README.it.md"><img src="assets/readme/italian.svg" alt="Read in Italian" width="100" height="28" /></a>
-</p>
-
-<p align="center">
-  <img src="assets/readme/screenshot.png" alt="DrawCircuit editor showing an annotated circuit diagram, the component library, and the properties panel" width="960" />
-</p>
-
-<p align="center">
-  <a href="docs/guide.md">User guide</a> · <a href="CONTRIBUTING.md">Contributing</a>
-</p>
 
 ## What is DrawCircuit?
 
