@@ -4,7 +4,7 @@ import { braceGeometry } from '../annotations/brace';
 import { electricalDrawingGeometry, electricalGeometry } from '../annotations/electrical';
 import { componentRegistry } from '../model/catalog';
 import { GRID } from '../model/types';
-import { getMeasurementBounds } from './measurementGeometry';
+import type { SymbolBounds } from '../model/symbolBounds';
 import type {
   ArrowAnnotation,
   CircuitComponent,
@@ -13,6 +13,7 @@ import type {
   Endpoint,
   Point,
   Wire,
+  WireRouting,
 } from '../model/types';
 export const snap = (n: number) => Math.round(n / GRID) * GRID;
 export const snapPoint = (p: Point): Point => ({ x: snap(p.x), y: snap(p.y) });
@@ -139,12 +140,23 @@ function terminalExit(endpoint: Endpoint | null, doc: CircuitDocument) {
         ? terminal.localX - body.x - body.width / 2
         : terminal.localY - body.y - body.height / 2,
     sign = Math.sign(coordinate) || 1;
+  // Use the rotated body envelope, including the empty spaces between open
+  // strokes such as the zig-zag resistor. A route must not cut through them.
+  const corners = [
+    { x: body.x, y: body.y },
+    { x: body.x + body.width, y: body.y },
+    { x: body.x, y: body.y + body.height },
+    { x: body.x + body.width, y: body.y + body.height },
+  ].map((p) => localToWorld(component, p)),
+    x = Math.min(...corners.map((p) => p.x)),
+    y = Math.min(...corners.map((p) => p.y));
   return {
     direction: rotatePoint(
       axis === 'x' ? { x: sign, y: 0 } : { x: 0, y: sign },
       component.rotation,
     ),
-    bounds: getMeasurementBounds(component),
+    bounds: { x, y, width: Math.max(...corners.map((p) => p.x)) - x,
+      height: Math.max(...corners.map((p) => p.y)) - y },
   };
 }
 
@@ -162,138 +174,166 @@ function diagonalLead(endpoint: Endpoint, point: Point, doc: CircuitDocument): P
   return add(point, { x: direction.x * length, y: direction.y * length });
 }
 
-/** Preserve familiar routes; only reroute when a terminal would point inward or
- * the connection would cross one of its own symbol bodies. The small visibility
- * graph concerns at most the two endpoint bodies, not a document-wide router. */
-function terminalSafeRoute(
-  original: Point[],
-  startEndpoint: Endpoint | null,
-  endEndpoint: Endpoint | null,
-  doc: CircuitDocument,
-): Point[] {
-  const startExit = terminalExit(startEndpoint, doc),
-    endExit = terminalExit(endEndpoint, doc),
-    obstacles = [startExit?.bounds, endExit?.bounds].filter((b) => b !== undefined),
-    points = original.filter((p, i) => i === 0 || distance(p, original[i - 1]) > 0.001),
-    start = points[0],
-    end = points.at(-1)!;
-  if (points.length < 2 || !obstacles.length) return points;
-  // Diagonal pins already have their outward lead at this point. Continue on a
-  // cardinal axis without asking the axis-aligned visibility graph to diagonalize.
-  for (const exit of [startExit, endExit]) {
-    if (!exit || !exit.direction.x || !exit.direction.y) continue;
-    exit.direction =
-      Math.abs(exit.direction.x) >= Math.abs(exit.direction.y)
-        ? { x: Math.sign(exit.direction.x), y: 0 }
-        : { x: 0, y: Math.sign(exit.direction.y) };
+/** Check the open body interior for every segment orientation, including free
+ * and 45-degree wires. Boundaries remain available for pins and lead-outs. */
+function crossesBody(a: Point, b: Point, box: SymbolBounds) {
+  let enter = 0, leave = 1;
+  for (const axis of ['x', 'y'] as const) {
+    const min = box[axis] + 0.001,
+      max = box[axis] + (axis === 'x' ? box.width : box.height) - 0.001,
+      delta = b[axis] - a[axis];
+    if (max <= min) return false;
+    if (Math.abs(delta) < 1e-10) {
+      if (a[axis] <= min || a[axis] >= max) return false;
+    } else {
+      const t0 = (min - a[axis]) / delta, t1 = (max - a[axis]) / delta;
+      enter = Math.max(enter, Math.min(t0, t1));
+      leave = Math.min(leave, Math.max(t0, t1));
+      if (enter >= leave) return false;
+    }
   }
-  const follows = (from: Point, to: Point, direction: Point) =>
-    (to.x - from.x) * direction.x + (to.y - from.y) * direction.y > 0.001 &&
-    (direction.x ? to.y === from.y : to.x === from.x);
-  const clear = (a: Point, b: Point) =>
-    obstacles.every((box) =>
-      a.x === b.x
-        ? !(
-            a.x > box.x + 0.001 &&
-            a.x < box.x + box.width - 0.001 &&
-            Math.max(a.y, b.y) > box.y + 0.001 &&
-            Math.min(a.y, b.y) < box.y + box.height - 0.001
-          )
-        : !(
-            a.y > box.y + 0.001 &&
-            a.y < box.y + box.height - 0.001 &&
-            Math.max(a.x, b.x) > box.x + 0.001 &&
-            Math.min(a.x, b.x) < box.x + box.width - 0.001
-          ),
-    );
-  if (
-    (!startExit || follows(start, points[1], startExit.direction)) &&
-    (!endExit || follows(end, points.at(-2)!, endExit.direction)) &&
-    points.slice(1).every((p, i) => clear(points[i], p))
-  )
-    return points;
-  const xs = [
-      ...new Set([
-        start.x,
-        end.x,
-        ...(startExit ? [start.x + startExit.direction.x * GRID] : []),
-        ...(endExit ? [end.x + endExit.direction.x * GRID] : []),
-        ...obstacles.flatMap((b) => [b.x - GRID, b.x + b.width + GRID]),
-      ]),
-    ].sort((a, b) => a - b),
-    ys = [
-      ...new Set([
-        start.y,
-        end.y,
-        ...(startExit ? [start.y + startExit.direction.y * GRID] : []),
-        ...(endExit ? [end.y + endExit.direction.y * GRID] : []),
-        ...obstacles.flatMap((b) => [b.y - GRID, b.y + b.height + GRID]),
-      ]),
-    ].sort((a, b) => a - b),
+  return enter < leave;
+}
+
+/** Small visibility graph around the endpoint bodies. Safe authored bends are
+ * retained; only individual obstructed legs need a detour. */
+function routeAroundBodies(
+  start: Point,
+  end: Point,
+  obstacles: SymbolBounds[],
+  startDirection?: Point,
+  endDirection?: Point,
+  routing: WireRouting = 'orthogonal',
+): Point[] {
+  const clear = (a: Point, b: Point) => obstacles.every((box) => !crossesBody(a, b, box));
+  const outward = (a: Point, b: Point, direction?: Point) =>
+    !direction || (b.x - a.x) * direction.x + (b.y - a.y) * direction.y >= -0.001;
+  const dx = end.x - start.x, dy = end.y - start.y,
+    direct = Math.abs(dx) < 0.001 || Math.abs(dy) < 0.001 || routing === 'free' ||
+      (routing === '45' && Math.abs(Math.abs(dx) - Math.abs(dy)) < 0.001);
+  if (direct && clear(start, end) && outward(start, end, startDirection) && outward(end, start, endDirection))
+    return [start, end];
+  const xs = [...new Set([
+      start.x, end.x, start.x - GRID, start.x + GRID, end.x - GRID, end.x + GRID,
+      ...obstacles.flatMap((b) => [b.x - GRID, b.x + b.width + GRID]),
+    ])].sort((a, b) => a - b),
+    ys = [...new Set([
+      start.y, end.y, start.y - GRID, start.y + GRID, end.y - GRID, end.y + GRID,
+      ...obstacles.flatMap((b) => [b.y - GRID, b.y + b.height + GRID]),
+    ])].sort((a, b) => a - b),
     nodes = ys.flatMap((y) => xs.map((x) => ({ x, y }))),
     first = nodes.findIndex((p) => p.x === start.x && p.y === start.y),
     last = nodes.findIndex((p) => p.x === end.x && p.y === end.y);
-  type State = {
-    node: number;
-    axis: 'x' | 'y' | '';
-    cost: number;
-    path: number[];
-  };
+  type State = { node: number; axis: 'x' | 'y' | ''; cost: number; path: number[] };
   const pending: State[] = [{ node: first, axis: '', cost: 0, path: [first] }],
     visited = new Set<string>();
   while (pending.length) {
     pending.sort((a, b) => a.cost - b.cost);
-    const current = pending.shift()!,
-      key = `${current.node}:${current.axis}`;
+    const current = pending.shift()!, key = `${current.node}:${current.axis}`;
     if (visited.has(key)) continue;
     visited.add(key);
-    if (current.node === last) {
-      const result: Point[] = [];
-      for (const index of current.path) {
-        const p = nodes[index],
-          a = result.at(-2),
-          b = result.at(-1);
-        if (a && b && ((a.x === b.x && b.x === p.x) || (a.y === b.y && b.y === p.y))) result.pop();
-        result.push(p);
-      }
-      return result;
-    }
+    if (current.node === last) return current.path.map((index) => nodes[index]);
     const x = current.node % xs.length,
-      y = Math.floor(current.node / xs.length),
-      a = nodes[current.node];
-    for (const [nx, ny] of [
-      [x - 1, y],
-      [x + 1, y],
-      [x, y - 1],
-      [x, y + 1],
-    ]) {
+      y = Math.floor(current.node / xs.length), a = nodes[current.node];
+    for (const [nx, ny] of [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]]) {
       if (nx < 0 || nx >= xs.length || ny < 0 || ny >= ys.length) continue;
-      const node = ny * xs.length + nx,
-        b = nodes[node],
-        axis = a.x === b.x ? 'y' : 'x';
-      if (
-        !clear(a, b) ||
-        (current.node === first && startExit && !follows(a, b, startExit.direction)) ||
-        (node === last && endExit && !follows(b, a, endExit.direction))
-      )
-        continue;
-      pending.push({
-        node,
-        axis,
+      const node = ny * xs.length + nx, b = nodes[node], axis = a.x === b.x ? 'y' : 'x';
+      if (!clear(a, b) ||
+        (current.node === first && !outward(a, b, startDirection)) ||
+        (node === last && !outward(b, a, endDirection))) continue;
+      pending.push({ node, axis,
         cost: current.cost + distance(a, b) + (current.axis && current.axis !== axis ? 0.01 : 0),
         path: [...current.path, node],
       });
     }
   }
-  // Overlapping symbols or a waypoint placed inside its own body cannot be routed
-  // around without moving user geometry. Preserve that authored waypoint.
-  return points;
-}
-export function wirePoints(wire: Wire, doc: CircuitDocument): Point[] {
-  return routeWire(wire, doc, false);
+  // A different component can overlap a fixed endpoint. Keep its electrical
+  // connection rather than silently moving it to another pin.
+  return [start, end];
 }
 
-/** New connections use signed exits without changing historical automatic paths. */
+function cleanRoute(points: Point[]): Point[] {
+  const result: Point[] = [];
+  for (const point of points) {
+    if (result.length && distance(point, result.at(-1)!) < 0.001) continue;
+    while (result.length > 1 &&
+      distance(result.at(-2)!, result.at(-1)!) + distance(result.at(-1)!, point) -
+        distance(result.at(-2)!, point) < 0.001) result.pop();
+    result.push(point);
+  }
+  return result;
+}
+
+/** Apply the same terminal protection to rendering, editing, movement and export.
+ * A bend swallowed by a moving symbol is discarded, while outside bends stay put. */
+function terminalSafeRoute(original: Point[], wire: Wire, doc: CircuitDocument): Point[] {
+  const startExit = terminalExit(wire.startEndpoint, doc),
+    endExit = terminalExit(wire.endEndpoint, doc),
+    obstacles = [startExit?.bounds, endExit?.bounds].filter((b) => b !== undefined),
+    points = original.filter((p, i) => i === 0 || distance(p, original[i - 1]) > 0.001);
+  if (points.length < 2 || !obstacles.length) return points;
+  const start = points[0], end = points.at(-1)!;
+  const follows = (from: Point, to: Point, exit: ReturnType<typeof terminalExit>) => {
+    if (!exit) return true;
+    const dx = to.x - from.x, dy = to.y - from.y, d = exit.direction;
+    return dx * d.x + dy * d.y > 0.001 &&
+      (wire.routing === 'free' || wire.routing === '45' || Math.abs(dx * d.y - dy * d.x) < 0.001);
+  };
+  // Lead-outs may lie inside the AABB of a diagonal symbol even though they are
+  // outside its actual body. Test those two short segments in local coordinates.
+  const clear = (a: Point, b: Point) => [wire.startEndpoint, wire.endEndpoint].every((ep) => {
+    if (ep.kind !== 'terminal') return true;
+    const component = objectIndex(doc).get(ep.componentId);
+    if (component?.kind !== 'component') return true;
+    const local = (p: Point) => rotatePoint({ x: p.x - component.x, y: p.y - component.y }, -component.rotation);
+    return !crossesBody(local(a), local(b), componentRegistry[component.type].measurementBounds);
+  });
+  if (follows(start, points[1], startExit) && follows(end, points.at(-2)!, endExit) &&
+    points.slice(1).every((p, i) => clear(points[i], p))) return points;
+  const lead = (point: Point, exit: NonNullable<ReturnType<typeof terminalExit>>) => {
+    const d = exit.direction, b = exit.bounds;
+    const outside = Math.min(...(['x', 'y'] as const).flatMap((axis) => d[axis] ? [
+      ((d[axis] > 0 ? b[axis] + (axis === 'x' ? b.width : b.height) : b[axis]) - point[axis]) / d[axis],
+    ] : []));
+    return add(point, { x: d.x * Math.max(GRID, outside + GRID / 2), y: d.y * Math.max(GRID, outside + GRID / 2) });
+  };
+  const inside = (p: Point) => obstacles.some((box) => crossesBody(p, p, box)),
+    retained = [start, ...points.slice(1, -1).filter((p) => !inside(p) &&
+      distance(p, start) > 0.001 && distance(p, end) > 0.001), end];
+  // A short connection may become straight again when an obsolete interior bend
+  // is removed. Do not add lead-outs that would overshoot its other endpoint.
+  if (follows(start, retained[1], startExit) && follows(end, retained.at(-2)!, endExit) &&
+    retained.slice(1).every((b, i) => {
+      const a = retained[i], dx = Math.abs(b.x - a.x), dy = Math.abs(b.y - a.y);
+      return clear(a, b) && (wire.routing === 'free' || dx < 0.001 || dy < 0.001 ||
+        (wire.routing === '45' && Math.abs(dx - dy) < 0.001));
+    })) return cleanRoute(retained);
+  const first = startExit ? lead(start, startExit) : start,
+    last = endExit ? lead(end, endExit) : end,
+    anchors = [first, ...retained.slice(1, -1), last],
+    result = [start, first];
+  for (let i = 1; i < anchors.length; i++)
+    result.push(...routeAroundBodies(anchors[i - 1], anchors[i], obstacles,
+      i === 1 ? startExit?.direction : undefined,
+      i === anchors.length - 1 ? endExit?.direction : undefined, wire.routing).slice(1));
+  return cleanRoute([...result, end]);
+}
+const resolvedWireRoutes = new WeakMap<CircuitDocument, WeakMap<Wire, Point[]>>();
+export function wirePoints(wire: Wire, doc: CircuitDocument): Point[] {
+  let routes = resolvedWireRoutes.get(doc);
+  if (!routes) {
+    routes = new WeakMap();
+    resolvedWireRoutes.set(doc, routes);
+  }
+  let points = routes.get(wire);
+  if (!points) {
+    points = routeWire(wire, doc, false);
+    routes.set(wire, points);
+  }
+  return points;
+}
+
+/** New connections can also constrain the exit axis of an existing wire branch. */
 export interface WireExitAxes {
   start?: 'x' | 'y';
   end?: 'x' | 'y';
@@ -302,10 +342,10 @@ export function safeWirePoints(wire: Wire, doc: CircuitDocument, axes: WireExitA
   return routeWire(wire, doc, true, axes);
 }
 
-function routeWire(wire: Wire, doc: CircuitDocument, protectTerminals: boolean, axes: WireExitAxes = {}): Point[] {
+function routeWire(wire: Wire, doc: CircuitDocument, editing: boolean, axes: WireExitAxes = {}): Point[] {
   const startPoint = resolveEndpoint(wire.startEndpoint, doc),
     endPoint = resolveEndpoint(wire.endEndpoint, doc);
-  if (wire.routing === 'free') return [startPoint, ...wire.vertices, endPoint];
+  if (wire.routing === 'free') return terminalSafeRoute([startPoint, ...wire.vertices, endPoint], wire, doc);
   if (wire.routing === '45') {
     const anchors = [startPoint, ...wire.vertices, endPoint];
     const result: Point[] = [startPoint];
@@ -322,7 +362,7 @@ function routeWire(wire: Wire, doc: CircuitDocument, protectTerminals: boolean, 
         });
       if (distance(result.at(-1)!, b) > 0.001) result.push(b);
     }
-    return result;
+    return terminalSafeRoute(result, wire, doc);
   }
   // Smart Placement uses a semantic zero-length wire at coincident terminals.
   // Diagonal lead-outs must not turn that connection into a visible loop.
@@ -333,13 +373,12 @@ function routeWire(wire: Wire, doc: CircuitDocument, protectTerminals: boolean, 
     end = endLead ?? endPoint;
   const sd = endpointDirection(wire.startEndpoint, doc),
     ed = endpointDirection(wire.endEndpoint, doc);
-  const route = (points: Point[], start: Endpoint | null, end: Endpoint | null) =>
-    protectTerminals ? terminalSafeRoute(points, start, end, doc) : points;
-  const withLeads = (points: Point[]) =>
+  const withLeads = (points: Point[]) => terminalSafeRoute(
     [startPoint, ...points, endPoint].filter(
       (p, i, all) => i === 0 || distance(p, all[i - 1]) > 0.001,
-    );
-  if (protectTerminals) {
+    ), wire, doc,
+  );
+  if (editing) {
     // Only terminal pins constrain the exit axis. Nodes and free points follow
     // the gesture instead of inheriting a horizontal pin and a middle dogleg.
     const dominant = (a: Point, b: Point) =>
@@ -356,47 +395,36 @@ function routeWire(wire: Wire, doc: CircuitDocument, protectTerminals: boolean, 
               startAxis ?? dominant(start, end),
               !!startAxis && startAxis === endAxis,
             );
-      return withLeads(route(points, wire.startEndpoint, wire.endEndpoint));
+      return withLeads(points);
     }
     const result: Point[] = [start];
     for (const [i, point] of wire.vertices.entries()) {
       const previous = result.at(-1)!;
       result.push(
-        ...route(
-          orthogonal(
-            previous,
-            point,
-            i === 0 && startAxis ? startAxis : dominant(previous, point),
-          ),
-          i === 0 ? wire.startEndpoint : null,
-          null,
-        ).slice(1),
+        ...orthogonal(previous, point,
+          i === 0 && startAxis ? startAxis : dominant(previous, point)).slice(1),
       );
     }
     const previous = result.at(-1)!;
     const tail =
       endAxis
-        ? route(orthogonal(end, previous, endAxis), wire.endEndpoint, null).reverse()
+        ? orthogonal(end, previous, endAxis).reverse()
         : orthogonal(previous, end, dominant(previous, end));
     result.push(...tail.slice(1));
     return withLeads(result);
   }
   if (!wire.vertices.length)
     return withLeads(
-      route(orthogonal(start, end, sd, sd === ed), wire.startEndpoint, wire.endEndpoint),
+      orthogonal(start, end, sd, sd === ed),
     );
   const result: Point[] = [start];
   wire.vertices.forEach((p, i) =>
     result.push(
-      ...route(
-        orthogonal(result[result.length - 1], p, i === 0 ? sd : 'x'),
-        i === 0 ? wire.startEndpoint : null,
-        null,
-      ).slice(1),
+      ...orthogonal(result[result.length - 1], p, i === 0 ? sd : 'x').slice(1),
     ),
   );
   result.push(
-    ...route(orthogonal(end, result[result.length - 1], ed), wire.endEndpoint, null)
+    ...orthogonal(end, result[result.length - 1], ed)
       .reverse()
       .slice(1),
   );

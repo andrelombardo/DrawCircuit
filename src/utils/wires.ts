@@ -187,7 +187,9 @@ export function routeEditedWire(wire: Wire, doc: CircuitDocument, axes: WireExit
   const original = wirePoints(wire, doc),
     safe = safeWirePoints(wire, doc, axes);
   return original.length === safe.length &&
-    original.every((point, i) => distance(point, safe[i]) < 0.001)
+    original.every((point, i) => distance(point, safe[i]) < 0.001) &&
+    wire.vertices.every((vertex) => original.some((point, i) => i > 0 &&
+      distance(vertex, projectOnSegment(vertex, original[i - 1], point)) < 0.001))
     ? wire
     : { ...wire, vertices: safe.slice(1, -1) };
 }
