@@ -18,6 +18,7 @@ import {
   fixedWireConnection,
 } from './geometry';
 import type { CircuitDocument, CircuitObject, Endpoint, Point, Rotation } from '../model/types';
+import { healWireConnections } from './wires';
 export function extractSelection(doc: CircuitDocument, ids: string[]): CircuitDocument {
   const selected = new Set(ids);
   const ep = (e: Endpoint): Endpoint =>
@@ -101,12 +102,32 @@ export function cloneObjects(
 }
 export function removeObjects(doc: CircuitDocument, ids: string[]): CircuitDocument {
   const removed = new Set(ids);
+  const connections = new Set<string>();
+  const detached = new Map<string, Endpoint>();
+  for (const o of doc.objects) {
+    if (o.kind !== 'wire' || !removed.has(o.id)) continue;
+    for (const endpoint of [o.startEndpoint, o.endEndpoint])
+      if (endpoint.kind === 'free' && endpoint.connectionId) connections.add(endpoint.connectionId);
+  }
+  const detach = (endpoint: Endpoint): Endpoint => {
+    const key = endpoint.kind === 'terminal'
+      ? JSON.stringify(['terminal', endpoint.componentId, endpoint.terminalId])
+      : endpoint.kind === 'junction' ? JSON.stringify(['junction', endpoint.junctionId]) : '';
+    let replacement = detached.get(key);
+    if (!replacement) {
+      const connectionId = makeId();
+      replacement = { kind: 'free', point: resolveEndpoint(endpoint, doc), connectionId };
+      detached.set(key, replacement);
+      connections.add(connectionId);
+    }
+    return replacement;
+  };
   const ep = (e: Endpoint): Endpoint =>
     (e.kind === 'terminal' && removed.has(e.componentId)) ||
     (e.kind === 'junction' && removed.has(e.junctionId))
-      ? { kind: 'free', point: resolveEndpoint(e, doc) }
+      ? detach(e)
       : e;
-  return {
+  return healWireConnections({
     ...doc,
     objects: doc.objects
       .filter((o) => !removed.has(o.id))
@@ -122,7 +143,7 @@ export function removeObjects(doc: CircuitDocument, ids: string[]): CircuitDocum
               ? detachWireEndpoints(o, ep, doc)
               : o,
       ),
-  };
+  }, connections);
 }
 /** Freeze the visible route before terminal direction is lost on detachment. */
 function detachWireEndpoints(
@@ -132,6 +153,7 @@ function detachWireEndpoints(
 ) {
   const startEndpoint = detach(wire.startEndpoint),
     endEndpoint = detach(wire.endEndpoint);
+  if (startEndpoint === wire.startEndpoint && endEndpoint === wire.endEndpoint) return wire;
   return {
     ...wire,
     startEndpoint,

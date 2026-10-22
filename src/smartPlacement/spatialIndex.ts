@@ -28,6 +28,7 @@ export class PlacementIndex {
   private longSegments: WireSegment[] = [];
   private centers = new Map<string, Point[]>();
   private components = new Map<string, CircuitComponent[]>();
+  private wireEnds = new Map<string, { wireId: string; side: number; point: Point }[]>();
   constructor(doc: CircuitDocument) {
     const occupied = new Set<string>();
     for (const o of doc.objects)
@@ -63,6 +64,12 @@ export class PlacementIndex {
           add(this.targets, cells({ ...target.point, width: 0, height: 0 })[0], target);
         }
       } else if (o.kind === 'wire') {
+        [o.startEndpoint, o.endEndpoint].forEach((endpoint, side) => {
+          if (endpoint.kind !== 'free') return;
+          add(this.wireEnds, cells({ ...endpoint.point, width: 0, height: 0 })[0], {
+            wireId: o.id, side, point: endpoint.point,
+          });
+        });
         const points = wirePoints(o, doc);
         points.slice(0, -1).forEach((a, segment) => {
           const b = points[segment + 1];
@@ -114,6 +121,11 @@ export class PlacementIndex {
           p.y - radius <= Math.max(s.a.y, s.b.y),
       ),
     ];
+  }
+  nearbyWireEnds(p: Point, radius: number) {
+    return query(this.wireEnds, {
+      x: p.x - radius, y: p.y - radius, width: radius * 2, height: radius * 2,
+    });
   }
   nearbyCenters(p: Point, radius: number): Point[] {
     return query(this.centers, {

@@ -49,10 +49,10 @@ export function useSmartPlacement(viewport: Viewport) {
     pointer.current = { point, type, alt };
     const s = useEditorStore.getState(),
       current = sessionRef.current;
-    let position = snapPoint(point),
+    let position = alt || !s.snapEnabled ? { ...point } : snapPoint(point),
       rotation = s.placementRotation;
     let next: PlacementPreview = { phase: 'free', position, rotation, guides: [] };
-    if (!alt) {
+    if (!alt && s.snapEnabled) {
       if (current.kind === 'anchored') {
         if (!current.manualRotation && inlineCompatible(type))
           rotation = anchorOrientation(
@@ -139,6 +139,8 @@ export function useSmartPlacement(viewport: Viewport) {
             !s.selection.length)
         ) {
           reset();
+        } else if (s.snapEnabled !== prev.snapEnabled) {
+          recompute.current();
         } else if (s.placementRotation !== prev.placementRotation) {
           changeSession({ ...sessionRef.current, manualRotation: true });
           recompute.current();

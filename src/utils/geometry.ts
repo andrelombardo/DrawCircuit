@@ -294,11 +294,15 @@ export function wirePoints(wire: Wire, doc: CircuitDocument): Point[] {
 }
 
 /** New connections use signed exits without changing historical automatic paths. */
-export function safeWirePoints(wire: Wire, doc: CircuitDocument): Point[] {
-  return routeWire(wire, doc, true);
+export interface WireExitAxes {
+  start?: 'x' | 'y';
+  end?: 'x' | 'y';
+}
+export function safeWirePoints(wire: Wire, doc: CircuitDocument, axes: WireExitAxes = {}): Point[] {
+  return routeWire(wire, doc, true, axes);
 }
 
-function routeWire(wire: Wire, doc: CircuitDocument, protectTerminals: boolean): Point[] {
+function routeWire(wire: Wire, doc: CircuitDocument, protectTerminals: boolean, axes: WireExitAxes = {}): Point[] {
   const startPoint = resolveEndpoint(wire.startEndpoint, doc),
     endPoint = resolveEndpoint(wire.endEndpoint, doc);
   if (wire.routing === 'free') return [startPoint, ...wire.vertices, endPoint];
@@ -340,17 +344,17 @@ function routeWire(wire: Wire, doc: CircuitDocument, protectTerminals: boolean):
     // the gesture instead of inheriting a horizontal pin and a middle dogleg.
     const dominant = (a: Point, b: Point) =>
       Math.abs(b.x - a.x) >= Math.abs(b.y - a.y) ? 'x' : 'y';
+    const startAxis = wire.startEndpoint.kind === 'terminal' ? sd : axes.start;
+    const endAxis = wire.endEndpoint.kind === 'terminal' ? ed : axes.end;
     if (!wire.vertices.length) {
       const points =
-        wire.startEndpoint.kind !== 'terminal' && wire.endEndpoint.kind === 'terminal'
-          ? orthogonal(end, start, ed).reverse()
+        !startAxis && endAxis
+          ? orthogonal(end, start, endAxis).reverse()
           : orthogonal(
               start,
               end,
-              wire.startEndpoint.kind === 'terminal' ? sd : dominant(start, end),
-              wire.startEndpoint.kind === 'terminal' &&
-                wire.endEndpoint.kind === 'terminal' &&
-                sd === ed,
+              startAxis ?? dominant(start, end),
+              !!startAxis && startAxis === endAxis,
             );
       return withLeads(route(points, wire.startEndpoint, wire.endEndpoint));
     }
@@ -362,7 +366,7 @@ function routeWire(wire: Wire, doc: CircuitDocument, protectTerminals: boolean):
           orthogonal(
             previous,
             point,
-            i === 0 && wire.startEndpoint.kind === 'terminal' ? sd : dominant(previous, point),
+            i === 0 && startAxis ? startAxis : dominant(previous, point),
           ),
           i === 0 ? wire.startEndpoint : null,
           null,
@@ -371,8 +375,8 @@ function routeWire(wire: Wire, doc: CircuitDocument, protectTerminals: boolean):
     }
     const previous = result.at(-1)!;
     const tail =
-      wire.endEndpoint.kind === 'terminal'
-        ? route(orthogonal(end, previous, ed), wire.endEndpoint, null).reverse()
+      endAxis
+        ? route(orthogonal(end, previous, endAxis), wire.endEndpoint, null).reverse()
         : orthogonal(previous, end, dominant(previous, end));
     result.push(...tail.slice(1));
     return withLeads(result);
@@ -452,6 +456,7 @@ export function nearestWire(
   doc: CircuitDocument,
   threshold: number,
   excluded = new Set<string>(),
+  options: { snapToGrid?: boolean } = {},
 ): { wire: Wire; point: Point; segment: number; points: Point[] } | null {
   let result: ReturnType<typeof nearestWire> = null,
     min = threshold;
@@ -468,8 +473,10 @@ export function nearestWire(
       const projection = projectOnSegment(p, points[i], points[i + 1]),
         gridPoint = projectOnSegment(snapPoint(projection), points[i], points[i + 1]);
       const d = distance(p, projection);
-      const q = distance(p, gridPoint) < threshold ? gridPoint : projection;
-      if (d < min) {
+      const q = options.snapToGrid !== false && distance(p, gridPoint) < threshold
+        ? gridPoint : projection;
+      const tie = Math.abs(d - min) < 0.001;
+      if (d < min - 0.001 || (result && tie && o.id.localeCompare(result.wire.id) < 0)) {
         min = d;
         result = { wire: o, point: q, segment: i, points };
       }

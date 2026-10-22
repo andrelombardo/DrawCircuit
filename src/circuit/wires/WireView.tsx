@@ -8,10 +8,14 @@ export const WireView = memo(
     object: o,
     points,
     paths,
+    looseStart,
+    looseEnd,
   }: {
     object: Wire;
     points: Point[];
     paths?: Point[][];
+    looseStart: boolean;
+    looseEnd: boolean;
   }) {
     useLanguage((state) => state.language);
     const hitPath = pointsPath(points);
@@ -37,7 +41,7 @@ export const WireView = memo(
         />
         {[points[0], points.at(-1)!].map((p, i) => (
           <g key={i} data-wire-endpoint={i ? 'end' : 'start'} className="wire-endpoint">
-            <title>{t('Drag to extend · Option/Alt-drag to reconnect')}</title>
+            <title>{t('Drag to move or reconnect · W to add a wire')}</title>
             <circle
               cx={p.x}
               cy={p.y}
@@ -46,7 +50,9 @@ export const WireView = memo(
               strokeWidth={14}
               vectorEffect="non-scaling-stroke"
             />
-            <circle cx={p.x} cy={p.y} r={3} className="terminal" pointerEvents="none" />
+            <circle cx={p.x} cy={p.y} r={3}
+              className={`terminal${(i ? looseEnd : looseStart) ? '' : ' connected-endpoint'}`}
+              pointerEvents="none" />
           </g>
         ))}
       </g>
@@ -56,6 +62,7 @@ export const WireView = memo(
     // Resolve every connection, but only redraw wires whose geometry or style changed.
     return (
       previous.object === next.object &&
+      previous.looseStart === next.looseStart && previous.looseEnd === next.looseEnd &&
       previous.points.length === next.points.length &&
       previous.points.every(
         (point, index) => point.x === next.points[index].x && point.y === next.points[index].y,

@@ -34,7 +34,11 @@ Drag an object to move it or drag its label independently. Wires follow terminal
 
 Choose **Orthogonal**, **45°**, or **Free** routing while using W. **Shift + W** cycles modes, including during drawing. Orthogonal routing uses right angles; 45° routing uses diagonals and any needed horizontal/vertical segments; Free connects points directly. Wires align with their start and last bend even off the grid. Crossings stay electrically separate unless a junction is inserted.
 
-In Select mode, drag a terminal or round wire endpoint to start a new connected wire. A click simply selects. **Option/Alt-drag an endpoint** reconnects the existing wire. Drag a wire body to move its segment while preserving connections; free endpoints follow, and orthogonal segments snap to the grid. Include a connected wire in a multiple selection to translate it as a whole.
+In Select mode, drag a terminal to start a new connected wire; a click simply selects. Drag a round wire endpoint to move or reconnect that existing wire. Use **W** to add a branch or extend a wire. Filled round handles indicate connected endpoints, hollow handles indicate free endpoints. Drag a connected wire body to slide its segment while preserving connections; free endpoints follow. Include a connected wire in a multiple selection to translate its route as a whole.
+
+The **magnet** beside the grid toggles snapping for wires, object movement, and component placement. **Alt/Option** temporarily bypasses snapping, including while drawing or editing a wire. Free routing keeps exact pointer positions while still offering nearby connection targets. Targets are chosen by proximity and remain stable through small pointer movements; the chosen wire is highlighted before a click connects it. Orthogonal segments use grid steps when snapping is enabled.
+
+Deleting a junction removes its dot and label while preserving the shared connection of its incident wires. Removing a branch heals its remaining two straight, identically styled fragments without changing their visible route, currents, or highlights. Explicit style splits remain separate until an attached branch is removed.
 
 Double-click a wire to add a bend. Drag square handles to edit bends; **Alt/Option-click** a square removes it. Redundant bends are removed only when the visible route remains identical. **Esc** cancels a gesture; panning with Space does not discard an unfinished wire.
 

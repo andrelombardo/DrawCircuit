@@ -7,13 +7,13 @@ import { SelectionActions } from '../properties/SelectionActions';
 import { ActionMenu } from '../toolbar/ActionMenu';
 import { useEditActions } from '../toolbar/useEditActions';
 import { useEffect, useRef, useState } from 'react';
-import { CircleAlert, Grid2X2, HelpCircle, Maximize, Minus, Plus } from 'lucide-react';
+import { CircleAlert, Grid2X2, HelpCircle, Magnet, Maximize, Minus, Plus } from 'lucide-react';
 import { useEditorStore } from '../../store/editorStore';
 import { catalog } from '../../model/catalog';
 import { componentTypes, GRID } from '../../model/types';
 import { wirePoints, pointsPath } from '../../utils/geometry';
 import type { ComponentType } from '../../model/types';
-import { drawingWireCandidate, wirePreview } from '../../utils/wires';
+import { wirePreview } from '../../utils/wires';
 import { TargetFeedbackLayer } from './TargetFeedbackLayer';
 import { DistanceGuideLayer } from './DistanceGuideLayer';
 import { CircuitLayer } from './CircuitLayer';
@@ -78,6 +78,7 @@ function CanvasContent({
     tool = useEditorStore((s) => s.tool),
     pendingPresetId = useEditorStore((s) => s.pendingPresetId),
     grid = useEditorStore((s) => s.grid),
+    snapEnabled = useEditorStore((s) => s.snapEnabled),
     selection = useEditorStore((s) => s.selection),
     gestureActive = useEditorStore((s) => Boolean(s.gestureStart)),
     wireRouting = useEditorStore((s) => s.wireRouting),
@@ -120,8 +121,8 @@ function CanvasContent({
             ? t('Click to insert into the wire · one undo step')
             : null;
   let previewPath = '';
-  if (draft && overlay.mouse) {
-    const candidate = drawingWireCandidate(overlay.mouse, doc, v.zoom, draft);
+  if (draft && overlay.connection) {
+    const candidate = overlay.connection;
     const wire = wirePreview(draft, candidate, doc);
     previewPath = pointsPath(wirePoints(wire, doc));
   }
@@ -157,9 +158,9 @@ function CanvasContent({
                         : tool === 'wire'
                           ? draft
                             ? t(
-                                'Click to add a bend · Backspace goes back · Enter finishes · Esc cancels',
+                                'Click to add a bend · click a target to connect · Enter finishes · Alt bypasses snap',
                               )
-                            : t('Click a terminal, junction, or wire to start')
+                            : t('Click to start a wire · Alt bypasses snap · Esc cancels')
                           : tool === 'junction'
                             ? t('Click to place junctions · Esc or V finishes')
                             : tool === 'text'
@@ -482,6 +483,13 @@ function CanvasContent({
               onClick={() => useEditorStore.getState().toggleGrid()}
             >
               <Grid2X2 size={15} />
+            </IconButton>
+            <IconButton
+              label={t('Snapping · hold Alt/Option to bypass')}
+              active={snapEnabled}
+              onClick={() => useEditorStore.getState().toggleSnap()}
+            >
+              <Magnet size={15} />
             </IconButton>
           </div>
           {hint && (

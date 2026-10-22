@@ -8,7 +8,7 @@ import { arrowCenter, rotationHandle } from '../../utils/arrows';
 import { braceGeometry } from '../../annotations/brace';
 import { electricalDrawingGeometry } from '../../annotations/electrical';
 import type { CircuitDocument, CircuitObject, Point } from '../../model/types';
-import { arrowPath, pointsPath, rotatePoint, wirePoints } from '../../utils/geometry';
+import { arrowPath, isLooseEndpoint, pointsPath, rotatePoint, wirePoints } from '../../utils/geometry';
 import { unionBounds, contentBounds } from '../../utils/visualBounds';
 import { loopGeometry, loopPath } from '../../utils/loops';
 import { WIRE_ENDPOINT_HIT_PX } from '../../utils/wires';
@@ -42,16 +42,18 @@ function Handle({
   name,
   zoom,
   square = false,
+  connected = false,
 }: {
   p: Point;
   name: string;
   zoom: number;
   square?: boolean;
+  connected?: boolean;
 }) {
   return (
     <g data-handle={name} className={`handle-hit handle-${name.split(':')[0]}`}>
       {(name === 'wireStart' || name === 'wireEnd') && (
-        <title>{t('Drag to extend · Option/Alt-drag to reconnect')}</title>
+        <title>{t('Drag to move or reconnect · W to add a wire')}</title>
       )}
       <circle
         cx={p.x}
@@ -68,7 +70,8 @@ function Handle({
           className="control-handle"
         />
       ) : (
-        <circle cx={p.x} cy={p.y} r={5 / zoom} className="control-handle" />
+        <circle cx={p.x} cy={p.y} r={5 / zoom}
+          className={`control-handle${connected ? ' connected-endpoint' : ''}`} />
       )}
     </g>
   );
@@ -146,7 +149,8 @@ export function SelectionLayer({
                       <Handle key={i} p={p} name={`vertex:${i}`} zoom={zoom} square />
                     ))}
                     {[wirePoints(o, doc)[0], wirePoints(o, doc).at(-1)!].map((p, i) => (
-                      <Handle key={i} p={p} name={i ? 'wireEnd' : 'wireStart'} zoom={zoom} />
+                      <Handle key={i} p={p} name={i ? 'wireEnd' : 'wireStart'} zoom={zoom}
+                        connected={!isLooseEndpoint(i ? o.endEndpoint : o.startEndpoint, doc)} />
                     ))}
                   </>
                 )}

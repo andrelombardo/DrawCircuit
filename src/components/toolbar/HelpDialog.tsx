@@ -35,7 +35,7 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
           <p>
             <b>{t('02 · Connect')}</b>
             {t(
-              'Press W, then click a terminal, junction, or wire to start a connection. Use N to place labeled junction dots. Click the sheet to add bends; double-click or press Enter to finish at a free point. The wire aligns with its starting point and last bend, even off the grid. Backspace removes the last bend. Choose Orthogonal, 45°, or Free routing; Shift + W cycles routing modes. In Select mode, drag a terminal or wire endpoint to start a new connection. Drag the wire body to move it.',
+              'Press W and click to start a wire. Click a terminal, junction, or highlighted wire to connect; click empty space to add bends. Double-click or press Enter to finish at a free point. Backspace removes the last bend. Choose Orthogonal, 45°, or Free; Shift + W changes routing. In Select, drag a terminal to create a wire, an endpoint to move or reconnect it, or a connected segment to slide it. The magnet toggles snapping; Alt/Option temporarily bypasses it. Free routing keeps exact pointer positions.',
             )}{' '}
           </p>
           <p>
@@ -67,11 +67,11 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
             ['R', t('Rotate component by 45° · brace/bracket by 90°')],
             ['Enter', t('Edit name or label')],
             [t('Alt + click handle'), t('Remove wire bend')],
-            [t('Option/Alt + drag endpoint'), t('Reconnect an existing wire')],
+            [t('Drag wire endpoint'), t('Reconnect an existing wire')],
             ['L', t('Draw an elliptical loop')],
             [shortcut('D'), t('Duplicate')],
             [`${shortcut('C')} / ${shortcut('X')} / ${shortcut('V')}`, t('Copy / cut / paste')],
-            [t('Option/Alt + drag'), t('Disable snapping while moving')],
+            [t('Option/Alt + drag'), t('Temporarily disable snapping')],
             [t('Shift while moving'), t('Show additional dimensions')],
             ['Delete / Backspace', t('Delete selection · on a label, delete only the text')],
             ['Shift + Delete / Backspace', t('Delete the object from its label')],
@@ -94,7 +94,7 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
         </div>
         <p className="help-note">
           {t(
-            'Drag labels to move them. Double-click a wire to add an editable bend. Round endpoint handles extend a wire; Option/Alt-drag reconnects the existing endpoint. Square handles edit bends; Alt-click removes one. For loops, drag the corners to resize and the tip handle to move the arrowhead. Write',
+            'Drag labels to move them. Double-click a wire to add an editable bend. Round handles move or reconnect the existing endpoint: filled means connected, hollow means free. Press W to add a branch. Square handles edit bends; Alt-click removes one. For loops, drag the corners to resize and the tip handle to move the arrowhead. Write',
           )}{' '}
           <code>r_&#123;AB&#125;</code> {t('for a subscript.')}{' '}
         </p>

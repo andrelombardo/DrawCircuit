@@ -9,7 +9,7 @@ import { ElectricalView } from '../../circuit/annotations/ElectricalView';
 import { wireDrawingPaths } from '../../annotations/electrical';
 import { memo, useMemo } from 'react';
 import type { CircuitDocument } from '../../model/types';
-import { wirePoints } from '../../utils/geometry';
+import { isLooseEndpoint, wirePoints } from '../../utils/geometry';
 import { ComponentView } from '../../circuit/components/ComponentView';
 import { WireView } from '../../circuit/wires/WireView';
 import { JunctionView } from '../../circuit/junctions/JunctionView';
@@ -80,6 +80,8 @@ export const CircuitLayer = memo(function CircuitLayer({
             key={object.id}
             object={object}
             points={points}
+            looseStart={isLooseEndpoint(object.startEndpoint, doc)}
+            looseEnd={isLooseEndpoint(object.endEndpoint, doc)}
             paths={wireDrawingPaths(points, currentGaps.get(object.id))}
           />
         ))}

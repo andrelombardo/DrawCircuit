@@ -1,10 +1,11 @@
 import { t } from '../i18n';
-import { remapHighlightSpans } from '../annotations/highlight';
+import { projectHighlight, remapHighlightSpans, sliceHighlightRoute } from '../annotations/highlight';
 import { createCurrent, currentWireAnchor } from '../annotations/electrical';
 import { placeNodeLabel } from './nodeLabels';
 import { makeId } from '../model/catalog';
 import { createJunction, createWire } from '../model/factories';
 import { GRID } from '../model/types';
+import { placementIndex } from '../smartPlacement/spatialIndex';
 import type {
   CircuitDocument,
   CircuitObject,
@@ -16,7 +17,7 @@ import type {
 } from '../model/types';
 import {
   distance,
-  localToWorld,
+  endpointDirection,
   nearestTarget,
   nearestWire,
   projectOnSegment,
@@ -24,17 +25,31 @@ import {
   snapPoint,
   safeWirePoints,
   wirePoints,
+  add,
+  isLooseEndpoint,
+  snap,
 } from './geometry';
+import type { WireExitAxes } from './geometry';
 export type WireCandidate =
   | { point: Point; endpoint: Endpoint; kind: 'terminal' | 'junction' | 'grid' }
-  | { point: Point; kind: 'wire'; wireId: string };
+  | { point: Point; kind: 'wire'; wireId: string; exitAxis?: 'x' | 'y' };
 export interface WireDraft {
   routing?: WireRouting;
   start: Endpoint;
   vertices: Point[];
+  startAxis?: 'x' | 'y';
 }
-export const TERMINAL_DRAG_THRESHOLD = 5;
+export const TERMINAL_DRAG_THRESHOLD = 8;
 export const WIRE_ENDPOINT_HIT_PX = 7;
+const SNAP_PX = 12;
+const RELEASE_PX = 16;
+const SWITCH_PX = 3;
+
+export interface WireSnapOptions {
+  enabled?: boolean;
+  previous?: WireCandidate | null;
+  routing?: WireRouting;
+}
 
 /** Keep endpoint gestures separate from moving the body, even on short wires. */
 export function wireEndAtPoint(p: Point, wire: Wire, doc: CircuitDocument, zoom: number) {
@@ -47,28 +62,16 @@ export function wireEndAtPoint(p: Point, wire: Wire, doc: CircuitDocument, zoom:
   return start <= end ? 'start' : 'end';
 }
 
-export function wireExtensionCandidate(
-  wire: Wire,
-  side: 'start' | 'end',
-  doc: CircuitDocument,
-): WireCandidate {
-  const endpoint = side === 'start' ? wire.startEndpoint : wire.endEndpoint;
-  const point = resolveEndpoint(endpoint, doc);
-  // Resolve a shared wire end only once dragging starts; clicks stay read-only.
-  return endpoint.kind === 'free'
-    ? { kind: 'wire', wireId: wire.id, point }
-    : { kind: endpoint.kind, endpoint, point };
-}
-
 export interface WireSnapContext {
   anchor: Point;
   routing?: WireRouting;
 }
 
 /** Use the authored axis before the absolute grid, including off-grid pins/nodes. */
-function alignedWirePoint(p: Point, zoom: number, context?: WireSnapContext): Point {
+function alignedWirePoint(p: Point, zoom: number, context?: WireSnapContext, enabled = true): Point {
+  if (!enabled || context?.routing === 'free') return { ...p };
   const point = snapPoint(p);
-  if (!context || context.routing === 'free') return point;
+  if (!context) return point;
   const { anchor } = context,
     dx = p.x - anchor.x,
     dy = p.y - anchor.y,
@@ -96,6 +99,7 @@ export function drawingWireCandidate(
   doc: CircuitDocument,
   zoom: number,
   draft: WireDraft | null,
+  options: WireSnapOptions = {},
 ): WireCandidate {
   return wireCandidate(
     p,
@@ -107,7 +111,8 @@ export function drawingWireCandidate(
           anchor: draft.vertices.at(-1) ?? resolveEndpoint(draft.start, doc),
           routing: draft.routing,
         }
-      : undefined,
+      : options.routing === 'free' ? { anchor: p, routing: 'free' } : undefined,
+    options,
   );
 }
 
@@ -117,15 +122,15 @@ export function wireEndpointCandidate(
   side: 'start' | 'end',
   doc: CircuitDocument,
   zoom: number,
+  options: WireSnapOptions = {},
 ): WireCandidate {
   const anchor =
     side === 'start'
       ? (wire.vertices[0] ?? resolveEndpoint(wire.endEndpoint, doc))
       : (wire.vertices.at(-1) ?? resolveEndpoint(wire.startEndpoint, doc));
-  return wireCandidate(p, doc, zoom, new Set([wire.id]), {
-    anchor,
-    routing: wire.routing,
-  });
+  return wireCandidate(
+    p, doc, zoom, new Set([wire.id]), { anchor, routing: wire.routing }, options,
+  );
 }
 
 /** A wire target is resolved only on begin/commit, so hover never changes topology. */
@@ -171,13 +176,16 @@ export function beginWire(
   const resolved = resolveWireCandidate(doc, candidate);
   return {
     doc: resolved.doc,
-    draft: { start: resolved.endpoint, vertices: [], routing } as WireDraft,
+    draft: {
+      start: resolved.endpoint, vertices: [], routing,
+      startAxis: candidate.kind === 'wire' ? candidate.exitAxis : undefined,
+    } as WireDraft,
   };
 }
 
-function routeNewWire(wire: Wire, doc: CircuitDocument): Wire {
+export function routeEditedWire(wire: Wire, doc: CircuitDocument, axes: WireExitAxes = {}): Wire {
   const original = wirePoints(wire, doc),
-    safe = safeWirePoints(wire, doc);
+    safe = safeWirePoints(wire, doc, axes);
   return original.length === safe.length &&
     original.every((point, i) => distance(point, safe[i]) < 0.001)
     ? wire
@@ -189,7 +197,7 @@ export function wirePreview(
   candidate: WireCandidate,
   doc: CircuitDocument,
 ): Wire {
-  return routeNewWire(
+  return routeEditedWire(
     {
       ...createWire(
         draft.start,
@@ -200,15 +208,17 @@ export function wirePreview(
       id: 'preview',
     },
     doc,
+    { start: draft.startAxis, end: candidate.kind === 'wire' ? candidate.exitAxis : undefined },
   );
 }
 
 /** Commit wire joins/splits and the new wire as one document change, without junctions. */
 export function commitWire(doc: CircuitDocument, draft: WireDraft, candidate: WireCandidate) {
   const resolved = resolveWireCandidate(doc, candidate),
-    wire = routeNewWire(
+    wire = routeEditedWire(
       createWire(draft.start, resolved.endpoint, draft.vertices, draft.routing),
       resolved.doc,
+      { start: draft.startAxis, end: candidate.kind === 'wire' ? candidate.exitAxis : undefined },
     ),
     points = wirePoints(wire, resolved.doc);
   if (points.length < 2 || points.every((point) => distance(point, points[0]) < 0.001)) return null;
@@ -250,56 +260,68 @@ export function wireCandidate(
   zoom: number,
   excluded = new Set<string>(),
   context?: WireSnapContext,
+  options: WireSnapOptions = {},
 ): WireCandidate {
-  // All distances are screen pixels. Close terminals win before junctions, wires and grid.
-  let terminal: WireCandidate | null = null,
-    closest = 10 / zoom;
-  for (const o of doc.objects)
-    if (o.kind === 'component' && !excluded.has(o.id))
-      for (const t of o.terminals) {
-        const q = localToWorld(o, { x: t.localX, y: t.localY }),
-          d = distance(p, q);
-        if (d < closest) {
-          closest = d;
-          terminal = {
-            kind: 'terminal',
-            point: q,
-            endpoint: { kind: 'terminal', componentId: o.id, terminalId: t.id },
-          };
-        }
-      }
-  if (terminal) return terminal;
-  const target = nearestTarget(p, doc, 14 / zoom, excluded);
-  if (target)
-    return {
-      ...target,
-      kind: target.endpoint.kind === 'terminal' ? 'terminal' : 'junction',
-    };
-  const hit = nearestWire(p, doc, 12 / zoom, excluded);
-  if (hit) {
-    const a = hit.points[hit.segment],
-      b = hit.points[hit.segment + 1];
+  const enabled = options.enabled !== false;
+  const point = alignedWirePoint(p, zoom, context, enabled);
+  const free: WireCandidate = { kind: 'grid', point, endpoint: { kind: 'free', point } };
+  if (!enabled) return free;
+  type Choice = { candidate: WireCandidate; key: string; gap: number; pointTarget: boolean };
+  const choices: Choice[] = [];
+  const push = (candidate: WireCandidate, key: string, pointTarget = true,
+    gap = distance(p, candidate.point) * zoom) => {
+    if (gap <= RELEASE_PX) choices.push({ candidate, key, gap, pointTarget });
+  };
+  const index = placementIndex(doc);
+  for (const target of index.nearbyTargets(p, RELEASE_PX / zoom)) {
+    const endpoint = target.endpoint;
+    const id = endpoint.kind === 'terminal' ? endpoint.componentId
+      : endpoint.kind === 'junction' ? endpoint.junctionId : '';
+    if (!excluded.has(id)) push({ ...target, kind: target.kind }, target.key);
+  }
+  for (const end of index.nearbyWireEnds(p, RELEASE_PX / zoom)) {
+    if (!excluded.has(end.wireId))
+      push({ kind: 'wire', point: end.point, wireId: end.wireId }, `e:${end.wireId}:${end.side}`);
+  }
+  for (const hit of index.nearbySegments(p, RELEASE_PX / zoom)) {
+    if (excluded.has(hit.wire.id) || distance(hit.a, hit.b) < 0.001) continue;
+    const { a, b } = hit;
     const aligned = alignedWirePoint(p, zoom, context);
-    if (context && context.routing !== 'free') {
-      if (a.x === b.x && Math.abs(p.y - context.anchor.y) <= 10 / zoom) aligned.x = a.x;
-      if (a.y === b.y && Math.abs(p.x - context.anchor.x) <= 10 / zoom) aligned.y = a.y;
+    if (context?.routing !== 'free') {
+      if (a.x === b.x) aligned.x = a.x;
+      if (a.y === b.y) aligned.y = a.y;
     }
     const point = projectOnSegment(aligned, a, b);
     // Alignment may choose a point only on the actual segment under the pointer.
-    return {
+    const candidate: WireCandidate = {
       kind: 'wire',
       point:
-        context &&
-        context.routing !== 'free' &&
+        context?.routing !== 'free' &&
         distance(aligned, point) < 0.001 &&
-        distance(p, point) < 14 / zoom
+        distance(p, point) <= SNAP_PX / zoom
           ? point
-          : hit.point,
+          : projectOnSegment(p, a, b),
       wireId: hit.wire.id,
     };
+    const interior = distance(candidate.point, a) > 0.001 && distance(candidate.point, b) > 0.001;
+    if (interior && (a.x === b.x || a.y === b.y))
+      candidate.exitAxis = a.x === b.x ? 'x' : 'y';
+    // Rank the actual stroke under the pointer, not its optional grid-aligned point.
+    push(candidate, `w:${hit.key}`, false, distance(p, projectOnSegment(p, a, b)) * zoom);
   }
-  const point = alignedWirePoint(p, zoom, context);
-  return { kind: 'grid', point, endpoint: { kind: 'free', point } };
+  const score = (choice: Choice) => choice.gap - (choice.pointTarget ? 4 : 0);
+  choices.sort((a, b) => score(a) - score(b) || a.key.localeCompare(b.key));
+  const best = choices.find((choice) => choice.gap <= SNAP_PX);
+  const previous = options.previous;
+  if (previous && previous.kind !== 'grid') {
+    const held = choices.find(({ candidate }) =>
+      candidate.kind === previous.kind && (candidate.kind === 'wire'
+        ? previous.kind === 'wire' && candidate.wireId === previous.wireId
+        : candidate.kind !== 'grid' && previous.kind !== 'wire' &&
+          JSON.stringify(candidate.endpoint) === JSON.stringify(previous.endpoint)));
+    if (held && (!best || score(held) <= score(best) + SWITCH_PX)) return held.candidate;
+  }
+  return best?.candidate ?? free;
 }
 /** Remove only points between their neighbors, never a deliberate backtrack. */
 export function simplifyPolyline(points: Point[]): Point[] {
@@ -347,6 +369,111 @@ export function normalizeDocumentWires(doc: CircuitDocument): CircuitDocument {
         normalizedIds,
       )
     : doc;
+}
+
+/** Slide the grabbed segment, keeping fixed connections and the rest of the route stable. */
+export function moveWireSegment(
+  wire: Wire, index: number, delta: Point, doc: CircuitDocument, snapping = true,
+): Wire {
+  const points = wirePoints(wire, doc);
+  const a = points[index], b = points[index + 1];
+  if (!a || !b) return wire;
+  const length = distance(a, b);
+  if (length < 0.001) return wire;
+  const normal = { x: -(b.y - a.y) / length, y: (b.x - a.x) / length };
+  const projected = delta.x * normal.x + delta.y * normal.y;
+  const amount = snapping && (!wire.routing || wire.routing === 'orthogonal') ? snap(projected) : projected;
+  if (Math.abs(amount) < 0.001) return wire;
+  const shift = { x: normal.x * amount, y: normal.y * amount };
+  const route = points.map((point, i) => i === index || i === index + 1 ? add(point, shift) : point);
+  let startEndpoint = wire.startEndpoint, endEndpoint = wire.endEndpoint;
+  const terminalLead = (endpoint: Endpoint, point: Point, neighbor: Point) => {
+    if (endpoint.kind !== 'terminal' || (wire.routing && wire.routing !== 'orthogonal')) return null;
+    const axis = endpointDirection(endpoint, doc);
+    if (axis === 'x' ? point.y !== neighbor.y : point.x !== neighbor.x) return null;
+    const size = distance(point, neighbor);
+    const length = Math.min(GRID, size / 3);
+    return {
+      x: point.x + (neighbor.x - point.x) * length / size,
+      y: point.y + (neighbor.y - point.y) * length / size,
+    };
+  };
+  if (index === 0) {
+    if (isLooseEndpoint(startEndpoint, doc)) startEndpoint = { kind: 'free', point: route[0] };
+    else {
+      const lead = terminalLead(startEndpoint, points[0], points[1]);
+      if (lead) {
+        route[0] = add(lead, shift);
+        route.unshift(points[0], lead);
+      } else route.unshift(points[0]);
+    }
+  }
+  if (index === points.length - 2) {
+    if (isLooseEndpoint(endEndpoint, doc)) endEndpoint = { kind: 'free', point: route.at(-1)! };
+    else {
+      const lead = terminalLead(endEndpoint, points.at(-1)!, points.at(-2)!);
+      if (lead) {
+        route[route.length - 1] = add(lead, shift);
+        route.push(lead, points.at(-1)!);
+      } else route.push(points.at(-1)!);
+    }
+  }
+  const moved = { ...wire, startEndpoint, endEndpoint, vertices: route.slice(1, -1) };
+  return routeEditedWire(moved, doc);
+}
+
+/** Heal only abandoned branch points. An explicit Split wire remains editable separately. */
+export function healWireConnections(doc: CircuitDocument, connections: ReadonlySet<string>): CircuitDocument {
+  let result = doc;
+  for (const connection of connections) {
+    const ends = result.objects.flatMap((o) => o.kind === 'wire'
+      ? (['startEndpoint', 'endEndpoint'] as const).flatMap((side) => {
+          const ep = o[side];
+          return ep.kind === 'free' && ep.connectionId === connection ? [{ wire: o, side }] : [];
+        }) : []);
+    if (ends.length !== 2 || ends[0].wire.id === ends[1].wire.id) continue;
+    const [first, second] = ends;
+    const a = first.wire, b = second.wire;
+    // A patterned stroke restarts its dash phase per object; merging would move its dashes.
+    if ((a.lineStyle ?? 'solid') !== 'solid' || (b.lineStyle ?? 'solid') !== 'solid') continue;
+    const style = (w: Wire) => JSON.stringify([
+      w.routing ?? 'orthogonal', w.color, w.width, w.opacity ?? 1,
+      w.lineStyle ?? 'solid', w.dashLength ?? w.width * 4, w.dashGap ?? w.width * 2,
+    ]);
+    if (style(a) !== style(b)) continue;
+    const ap = simplifyPolyline(wirePoints(a, result)), bp = simplifyPolyline(wirePoints(b, result));
+    if (first.side === 'startEndpoint') ap.reverse();
+    if (second.side === 'endEndpoint') bp.reverse();
+    if (ap.length < 2 || bp.length < 2 || distance(ap.at(-1)!, bp[0]) > 0.001) continue;
+    const before = ap.at(-2)!, join = ap.at(-1)!, after = bp[1];
+    // Merge a straight continuation, never a corner, return, or semantic zero-length link.
+    if (distance(join, projectOnSegment(join, before, after)) > 0.001) continue;
+    const route = simplifyPolyline([...ap, ...bp.slice(1)]);
+    const merged: Wire = {
+      ...a,
+      startEndpoint: first.side === 'endEndpoint' ? a.startEndpoint : a.endEndpoint,
+      endEndpoint: second.side === 'startEndpoint' ? b.endEndpoint : b.startEndpoint,
+      vertices: route.slice(1, -1),
+    };
+    const actual = simplifyPolyline(wirePoints(merged, result));
+    if (actual.length !== route.length || actual.some((p, i) => distance(p, route[i]) > 0.001)) continue;
+    const previous = result;
+    const ids = new Map([[a.id, [a.id]], [b.id, [a.id]]]);
+    result = { ...result, objects: result.objects.flatMap((o) => o.id === a.id ? [merged] : o.id === b.id ? [] : [o]) };
+    result = remapSplitWireCurrents(previous, result, ids);
+    result = {
+      ...result,
+      objects: result.objects.map((o) => o.kind === 'highlight' && o.mode === 'smart'
+        ? { ...o, spans: o.spans.map((span) => {
+            if (!('wireId' in span) || !ids.has(span.wireId)) return span;
+            const original = span.wireId === a.id ? a : b;
+            const points = sliceHighlightRoute(wirePoints(original, previous), span.start, span.end);
+            return { wireId: a.id, start: projectHighlight(route, points[0]).ratio,
+              end: projectHighlight(route, points.at(-1)!).ratio };
+          }) } : o),
+    };
+  }
+  return result;
 }
 /** Quick Junction: split all incident wires, preserving terminal references at endpoints. */
 export function insertJunction(
@@ -476,6 +603,7 @@ export function remapSplitWireCurrents(
         next,
         Infinity,
         new Set(next.objects.filter((x) => !ids.has(x.id)).map((x) => x.id)),
+      { snapToGrid: false },
       );
       if (!candidate) return o;
       const attached = createCurrent(candidate.wire, center, next);

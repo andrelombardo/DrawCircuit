@@ -446,7 +446,15 @@ svg {
 }
 .tool-select .wire-endpoint {
   pointer-events: all;
-  cursor: crosshair;
+  cursor: grab;
+}
+.terminal.connected-endpoint,
+.control-handle.connected-endpoint {
+  fill: #6892dd;
+}
+.handle-wireStart .control-handle,
+.handle-wireEnd .control-handle {
+  cursor: grab;
 }
 .tool-select .circuit-object:hover .wire-endpoint .terminal {
   opacity: 1;
