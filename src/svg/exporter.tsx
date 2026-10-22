@@ -10,7 +10,7 @@ import type { CircuitDocument, Point, Rotation } from '../model/types';
 import { canvasTextLayout, xmlText } from '../tikz/canvasText';
 import { isExportableObject } from '../tikz/validation';
 import { canvasArrowHead, canvasArrowHeadPath } from '../tikz/arrowheads';
-import { arrowPath, pointsPath, wirePoints } from '../utils/geometry';
+import { arrowPath, pointsPath, linePoints, wirePoints } from '../utils/geometry';
 import { loopPath } from '../utils/loops';
 import { visualBounds, unionBounds } from '../utils/visualBounds';
 import type { Bounds } from '../utils/visualBounds';
@@ -127,7 +127,7 @@ export function exportSVG(
     } else if (o.kind === 'line') {
       boxes.push(visualBounds(o, doc));
       parts.push(
-        `<g opacity="${f(o.opacity ?? 1)}">${path(pointsPath([o.start, o.end]), o.color, o.width, 'round', o)}</g>`,
+        `<g opacity="${f(o.opacity ?? 1)}">${path(pointsPath(linePoints(o, doc)), o.color, o.width, 'round', o)}</g>`,
       );
     }
   }

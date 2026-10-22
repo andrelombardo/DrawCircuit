@@ -1,4 +1,4 @@
-import { t } from '../../i18n';
+import { t, useLanguage } from '../../i18n';
 import {
   highlightPath,
   highlightPoints,
@@ -8,7 +8,7 @@ import { arrowCenter, rotationHandle } from '../../utils/arrows';
 import { braceGeometry } from '../../annotations/brace';
 import { electricalDrawingGeometry } from '../../annotations/electrical';
 import type { CircuitDocument, CircuitObject, Point } from '../../model/types';
-import { arrowPath, distance, isLooseEndpoint, pointsPath, projectOnSegment, rotatePoint, wirePoints } from '../../utils/geometry';
+import { arrowPath, distance, isLooseEndpoint, lineAsWire, linePoints, pointsPath, projectOnSegment, rotatePoint, wirePoints } from '../../utils/geometry';
 import { unionBounds, contentBounds } from '../../utils/visualBounds';
 import { loopGeometry, loopPath } from '../../utils/loops';
 import { WIRE_ENDPOINT_HIT_PX } from '../../utils/wires';
@@ -43,17 +43,19 @@ function Handle({
   zoom,
   square = false,
   connected = false,
+  decorative = false,
 }: {
   p: Point;
   name: string;
   zoom: number;
   square?: boolean;
   connected?: boolean;
+  decorative?: boolean;
 }) {
   return (
     <g data-handle={name} className={`handle-hit handle-${name.split(':')[0]}`}>
       {(name === 'wireStart' || name === 'wireEnd') && (
-        <title>{t('Drag to move or reconnect · W to add a wire')}</title>
+        <title>{t(decorative ? 'Drag to move or reconnect' : 'Drag to move or reconnect · W to add a wire')}</title>
       )}
       <circle
         cx={p.x}
@@ -87,6 +89,7 @@ export function SelectionLayer({
   hoveredArrow?: string | null;
   zoom: number;
 }) {
+  useLanguage((state) => state.language);
   const selected = new Set(selection);
   const objects = doc.objects.filter((object) => selected.has(object.id));
   const single = objects.length === 1;
@@ -101,11 +104,13 @@ export function SelectionLayer({
         />
       )}
       {objects.map((o) => {
+        const routed = o.kind === 'line' ? lineAsWire(o) : o.kind === 'wire' ? o : null,
+          route = routed ? wirePoints(routed, doc) : null;
         const path =
           o.kind === 'highlight'
             ? highlightPath(o, doc)
             : o.kind === 'line'
-              ? pointsPath([o.start, o.end])
+              ? pointsPath(linePoints(o, doc))
               : o.kind === 'brace'
                 ? braceGeometry(o).d
                 : o.kind === 'wire'
@@ -143,14 +148,15 @@ export function SelectionLayer({
                       </>
                     ) : null;
                   })()}
-                {o.kind === 'wire' && (
+                {routed && route && (
                   <>
-                    {o.vertices.map((p, i) => wirePoints(o, doc).some((point, n, route) =>
+                    {routed.vertices.map((p, i) => route.some((point, n, route) =>
                       n > 0 && distance(p, projectOnSegment(p, route[n - 1], point)) < 0.001,
                     ) ? <Handle key={i} p={p} name={`vertex:${i}`} zoom={zoom} square /> : null)}
-                    {[wirePoints(o, doc)[0], wirePoints(o, doc).at(-1)!].map((p, i) => (
+                    {[route[0], route.at(-1)!].map((p, i) => (
                       <Handle key={i} p={p} name={i ? 'wireEnd' : 'wireStart'} zoom={zoom}
-                        connected={!isLooseEndpoint(i ? o.endEndpoint : o.startEndpoint, doc)} />
+                        connected={!isLooseEndpoint(i ? routed.endEndpoint : routed.startEndpoint, doc)}
+                        decorative={o.kind === 'line'} />
                     ))}
                   </>
                 )}
@@ -179,7 +185,7 @@ export function SelectionLayer({
                     ))}
                   </>
                 )}
-                {(o.kind === 'arrow' || o.kind === 'brace' || o.kind === 'line') && (
+                {(o.kind === 'arrow' || o.kind === 'brace') && (
                   <>
                     {o.kind === 'arrow' && o.type === 'curve' && (
                       <>

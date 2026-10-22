@@ -1,6 +1,6 @@
 import { memo, useMemo } from 'react';
 import type { CircuitDocument, Point } from '../../model/types';
-import { localToWorld, pointsPath, wirePoints } from '../../utils/geometry';
+import { localToWorld, linePoints, pointsPath, wirePoints } from '../../utils/geometry';
 import { visualBounds } from '../../utils/visualBounds';
 export const TargetFeedbackLayer = memo(function TargetFeedbackLayer({
   doc,
@@ -47,10 +47,10 @@ export const TargetFeedbackLayer = memo(function TargetFeedbackLayer({
           })}
         </g>
       )}
-      {w?.kind === 'wire' && (
+      {(w?.kind === 'wire' || w?.kind === 'line') && (
         <path
           data-current-hover={w.id}
-          d={pointsPath(wirePoints(w, doc))}
+          d={pointsPath(w.kind === 'line' ? linePoints(w, doc) : wirePoints(w, doc))}
           fill="none"
           stroke="#2463cb"
           strokeWidth={6 / zoom}

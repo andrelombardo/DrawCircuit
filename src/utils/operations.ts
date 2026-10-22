@@ -9,6 +9,8 @@ import { rotateArrow } from './arrows';
 import { makeId } from '../model/catalog';
 import {
   add,
+  lineAsWire,
+  lineFromWire,
   moveObject,
   objectBounds,
   resolveEndpoint,
@@ -19,6 +21,7 @@ import {
 } from './geometry';
 import type { CircuitDocument, CircuitObject, Endpoint, Point, Rotation } from '../model/types';
 import { healWireConnections } from './wires';
+import { detachLineEndpoints } from './lines';
 export function extractSelection(doc: CircuitDocument, ids: string[]): CircuitDocument {
   const selected = new Set(ids);
   const ep = (e: Endpoint): Endpoint =>
@@ -39,7 +42,9 @@ export function extractSelection(doc: CircuitDocument, ids: string[]): CircuitDo
               ((o.wireId && !selected.has(o.wireId)) ||
                 (o.componentId && !selected.has(o.componentId)))
             ? detachElectrical(o, doc)
-            : o.kind === 'wire'
+            : o.kind === 'line'
+              ? detachLineEndpoints(o, ep, doc)
+              : o.kind === 'wire'
               ? detachWireEndpoints(o, ep, doc)
               : o,
       ),
@@ -93,6 +98,10 @@ export function cloneObjects(
       if (copy.wireId) copy.wireId = ids.get(copy.wireId);
       if (copy.componentId) copy.componentId = ids.get(copy.componentId);
     }
+    if (copy.kind === 'line') {
+      if (copy.startEndpoint) copy.startEndpoint = remap(copy.startEndpoint);
+      if (copy.endEndpoint) copy.endEndpoint = remap(copy.endEndpoint);
+    }
     if (copy.kind === 'wire') {
       copy.startEndpoint = remap(copy.startEndpoint);
       copy.endEndpoint = remap(copy.endEndpoint);
@@ -139,7 +148,9 @@ export function removeObjects(doc: CircuitDocument, ids: string[]): CircuitDocum
           : o.kind === 'electrical' &&
               ((o.wireId && removed.has(o.wireId)) || (o.componentId && removed.has(o.componentId)))
             ? detachElectrical(o, doc)
-            : o.kind === 'wire'
+            : o.kind === 'line'
+              ? detachLineEndpoints(o, ep, doc)
+              : o.kind === 'wire'
               ? detachWireEndpoints(o, ep, doc)
               : o,
       ),
@@ -164,8 +175,22 @@ function detachWireEndpoints(
         : wire.vertices,
   };
 }
+/** Geometric line anchors use the same transforms as wires, in an isolated
+ * view that never enters the document's electrical connection operations. */
+function transformLineRoutes(doc: CircuitDocument, transform: (doc: CircuitDocument) => CircuitDocument) {
+  const lines = new Map(doc.objects.flatMap((o) => o.kind === 'line' ? [[o.id, o] as const] : [])),
+    adapted = { ...doc, objects: doc.objects.map((o) => o.kind === 'line' ? lineAsWire(o) : o) },
+    result = transform(adapted);
+  if (result === adapted) return doc;
+  return { ...result, objects: result.objects.map((o) => {
+    const line = lines.get(o.id);
+    return line && o.kind === 'wire' ? lineFromWire(line, o, result) : o;
+  }) };
+}
 /** Shared geometric move used by pointer dragging and keyboard nudging. */
 export function moveSelection(doc: CircuitDocument, ids: string[], delta: Point): CircuitDocument {
+  if (doc.objects.some((o) => o.kind === 'line'))
+    return transformLineRoutes(doc, (adapted) => moveSelection(adapted, ids, delta));
   const selected = new Set(ids);
   const attachedToSelection = (ep: Endpoint) =>
     ep.kind === 'terminal'
@@ -237,6 +262,8 @@ export function rotateObjects(
   ids: string[],
   increment?: Rotation,
 ): CircuitDocument {
+  if (doc.objects.some((o) => o.kind === 'line'))
+    return transformLineRoutes(doc, (adapted) => rotateObjects(adapted, ids, increment));
   const selected = new Set(ids),
     objects = doc.objects.filter((o) => selected.has(o.id));
   if (!objects.length || increment === 0) return doc;

@@ -1,6 +1,6 @@
 import { t } from '../i18n';
 import { componentRegistry, terminalsFor } from './catalog';
-import type { CircuitComponent, CircuitDocument, ComponentType } from './types';
+import type { CircuitComponent, CircuitDocument, ComponentType, Endpoint } from './types';
 export function compatibleReplacements(c: CircuitComponent): ComponentType[] {
   const pairs: ComponentType[][] = [
     ['npn', 'pnp'],
@@ -36,6 +36,8 @@ export function replaceComponent(
     throw new Error(t('Incompatible replacement.'));
   const pins = terminalsFor(type);
   const mapping = new Map(old.terminals.map((t, i) => [t.id, pins[i].id]));
+  const remap = (ep: Endpoint): Endpoint => ep.kind === 'terminal' && ep.componentId === id
+    ? { ...ep, terminalId: mapping.get(ep.terminalId)! } : ep;
   const component: CircuitComponent = { ...old, type, terminals: pins };
   // Labels have no explicit provenance: preserve them rather than guessing.
   if (componentRegistry[type].internalText === undefined) delete component.bodyText;
@@ -54,6 +56,9 @@ export function replaceComponent(
                   : span,
               ),
             }
+          : o.kind === 'line'
+            ? { ...o, startEndpoint: o.startEndpoint && remap(o.startEndpoint),
+                endEndpoint: o.endEndpoint && remap(o.endEndpoint) }
           : o.kind === 'wire'
             ? {
                 ...o,

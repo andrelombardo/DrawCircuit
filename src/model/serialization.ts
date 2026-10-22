@@ -224,7 +224,11 @@ export function deserializeDocument(raw: string): CircuitDocument {
       )
         fail();
     } else if (o.kind === 'line') {
-      if (!point(o.start) || !point(o.end) || !color(o.color) || !positive(o.width, MAX_LINE_WIDTH))
+      if (!point(o.start) || !point(o.end) || !color(o.color) || !positive(o.width, MAX_LINE_WIDTH) ||
+        (o.routing !== undefined && !['orthogonal', '45', 'free'].includes(String(o.routing))) ||
+        (o.vertices !== undefined && (!Array.isArray(o.vertices) || o.vertices.length > 1000 || !o.vertices.every(point))) ||
+        (o.startEndpoint !== undefined && !endpoint(o.startEndpoint)) ||
+        (o.endEndpoint !== undefined && !endpoint(o.endEndpoint)))
         fail();
     } else if (o.kind === 'junction') {
       if (!num(o.x) || !num(o.y) || !label(o.label) || !color(o.color)) fail();
@@ -340,7 +344,10 @@ export function deserializeDocument(raw: string): CircuitDocument {
   const doc = root as unknown as CircuitDocument;
   const connections = new Map<string, Point>();
   for (const o of doc.objects)
-    if (o.kind === 'wire') {
+    if (o.kind === 'line') {
+      if (o.startEndpoint) resolveEndpoint(o.startEndpoint, doc);
+      if (o.endEndpoint) resolveEndpoint(o.endEndpoint, doc);
+    } else if (o.kind === 'wire') {
       resolveEndpoint(o.startEndpoint, doc);
       resolveEndpoint(o.endEndpoint, doc);
       for (const ep of [o.startEndpoint, o.endEndpoint]) {

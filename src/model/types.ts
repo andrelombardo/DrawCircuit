@@ -263,6 +263,12 @@ export interface LineAnnotation extends StrokeStyle {
   id: string;
   start: Point;
   end: Point;
+  /** Graphic anchors follow symbols without participating in circuit topology. */
+  startEndpoint?: Endpoint;
+  endEndpoint?: Endpoint;
+  vertices?: Point[];
+  /** Legacy decorative lines remain straight. */
+  routing?: WireRouting;
   color: string;
   width: number;
   opacity?: number;

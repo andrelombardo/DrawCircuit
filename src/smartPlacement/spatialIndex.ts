@@ -1,5 +1,5 @@
 import type { CircuitComponent, CircuitDocument, Point } from '../model/types';
-import { localToWorld, objectBounds, wirePoints } from '../utils/geometry';
+import { lineAsWire, localToWorld, objectBounds, wirePoints } from '../utils/geometry';
 import type { ConnectionTarget, WireSegment } from './types';
 
 const CELL = 160;
@@ -26,6 +26,9 @@ export class PlacementIndex {
   private targets = new Map<string, ConnectionTarget[]>();
   private segments = new Map<string, WireSegment[]>();
   private longSegments: WireSegment[] = [];
+  private lineSegments = new Map<string, WireSegment[]>();
+  private longLineSegments: WireSegment[] = [];
+  private lineEnds = new Map<string, { wireId: string; side: number; point: Point }[]>();
   private centers = new Map<string, Point[]>();
   private components = new Map<string, CircuitComponent[]>();
   private wireEnds = new Map<string, { wireId: string; side: number; point: Point }[]>();
@@ -63,17 +66,21 @@ export class PlacementIndex {
           target.connected = occupied.has(JSON.stringify(target.endpoint));
           add(this.targets, cells({ ...target.point, width: 0, height: 0 })[0], target);
         }
-      } else if (o.kind === 'wire') {
-        [o.startEndpoint, o.endEndpoint].forEach((endpoint, side) => {
+      } else if (o.kind === 'wire' || o.kind === 'line') {
+        const wire = o.kind === 'line' ? lineAsWire(o) : o,
+          ends = o.kind === 'line' ? this.lineEnds : this.wireEnds,
+          segments = o.kind === 'line' ? this.lineSegments : this.segments,
+          longSegments = o.kind === 'line' ? this.longLineSegments : this.longSegments;
+        [wire.startEndpoint, wire.endEndpoint].forEach((endpoint, side) => {
           if (endpoint.kind !== 'free') return;
-          add(this.wireEnds, cells({ ...endpoint.point, width: 0, height: 0 })[0], {
+          add(ends, cells({ ...endpoint.point, width: 0, height: 0 })[0], {
             wireId: o.id, side, point: endpoint.point,
           });
         });
-        const points = wirePoints(o, doc);
+        const points = wirePoints(wire, doc);
         points.slice(0, -1).forEach((a, segment) => {
           const b = points[segment + 1];
-          const item: WireSegment = { key: `${o.id}:${segment}`, wire: o, points, segment, a, b };
+          const item: WireSegment = { key: `${o.id}:${segment}`, wire, points, segment, a, b };
           const bounds = {
             x: Math.min(a.x, b.x),
             y: Math.min(a.y, b.y),
@@ -82,8 +89,8 @@ export class PlacementIndex {
           };
           // A very long imported wire must not allocate unbounded buckets.
           if ((bounds.width / CELL + 2) * (bounds.height / CELL + 2) > 256)
-            this.longSegments.push(item);
-          else for (const key of cells(bounds)) add(this.segments, key, item);
+            longSegments.push(item);
+          else for (const key of cells(bounds)) add(segments, key, item);
         });
       }
     }
@@ -105,7 +112,7 @@ export class PlacementIndex {
       height: radius * 2,
     });
   }
-  nearbySegments(p: Point, radius: number): WireSegment[] {
+  nearbySegments(p: Point, radius: number, includeLines = false): WireSegment[] {
     return [
       ...query(this.segments, {
         x: p.x - radius,
@@ -113,7 +120,8 @@ export class PlacementIndex {
         width: radius * 2,
         height: radius * 2,
       }),
-      ...this.longSegments.filter(
+      ...(includeLines ? query(this.lineSegments, { x: p.x - radius, y: p.y - radius, width: radius * 2, height: radius * 2 }) : []),
+      ...[...this.longSegments, ...(includeLines ? this.longLineSegments : [])].filter(
         (s) =>
           p.x + radius >= Math.min(s.a.x, s.b.x) &&
           p.x - radius <= Math.max(s.a.x, s.b.x) &&
@@ -122,10 +130,11 @@ export class PlacementIndex {
       ),
     ];
   }
-  nearbyWireEnds(p: Point, radius: number) {
-    return query(this.wireEnds, {
+  nearbyWireEnds(p: Point, radius: number, includeLines = false) {
+    const bounds = {
       x: p.x - radius, y: p.y - radius, width: radius * 2, height: radius * 2,
-    });
+    };
+    return [...query(this.wireEnds, bounds), ...(includeLines ? query(this.lineEnds, bounds) : [])];
   }
   nearbyCenters(p: Point, radius: number): Point[] {
     return query(this.centers, {

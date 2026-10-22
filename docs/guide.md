@@ -44,6 +44,8 @@ Double-click a wire to add a bend. Drag square handles to edit bends; **Alt/Opti
 
 Choose **Line style → Solid / Dashed / Dotted** in Properties for wires, decorative lines, rectangles, and circles. Dash length and gap use document units. A continuous hit area keeps dashed objects selectable. To style only a continuation, select a wire, choose **right-click → Split wire…**, and click the split point. The connected second segment remains selected and can receive its own style. Splits preserve current annotations and avoid endpoints and crossings. **Esc** cancels split placement.
 
+Decorative lines share wire routing and editing: choose **Orthogonal**, **45°**, or **Free**, click to add bends (double-click or Enter finishes), or drag to draw in one gesture. The magnet and Alt/Option behave as for wires. Round handles move/re-anchor endpoints; double-click adds a bend and Alt/Option-click removes a square bend handle. Attached segments slide while retaining anchors. Graphic terminal/junction anchors follow their hosts and respect symbol bodies. Snapping onto wires or other decorative lines does not split or electrically join them. Existing straight lines retain Free routing. Copying, duplication, personal blocks, and image copying preserve the complete route and style.
+
 ## Properties and precise layout
 
 The **Properties** sidebar shows the selected type or number of elements. It offers only shared properties for mixed selections. Different values appear as **Mixed values**, **Mixed**, or a dash. Confirm text and numeric changes with Enter or by leaving the field; Esc discards the draft. A shared edit changes the whole selection in one undo step.
@@ -108,7 +110,7 @@ Drag to erase only the crossed portions of every intersected highlight. A 4 px m
 
 ### Rectangles, circles, and decorative lines
 
-Drag with **Rectangle**, **Circle**, or **Decorative line** to create a shape. Rectangle uses **Shift** for a square; Rectangle and Circle use **Alt/Option** to draw from the center. Circles stay circular when drawn or resized. Line uses **Shift** for 45° increments. Esc cancels previews. Rectangles and circles start unfilled; select their border and resize with corner handles. Enter width/height for rectangles or **Diameter** for circles in Properties. Both support independent outline/fill colors and opacity, plus solid, dashed, or dotted outlines. A 90° rotation exchanges rectangle width and height. These shapes render behind the circuit and create no electrical connections. Unfilled rectangles and circles leave interior objects selectable.
+Drag with **Rectangle** or **Circle** to create a shape. Rectangle uses **Shift** for a square; Rectangle and Circle use **Alt/Option** to draw from the center. Circles stay circular when drawn or resized. Esc cancels previews. Rectangles and circles start unfilled; select their border and resize with corner handles. Enter width/height for rectangles or **Diameter** for circles in Properties. Both support independent outline/fill colors and opacity, plus solid, dashed, or dotted outlines. A 90° rotation exchanges rectangle width and height. These shapes render behind the circuit and create no electrical connections. Unfilled rectangles and circles leave interior objects selectable.
 
 ## Smart Placement and reusable blocks
 

@@ -1,3 +1,4 @@
+import { detachLineEndpoints } from '../utils/lines';
 import { detachHighlight, highlightSpanHost } from '../annotations/highlight';
 import { detachElectrical } from '../annotations/electrical';
 import type { CircuitDocument, Endpoint, Wire } from '../model/types';
@@ -111,6 +112,9 @@ export function getExportSelection(doc: CircuitDocument, ids: readonly string[])
         ((o.wireId && !included.has(o.wireId)) || (o.componentId && !included.has(o.componentId)))
       )
         return detachElectrical(o, doc);
+      if (o.kind === 'line') return detachLineEndpoints(o, (ep) =>
+        ep.kind === 'junction' && !included.has(ep.junctionId)
+          ? { kind: 'free', point: resolveEndpoint(ep, doc) } : endpoint(ep), doc);
       if (o.kind !== 'wire') return o;
       const startEndpoint = endpoint(o.startEndpoint),
         endEndpoint = endpoint(o.endEndpoint);

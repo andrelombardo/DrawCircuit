@@ -1,3 +1,4 @@
+import { lineAsWire } from './geometry';
 import type { CircuitDocument, CircuitObject, Endpoint, Point } from '../model/types';
 import { localToWorld, snap, wirePoints } from './geometry';
 import { contentBounds, visualBounds, unionBounds } from './visualBounds';
@@ -71,7 +72,7 @@ function item(o: CircuitObject, doc: CircuitDocument): GuideItem {
         : { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 },
     pins: pins(o),
     ...(o.kind === 'component' || o.kind === 'junction' ? { referenceKind: o.kind } : {}),
-    ...(o.kind === 'line'
+    ...(o.kind === 'line' && !o.vertices?.length
       ? { segmentAxis: segmentAxis(o.start, o.end), referenceKind: 'line' as const }
       : {}),
     ...(o.kind === 'text' ? { baseline: o.y } : {}),
@@ -85,11 +86,12 @@ export class GuideIndex {
   constructor(doc: CircuitDocument, excluded: Set<string>) {
     for (const o of doc.objects) {
       if (excluded.has(o.id)) continue;
-      if (o.kind === 'wire') {
+      if (o.kind === 'wire' || o.kind === 'line') {
+        const wire = o.kind === 'line' ? lineAsWire(o) : o;
         // Incident routes change with the selection. Their immutable straight
         // branch references are handled separately, never as static obstacles.
-        if (belongsTo(o.startEndpoint, excluded) || belongsTo(o.endEndpoint, excluded)) continue;
-        const points = simplifyPolyline(wirePoints(o, doc));
+        if (belongsTo(wire.startEndpoint, excluded) || belongsTo(wire.endEndpoint, excluded)) continue;
+        const points = simplifyPolyline(wirePoints(wire, doc));
         for (let i = 1; i < points.length; i++) {
           const a = points[i - 1],
             b = points[i],
@@ -109,7 +111,7 @@ export class GuideIndex {
             anchor: { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 },
             pins: [],
             segmentAxis: axis,
-            referenceKind: 'wire',
+            referenceKind: o.kind,
           });
         }
         continue;

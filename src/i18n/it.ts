@@ -60,6 +60,14 @@ export const italian: Readonly<Record<string, string>> = {
   'Local saving is unavailable. Keep this page open and use “Copy as image”.':
     'Salvataggio locale non disponibile. Mantieni aperta la pagina e usa “Copia come immagine”.',
   'Wire routing': 'Routing filo',
+  'Line routing': 'Routing linea',
+  'Drag to move or reconnect': 'Trascina per spostare o riagganciare',
+  'Click or drag to start a decorative line · Alt bypasses snap · Esc cancels':
+    'Clicca o trascina per iniziare una linea decorativa · Alt ignora lo snap · Esc annulla',
+  'Click to add a bend · click a target to finish · Enter finishes · Alt bypasses snap':
+    'Clicca per aggiungere una svolta · clicca un bersaglio o premi Invio per terminare · Alt ignora lo snap',
+  'Decorative lines use the same routing, snapping, endpoint and bend controls as wires. Choose Orthogonal, 45°, or Free. Click to add bends or drag to draw, then double-click or press Enter to finish. Graphic terminal anchors follow moved or rotated symbols.':
+    'Le linee decorative usano gli stessi percorsi, agganci e controlli di estremi e svolte dei fili. Scegli Ortogonale, 45° o Libero. Clicca per aggiungere svolte o trascina per disegnare; doppio clic o Invio termina. Gli agganci grafici ai terminali seguono i simboli spostati o ruotati.',
   'Shift+W changes routing': 'Shift+W cambia routing',
   Orthogonal: 'Ortogonale',
   Free: 'Libero',

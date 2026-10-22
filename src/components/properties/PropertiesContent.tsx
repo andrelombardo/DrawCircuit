@@ -1,8 +1,9 @@
+import { routeEditedLine } from '../../utils/lines';
 import { EraserProperties } from './EraserProperties';
 import { t } from '../../i18n';
 import { HighlightProperties } from './HighlightProperties';
 import { commonValue } from './commonValue';
-import { fixedWireConnection } from '../../utils/geometry';
+import { fixedWireConnection, linePoints } from '../../utils/geometry';
 import { useShallow } from 'zustand/react/shallow';
 import {
   RotateCw,
@@ -524,14 +525,14 @@ export function PropertiesContent() {
                 ))}
               </div>
             )}
-            {objects.every((o) => o.kind === 'wire') && (
+            {objects.every((o) => o.kind === 'wire' || o.kind === 'line') && (
               <PropertySelect
-                label={t('Wire routing')}
+                label={t(objects.every((o) => o.kind === 'line') ? 'Line routing' : 'Wire routing')}
                 value={commonValue(
-                  objects.flatMap((o) => (o.kind === 'wire' ? [o.routing ?? 'orthogonal'] : [])),
+                  objects.flatMap((o) => (o.kind === 'wire' || o.kind === 'line' ? [o.routing ?? (o.kind === 'line' ? 'free' : 'orthogonal')] : [])),
                 )}
                 onChange={(v) =>
-                  apply((o) => (o.kind === 'wire' ? { ...o, routing: v as WireRouting } : o))
+                  apply((o) => o.kind === 'line' ? routeEditedLine({ ...o, routing: v as WireRouting }, doc) : o.kind === 'wire' ? { ...o, routing: v as WireRouting } : o)
                 }
               >
                 <option value="orthogonal">{t('Orthogonal')}</option>
@@ -563,10 +564,11 @@ export function PropertiesContent() {
                       key={axis}
                       label={`${end === 'start' ? t('Start') : t('End')} ${axis.toUpperCase()}`}
                       numeric
-                      value={o[end][axis]}
+                      value={(end === 'start' ? linePoints(o, doc)[0] : linePoints(o, doc).at(-1)!)[axis]}
                       onCommit={(v) =>
                         apply((o) =>
-                          o.kind === 'line' ? { ...o, [end]: { ...o[end], [axis]: Number(v) } } : o,
+                          o.kind === 'line' ? routeEditedLine({ ...o, [end]: { ...(end === 'start' ? linePoints(o, doc)[0] : linePoints(o, doc).at(-1)!), [axis]: Number(v) },
+                            [end === 'start' ? 'startEndpoint' : 'endEndpoint']: undefined }, doc) : o,
                         )
                       }
                     />

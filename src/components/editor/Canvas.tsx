@@ -1,3 +1,4 @@
+import { linePoints } from '../../utils/geometry';
 import { t } from '../../i18n';
 import { GraphicView } from '../../circuit/annotations/GraphicView';
 import { BraceView } from '../../circuit/annotations/BraceView';
@@ -99,6 +100,7 @@ function CanvasContent({
   const smart = interactions.smart;
   const terminalsNeeded =
     tool === 'wire' ||
+    tool === 'line' ||
     tool === 'junction' ||
     tool === 'voltage' ||
     !!placementType ||
@@ -136,7 +138,8 @@ function CanvasContent({
           : tool === 'circle'
             ? t('Drag to draw a circle · Option from center · Esc cancels')
             : tool === 'line'
-              ? t('Drag a decorative line · Shift snaps to 45° · Esc cancels')
+              ? draft ? t('Click to add a bend · click a target to finish · Enter finishes · Alt bypasses snap')
+                : t('Click or drag to start a decorative line · Alt bypasses snap · Esc cancels')
               : tool === 'brace' || tool === 'bracket'
                 ? t('Drag to group · double-click to label · R rotates · Flip side in Properties')
                 : tool === 'preset'
@@ -192,8 +195,8 @@ function CanvasContent({
         {!inspector.preferences.visible && (
           <SidebarToggle side="right" visible={false} onToggle={inspector.toggle} />
         )}
-        {tool === 'wire' && (
-          <div className="arrow-tool-options" role="group" aria-label={t('Wire routing')}>
+        {(tool === 'wire' || tool === 'line') && (
+          <div className="arrow-tool-options" role="group" aria-label={t(tool === 'line' ? 'Line routing' : 'Wire routing')}>
             {(['orthogonal', '45', 'free'] as const).map((routing, i) => (
               <button
                 key={routing}
@@ -386,7 +389,7 @@ function CanvasContent({
                 (overlay.arrow.kind === 'rectangle' ||
                 overlay.arrow.kind === 'circle' ||
                 overlay.arrow.kind === 'line' ? (
-                  <GraphicView object={overlay.arrow} />
+                  <GraphicView object={overlay.arrow} points={overlay.arrow.kind === 'line' ? linePoints(overlay.arrow, doc) : undefined} />
                 ) : overlay.arrow.kind === 'brace' ? (
                   <BraceView object={overlay.arrow} zoom={v.zoom} />
                 ) : overlay.arrow.kind === 'electrical' ? (

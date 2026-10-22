@@ -34,6 +34,7 @@ export type WireCandidate =
   | { point: Point; endpoint: Endpoint; kind: 'terminal' | 'junction' | 'grid' }
   | { point: Point; kind: 'wire'; wireId: string; exitAxis?: 'x' | 'y' };
 export interface WireDraft {
+  kind?: 'line';
   routing?: WireRouting;
   start: Endpoint;
   vertices: Point[];
@@ -46,6 +47,7 @@ const RELEASE_PX = 16;
 const SWITCH_PX = 3;
 
 export interface WireSnapOptions {
+  includeLines?: boolean;
   enabled?: boolean;
   previous?: WireCandidate | null;
   routing?: WireRouting;
@@ -281,11 +283,11 @@ export function wireCandidate(
       : endpoint.kind === 'junction' ? endpoint.junctionId : '';
     if (!excluded.has(id)) push({ ...target, kind: target.kind }, target.key);
   }
-  for (const end of index.nearbyWireEnds(p, RELEASE_PX / zoom)) {
+  for (const end of index.nearbyWireEnds(p, RELEASE_PX / zoom, options.includeLines)) {
     if (!excluded.has(end.wireId))
       push({ kind: 'wire', point: end.point, wireId: end.wireId }, `e:${end.wireId}:${end.side}`);
   }
-  for (const hit of index.nearbySegments(p, RELEASE_PX / zoom)) {
+  for (const hit of index.nearbySegments(p, RELEASE_PX / zoom, options.includeLines)) {
     if (excluded.has(hit.wire.id) || distance(hit.a, hit.b) < 0.001) continue;
     const { a, b } = hit;
     const aligned = alignedWirePoint(p, zoom, context);
@@ -371,6 +373,24 @@ export function normalizeDocumentWires(doc: CircuitDocument): CircuitDocument {
         normalizedIds,
       )
     : doc;
+}
+
+/** Keep adjacent orthogonal bends aligned when a stored vertex moves. In
+ * particular, moving a bend inserted on a straight run must not leave a spur. */
+export function moveWireVertex(wire: Wire, index: number, point: Point, doc: CircuitDocument): Wire {
+  const vertex = wire.vertices[index];
+  if (!vertex) return wire;
+  const vertices = wire.vertices.map((p) => ({ ...p }));
+  vertices[index] = point;
+  if (!wire.routing || wire.routing === 'orthogonal') {
+    for (const neighbor of [index - 1, index + 1]) {
+      const original = wire.vertices[neighbor];
+      if (!original) continue;
+      if (Math.abs(original.x - vertex.x) < 0.001) vertices[neighbor].x = point.x;
+      else if (Math.abs(original.y - vertex.y) < 0.001) vertices[neighbor].y = point.y;
+    }
+  }
+  return routeEditedWire({ ...wire, vertices }, doc);
 }
 
 /** Slide the grabbed segment, keeping fixed connections and the rest of the route stable. */

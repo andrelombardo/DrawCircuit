@@ -101,7 +101,9 @@ export function instantiatePersonalBlock(
         };
       }
       if (o.kind === 'highlight') return mapHighlight(o, rp);
-      if (o.kind === 'line') return { ...o, start: rp(o.start), end: rp(o.end) };
+      if (o.kind === 'line') return { ...o, start: rp(o.start), end: rp(o.end),
+        vertices: o.vertices?.map(rp), startEndpoint: o.startEndpoint && ep(o.startEndpoint),
+        endEndpoint: o.endEndpoint && ep(o.endEndpoint) };
       if (o.kind === 'wire')
         return {
           ...o,

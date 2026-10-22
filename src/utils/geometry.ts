@@ -12,6 +12,7 @@ import type {
   CircuitObject,
   Endpoint,
   Point,
+  LineAnnotation,
   Wire,
   WireRouting,
 } from '../model/types';
@@ -318,6 +319,32 @@ function terminalSafeRoute(original: Point[], wire: Wire, doc: CircuitDocument):
       i === anchors.length - 1 ? endExit?.direction : undefined, wire.routing).slice(1));
   return cleanRoute([...result, end]);
 }
+const lineRoutes = new WeakMap<LineAnnotation, Wire>();
+/** Reuse wire geometry while keeping the graphic object out of electrical indexes. */
+export function lineAsWire(line: LineAnnotation): Wire {
+  let wire = lineRoutes.get(line);
+  if (!wire) {
+    wire = { ...line, kind: 'wire',
+      startEndpoint: line.startEndpoint?.kind === 'free' ? { kind: 'free', point: line.startEndpoint.point }
+        : line.startEndpoint ?? { kind: 'free', point: line.start },
+      endEndpoint: line.endEndpoint?.kind === 'free' ? { kind: 'free', point: line.endEndpoint.point }
+        : line.endEndpoint ?? { kind: 'free', point: line.end },
+      vertices: line.vertices ?? [], routing: line.routing ?? 'free',
+    };
+    lineRoutes.set(line, wire);
+  }
+  return wire;
+}
+export function linePoints(line: LineAnnotation, doc: CircuitDocument): Point[] {
+  return wirePoints(lineAsWire(line), doc);
+}
+export function lineFromWire(line: LineAnnotation, wire: Wire, doc: CircuitDocument): LineAnnotation {
+  return { ...line, start: resolveEndpoint(wire.startEndpoint, doc),
+    end: resolveEndpoint(wire.endEndpoint, doc), vertices: wire.vertices, routing: wire.routing,
+    startEndpoint: wire.startEndpoint.kind === 'free' ? undefined : wire.startEndpoint,
+    endEndpoint: wire.endEndpoint.kind === 'free' ? undefined : wire.endEndpoint,
+  };
+}
 const resolvedWireRoutes = new WeakMap<CircuitDocument, WeakMap<Wire, Point[]>>();
 export function wirePoints(wire: Wire, doc: CircuitDocument): Point[] {
   let routes = resolvedWireRoutes.get(doc);
@@ -530,7 +557,10 @@ export function moveObject(o: CircuitObject, delta: Point, moved: Set<string>): 
       ? { ...o, offset: add(o.offset, delta) }
       : { ...o, start: add(o.start, delta), end: add(o.end, delta) };
   }
-  if (o.kind === 'brace' || o.kind === 'line')
+  if (o.kind === 'line')
+    return { ...o, start: add(o.start, delta), end: add(o.end, delta),
+      vertices: o.vertices?.map((p) => add(p, delta)) };
+  if (o.kind === 'brace')
     return { ...o, start: add(o.start, delta), end: add(o.end, delta) };
   if (o.kind === 'arrow')
     return {
@@ -634,7 +664,7 @@ export function objectBounds(
     if (drawing) points.push(...drawing.head);
   } else if (o.kind === 'rectangle' || o.kind === 'circle')
     return { x: o.x, y: o.y, width: o.width, height: o.height };
-  else if (o.kind === 'line') points = [o.start, o.end];
+  else if (o.kind === 'line') points = linePoints(o, doc);
   else if (o.kind === 'wire') points = wirePoints(o, doc);
   else if (o.kind === 'loop-arrow') {
     const angle = ((o.rotation ?? 0) * Math.PI) / 180;
