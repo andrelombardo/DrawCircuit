@@ -8,7 +8,7 @@
 <p align="center">Un editor open source essenziale per creare schemi elettrici chiari nel browser.</p>
 
 <p align="center">
-  <a href="https://andrelombardo.github.io/DrawCircuit/"><strong>Apri DrawCircuit →</strong></a>
+  <a href="https://andrelombardo.github.io/drawcircuit/"><strong>Apri DrawCircuit →</strong></a>
 </p>
 
 <p align="center">
@@ -38,7 +38,7 @@ DrawCircuit è un editor gratuito utilizzabile dal browser, pensato per studenti
 
 ## Inizia a usare DrawCircuit
 
-**[Apri DrawCircuit](https://andrelombardo.github.io/DrawCircuit/)** e inizia a disegnare:
+**[Apri DrawCircuit](https://andrelombardo.github.io/drawcircuit/)** e inizia a disegnare:
 
 1. Scegli un componente dalla libreria e clicca per posizionarlo.
 2. Premi **W** per collegare i terminali con fili; usa **N** per aggiungere nodi.
@@ -55,8 +55,8 @@ Per scorciatoie, annotazioni, strumenti di disposizione e blocchi riutilizzabili
 Usa **Node.js 26.5.0** (vedi [`.nvmrc`](.nvmrc)) e npm:
 
 ```bash
-git clone https://github.com/andrelombardo/DrawCircuit.git
-cd DrawCircuit
+git clone https://github.com/andrelombardo/drawcircuit.git
+cd drawcircuit
 npm ci
 npm run dev
 ```
@@ -71,7 +71,7 @@ npm run build
 
 ## Contribuire
 
-Segnalazioni di bug, idee e pull request sono benvenute. Leggi [CONTRIBUTING.it.md](CONTRIBUTING.it.md) prima di apportare modifiche oppure consulta le [issue](https://github.com/andrelombardo/DrawCircuit/issues).
+Segnalazioni di bug, idee e pull request sono benvenute. Leggi [CONTRIBUTING.it.md](CONTRIBUTING.it.md) prima di apportare modifiche oppure consulta le [issue](https://github.com/andrelombardo/drawcircuit/issues).
 
 ## Licenza
 

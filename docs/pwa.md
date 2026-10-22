@@ -2,7 +2,7 @@
 
 DrawCircuit loads from the network and stores circuits, personal blocks, and preferences in the browser. It does not register service workers, precache resources, or implement an update system. Opening the app loads the site normally. The host controls ordinary HTTP caching; this is separate from an app-managed offline cache. An already open editor may continue working with resources in memory, but offline startup is not guaranteed.
 
-`public/manifest.webmanifest` preserves the name, icons, colors, and standalone launch. The repository rename changes the public path to case-sensitive `/DrawCircuit/`. Relative `start_url` and `scope` work under the new path. Local data belongs to the unchanged origin `https://andrelombardo.github.io`. An app installed from the old address may need to be installed again from the new URL. The manifest defaults to English; the in-app language selector remembers English or Italian independently of circuit data.
+`public/manifest.webmanifest` preserves the name, icons, colors, and standalone launch. The canonical public path is case-sensitive `/drawcircuit/`; the visible app name remains DrawCircuit. Relative `start_url` and `scope` work under this path. Local data belongs to the unchanged origin `https://andrelombardo.github.io`. An app installed from the old address may need to be installed again from the new URL. The manifest defaults to English; the in-app language selector remembers English or Italian independently of circuit data.
 
 ## Browsers
 
@@ -22,11 +22,11 @@ Reference documentation, consulted October 15, 2026: [MDN: installability](https
 Two entry points are needed because an old cached shell may prevent the new JavaScript from running:
 
 - `public/sw.js`: at the old worker URL, the browser finds a replacement that activates immediately, claims clients without intercepting fetches, removes the old precache, and unregisters itself. It does not reload windows, preserving ongoing edits and memory state.
-- `src/pwa/retireLegacyOffline.ts`: when the new production site loads, it removes registrations with the **exact app scope or historical `/drawcircuit/` alias** and the **exact `sw.js` script**, then removes orphaned precaches. Access failures do not block the editor and are retried on the next visit, without timers or persistent flags.
+- `src/pwa/retireLegacyOffline.ts`: when the new production site loads, it removes registrations with the **exact app scope or historical `/DrawCircuit/` alias** and the **exact `sw.js` script**, then removes orphaned precaches. Access failures do not block the editor and are retried on the next visit, without timers or persistent flags.
 
 Only historical Workbox names matching `workbox-precache-v<number>-<exact scope>` are removed. Other scopes, different cache prefixes, localStorage, IndexedDB, documents, blocks, preferences, and recovery copies are preserved. There is no `Clear-Site-Data`, blanket deletion, or document-structure change.
 
-GitHub Pages does not automatically redirect a renamed path. The separate [andrelombardo.github.io repository](https://github.com/andrelombardo/andrelombardo.github.io) publishes only the `/drawcircuit/` entry point, redirecting to canonical `/DrawCircuit/` on the same origin. It contains neither an app copy nor a worker. If `/drawcircuit/sw.js` is unreachable, the browser cannot fetch its retirement worker; opening the [new site](https://andrelombardo.github.io/DrawCircuit/) also cleans the old scope without changing local data. A worker on the new scope cannot claim old-scope windows; an old cached shell may require opening the canonical address directly.
+GitHub Pages does not automatically redirect a renamed path, and no separate redirect site is maintained. If `/DrawCircuit/sw.js` is unreachable, the browser cannot fetch its retirement worker; opening the [canonical site](https://andrelombardo.github.io/drawcircuit/) also cleans the old scope without changing local data. A worker on the new scope cannot claim old-scope windows; an old cached shell may require opening the canonical address directly.
 
 Retirement cannot reach an installation that stays completely offline. On reconnection, browser update checks may reach `sw.js`. The site cannot force browser update timing; code already running in an old window stays loaded until the window is normally reopened. Once the retirement worker takes over, resources are no longer served from the old precache.
 

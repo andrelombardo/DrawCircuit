@@ -6,7 +6,10 @@ export async function retireLegacyOffline(scope: string): Promise<void> {
   const scopes = [scope];
   // The repository rename changes the case-sensitive Pages path. Browser data
   // stays on the same origin; retire the former installation on the next visit.
-  if (new URL(scope).pathname === '/DrawCircuit/')
+  const pathname = new URL(scope).pathname;
+  if (pathname === '/drawcircuit/')
+    scopes.push(new URL('../DrawCircuit/', scope).href);
+  else if (pathname === '/DrawCircuit/')
     scopes.push(new URL('../drawcircuit/', scope).href);
   const workerURLs = new Map(scopes.map((base) => [base, new URL('sw.js', base).href]));
   try {

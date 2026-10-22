@@ -8,11 +8,11 @@ Thanks for your interest in improving DrawCircuit! Contributions of all kinds ar
 
 ## Before you start
 
-Take a look at the [existing issues](https://github.com/andrelombardo/DrawCircuit/issues) to see whether your idea or bug has already been discussed.
+Take a look at the [existing issues](https://github.com/andrelombardo/drawcircuit/issues) to see whether your idea or bug has already been discussed.
 
-- [Good first issues](https://github.com/andrelombardo/DrawCircuit/labels/good%20first%20issue) are a good place to start.
-- [Help wanted](https://github.com/andrelombardo/DrawCircuit/labels/help%20wanted) highlights tasks open to contributions.
-- [Report a bug](https://github.com/andrelombardo/DrawCircuit/issues/new?template=bug_report.yml) or [suggest a feature](https://github.com/andrelombardo/DrawCircuit/issues/new?template=feature_request.yml) if you have something new to share.
+- [Good first issues](https://github.com/andrelombardo/drawcircuit/labels/good%20first%20issue) are a good place to start.
+- [Help wanted](https://github.com/andrelombardo/drawcircuit/labels/help%20wanted) highlights tasks open to contributions.
+- [Report a bug](https://github.com/andrelombardo/drawcircuit/issues/new?template=bug_report.yml) or [suggest a feature](https://github.com/andrelombardo/drawcircuit/issues/new?template=feature_request.yml) if you have something new to share.
 
 For larger changes, open an issue or leave a comment before writing code. This helps avoid duplicate work and keeps the scope clear.
 
@@ -25,8 +25,8 @@ You'll need [Node.js](https://nodejs.org/) and npm. The recommended Node.js vers
 3. Install dependencies and start the development server.
 
 ```sh
-git clone https://github.com/YOUR_USERNAME/DrawCircuit.git
-cd DrawCircuit
+git clone https://github.com/YOUR_USERNAME/drawcircuit.git
+cd drawcircuit
 nvm install
 nvm use
 npm ci
@@ -45,7 +45,7 @@ Keep changes focused and consistent with the existing codebase. In particular:
 - Avoid breaking saved documents, browser storage, or compatibility with the current JSON format.
 - Keep the interface accessible and usable on different screen sizes.
 - Update relevant documentation when changing how something works.
-- Preserve the bundled assets, their license notices, and the `/DrawCircuit/` deployment path.
+- Preserve the bundled assets, their license notices, and the `/drawcircuit/` deployment path.
 - If you're changing app installation or caching behavior, review [the PWA documentation](docs/pwa.md) first and avoid clearing unrelated user data.
 
 ## Test your changes
@@ -56,10 +56,10 @@ Before submitting a pull request, run:
 npm run lint
 npm test
 npm run build
-npm run preview -- --base /DrawCircuit/
+npm run preview -- --base /drawcircuit/
 ```
 
-Check the production preview at [http://127.0.0.1:4173/DrawCircuit/](http://127.0.0.1:4173/DrawCircuit/).
+Check the production preview at [http://127.0.0.1:4173/drawcircuit/](http://127.0.0.1:4173/drawcircuit/).
 
 Also test the behavior affected by your changes. When relevant, verify drawing and editing, undo/redo, saving after reload, copying as an image, keyboard interactions, and responsive layouts.
 

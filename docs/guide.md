@@ -1,6 +1,6 @@
 # DrawCircuit user guide
 
-[Read in Italian](it/guide.md) · [Open DrawCircuit](https://andrelombardo.github.io/DrawCircuit/)
+[Read in Italian](it/guide.md) · [Open DrawCircuit](https://andrelombardo.github.io/drawcircuit/)
 
 DrawCircuit is a browser editor for electrical circuits in notes and teaching material. Components, wires, and annotations are editable vector objects. The library contains 72 symbols in 12 categories and 23 quick blocks. Comic Relief is bundled for circuit text and formulas; the UI uses Inter and KaTeX lays out mathematical labels.
 

@@ -8,11 +8,11 @@ Grazie per il tuo interesse a migliorare DrawCircuit! Ogni tipo di contributo è
 
 ## Prima di iniziare
 
-Consulta le [issue esistenti](https://github.com/andrelombardo/DrawCircuit/issues) per verificare se la tua idea o il bug sono già stati discussi.
+Consulta le [issue esistenti](https://github.com/andrelombardo/drawcircuit/issues) per verificare se la tua idea o il bug sono già stati discussi.
 
-- Le issue con l’etichetta [good first issue](https://github.com/andrelombardo/DrawCircuit/labels/good%20first%20issue) sono un buon punto di partenza.
-- L’etichetta [help wanted](https://github.com/andrelombardo/DrawCircuit/labels/help%20wanted) segnala attività aperte ai contributi.
-- [Segnala un bug](https://github.com/andrelombardo/DrawCircuit/issues/new?template=bug_report.yml) o [proponi una funzionalità](https://github.com/andrelombardo/DrawCircuit/issues/new?template=feature_request.yml) se hai qualcosa di nuovo da condividere.
+- Le issue con l’etichetta [good first issue](https://github.com/andrelombardo/drawcircuit/labels/good%20first%20issue) sono un buon punto di partenza.
+- L’etichetta [help wanted](https://github.com/andrelombardo/drawcircuit/labels/help%20wanted) segnala attività aperte ai contributi.
+- [Segnala un bug](https://github.com/andrelombardo/drawcircuit/issues/new?template=bug_report.yml) o [proponi una funzionalità](https://github.com/andrelombardo/drawcircuit/issues/new?template=feature_request.yml) se hai qualcosa di nuovo da condividere.
 
 Per modifiche più ampie, apri una issue o lascia un commento prima di scrivere codice. Questo aiuta a evitare lavoro duplicato e a mantenere chiaro l’ambito delle modifiche.
 
@@ -25,8 +25,8 @@ Servono [Node.js](https://nodejs.org/) e npm. La versione consigliata di Node.js
 3. Installa le dipendenze e avvia il server di sviluppo.
 
 ```sh
-git clone https://github.com/YOUR_USERNAME/DrawCircuit.git
-cd DrawCircuit
+git clone https://github.com/YOUR_USERNAME/drawcircuit.git
+cd drawcircuit
 nvm install
 nvm use
 npm ci
@@ -45,7 +45,7 @@ Mantieni le modifiche mirate e coerenti con il codice esistente. In particolare:
 - Evita di compromettere i documenti salvati, i dati nel browser o la compatibilità con il formato JSON attuale.
 - Mantieni l’interfaccia accessibile e utilizzabile su schermi di dimensioni diverse.
 - Aggiorna la documentazione pertinente quando cambi il funzionamento di una funzionalità.
-- Conserva le risorse incluse, i relativi avvisi di licenza e il percorso di pubblicazione `/DrawCircuit/`.
+- Conserva le risorse incluse, i relativi avvisi di licenza e il percorso di pubblicazione `/drawcircuit/`.
 - Se modifichi l’installazione dell’app o il comportamento della cache, consulta prima la [documentazione PWA](docs/pwa.md) ed evita di cancellare dati utente non pertinenti.
 
 ## Verifica le modifiche
@@ -56,10 +56,10 @@ Prima di inviare una pull request, esegui:
 npm run lint
 npm test
 npm run build
-npm run preview -- --base /DrawCircuit/
+npm run preview -- --base /drawcircuit/
 ```
 
-Controlla l’anteprima di produzione su [http://127.0.0.1:4173/DrawCircuit/](http://127.0.0.1:4173/DrawCircuit/).
+Controlla l’anteprima di produzione su [http://127.0.0.1:4173/drawcircuit/](http://127.0.0.1:4173/drawcircuit/).
 
 Prova anche il comportamento interessato dalle tue modifiche. Quando pertinente, verifica disegno e modifica, annulla/ripeti, salvataggio dopo la ricarica, copia come immagine, interazioni da tastiera e adattamento a schermi di dimensioni diverse.
 

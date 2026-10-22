@@ -46,7 +46,7 @@ body:
     attributes:
       label: App URL or local commit
       description: Include whether you use a browser tab or an installed web app.
-      placeholder: https://andrelombardo.github.io/DrawCircuit/
+      placeholder: https://andrelombardo.github.io/drawcircuit/
   - type: textarea
     id: context
     attributes:

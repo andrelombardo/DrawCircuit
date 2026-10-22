@@ -1,6 +1,6 @@
 # Web architecture
 
-DrawCircuit uses React, TypeScript, Vite, and Zustand. `index.html` loads `src/main.tsx`, which mounts `App` after loading both circuit font faces. Any static host can serve `dist/`, including under `/DrawCircuit/`. No backend, account, or native runtime is required.
+DrawCircuit uses React, TypeScript, Vite, and Zustand. `index.html` loads `src/main.tsx`, which mounts `App` after loading both circuit font faces. Any static host can serve `dist/`, including under `/drawcircuit/`. No backend, account, or native runtime is required.
 
 | Module                                                       | Responsibility                                                          |
 | ------------------------------------------------------------ | ----------------------------------------------------------------------- |

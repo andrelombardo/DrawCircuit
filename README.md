@@ -14,7 +14,7 @@
 <p align="center">A focused, open-source editor for creating clean circuit diagrams in your browser.</p>
 
 <p align="center">
-  <a href="https://andrelombardo.github.io/DrawCircuit/"><strong>Open DrawCircuit →</strong></a>
+  <a href="https://andrelombardo.github.io/drawcircuit/"><strong>Open DrawCircuit →</strong></a>
 </p>
 
 
@@ -33,7 +33,7 @@ DrawCircuit is a free, browser-based editor built for students, educators, and a
 
 ## Get started
 
-**[Launch DrawCircuit](https://andrelombardo.github.io/DrawCircuit/)** and start drawing:
+**[Launch DrawCircuit](https://andrelombardo.github.io/drawcircuit/)** and start drawing:
 
 1. Pick a component from the library and click to place it.
 2. Press **W** to connect terminals with wires; use **N** to add junctions.
@@ -50,8 +50,8 @@ For shortcuts, annotations, layout tools, and reusable blocks, see the **[user g
 Use **Node.js 26.5.0** (see [`.nvmrc`](.nvmrc)) and npm:
 
 ```bash
-git clone https://github.com/andrelombardo/DrawCircuit.git
-cd DrawCircuit
+git clone https://github.com/andrelombardo/drawcircuit.git
+cd drawcircuit
 npm ci
 npm run dev
 ```
@@ -66,7 +66,7 @@ npm run build
 
 ## Contributing
 
-Bug reports, ideas, and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) before making a change, or explore the [issues](https://github.com/andrelombardo/DrawCircuit/issues).
+Bug reports, ideas, and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) before making a change, or explore the [issues](https://github.com/andrelombardo/drawcircuit/issues).
 
 ## License
 
