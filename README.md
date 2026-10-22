@@ -6,11 +6,6 @@
 
 <p align="center">Electrical diagrams, made simple.</p>
 
-<p align="center">
-  <a href="docs/guide.md">User guide</a> · <a href="CONTRIBUTING.md">Contributing</a>
-</p>
-
-
 
 <p align="center">
   <img src="assets/readme/screenshot.png" alt="DrawCircuit editor showing an annotated circuit diagram, the component library, and the properties panel" width="960" />
