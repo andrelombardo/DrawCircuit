@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <img src="assets/readme/demo.gif" alt="Place a circuit, edit a mathematical label, and copy it as an image in DrawCircuit" width="960" />
+  <img src="assets/readme/screenshot.png" alt="DrawCircuit editor showing an annotated circuit diagram, the component library, and the properties panel" width="960" />
 </p>
 
 <p align="center">

@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <img src="assets/readme/demo.gif" alt="Inserisci un circuito, modifica un’etichetta matematica e copialo come immagine in DrawCircuit" width="960" />
+  <img src="assets/readme/screenshot.png" alt="Editor DrawCircuit con uno schema elettrico annotato, la libreria dei componenti e il pannello delle proprietà" width="960" />
 </p>
 
 <p align="center">
