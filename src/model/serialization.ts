@@ -225,6 +225,8 @@ export function deserializeDocument(raw: string): CircuitDocument {
         fail();
     } else if (o.kind === 'line') {
       if (!point(o.start) || !point(o.end) || !color(o.color) || !positive(o.width, MAX_LINE_WIDTH) ||
+        (o.arrowhead !== undefined && o.arrowhead !== 'open' && o.arrowhead !== 'filled') ||
+        (o.reversed !== undefined && typeof o.reversed !== 'boolean') ||
         (o.controlPoints !== undefined && (!Array.isArray(o.controlPoints) || o.controlPoints.length !== 2 || !o.controlPoints.every(point))) ||
         (o.routing !== undefined && !['orthogonal', '45', 'free'].includes(String(o.routing))) ||
         (o.vertices !== undefined && (!Array.isArray(o.vertices) || o.vertices.length > 1000 || !o.vertices.every(point))) ||

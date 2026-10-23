@@ -2,6 +2,7 @@ import { memo } from 'react';
 import type { CircuitDocument, LineAnnotation, ShapeAnnotation } from '../../model/types';
 import { dashPattern } from '../../utils/strokeStyle';
 import { linePath } from '../../utils/geometry';
+import { lineArrowHeadPath } from '../../tikz/arrowheads';
 export const GraphicView = memo(function GraphicView({
   object: o,
   doc,
@@ -21,7 +22,6 @@ export const GraphicView = memo(function GraphicView({
     fill: 'none',
     stroke: o.color,
     strokeWidth: width,
-    opacity: o.opacity,
     strokeDasharray: dashPattern(o, width)?.join(' '),
     strokeLinecap: 'round' as const,
     strokeLinejoin: 'round' as const,
@@ -41,7 +41,7 @@ export const GraphicView = memo(function GraphicView({
             vectorEffect="non-scaling-stroke"
             pointerEvents="stroke"
           />
-          <Shape {...geometry} {...stroke} pointerEvents="none" />
+          <Shape {...geometry} {...stroke} opacity={o.opacity} pointerEvents="none" />
         </>
       ) : (
         <>
@@ -52,7 +52,17 @@ export const GraphicView = memo(function GraphicView({
             strokeWidth={16}
             vectorEffect="non-scaling-stroke"
           />
-          <path d={linePath(o, doc)} {...stroke} pointerEvents="none" />
+          <g opacity={o.opacity}>
+            <path d={linePath(o, doc)} {...stroke} pointerEvents="none" />
+            {o.arrowhead && (
+              <path
+                d={lineArrowHeadPath(o, doc)}
+                {...stroke}
+                strokeDasharray={undefined}
+                fill={o.arrowhead === 'filled' ? o.color : 'none'}
+              />
+            )}
+          </g>
         </>
       )}
     </g>

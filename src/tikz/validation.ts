@@ -191,6 +191,8 @@ export function isExportableObject(o: CircuitObject): boolean {
       );
     case 'line':
       return finitePoint(o.start) && finitePoint(o.end) && positive(o.width) && validStroke(o) &&
+        (o.arrowhead === undefined || ['open', 'filled'].includes(o.arrowhead)) &&
+        (o.reversed === undefined || typeof o.reversed === 'boolean') &&
         (o.controlPoints === undefined || (Array.isArray(o.controlPoints) && o.controlPoints.length === 2 && o.controlPoints.every(finitePoint))) &&
         (o.routing === undefined || ['orthogonal', '45', 'free'].includes(o.routing)) &&
         (o.vertices === undefined || (Array.isArray(o.vertices) && o.vertices.every(finitePoint))) &&

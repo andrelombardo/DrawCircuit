@@ -241,6 +241,8 @@ export const italian: Readonly<Record<string, string>> = {
   Arrowhead: 'Punta',
   'Open arrowhead': 'Aperta',
   'Filled arrowhead': 'Riempita',
+  'Select a decorative line and choose an open or filled Arrowhead in Properties to turn it into an arrow. Reverse arrow changes its direction.':
+    'Seleziona una linea decorativa e scegli una Punta aperta o riempita nelle Proprietà per trasformarla in una freccia. Inverti freccia ne cambia il verso.',
   Shape: 'Forma',
   Properties: 'Proprietà',
   'Resize properties': 'Ridimensiona proprietà',

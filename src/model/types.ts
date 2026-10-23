@@ -271,6 +271,10 @@ export interface LineAnnotation extends StrokeStyle {
   vertices?: Point[];
   /** Legacy decorative lines remain straight. */
   routing?: WireRouting;
+  /** Missing keeps legacy decorative lines without a tip. */
+  arrowhead?: 'open' | 'filled';
+  /** Point the tip at the start instead of the end. */
+  reversed?: boolean;
   color: string;
   width: number;
   opacity?: number;

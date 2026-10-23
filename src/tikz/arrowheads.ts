@@ -1,5 +1,5 @@
-import type { ArrowAnnotation, LoopArrow, Point } from '../model/types';
-import { distance, arcGeometry, rotatePoint } from '../utils/geometry';
+import type { ArrowAnnotation, CircuitDocument, LineAnnotation, LoopArrow, Point } from '../model/types';
+import { distance, arcGeometry, lineCurveGeometry, linePoints, rotatePoint } from '../utils/geometry';
 import { loopGeometry } from '../utils/loops';
 
 /** Compact chevron for electrical annotations integrated into the circuit. */
@@ -64,8 +64,30 @@ export function canvasArrowHead(arrow: ArrowAnnotation | LoopArrow): Point[] {
   return handwrittenHead(tip, { x: tip.x - from.x, y: tip.y - from.y }, arrow.width);
 }
 
+function headPath(points: Point[], filled: boolean): string {
+  if (!points.length) return '';
+  const [start, upper, tip, lower, end] = points;
+  return `M ${start.x} ${start.y} Q ${upper.x} ${upper.y} ${tip.x} ${tip.y} Q ${lower.x} ${lower.y} ${end.x} ${end.y}${filled ? ' Z' : ''}`;
+}
+
+/** Follow the final route segment or the exact Bezier endpoint tangent. */
+export function lineArrowHead(line: LineAnnotation, doc?: CircuitDocument): Point[] {
+  if (!line.arrowhead) return [];
+  const geometry = lineCurveGeometry(line, doc);
+  const points = line.controlPoints
+    ? [geometry.start, ...geometry.controls, geometry.end]
+    : doc ? linePoints(line, doc) : [line.start, ...(line.vertices ?? []), line.end];
+  const directed = line.reversed ? points : [...points].reverse();
+  const tip = directed[0];
+  const from = directed.find((point) => distance(point, tip) > 0);
+  return from ? handwrittenHead(tip, { x: tip.x - from.x, y: tip.y - from.y }, line.width) : [];
+}
+
+export function lineArrowHeadPath(line: LineAnnotation, doc?: CircuitDocument): string {
+  return headPath(lineArrowHead(line, doc), line.arrowhead === 'filled');
+}
+
 /** Shared by the editor, placement previews and SVG/PNG output. */
 export function canvasArrowHeadPath(arrow: ArrowAnnotation | LoopArrow): string {
-  const [start, upper, tip, lower, end] = canvasArrowHead(arrow);
-  return `M ${start.x} ${start.y} Q ${upper.x} ${upper.y} ${tip.x} ${tip.y} Q ${lower.x} ${lower.y} ${end.x} ${end.y}${arrow.headFilled ? ' Z' : ''}`;
+  return headPath(canvasArrowHead(arrow), !!arrow.headFilled);
 }

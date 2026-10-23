@@ -9,7 +9,7 @@ import { bridgePaths, wireCrossings } from '../utils/crossings';
 import type { CircuitDocument, Point, Rotation } from '../model/types';
 import { canvasTextLayout, xmlText } from '../tikz/canvasText';
 import { isExportableObject } from '../tikz/validation';
-import { canvasArrowHead, canvasArrowHeadPath } from '../tikz/arrowheads';
+import { canvasArrowHead, canvasArrowHeadPath, lineArrowHeadPath } from '../tikz/arrowheads';
 import { arrowPath, pointsPath, linePath, wirePoints } from '../utils/geometry';
 import { loopPath } from '../utils/loops';
 import { visualBounds, unionBounds } from '../utils/visualBounds';
@@ -125,9 +125,16 @@ export function exportSVG(
         `<${shape} ${geometry} fill="none" stroke="${o.color}" stroke-width="${f(o.strokeWidth)}" opacity="${f(o.opacity ?? 1)}" stroke-linejoin="round"${dashPattern(o, o.strokeWidth) ? ` stroke-dasharray="${dashPattern(o, o.strokeWidth)!.map(f).join(' ')}"` : ''} stroke-linecap="round"/>`,
       );
     } else if (o.kind === 'line') {
-      boxes.push(visualBounds(o, doc));
+      const bounds = visualBounds(o, doc);
+      boxes.push({
+        x: bounds.x - o.width / 2,
+        y: bounds.y - o.width / 2,
+        width: bounds.width + o.width,
+        height: bounds.height + o.width,
+      });
+      const head = lineArrowHeadPath(o, doc);
       parts.push(
-        `<g opacity="${f(o.opacity ?? 1)}">${path(linePath(o, doc), o.color, o.width, 'round', o)}</g>`,
+        `<g opacity="${f(o.opacity ?? 1)}">${path(linePath(o, doc), o.color, o.width, 'round', o)}${head ? path(head, o.color, o.width, 'round', {}, o.arrowhead === 'filled' ? o.color : 'none') : ''}</g>`,
       );
     }
   }

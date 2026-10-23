@@ -1,4 +1,5 @@
 import { t } from '../i18n';
+import { lineArrowHead } from '../tikz/arrowheads';
 import { highlightBounds, mapHighlight } from '../annotations/highlight';
 import { braceGeometry } from '../annotations/brace';
 import { electricalDrawingGeometry, electricalGeometry } from '../annotations/electrical';
@@ -715,7 +716,7 @@ export function objectBounds(
     if (drawing) points.push(...drawing.head);
   } else if (o.kind === 'rectangle' || o.kind === 'circle')
     return { x: o.x, y: o.y, width: o.width, height: o.height };
-  else if (o.kind === 'line') points = linePoints(o, doc);
+  else if (o.kind === 'line') points = [...linePoints(o, doc), ...lineArrowHead(o, doc)];
   else if (o.kind === 'wire') points = wirePoints(o, doc);
   else if (o.kind === 'loop-arrow') {
     const angle = ((o.rotation ?? 0) * Math.PI) / 180;

@@ -311,6 +311,24 @@ export function PropertiesContent() {
               <option value="filled">{t('Filled arrowhead')}</option>
             </PropertySelect>
           )}
+          {!labelTarget && objects.every((o) => o.kind === 'line') && (
+            <PropertySelect
+              label={t('Arrowhead')}
+              value={commonValue(
+                objects.map((o) => o.kind === 'line' ? o.arrowhead ?? 'none' : 'none'),
+              )}
+              onChange={(value) =>
+                apply((o) => o.kind === 'line'
+                  ? { ...o, arrowhead: value === 'none' ? undefined : value as 'open' | 'filled' }
+                  : o,
+                )
+              }
+            >
+              <option value="none">{t('None')}</option>
+              <option value="open">{t('Open arrowhead')}</option>
+              <option value="filled">{t('Filled arrowhead')}</option>
+            </PropertySelect>
+          )}
           {!labelTarget && lineObjects.length === objects.length && (
             <PropertySelect
               label={t('Line style')}
@@ -457,13 +475,16 @@ export function PropertiesContent() {
                 </button>
               </PropertyRow>
             )}
-            {objects.every((item) => ['arrow', 'loop-arrow'].includes(item.kind)) && (
+            {objects.every((item) =>
+              item.kind === 'arrow' || item.kind === 'loop-arrow' ||
+              (item.kind === 'line' && item.arrowhead),
+            ) && (
               <PropertyRow caption={t('Direction')}>
                 <button
                   className="inspector-property-action"
                   onClick={() =>
                     apply((item) =>
-                      item.kind === 'arrow' || item.kind === 'electrical'
+                      item.kind === 'arrow' || item.kind === 'electrical' || item.kind === 'line'
                         ? { ...item, reversed: !item.reversed }
                         : item.kind === 'loop-arrow'
                           ? reverseLoop(item)
