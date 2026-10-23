@@ -13,6 +13,7 @@ const colorNames = {
   ink: 'Black',
   blue: 'Blue',
   red: 'Red',
+  orange: 'Orange',
   green: 'Green',
   purple: 'Purple',
 };

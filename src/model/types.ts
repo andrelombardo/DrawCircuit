@@ -351,6 +351,7 @@ export const COLORS = {
   ink: '#171a20',
   blue: '#2463cb',
   red: '#df4949',
+  orange: '#FFA500',
   green: '#269978',
   purple: '#8855c2',
 };
