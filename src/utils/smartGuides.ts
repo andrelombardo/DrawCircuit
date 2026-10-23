@@ -72,7 +72,7 @@ function item(o: CircuitObject, doc: CircuitDocument): GuideItem {
         : { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 },
     pins: pins(o),
     ...(o.kind === 'component' || o.kind === 'junction' ? { referenceKind: o.kind } : {}),
-    ...(o.kind === 'line' && !o.vertices?.length
+    ...(o.kind === 'line' && !o.controlPoints && !o.vertices?.length
       ? { segmentAxis: segmentAxis(o.start, o.end), referenceKind: 'line' as const }
       : {}),
     ...(o.kind === 'text' ? { baseline: o.y } : {}),
@@ -87,6 +87,10 @@ export class GuideIndex {
     for (const o of doc.objects) {
       if (excluded.has(o.id)) continue;
       if (o.kind === 'wire' || o.kind === 'line') {
+        if (o.kind === 'line' && o.controlPoints) {
+          this.add(item(o, doc));
+          continue;
+        }
         const wire = o.kind === 'line' ? lineAsWire(o) : o;
         // Incident routes change with the selection. Their immutable straight
         // branch references are handled separately, never as static obstacles.

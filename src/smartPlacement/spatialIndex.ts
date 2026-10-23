@@ -1,5 +1,5 @@
 import type { CircuitComponent, CircuitDocument, Point } from '../model/types';
-import { lineAsWire, localToWorld, objectBounds, wirePoints } from '../utils/geometry';
+import { lineAsWire, linePoints, localToWorld, objectBounds, wirePoints } from '../utils/geometry';
 import type { ConnectionTarget, WireSegment } from './types';
 
 const CELL = 160;
@@ -77,7 +77,7 @@ export class PlacementIndex {
             wireId: o.id, side, point: endpoint.point,
           });
         });
-        const points = wirePoints(wire, doc);
+        const points = o.kind === 'line' ? linePoints(o, doc) : wirePoints(wire, doc);
         points.slice(0, -1).forEach((a, segment) => {
           const b = points[segment + 1];
           const item: WireSegment = { key: `${o.id}:${segment}`, wire, points, segment, a, b };

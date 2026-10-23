@@ -320,7 +320,8 @@ function terminalSafeRoute(original: Point[], wire: Wire, doc: CircuitDocument):
   return cleanRoute([...result, end]);
 }
 const lineRoutes = new WeakMap<LineAnnotation, Wire>();
-/** Reuse wire geometry while keeping the graphic object out of electrical indexes. */
+/** Reuse wire transforms while keeping graphics out of electrical indexes.
+ * Curve controls act as vertices only during these geometric transforms. */
 export function lineAsWire(line: LineAnnotation): Wire {
   let wire = lineRoutes.get(line);
   if (!wire) {
@@ -329,18 +330,67 @@ export function lineAsWire(line: LineAnnotation): Wire {
         : line.startEndpoint ?? { kind: 'free', point: line.start },
       endEndpoint: line.endEndpoint?.kind === 'free' ? { kind: 'free', point: line.endEndpoint.point }
         : line.endEndpoint ?? { kind: 'free', point: line.end },
-      vertices: line.vertices ?? [], routing: line.routing ?? 'free',
+      vertices: line.controlPoints ?? line.vertices ?? [], routing: line.controlPoints ? 'free' : line.routing ?? 'free',
     };
     lineRoutes.set(line, wire);
   }
   return wire;
 }
+const resolvedLineCurves = new WeakMap<CircuitDocument, WeakMap<LineAnnotation, Point[]>>();
 export function linePoints(line: LineAnnotation, doc: CircuitDocument): Point[] {
+  if (line.controlPoints) {
+    let curves = resolvedLineCurves.get(doc);
+    if (!curves) { curves = new WeakMap(); resolvedLineCurves.set(doc, curves); }
+    const cached = curves.get(line);
+    if (cached) return cached;
+    const { start, end, controls } = lineCurveGeometry(line, doc);
+    // Sample only for snapping and bounds; rendering and exports use the cubic path.
+    const count = Math.min(512, Math.max(32, Math.ceil((distance(start, controls[0]) +
+      distance(controls[0], controls[1]) + distance(controls[1], end)) / 4)));
+    const times = Array.from({ length: count + 1 }, (_, i) => i / count);
+    // Include exact extrema so export/selection bounds cannot clip a curve.
+    for (const axis of ['x', 'y'] as const) {
+      const a = -start[axis] + 3 * controls[0][axis] - 3 * controls[1][axis] + end[axis],
+        b = 2 * (start[axis] - 2 * controls[0][axis] + controls[1][axis]),
+        c = controls[0][axis] - start[axis], discriminant = b * b - 4 * a * c;
+      const roots = Math.abs(a) < 1e-10 ? Math.abs(b) < 1e-10 ? [] : [-c / b]
+        : discriminant < 0 ? [] : [(-b - Math.sqrt(discriminant)) / (2 * a), (-b + Math.sqrt(discriminant)) / (2 * a)];
+      times.push(...roots.filter((t) => t > 0 && t < 1));
+    }
+    const points = [...new Set(times)].sort((a, b) => a - b).map((t) => {
+      const s = 1 - t;
+      return { x: s ** 3 * start.x + 3 * s ** 2 * t * controls[0].x +
+        3 * s * t ** 2 * controls[1].x + t ** 3 * end.x,
+      y: s ** 3 * start.y + 3 * s ** 2 * t * controls[0].y +
+        3 * s * t ** 2 * controls[1].y + t ** 3 * end.y };
+    });
+    curves.set(line, points);
+    return points;
+  }
   return wirePoints(lineAsWire(line), doc);
+}
+export function lineCurveGeometry(line: LineAnnotation, doc?: CircuitDocument) {
+  const start = doc && line.startEndpoint ? resolveEndpoint(line.startEndpoint, doc) : line.start,
+    end = doc && line.endEndpoint ? resolveEndpoint(line.endEndpoint, doc) : line.end;
+  const controls: [Point, Point] = line.controlPoints
+    ? [add(line.controlPoints[0], { x: start.x - line.start.x, y: start.y - line.start.y }),
+      add(line.controlPoints[1], { x: end.x - line.end.x, y: end.y - line.end.y })]
+    : [{ x: start.x + (end.x - start.x) / 3 + (end.y - start.y) / 3,
+      y: start.y + (end.y - start.y) / 3 - (end.x - start.x) / 3 },
+    { x: start.x + (end.x - start.x) * 2 / 3 + (end.y - start.y) / 3,
+      y: start.y + (end.y - start.y) * 2 / 3 - (end.x - start.x) / 3 }];
+  return { start, end, controls };
+}
+export function linePath(line: LineAnnotation, doc?: CircuitDocument): string {
+  if (!line.controlPoints) return pointsPath(doc ? linePoints(line, doc) : [line.start, line.end]);
+  const { start, end, controls: [a, b] } = lineCurveGeometry(line, doc);
+  return `M ${start.x} ${start.y} C ${a.x} ${a.y} ${b.x} ${b.y} ${end.x} ${end.y}`;
 }
 export function lineFromWire(line: LineAnnotation, wire: Wire, doc: CircuitDocument): LineAnnotation {
   return { ...line, start: resolveEndpoint(wire.startEndpoint, doc),
-    end: resolveEndpoint(wire.endEndpoint, doc), vertices: wire.vertices, routing: wire.routing,
+    end: resolveEndpoint(wire.endEndpoint, doc),
+    ...(line.controlPoints ? { controlPoints: [wire.vertices[0], wire.vertices[1]] as [Point, Point], vertices: [] }
+      : { vertices: wire.vertices }), routing: wire.routing,
     startEndpoint: wire.startEndpoint.kind === 'free' ? undefined : wire.startEndpoint,
     endEndpoint: wire.endEndpoint.kind === 'free' ? undefined : wire.endEndpoint,
   };
@@ -559,6 +609,7 @@ export function moveObject(o: CircuitObject, delta: Point, moved: Set<string>): 
   }
   if (o.kind === 'line')
     return { ...o, start: add(o.start, delta), end: add(o.end, delta),
+      ...(o.controlPoints ? { controlPoints: [add(o.controlPoints[0], delta), add(o.controlPoints[1], delta)] as [Point, Point] } : {}),
       vertices: o.vertices?.map((p) => add(p, delta)) };
   if (o.kind === 'brace')
     return { ...o, start: add(o.start, delta), end: add(o.end, delta) };

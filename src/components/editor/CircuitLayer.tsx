@@ -1,4 +1,3 @@
-import { linePoints } from '../../utils/geometry';
 import { highlightPaintGroups } from '../../annotations/highlight';
 import { HighlightView } from '../../circuit/annotations/HighlightView';
 import type { Highlight } from '../../model/types';
@@ -71,7 +70,7 @@ export const CircuitLayer = memo(function CircuitLayer({
       <g data-layer="graphics">
         {doc.objects.map((o) =>
           o.kind === 'rectangle' || o.kind === 'circle' || o.kind === 'line' ? (
-            <GraphicView key={o.id} object={o} points={o.kind === 'line' ? linePoints(o, doc) : undefined} />
+            <GraphicView key={o.id} object={o} doc={doc} />
           ) : null,
         )}
       </g>

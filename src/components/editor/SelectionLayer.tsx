@@ -8,7 +8,7 @@ import { arrowCenter, rotationHandle } from '../../utils/arrows';
 import { braceGeometry } from '../../annotations/brace';
 import { electricalDrawingGeometry } from '../../annotations/electrical';
 import type { CircuitDocument, CircuitObject, Point } from '../../model/types';
-import { arrowPath, distance, isLooseEndpoint, lineAsWire, linePoints, pointsPath, projectOnSegment, rotatePoint, wirePoints } from '../../utils/geometry';
+import { arrowPath, distance, isLooseEndpoint, lineAsWire, lineCurveGeometry, linePath, linePoints, pointsPath, projectOnSegment, rotatePoint, wirePoints } from '../../utils/geometry';
 import { unionBounds, contentBounds } from '../../utils/visualBounds';
 import { loopGeometry, loopPath } from '../../utils/loops';
 import { WIRE_ENDPOINT_HIT_PX } from '../../utils/wires';
@@ -57,6 +57,7 @@ function Handle({
       {(name === 'wireStart' || name === 'wireEnd') && (
         <title>{t(decorative ? 'Drag to move or reconnect' : 'Drag to move or reconnect · W to add a wire')}</title>
       )}
+      {name.startsWith('control:') && <title>{t('Drag to shape the curve')}</title>}
       <circle
         cx={p.x}
         cy={p.y}
@@ -105,12 +106,12 @@ export function SelectionLayer({
       )}
       {objects.map((o) => {
         const routed = o.kind === 'line' ? lineAsWire(o) : o.kind === 'wire' ? o : null,
-          route = routed ? wirePoints(routed, doc) : null;
+          route = o.kind === 'line' ? linePoints(o, doc) : routed ? wirePoints(routed, doc) : null;
         const path =
           o.kind === 'highlight'
             ? highlightPath(o, doc)
             : o.kind === 'line'
-              ? pointsPath(linePoints(o, doc))
+              ? linePath(o, doc)
               : o.kind === 'brace'
                 ? braceGeometry(o).d
                 : o.kind === 'wire'
@@ -150,7 +151,7 @@ export function SelectionLayer({
                   })()}
                 {routed && route && (
                   <>
-                    {routed.vertices.map((p, i) => route.some((point, n, route) =>
+                    {!(o.kind === 'line' && o.controlPoints) && routed.vertices.map((p, i) => route.some((point, n, route) =>
                       n > 0 && distance(p, projectOnSegment(p, route[n - 1], point)) < 0.001,
                     ) ? <Handle key={i} p={p} name={`vertex:${i}`} zoom={zoom} square /> : null)}
                     {[route[0], route.at(-1)!].map((p, i) => (
@@ -160,6 +161,14 @@ export function SelectionLayer({
                     ))}
                   </>
                 )}
+                {o.kind === 'line' && o.controlPoints && (() => {
+                  const { start, end, controls } = lineCurveGeometry(o, doc);
+                  return <>
+                    <path d={pointsPath([start, controls[0]]) + pointsPath([end, controls[1]])}
+                      className="handle-line" pointerEvents="none" />
+                    {controls.map((p, i) => <Handle key={i} p={p} name={`control:${i}`} zoom={zoom} />)}
+                  </>;
+                })()}
                 {(o.kind === 'rectangle' || o.kind === 'circle') && (
                   <>
                     <rect

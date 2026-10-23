@@ -62,12 +62,17 @@ export const italian: Readonly<Record<string, string>> = {
   'Wire routing': 'Routing filo',
   'Line routing': 'Routing linea',
   'Drag to move or reconnect': 'Trascina per spostare o riagganciare',
+  'Drag to shape the curve': 'Trascina per modificare la curva',
   'Click or drag to start a decorative line · Alt bypasses snap · Esc cancels':
     'Clicca o trascina per iniziare una linea decorativa · Alt ignora lo snap · Esc annulla',
   'Click to add a bend · click a target to finish · Enter finishes · Alt bypasses snap':
     'Clicca per aggiungere una svolta · clicca un bersaglio o premi Invio per terminare · Alt ignora lo snap',
+  'Click to finish the curve · Enter finishes · Alt bypasses snap':
+    'Clicca per terminare la curva · Invio termina · Alt ignora lo snap',
   'Decorative lines use the same routing, snapping, endpoint and bend controls as wires. Choose Orthogonal, 45°, or Free. Click to add bends or drag to draw, then double-click or press Enter to finish. Graphic terminal anchors follow moved or rotated symbols.':
     'Le linee decorative usano gli stessi percorsi, agganci e controlli di estremi e svolte dei fili. Scegli Ortogonale, 45° o Libero. Clicca per aggiungere svolte o trascina per disegnare; doppio clic o Invio termina. Gli agganci grafici ai terminali seguono i simboli spostati o ruotati.',
+  'Choose Curved in Line routing to draw a curve or convert selected decorative lines. Click the two endpoints or drag to draw, then select the line and drag its two control handles to shape it.':
+    'Scegli Curva in Routing linea per disegnare una curva o convertire le linee decorative selezionate. Clicca i due estremi o trascina per disegnare, poi seleziona la linea e trascina le due maniglie di controllo per modificarne la forma.',
   'Shift+W changes routing': 'Shift+W cambia routing',
   Orthogonal: 'Ortogonale',
   Free: 'Libero',

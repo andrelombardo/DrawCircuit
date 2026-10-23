@@ -1,13 +1,13 @@
 import { memo } from 'react';
-import type { LineAnnotation, ShapeAnnotation, Point } from '../../model/types';
+import type { CircuitDocument, LineAnnotation, ShapeAnnotation } from '../../model/types';
 import { dashPattern } from '../../utils/strokeStyle';
-import { pointsPath } from '../../utils/geometry';
+import { linePath } from '../../utils/geometry';
 export const GraphicView = memo(function GraphicView({
   object: o,
-  points,
+  doc,
 }: {
   object: LineAnnotation | ShapeAnnotation;
-  points?: Point[];
+  doc?: CircuitDocument;
 }) {
   const width = o.kind === 'line' ? o.width : o.strokeWidth;
   const Shape = o.kind === 'circle' ? 'circle' : 'rect';
@@ -46,13 +46,13 @@ export const GraphicView = memo(function GraphicView({
       ) : (
         <>
           <path
-            d={pointsPath(points ?? [o.start, o.end])}
+            d={linePath(o, doc)}
             fill="none"
             stroke="transparent"
             strokeWidth={16}
             vectorEffect="non-scaling-stroke"
           />
-          <path d={pointsPath(points ?? [o.start, o.end])} {...stroke} pointerEvents="none" />
+          <path d={linePath(o, doc)} {...stroke} pointerEvents="none" />
         </>
       )}
     </g>

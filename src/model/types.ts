@@ -263,6 +263,8 @@ export interface LineAnnotation extends StrokeStyle {
   id: string;
   start: Point;
   end: Point;
+  /** Cubic Bezier controls; missing keeps the existing polyline route. */
+  controlPoints?: [Point, Point];
   /** Graphic anchors follow symbols without participating in circuit topology. */
   startEndpoint?: Endpoint;
   endEndpoint?: Endpoint;

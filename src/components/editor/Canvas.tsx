@@ -1,4 +1,4 @@
-import { linePoints } from '../../utils/geometry';
+import { linePreviewPath } from '../../utils/lines';
 import { t } from '../../i18n';
 import { GraphicView } from '../../circuit/annotations/GraphicView';
 import { BraceView } from '../../circuit/annotations/BraceView';
@@ -83,6 +83,7 @@ function CanvasContent({
     selection = useEditorStore((s) => s.selection),
     gestureActive = useEditorStore((s) => Boolean(s.gestureStart)),
     wireRouting = useEditorStore((s) => s.wireRouting),
+    lineCurve = useEditorStore((s) => s.lineCurve),
     arrowType = useEditorStore((s) => s.arrowType),
     storageError = useEditorStore((s) => s.storageError),
     eraserSize = useEditorStore((s) => s.eraserSize);
@@ -125,8 +126,8 @@ function CanvasContent({
   let previewPath = '';
   if (draft && overlay.connection) {
     const candidate = overlay.connection;
-    const wire = wirePreview(draft, candidate, doc);
-    previewPath = pointsPath(wirePoints(wire, doc));
+    previewPath = draft.curve ? linePreviewPath(draft, candidate, doc)
+      : pointsPath(wirePoints(wirePreview(draft, candidate, doc), doc));
   }
   const hint =
     tool === 'highlight-eraser'
@@ -138,7 +139,8 @@ function CanvasContent({
           : tool === 'circle'
             ? t('Drag to draw a circle · Option from center · Esc cancels')
             : tool === 'line'
-              ? draft ? t('Click to add a bend · click a target to finish · Enter finishes · Alt bypasses snap')
+              ? draft ? draft.curve ? t('Click to finish the curve · Enter finishes · Alt bypasses snap')
+                : t('Click to add a bend · click a target to finish · Enter finishes · Alt bypasses snap')
                 : t('Click or drag to start a decorative line · Alt bypasses snap · Esc cancels')
               : tool === 'brace' || tool === 'bracket'
                 ? t('Drag to group · double-click to label · R rotates · Flip side in Properties')
@@ -200,14 +202,20 @@ function CanvasContent({
             {(['orthogonal', '45', 'free'] as const).map((routing, i) => (
               <button
                 key={routing}
-                aria-pressed={wireRouting === routing}
-                className={wireRouting === routing ? 'selected' : ''}
-                onClick={() => useEditorStore.getState().setWireRouting(routing)}
+                aria-pressed={wireRouting === routing && !(tool === 'line' && lineCurve)}
+                className={wireRouting === routing && !(tool === 'line' && lineCurve) ? 'selected' : ''}
+                onClick={() => {
+                  if (tool === 'line') useEditorStore.getState().setLineCurve(false);
+                  useEditorStore.getState().setWireRouting(routing);
+                }}
                 title={t('Shift+W changes routing')}
               >
                 {[t('Orthogonal'), '45°', t('Free')][i]}
               </button>
             ))}
+            {tool === 'line' && <button aria-pressed={lineCurve}
+              className={lineCurve ? 'selected' : ''}
+              onClick={() => useEditorStore.getState().setLineCurve(true)}>{t('Curved')}</button>}
           </div>
         )}
         {tool === 'arrow' && (
@@ -389,7 +397,7 @@ function CanvasContent({
                 (overlay.arrow.kind === 'rectangle' ||
                 overlay.arrow.kind === 'circle' ||
                 overlay.arrow.kind === 'line' ? (
-                  <GraphicView object={overlay.arrow} points={overlay.arrow.kind === 'line' ? linePoints(overlay.arrow, doc) : undefined} />
+                  <GraphicView object={overlay.arrow} doc={doc} />
                 ) : overlay.arrow.kind === 'brace' ? (
                   <BraceView object={overlay.arrow} zoom={v.zoom} />
                 ) : overlay.arrow.kind === 'electrical' ? (

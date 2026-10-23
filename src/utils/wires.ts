@@ -35,6 +35,7 @@ export type WireCandidate =
   | { point: Point; kind: 'wire'; wireId: string; exitAxis?: 'x' | 'y' };
 export interface WireDraft {
   kind?: 'line';
+  curve?: boolean;
   routing?: WireRouting;
   start: Endpoint;
   vertices: Point[];

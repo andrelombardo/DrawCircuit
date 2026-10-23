@@ -21,7 +21,7 @@ import {
 } from './geometry';
 import type { CircuitDocument, CircuitObject, Endpoint, Point, Rotation } from '../model/types';
 import { healWireConnections } from './wires';
-import { detachLineEndpoints } from './lines';
+import { detachLineEndpoints, normalizeLine } from './lines';
 export function extractSelection(doc: CircuitDocument, ids: string[]): CircuitDocument {
   const selected = new Set(ids);
   const ep = (e: Endpoint): Endpoint =>
@@ -178,12 +178,21 @@ function detachWireEndpoints(
 /** Geometric line anchors use the same transforms as wires, in an isolated
  * view that never enters the document's electrical connection operations. */
 function transformLineRoutes(doc: CircuitDocument, transform: (doc: CircuitDocument) => CircuitDocument) {
-  const lines = new Map(doc.objects.flatMap((o) => o.kind === 'line' ? [[o.id, o] as const] : [])),
-    adapted = { ...doc, objects: doc.objects.map((o) => o.kind === 'line' ? lineAsWire(o) : o) },
+  const lines = new Map(doc.objects.flatMap((o) => o.kind === 'line'
+    ? [[o.id, o.controlPoints ? normalizeLine(o, doc) : o] as const] : [])),
+    adapted = { ...doc, objects: doc.objects.map((o) => o.kind === 'line' ? lineAsWire(lines.get(o.id)!) : o) },
     result = transform(adapted);
   if (result === adapted) return doc;
   return { ...result, objects: result.objects.map((o) => {
     const line = lines.get(o.id);
+    if (line?.controlPoints && o.kind === 'wire' && o.vertices === line.controlPoints) {
+      // An unselected curve follows its anchors, including its endpoint tangents.
+      const start = resolveEndpoint(o.startEndpoint, result), end = resolveEndpoint(o.endEndpoint, result);
+      return lineFromWire(line, { ...o, vertices: [
+        add(line.controlPoints[0], { x: start.x - line.start.x, y: start.y - line.start.y }),
+        add(line.controlPoints[1], { x: end.x - line.end.x, y: end.y - line.end.y }),
+      ] }, result);
+    }
     return line && o.kind === 'wire' ? lineFromWire(line, o, result) : o;
   }) };
 }

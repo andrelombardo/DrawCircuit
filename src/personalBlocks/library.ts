@@ -102,6 +102,7 @@ export function instantiatePersonalBlock(
       }
       if (o.kind === 'highlight') return mapHighlight(o, rp);
       if (o.kind === 'line') return { ...o, start: rp(o.start), end: rp(o.end),
+        ...(o.controlPoints ? { controlPoints: [rp(o.controlPoints[0]), rp(o.controlPoints[1])] as [Point, Point] } : {}),
         vertices: o.vertices?.map(rp), startEndpoint: o.startEndpoint && ep(o.startEndpoint),
         endEndpoint: o.endEndpoint && ep(o.endEndpoint) };
       if (o.kind === 'wire')

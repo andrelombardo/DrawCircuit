@@ -46,6 +46,8 @@ Choose **Line style → Solid / Dashed / Dotted** in Properties for wires, decor
 
 Decorative lines share wire routing and editing: choose **Orthogonal**, **45°**, or **Free**, click to add bends (double-click or Enter finishes), or drag to draw in one gesture. The magnet and Alt/Option behave as for wires. Round handles move/re-anchor endpoints; double-click adds a bend and Alt/Option-click removes a square bend handle. Attached segments slide while retaining anchors. Graphic terminal/junction anchors follow their hosts and respect symbol bodies. Snapping onto wires or other decorative lines does not split or electrically join them. Existing straight lines retain Free routing. Copying, duplication, personal blocks, and image copying preserve the complete route and style.
 
+Choose **Curved** in **Line routing**, either while drawing or in Properties, to create a cubic curve or convert selected decorative lines. Click the two endpoints or drag to draw in one gesture. Select the curve and drag either of its two control handles to shape it; the round endpoint handles still move or re-anchor its ends. Curves preserve line style, color, opacity, anchors, and their shape when saved, copied, rotated, used in personal blocks, or exported as SVG/PNG. Choose Orthogonal, 45°, or Free to return to a polyline.
+
 ## Properties and precise layout
 
 The **Properties** sidebar shows the selected type or number of elements. It offers only shared properties for mixed selections. Different values appear as **Mixed values**, **Mixed**, or a dash. Confirm text and numeric changes with Enter or by leaving the field; Esc discards the draft. A shared edit changes the whole selection in one undo step.

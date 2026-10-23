@@ -72,6 +72,8 @@ interface EditorState {
   setHighlightSettings: (settings: Partial<HighlightSettings>) => void;
   wireRouting: WireRouting;
   setWireRouting: (routing: WireRouting) => void;
+  lineCurve: boolean;
+  setLineCurve: (curve: boolean) => void;
   grid: boolean;
   snapEnabled: boolean;
   toggleSnap: () => void;
@@ -159,6 +161,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     })),
   wireRouting: 'orthogonal',
   setWireRouting: (wireRouting) => set({ wireRouting }),
+  lineCurve: false,
+  setLineCurve: (lineCurve) => set({ lineCurve }),
   grid: true,
   snapEnabled: true,
   toggleSnap: () => set((s) => ({ snapEnabled: !s.snapEnabled })),

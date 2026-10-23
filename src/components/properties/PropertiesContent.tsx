@@ -1,4 +1,4 @@
-import { routeEditedLine } from '../../utils/lines';
+import { moveLineEndpoint, routeEditedLine, setLineRouting } from '../../utils/lines';
 import { EraserProperties } from './EraserProperties';
 import { t } from '../../i18n';
 import { HighlightProperties } from './HighlightProperties';
@@ -529,15 +529,17 @@ export function PropertiesContent() {
               <PropertySelect
                 label={t(objects.every((o) => o.kind === 'line') ? 'Line routing' : 'Wire routing')}
                 value={commonValue(
-                  objects.flatMap((o) => (o.kind === 'wire' || o.kind === 'line' ? [o.routing ?? (o.kind === 'line' ? 'free' : 'orthogonal')] : [])),
+                  objects.flatMap((o) => (o.kind === 'wire' || o.kind === 'line'
+                    ? [o.kind === 'line' && o.controlPoints ? 'curve' : o.routing ?? (o.kind === 'line' ? 'free' : 'orthogonal')] : [])),
                 )}
                 onChange={(v) =>
-                  apply((o) => o.kind === 'line' ? routeEditedLine({ ...o, routing: v as WireRouting }, doc) : o.kind === 'wire' ? { ...o, routing: v as WireRouting } : o)
+                  apply((o) => o.kind === 'line' ? setLineRouting(o, v as WireRouting | 'curve', doc) : o.kind === 'wire' ? { ...o, routing: v as WireRouting } : o)
                 }
               >
                 <option value="orthogonal">{t('Orthogonal')}</option>
                 <option value="45">45°</option>
                 <option value="free">{t('Free')}</option>
+                {objects.every((o) => o.kind === 'line') && <option value="curve">{t('Curved')}</option>}
               </PropertySelect>
             )}
             {o?.kind === 'arrow' && (
@@ -567,8 +569,8 @@ export function PropertiesContent() {
                       value={(end === 'start' ? linePoints(o, doc)[0] : linePoints(o, doc).at(-1)!)[axis]}
                       onCommit={(v) =>
                         apply((o) =>
-                          o.kind === 'line' ? routeEditedLine({ ...o, [end]: { ...(end === 'start' ? linePoints(o, doc)[0] : linePoints(o, doc).at(-1)!), [axis]: Number(v) },
-                            [end === 'start' ? 'startEndpoint' : 'endEndpoint']: undefined }, doc) : o,
+                          o.kind === 'line' ? routeEditedLine(moveLineEndpoint(o, end, { kind: 'free',
+                            point: { ...(end === 'start' ? linePoints(o, doc)[0] : linePoints(o, doc).at(-1)!), [axis]: Number(v) } }, doc), doc) : o,
                         )
                       }
                     />
