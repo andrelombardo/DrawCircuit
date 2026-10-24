@@ -28,11 +28,11 @@ function loadPosition(): Position {
   } catch {
     /* A UI preference must never prevent drawing. */
   }
-  return { x: 0.5, y: 0 };
+  return { x: 0, y: 0 };
 }
 
 /** Normalized coordinates refer to the available travel inside the editor, not the circuit. */
-export function useFloatingToolbar(sidebarVisible: boolean) {
+export function useFloatingToolbar(sidebarVisible: boolean, inspectorVisible: boolean) {
   const ref = useRef<HTMLDivElement>(null);
   const preference = useRef<Position | null>(null);
   if (preference.current === null) preference.current = loadPosition();
@@ -72,6 +72,14 @@ export function useFloatingToolbar(sidebarVisible: boolean) {
         if (b.travelX >= 44) position.x = 58;
         else position.y = Math.min(reopenBottom, MARGIN + b.travelY);
       }
+      // Both panel buttons share the top row. Keep tools clear of the right
+      // button too, moving them below that row when the screen is narrow.
+      if (!inspectorVisible && position.y < reopenBottom && position.x + b.toolbarWidth > b.width - 58) {
+        const left = sidebarVisible ? MARGIN : 58;
+        if (b.toolbarWidth <= b.width - 58 - left)
+          position.x = Math.max(left, b.width - 58 - b.toolbarWidth);
+        else position.y = Math.min(reopenBottom, MARGIN + b.travelY);
+      }
       // The canvas reaches the top edge in installed apps. Keep a toolbar dragged
       // into that area inside the space between the browser's window buttons.
       const title = b.titleArea;
@@ -89,7 +97,7 @@ export function useFloatingToolbar(sidebarVisible: boolean) {
       });
       return position;
     },
-    [sidebarVisible],
+    [sidebarVisible, inspectorVisible],
   );
   const save = () => {
     const b = bounds.current;

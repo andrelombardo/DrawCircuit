@@ -23,8 +23,8 @@ export function nearbyTerminalComponents(
       const dx = point.x - component.x,
         dy = point.y - component.y;
       const local = {
-        x: dx * Math.cos(angle) - dy * Math.sin(angle),
-        y: dx * Math.sin(angle) + dy * Math.cos(angle),
+        x: (dx * Math.cos(angle) - dy * Math.sin(angle))/(component.scale ?? 1),
+        y: (dx * Math.sin(angle) + dy * Math.cos(angle))/(component.scale ?? 1),
       };
       const b = componentRegistry[component.type].bounds;
       const distance = Math.hypot(
@@ -32,7 +32,7 @@ export function nearbyTerminalComponents(
         Math.max(b.y - local.y, 0, local.y - b.y - b.height),
       );
       return (
-        distance * zoom <=
+        distance * zoom * (component.scale ?? 1) <=
         (retained.has(component.id) ? TERMINAL_RELEASE_PX : TERMINAL_PROXIMITY_PX)
       );
     })

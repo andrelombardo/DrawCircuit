@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 export const SIDEBAR_STORAGE_KEY = 'drawcircuit.sidebar.v1';
-export const SIDEBAR_DEFAULT_WIDTH = 232;
+export const SIDEBAR_DEFAULT_WIDTH = 268;
 export const SIDEBAR_MIN_WIDTH = 200;
 export const SIDEBAR_MAX_WIDTH = 480;
 export const clampWidth = (width: number) =>

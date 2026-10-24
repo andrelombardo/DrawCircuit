@@ -1,6 +1,7 @@
 import { t } from '../i18n';
+import { validObjectAppearance, validShapeAppearance, validFrameTree } from './shapeAppearance';
 import { highlightSpanExists } from '../annotations/highlight';
-import { COLORS, componentTypes, isRotation } from './types';
+import { BLEND_MODES, COLORS, componentTypes, isRotation } from './types';
 import { componentRegistry, terminalsFor } from './catalog';
 import type { CircuitDocument, Point } from './types';
 import { resolveEndpoint, distance } from '../utils/geometry';
@@ -44,7 +45,7 @@ function label(v: unknown): boolean {
 }
 function endpoint(v: unknown): boolean {
   const e = record(v);
-  return e.kind === 'free'
+  return e.kind === 'shape' ? str(e.shapeId) && !!e.shapeId && point(e.anchor) && [record(e.anchor).x,record(e.anchor).y].every(v=>Number(v)>=0 && Number(v)<=1) : e.kind === 'free'
     ? point(e.point) && (e.connectionId === undefined || (str(e.connectionId) && !!e.connectionId))
     : e.kind === 'terminal'
       ? str(e.componentId) && str(e.terminalId)
@@ -77,6 +78,9 @@ export function deserializeDocument(raw: string): CircuitDocument {
     if (!str(o.id) || !o.id || ids.has(String(o.id))) fail();
     ids.add(String(o.id));
     if (!opacity(o.opacity)) fail();
+    if (!validObjectAppearance(o)) fail();
+    if (!opacity(o.styleOpacity) || (o.blendMode !== undefined && !(BLEND_MODES as readonly unknown[]).includes(o.blendMode)) ||
+      (o.styleId !== undefined && (!str(o.styleId) || !o.styleId))) fail();
     if (
       (o.kind === 'arrow' || o.kind === 'loop-arrow') &&
       o.headFilled !== undefined &&
@@ -84,7 +88,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
     )
       fail();
     if (
-      ['wire', 'rectangle', 'circle', 'line'].includes(String(o.kind)) &&
+      ['wire', 'rectangle', 'circle', 'line', 'angle'].includes(String(o.kind)) &&
       ((o.lineStyle !== undefined &&
         !['solid', 'dashed', 'dotted'].includes(String(o.lineStyle))) ||
         (o.dashLength !== undefined && !positive(o.dashLength, 1000)) ||
@@ -109,6 +113,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
         !num(o.x) ||
         !num(o.y) ||
         !rotation(o.rotation) ||
+        (o.scale !== undefined && !positive(o.scale, 100)) ||
         !label(o.label) ||
         (o.value !== undefined && !str(o.value)) ||
         (o.bodyText !== undefined &&
@@ -220,7 +225,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
         !color(o.color) ||
         !positive(o.strokeWidth, MAX_LINE_WIDTH) ||
         (o.fill !== 'none' && !color(o.fill)) ||
-        !opacity(o.fillOpacity)
+        !opacity(o.fillOpacity) || !validShapeAppearance(o)
       )
         fail();
     } else if (o.kind === 'line') {
@@ -235,6 +240,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
         fail();
     } else if (o.kind === 'junction') {
       if (!num(o.x) || !num(o.y) || !label(o.label) || !color(o.color)) fail();
+      if (o.radius !== undefined && !positive(o.radius, 1000)) fail();
     } else if (o.kind === 'wire') {
       if (
         (o.routing !== undefined && !['orthogonal', '45', 'free'].includes(String(o.routing))) ||
@@ -247,6 +253,10 @@ export function deserializeDocument(raw: string): CircuitDocument {
         !positive(o.width, MAX_LINE_WIDTH)
       )
         fail();
+    } else if (o.kind === 'angle') {
+      if (!num(o.x) || !num(o.y) || !positive(o.radius, 1e7) || !num(o.startAngle) ||
+        !num(o.sweepAngle) || Math.abs(Number(o.sweepAngle)) > 360 || Number(o.sweepAngle) === 0 ||
+        typeof o.showRays !== 'boolean' || !label(o.label) || !color(o.color) || !positive(o.width, MAX_LINE_WIDTH)) fail();
     } else if (o.kind === 'brace') {
       if (
         !['brace', 'bracket'].includes(String(o.type)) ||
@@ -345,6 +355,7 @@ export function deserializeDocument(raw: string): CircuitDocument {
     if (o.kind === 'text') delete o.fontFamily;
   }
   const doc = root as unknown as CircuitDocument;
+  if (!validFrameTree(doc)) fail();
   const connections = new Map<string, Point>();
   for (const o of doc.objects)
     if (o.kind === 'line') {

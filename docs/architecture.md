@@ -9,7 +9,7 @@ DrawCircuit uses React, TypeScript, Vite, and Zustand. `index.html` loads `src/m
 | `src/components/`                                            | Editor, library, properties, menus, and dialogs                         |
 | `src/circuit/`                                               | SVG layers, symbols, annotations, and canvas KaTeX rendering            |
 | `src/math/`                                                  | Math normalization, KaTeX rendering, and glyphs                         |
-| `src/i18n/`                                                  | English message keys, Italian translations, and language preference     |
+| `src/i18n/`                                                  | English message keys and fixed Italian interface translations     |
 | `src/smartPlacement/`, `src/presets/`, `src/personalBlocks/` | Snapping, preset blocks, and personal library                           |
 | `src/svg/`, `src/png/`, `src/tikz/`                          | Internal SVG-to-PNG copying, shared geometry, validation, and selection |
 | `src/utils/`                                                 | Shared geometry, browser clipboard, and local persistence               |
@@ -23,7 +23,7 @@ Shared limits in `src/model/limits.ts` apply to fields and JSON parsing. The sto
 
 ## Workspace and rendering
 
-`App` coordinates panels. At widths up to 600 px they start closed and open one at a time without changing desktop preferences. Choosing a tool or block closes the mobile library. A hidden inspector does not mount property controls. Selection uses ID sets and computes compatible replacements once per component. Groups retain a shared outline; editing handles and selection terminals belong to single selections. Tool and pointer-proximity terminals remain available.
+`App` coordinates panels. At widths up to 800 px they start closed and open one at a time without changing desktop preferences. Choosing a tool or block closes the mobile library. A hidden inspector does not mount property controls. Selection uses ID sets and computes compatible replacements once per component. Groups retain a shared outline; editing handles and selection terminals belong to single selections. Tool and pointer-proximity terminals remain available.
 
 Highlights are independent `highlight` objects in the document union, handled by `src/annotations/highlight.ts`. Smart strokes store normalized directed ranges on wires and component terminal/body paths, without duplicating routing or changing topology. Preview and commit use only the dragged portion, including partial endpoints inside a component body; a click or very short gesture does not highlight an entire element.
 
@@ -49,9 +49,9 @@ Circuit text uses Comic Relief 1.210, served as regular and bold WOFF2 under SIL
 
 ## Localization
 
-English messages and catalog/preset metadata are the source. `t()` resolves Italian entries from `src/i18n/it.ts` and interpolates named placeholders after translation. Missing entries fall back to English. `searchText()` indexes English and Italian together, independently of the selected language.
+English messages and catalog/preset metadata are the source. `t()` resolves Italian entries from `src/i18n/it.ts` and interpolates named placeholders after translation. Missing entries fall back to English. `searchText()` indexes English and Italian together for component and preset searches.
 
-The bottom-right selector updates `useLanguage`, a separate Zustand store. `App` subscribes to rerender UI and set the document’s `lang`; memoized views containing translated UI subscribe independently. `drawcircuit.language.v1` stores only `en` or `it`, defaults to English, and tolerates inaccessible storage. Switching languages preserves user-authored circuit text, personal block names, document data, undo history, and editing state.
+The interface and document `lang` are fixed to Italian. The former language selector and Zustand language store have been removed; an existing language preference is left untouched. User-authored circuit text, personal block names, document data, and undo history keep their original content.
 
 The primary README and technical documentation are English. `README.it.md` and `docs/it/guide.md` contain the Italian documentation.
 
@@ -63,3 +63,9 @@ Removing a terminal or junction reuses a shared free connection for its incident
 
 
 Decorative `line` objects share wire routing through a geometry adapter (`lineAsWire`, `linePoints`), with optional v1 `vertices`, `routing`, and graphic endpoint references. Missing routing keeps legacy straight lines in Free mode. Line tools reuse candidate ranking, hysteresis, preview, and edit gestures, while committing graphic objects without splitting wires or creating electrical connections. Transformations temporarily adapt lines to the wire geometry operations, then restore their graphic identity. Selection extraction and deletion freeze detached routes; duplication, replacement, personal blocks, validation, and image copying preserve or remap their graphic anchors.
+
+## Shape anchors and mathematical diagrams
+
+Decorative lines can reference circles and rectangles through normalized local anchors. The shared endpoint resolver follows translation, resizing, and rectangle rotation; copying remaps anchors and removing a host freezes the visible endpoint. These references do not join electrical topology.
+
+Native `angle` annotations store a vertex, radius, starting angle and signed counterclockwise sweep. Editor paths, bounds, labels and SVG/PNG copying share `src/annotations/angle.ts`. The Cartesian axes and Gauss plane presets compose ordinary lines, circles, text, junctions and angles with fresh IDs, so every element remains editable.

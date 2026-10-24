@@ -15,14 +15,14 @@ export const ComponentView = memo(function ComponentView({
   const bounds = componentRegistry[o.type].bounds;
   return (
     <g data-object={o.id} className="circuit-object">
-      <g transform={`translate(${o.x} ${o.y}) rotate(${o.rotation})`}>
+      <g transform={`translate(${o.x} ${o.y}) rotate(${o.rotation}) scale(${o.scale ?? 1})`}>
         <rect {...bounds} rx={5} className="object-hit" />
         <g
           className={selected ? 'selected-symbol' : undefined}
           opacity={o.opacity}
           data-selected={selected || undefined}
         >
-          <Symbol type={o.type} color={o.color} width={o.width} bodyText={o.bodyText}
+          <Symbol type={o.type} color={o.color} width={o.width/(o.scale ?? 1)} bodyText={o.bodyText}
             rotation={o.rotation} />
         </g>
       </g>

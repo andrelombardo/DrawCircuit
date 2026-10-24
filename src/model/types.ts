@@ -2,10 +2,11 @@ export interface Point {
   x: number;
   y: number;
 }
-export type Rotation = 0 | 45 | 90 | 135 | 180 | 225 | 270 | 315;
+/** Angles in degrees, normalized to [0, 360). */
+export type Rotation = number;
 export const ROTATIONS: readonly Rotation[] = [0, 45, 90, 135, 180, 225, 270, 315];
 export function isRotation(value: unknown): value is Rotation {
-  return typeof value === 'number' && ROTATIONS.includes(value as Rotation);
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0 && value < 360;
 }
 export const componentTypes = [
   'resistor',
@@ -105,6 +106,7 @@ export interface CircuitComponent {
   x: number;
   y: number;
   rotation: Rotation;
+  scale?: number;
   terminals: Terminal[];
   label: Label;
   bodyText?: string;
@@ -118,6 +120,7 @@ export interface Junction {
   id: string;
   x: number;
   y: number;
+  radius?: number;
   label: Label;
   color: string;
   /** Independent of HEX color; missing means fully opaque. */
@@ -126,6 +129,7 @@ export interface Junction {
 export type Endpoint =
   | { kind: 'terminal'; componentId: string; terminalId: string }
   | { kind: 'junction'; junctionId: string }
+  | { kind: 'shape'; shapeId: string; anchor: Point }
   | {
       kind: 'free';
       point: Point;
@@ -140,7 +144,7 @@ export interface StrokeStyle {
   dashLength?: number;
   dashGap?: number;
 }
-export interface Wire extends StrokeStyle {
+export interface Wire extends StrokeStyle, ObjectAppearance {
   /** Missing in v1 documents means orthogonal. */
   routing?: WireRouting;
   kind: 'wire';
@@ -238,6 +242,55 @@ export interface BraceAnnotation {
   opacity?: number;
   width: number;
 }
+/** Mathematical angles use counterclockwise degrees from the positive x axis. */
+export interface AngleAnnotation extends StrokeStyle {
+  kind: 'angle';
+  id: string;
+  x: number;
+  y: number;
+  radius: number;
+  startAngle: number;
+  sweepAngle: number;
+  showRays: boolean;
+  label: Label;
+  color: string;
+  opacity?: number;
+  width: number;
+}
+export const BLEND_MODES = ['normal', 'multiply', 'screen', 'overlay', 'darken', 'lighten', 'color-dodge', 'color-burn', 'hard-light', 'soft-light', 'difference', 'exclusion', 'hue', 'saturation', 'color', 'luminosity'] as const;
+export type BlendMode = (typeof BLEND_MODES)[number];
+export interface ShapeFill {
+  id: string;
+  color: string;
+  opacity: number;
+  enabled: boolean;
+}
+export interface ShapeBorder extends ShapeFill, StrokeStyle {
+  width: number;
+  position: 'center' | 'inside' | 'outside';
+}
+export interface ShapeStyle {
+  fills: ShapeFill[];
+  borders: ShapeBorder[];
+  blendMode: BlendMode;
+  styleOpacity: number;
+  cornerRadii: [number, number, number, number];
+}
+export interface FrameConstraint {
+  horizontal: 'start' | 'end' | 'both' | 'center' | 'scale';
+  vertical: 'start' | 'end' | 'both' | 'center' | 'scale';
+}
+export interface FrameLayout {
+  name: string;
+  children: string[];
+  constraints: Record<string, FrameConstraint>;
+  direction: 'free' | 'horizontal' | 'vertical';
+  gap: number;
+  padding: [number, number, number, number];
+  align: 'start' | 'center' | 'end' | 'stretch';
+  widthSizing: 'fixed' | 'hug';
+  heightSizing: 'fixed' | 'hug';
+}
 interface FilledShape extends StrokeStyle {
   id: string;
   x: number;
@@ -249,16 +302,26 @@ interface FilledShape extends StrokeStyle {
   opacity?: number;
   fill: string | 'none';
   fillOpacity?: number;
+  /** Optional appearance fields keep version-1 drawings readable. */
+  fills?: ShapeFill[];
+  borders?: ShapeBorder[];
+  blendMode?: BlendMode;
+  styleOpacity?: number;
+  cornerRadii?: [number, number, number, number];
+  styleId?: string;
+  aspectLocked?: boolean;
 }
 export interface RectangleAnnotation extends FilledShape {
   kind: 'rectangle';
+  rotation?: number;
+  frame?: FrameLayout;
 }
 /** Circular annotations keep equal width and height, including while resizing. */
 export interface CircleAnnotation extends FilledShape {
   kind: 'circle';
 }
 export type ShapeAnnotation = RectangleAnnotation | CircleAnnotation;
-export interface LineAnnotation extends StrokeStyle {
+export interface LineAnnotation extends StrokeStyle, ObjectAppearance {
   kind: 'line';
   id: string;
   start: Point;
@@ -279,7 +342,7 @@ export interface LineAnnotation extends StrokeStyle {
   width: number;
   opacity?: number;
 }
-export interface HighlightStyle {
+export interface HighlightStyle extends ObjectAppearance {
   color: string;
   opacity: number;
   width: number;
@@ -308,7 +371,14 @@ export type Highlight = HighlightStyle & { kind: 'highlight'; id: string; paintG
 export interface HighlightSettings extends HighlightStyle {
   mode: 'smart' | 'free';
 }
-export type CircuitObject =
+export interface ObjectAppearance {
+  blendMode?: BlendMode;
+  styleOpacity?: number;
+  styleId?: string;
+  fills?: ShapeFill[];
+  borders?: ShapeBorder[];
+}
+export type CircuitObject = (
   | CircuitComponent
   | Junction
   | Wire
@@ -317,10 +387,11 @@ export type CircuitObject =
   | LoopArrow
   | ElectricalAnnotation
   | BraceAnnotation
+  | AngleAnnotation
   | RectangleAnnotation
   | CircleAnnotation
   | LineAnnotation
-  | Highlight;
+  | Highlight) & ObjectAppearance;
 export interface CircuitDocument {
   version: 1;
   title: string;
@@ -343,6 +414,7 @@ export type Tool =
   | 'voltage'
   | 'brace'
   | 'bracket'
+  | 'angle'
   | 'pan'
   | 'preset'
   | ComponentType;

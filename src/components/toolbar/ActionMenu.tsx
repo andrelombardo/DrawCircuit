@@ -12,6 +12,7 @@ export type MenuAction = {
   onSelect?: () => void;
   children?: MenuAction[];
   separatorBefore?: boolean;
+  group?: string;
   disabled?: boolean;
   checked?: boolean;
 };
@@ -35,6 +36,7 @@ function MenuPanel({
   cancelHover,
   rowRefs,
   matchTriggerWidth,
+  inspector,
 }: {
   id: string;
   label: string;
@@ -53,6 +55,7 @@ function MenuPanel({
   cancelHover: () => void;
   rowRefs: Map<string, HTMLButtonElement>;
   matchTriggerWidth?: boolean;
+  inspector: boolean;
 }) {
   const panel = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
@@ -72,6 +75,22 @@ function MenuPanel({
         { width: window.innerWidth, height: window.innerHeight },
         level > 0,
       );
+      if (inspector && matchTriggerWidth && !point) {
+        const selected = element.querySelector<HTMLElement>('[aria-checked="true"]') ?? element.querySelector<HTMLElement>(enabledItems);
+        if (selected) {
+          const anchorRect = (trigger as HTMLButtonElement).getBoundingClientRect();
+          const selectedRect = selected.getBoundingClientRect();
+          const rowTop = anchorRect.top + (anchorRect.height-selectedRect.height)/2;
+          const idealTop = rowTop-selected.offsetTop;
+          const available = idealTop >= 8 ? window.innerHeight-8-idealTop : rowTop+selectedRect.height+4-8;
+          const naturalHeight = element.scrollHeight+2;
+          if (available >= Math.min(160, naturalHeight)) {
+            p.top = Math.max(8, idealTop);
+            element.style.maxHeight = `${Math.min(window.innerHeight-16, available)}px`;
+            element.scrollTop = Math.max(0, p.top-idealTop);
+          }
+        }
+      }
       element.style.left = `${p.left}px`;
       element.style.top = `${p.top}px`;
       element.dataset.side = p.side;
@@ -81,13 +100,14 @@ function MenuPanel({
     observer.observe(element);
     if (!point) observer.observe(trigger as HTMLButtonElement);
     window.addEventListener('resize', position);
-    window.addEventListener('scroll', position, true);
+    const scroll = (event: Event) => { if (!element.contains(event.target as Node)) position(); };
+    window.addEventListener('scroll', scroll, true);
     return () => {
       observer.disconnect();
       window.removeEventListener('resize', position);
-      window.removeEventListener('scroll', position, true);
+      window.removeEventListener('scroll', scroll, true);
     };
-  }, [anchor, level, matchTriggerWidth]);
+  }, [anchor, level, matchTriggerWidth, inspector]);
   useLayoutEffect(() => {
     if (focusRequest?.level !== level) return;
     const buttons = [...(panel.current?.querySelectorAll<HTMLButtonElement>(enabledItems) ?? [])];
@@ -144,6 +164,7 @@ function MenuPanel({
       id={id}
       className={`action-menu-panel${matchTriggerWidth ? ' action-menu-options' : ''}`}
       data-nested={level > 0 || undefined}
+      data-inspector={inspector || undefined}
       role="menu"
       aria-label={label}
       onKeyDown={keydown}
@@ -152,7 +173,8 @@ function MenuPanel({
     >
       {items.map((item, index) => (
         <div key={item.id} role="none">
-          {item.separatorBefore && <div className="action-menu-separator" role="separator" />}
+          {index > 0 && item.separatorBefore && <div className="action-menu-separator" role="separator" />}
+          {item.group && <div className="action-menu-group" aria-hidden="true">{item.group}</div>}
           <button
             ref={(element) => {
               if (element) rowRefs.set(`${level}:${item.id}`, element);
@@ -178,9 +200,9 @@ function MenuPanel({
             onPointerEnter={() => onHover(item)}
             onClick={() => (item.children ? onBranch(item, true) : onSelect(item))}
           >
-            <span className="action-menu-icon">{item.icon}</span>
+            <span className="action-menu-icon">{inspector && item.checked ? <Check size={13} aria-hidden="true" /> : item.icon}</span>
             <span className="action-menu-label">{item.label}</span>
-            {item.checked && <Check className="action-menu-check" size={14} aria-hidden="true" />}
+            {!inspector && item.checked && <Check className="action-menu-check" size={14} aria-hidden="true" />}
             {item.shortcut && <kbd className="action-menu-shortcut">{item.shortcut}</kbd>}
             {item.children && (
               <ChevronRight className="action-menu-chevron" size={14} aria-hidden="true" />
@@ -222,6 +244,7 @@ export function ActionMenu({
 }) {
   const id = useId();
   const choices = variant === 'choices';
+  const inspector = className.split(/\s+/).some((name) => name.startsWith('inspector-'));
   const root = useRef<HTMLDivElement>(null);
   const floating = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -245,7 +268,7 @@ export function ActionMenu({
     context?.onClose();
     if (restoreFocus) {
       if (context) context.returnFocus();
-      else trigger.current?.focus();
+      else trigger.current?.focus({ preventScroll: true });
     }
   };
   useEffect(() => {
@@ -322,6 +345,7 @@ export function ActionMenu({
         focusRequest={focusRequest}
         rowRefs={rowRefs}
         matchTriggerWidth={level === 0 && choices}
+        inspector={inspector}
         cancelHover={cancelHover}
         onBranch={(item, keyboard) => {
           cancelHover();

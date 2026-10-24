@@ -2,11 +2,11 @@
 
 [Read in Italian](it/guide.md) · [Open DrawCircuit](https://andrelombardo.github.io/drawcircuit/)
 
-DrawCircuit is a browser editor for electrical circuits in notes and teaching material. Components, wires, and annotations are editable vector objects. The library contains 72 symbols in 12 categories and 23 quick blocks. Comic Relief is bundled for circuit text and formulas; the UI uses Inter and KaTeX lays out mathematical labels.
+DrawCircuit is a browser editor for electrical circuits in notes and teaching material. Components, wires, and annotations are editable vector objects. The library contains 72 symbols in 12 categories and 25 quick blocks and diagrams. Comic Relief is bundled for circuit text and formulas; the UI uses Inter and KaTeX lays out mathematical labels.
 
 ## Language and local data
 
-Choose **English** or **Italiano** in the selector at the bottom right. English is the default. The interface, tooltips, properties, messages, and built-in help switch together; the browser remembers your choice. Searches match English and Italian names in either interface language. Your existing labels, block names, circuit, and undo history are preserved.
+The interface, tooltips, properties, messages, and built-in help use Italian. Searches match English and Italian names. Your existing labels, block names, circuit, and undo history are preserved.
 
 Your circuit saves automatically after 400 ms of inactivity and before reload or closing. Personal blocks and preferences use separate browser storage. Keep using the same browser profile and origin to access them. Browser storage can be unavailable or cleared by browser settings; if saving fails, keep the page open and copy the drawing as an image. See the [web app guide](pwa.md) for installation and legacy migration.
 
@@ -18,7 +18,7 @@ Your circuit saves automatically after 400 ms of inactivity and before reload or
 4. Double-click a label or text to edit it inline. **Enter** or clicking outside confirms; **Esc** cancels. Choose **Text** in the toolbar for standalone text.
 5. Select elements, right-click, and choose **Copy as image**. Use **Cmd/Ctrl A** first to copy the whole circuit.
 
-The toolbar grip lets you move the tools; its position is remembered. **Help** is at the bottom right. Zoom and grid controls are at the bottom left. Components and Properties each have a show/hide button and a draggable resize edge; double-click an edge to reset its width. At widths up to 600 px, both panels start closed and open one at a time. Choosing a component or block closes the mobile library. Desktop panel preferences are restored when returning to a wider layout.
+The toolbar grip lets you move the tools; its position is remembered. **Help** is at the bottom right. Zoom and grid controls are at the bottom left. Components and Properties each have a show/hide button and a draggable resize edge; double-click an edge to reset its width. At widths up to 800 px, both panels start closed and open one at a time. Choosing a component or block closes the mobile library. Desktop panel preferences are restored when returning to a wider layout.
 
 ## Select, move, and edit
 
@@ -52,13 +52,13 @@ Choose **Curved** in **Line routing**, either while drawing or in Properties, to
 
 The **Properties** sidebar shows the selected type or number of elements. It offers only shared properties for mixed selections. Different values appear as **Mixed values**, **Mixed**, or a dash. Confirm text and numeric changes with Enter or by leaving the field; Esc discards the draft. A shared edit changes the whole selection in one undo step.
 
-**Text size**, **Thickness**, and **Rotation** combine editable values with their usual presets. Type a custom number, then press Enter or leave the field to apply it; use the arrow button or Up/Down to browse presets. Esc discards the draft. Decimal points, decimal commas, and pasted units are accepted. Invalid values show an error and leave the drawing unchanged. Text size must be greater than 0 and at most 200 px; line width must be greater than 0 and at most 20 px. Component, text, and label rotations retain their 45° increments (0–315°); arrows and loops allow custom angles. Distances, coordinates, and other numeric fields remain directly editable.
+**Text size**, **Thickness**, and **Rotation** combine editable values with their usual presets. Type a custom number, then press Enter or leave the field to apply it; use the arrow button or Up/Down to browse presets. Esc discards the draft. Decimal points, decimal commas, and pasted units are accepted. Invalid values show an error and leave the drawing unchanged. Text size must be greater than 0 and at most 200 px; line width must be greater than 0 and at most 20 px. Components, text, labels, rectangles, arrows, and loops accept custom rotation angles; suggested presets do not constrain the entered angle. Distances, coordinates, and other numeric fields remain directly editable.
 
-- **Label / Content:** edit object text or a shared value. **Internal text** edits the text inside generic blocks.
+- **Label / Text:** edit object text or a shared value; its size control sits to the right. **Internal text** edits the text inside generic blocks.
 - **Position:** X/Y describe an object’s position or the top-left geometric bounds of a multiple selection. Editing a group coordinate translates the entire selection. Rotation applies to the object or selected label.
-- **Appearance:** adjust symbol/text and label colors and opacity independently; change line width, styles, text size (up to 200 px)/alignment, and shape fill where relevant. Click a color for preset swatches or **Custom color…**. Native color-picker previews form one gesture.
+- **Style / Fills / Borders:** save reusable styles, adjust colors and opacity, and edit multiple fills and borders. Click a color for presets or the custom color picker. Native color-picker previews form one gesture.
 - **Transforms:** rotate compatible groups around their center and mirror arrows or loops horizontally/vertically. **Reverse arrow** changes arrowhead direction without reflecting the shape.
-- **Geometry:** object-specific dimensions, endpoints, routing, braces, alignment, distribution, and spacing.
+- **Layout:** object-specific dimensions, endpoints, routing, braces, and angles. Distribution and spacing appear for compatible multiple selections. Thin separators divide the main sections; expandable groups within a section have no extra divider lines.
 
 The inspector resizes from 252–440 px, initially 292 px; the component sidebar uses 200–480 px. Their keyboard-accessible separators support arrow keys, Home, End, and double-click reset. Opening or resizing panels preserves zoom and the view center. Below 1050 px the inspector overlays the canvas.
 
@@ -112,7 +112,11 @@ Drag to erase only the crossed portions of every intersected highlight. A 4 px m
 
 ### Rectangles, circles, and decorative lines
 
-Drag with **Rectangle** or **Circle** to create a shape. Rectangle uses **Shift** for a square; Rectangle and Circle use **Alt/Option** to draw from the center. Circles stay circular when drawn or resized. Esc cancels previews. Rectangles and circles start unfilled; select their border and resize with corner handles. Enter width/height for rectangles or **Diameter** for circles in Properties. Both support independent outline/fill colors and opacity, plus solid, dashed, or dotted outlines. A 90° rotation exchanges rectangle width and height. These shapes render behind the circuit and create no electrical connections. Unfilled rectangles and circles leave interior objects selectable.
+Drag with **Rectangle** or **Circle** to create a shape. Rectangle uses **Shift** for a square; Rectangle and Circle use **Alt/Option** to draw from the center. Circles stay circular when drawn or resized. Esc cancels previews. Rectangles and circles start unfilled; select their border and resize with corner handles. Use **W/H** in Properties to change dimensions. Rectangles support free rotation and rounded corners, including a separate radius for each corner. Both shapes support multiple fills and borders, independent opacity, and solid, dashed, or dotted outlines. These shapes render behind the circuit and create no electrical connections. Unfilled rectangles and circles leave interior objects selectable.
+
+### Axes and angles
+
+In **Disegno e annotazioni → Diagrammi**, choose **Assi cartesiani** or **Piano di Gauss** and click to place an editable starter. The Gauss plane includes Re/Im axes, a dashed circle and rays, a vector, and an angle label. Use **Angolo** for a new angle: click the vertex, the first ray and radius, then the second ray. Properties edits the starting angle, signed sweep, radius, rays, and mathematical label. Decorative lines snap to the centers and outlines of circles and rectangles and follow them when moved or resized.
 
 ## Smart Placement and reusable blocks
 

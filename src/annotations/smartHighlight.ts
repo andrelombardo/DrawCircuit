@@ -71,7 +71,7 @@ function networkFor(doc: CircuitDocument): Network {
   const endpoint = (ep: Endpoint, wireId: string, side: string) =>
     ep.kind === 'terminal' ? terminalNode(ep.componentId, ep.terminalId) :
       ep.kind === 'junction' ? JSON.stringify(['junction', ep.junctionId]) :
-        ep.connectionId ? JSON.stringify(['connection', ep.connectionId]) :
+        ep.kind === 'free' && ep.connectionId ? JSON.stringify(['connection', ep.connectionId]) :
           JSON.stringify(['free', wireId, side]);
   for (const object of doc.objects) {
     if (object.kind === 'wire') {

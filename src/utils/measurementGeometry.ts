@@ -18,7 +18,8 @@ export function getMeasurementBounds(component: CircuitComponent): Bounds {
     );
     rotatedBodyBounds.set(key, bounds);
   }
-  return { ...bounds, x: bounds.x + component.x, y: bounds.y + component.y };
+  const scale = component.scale ?? 1;
+  return { x: bounds.x*scale + component.x, y: bounds.y*scale + component.y, width: bounds.width*scale, height: bounds.height*scale };
 }
 
 export function measurementBounds(object: CircuitObject, document: CircuitDocument): Bounds {

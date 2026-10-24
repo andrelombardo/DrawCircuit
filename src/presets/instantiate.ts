@@ -107,5 +107,6 @@ export function instantiatePreset(
       ...createTextAnnotation(position(text), text.text),
       rotation,
     });
+  objects.push(...(preset.graphics?.(origin, rotation) ?? []));
   return objects;
 }

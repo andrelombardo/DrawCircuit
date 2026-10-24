@@ -1,4 +1,5 @@
 import { t } from '../i18n';
+import { nearestShapeAnchor } from './shapeAnchors';
 import { projectHighlight, remapHighlightSpans, sliceHighlightRoute } from '../annotations/highlight';
 import { createCurrent, currentWireAnchor } from '../annotations/electrical';
 import { placeNodeLabel } from './nodeLabels';
@@ -31,7 +32,7 @@ import {
 } from './geometry';
 import type { WireExitAxes } from './geometry';
 export type WireCandidate =
-  | { point: Point; endpoint: Endpoint; kind: 'terminal' | 'junction' | 'grid' }
+  | { point: Point; endpoint: Endpoint; kind: 'terminal' | 'junction' | 'shape' | 'grid' }
   | { point: Point; kind: 'wire'; wireId: string; exitAxis?: 'x' | 'y' };
 export interface WireDraft {
   kind?: 'line';
@@ -232,7 +233,7 @@ export function commitWire(doc: CircuitDocument, draft: WireDraft, candidate: Wi
       ? `terminal:${endpoint.componentId}:${endpoint.terminalId}`
       : endpoint.kind === 'junction'
         ? `junction:${endpoint.junctionId}`
-        : `free:${endpoint.point.x}:${endpoint.point.y}`;
+        : endpoint.kind === 'shape' ? `shape:${endpoint.shapeId}:${endpoint.anchor.x}:${endpoint.anchor.y}` : `free:${endpoint.point.x}:${endpoint.point.y}`;
   const route = simplifyPolyline(points),
     startKey = key(wire.startEndpoint),
     endKey = key(wire.endEndpoint);
@@ -284,6 +285,11 @@ export function wireCandidate(
       : endpoint.kind === 'junction' ? endpoint.junctionId : '';
     if (!excluded.has(id)) push({ ...target, kind: target.kind }, target.key);
   }
+  if (options.includeLines) for (const shape of doc.objects) {
+    if ((shape.kind !== 'circle' && shape.kind !== 'rectangle') || excluded.has(shape.id)) continue;
+    const hit = nearestShapeAnchor(shape, p, RELEASE_PX/zoom);
+    if (hit) push({kind:'shape',point:hit.point,endpoint:{kind:'shape',shapeId:shape.id,anchor:hit.anchor}}, `s:${shape.id}`);
+  }
   for (const end of index.nearbyWireEnds(p, RELEASE_PX / zoom, options.includeLines)) {
     if (!excluded.has(end.wireId))
       push({ kind: 'wire', point: end.point, wireId: end.wireId }, `e:${end.wireId}:${end.side}`);
@@ -319,11 +325,14 @@ export function wireCandidate(
   const best = choices.find((choice) => choice.gap <= SNAP_PX);
   const previous = options.previous;
   if (previous && previous.kind !== 'grid') {
-    const held = choices.find(({ candidate }) =>
-      candidate.kind === previous.kind && (candidate.kind === 'wire'
-        ? previous.kind === 'wire' && candidate.wireId === previous.wireId
-        : candidate.kind !== 'grid' && previous.kind !== 'wire' &&
-          JSON.stringify(candidate.endpoint) === JSON.stringify(previous.endpoint)));
+    const held = choices.find(({ candidate }) => {
+      if (candidate.kind !== previous.kind) return false;
+      if (candidate.kind === 'wire') return previous.kind === 'wire' && candidate.wireId === previous.wireId;
+      if (candidate.kind === 'grid' || previous.kind === 'wire') return false;
+      if (candidate.endpoint.kind === 'shape' && previous.endpoint.kind === 'shape')
+        return candidate.endpoint.shapeId === previous.endpoint.shapeId;
+      return JSON.stringify(candidate.endpoint) === JSON.stringify(previous.endpoint);
+    });
     if (held && (!best || score(held) <= score(best) + SWITCH_PX)) return held.candidate;
   }
   return best?.candidate ?? free;

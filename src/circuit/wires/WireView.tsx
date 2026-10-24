@@ -1,4 +1,4 @@
-import { t, useLanguage } from '../../i18n';
+import { t } from '../../i18n';
 import { dashPattern } from '../../utils/strokeStyle';
 import { memo } from 'react';
 import type { Point, Wire } from '../../model/types';
@@ -17,7 +17,6 @@ export const WireView = memo(
     looseStart: boolean;
     looseEnd: boolean;
   }) {
-    useLanguage((state) => state.language);
     const hitPath = pointsPath(points);
     const d = (paths ?? [points]).map(pointsPath).join(' ');
     return (

@@ -1,9 +1,10 @@
 import { t } from '../../i18n';
 import { useLayoutEffect, useRef } from 'react';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { PropertiesContent } from './PropertiesContent';
 import { useEditorStore } from '../../store/editorStore';
-import { SidebarToggle } from '../toolbar/SidebarToggle';
+import { InspectorHeader } from './InspectorHeader';
+import { inspectorKeyDown } from './inspectorKeyboard';
 import {
   clampInspectorWidth,
   INSPECTOR_DEFAULT_WIDTH,
@@ -15,7 +16,8 @@ export function PropertiesInspector({
   preferences,
   setPreferences,
   toggle,
-}: ReturnType<typeof useInspectorPreferences>) {
+  footer,
+}: ReturnType<typeof useInspectorPreferences> & { footer?: ReactNode }) {
   const drag = useRef<{ x: number; width: number; pointer: number } | null>(null);
   const scroll = useRef<HTMLDivElement>(null);
   const selectionKey = useEditorStore((s) => JSON.stringify([s.selection, s.activeLabel]));
@@ -30,47 +32,17 @@ export function PropertiesInspector({
       className="properties-inspector"
       role="region"
       aria-label={t('Properties')}
-      onKeyDown={(event) => {
-        const target = event.target as HTMLElement;
-        const editingText = target.matches(
-          'textarea, input:not([type="checkbox"]):not([type="color"]):not([type="range"]), [contenteditable="true"]',
-        );
-        if ((event.ctrlKey || event.metaKey) && !event.altKey && !editingText) {
-          const key = event.key.toLowerCase();
-          if (key === 'z' || key === 'y') {
-            event.preventDefault();
-            event.stopPropagation();
-            const state = useEditorStore.getState();
-            const selection = state.selection,
-              activeLabel = state.activeLabel;
-            if (key === 'y' || event.shiftKey) state.redo();
-            else state.undo();
-            const next = useEditorStore.getState();
-            const existing = new Set(next.document.objects.map((object) => object.id));
-            const remaining = selection.filter((id) => existing.has(id));
-            if (remaining.length) {
-              next.select(remaining);
-              if (activeLabel && remaining.includes(activeLabel)) next.setActiveLabel(activeLabel);
-            }
-            return;
-          }
-        }
-        // Native controls own Enter, Space and letter keys. Canvas shortcuts
-        // must not rotate or enter label editing while using this inspector.
-        if (!event.ctrlKey && !event.metaKey) event.stopPropagation();
-      }}
+      onKeyDown={inspectorKeyDown}
       hidden={!preferences.visible}
       style={{ '--inspector-width': `${preferences.width}px` } as CSSProperties}
     >
-      <div className="inspector-header">
-        <h2>{t('Properties')}</h2>
-        <SidebarToggle side="right" visible onToggle={toggle} />
-      </div>
+      <InspectorHeader onHide={toggle} />
       {preferences.visible && (
         <div ref={scroll} className="inspector-scroll">
           <PropertiesContent />
         </div>
       )}
+      {preferences.visible && footer && <div className="inspector-footer">{footer}</div>}
       <div
         className="inspector-resizer"
         role="separator"

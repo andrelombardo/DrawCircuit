@@ -1,3 +1,5 @@
+import { createAngle, resizeAngle } from '../../annotations/angle';
+import type { AngleAnnotation } from '../../model/types';
 import { beginLine, commitLine, graphicEndpoint, moveLineEndpoint, nearestLinePoint, normalizeLine, routeEditedLine } from '../../utils/lines';
 import { HighlightEraserGesture } from '../../annotations/eraseHighlight';
 import { t } from '../../i18n';
@@ -18,6 +20,7 @@ import {
 } from '../../annotations/highlight';
 import type { Highlight } from '../../model/types';
 import { circleFromDrag, rectangleFromDrag, resizeShape } from '../../utils/rectangles';
+import { shapeCenter } from '../../utils/shapes';
 import type { ShapeAnnotation, LineAnnotation } from '../../model/types';
 import { createBrace, resizeBrace } from '../../annotations/brace';
 import { createCurrent, createElectrical, createPolarity } from '../../annotations/electrical';
@@ -130,6 +133,7 @@ export interface Overlay {
   box: { x: number; y: number; width: number; height: number } | null;
   guides: { x?: number; y?: number };
   arrow:
+    | AngleAnnotation
     | ArrowAnnotation
     | LoopArrow
     | ElectricalAnnotation
@@ -181,6 +185,9 @@ export function useCanvasInteractions(
   const [overlay, setOverlay] = useState<Overlay>(blank);
   const doc = useEditorStore((s) => s.document);
   const objectMap = useMemo(() => new Map(doc.objects.map((o) => [o.id, o])), [doc]);
+  const anglePointsRef = useRef<Point[]>([]);
+  const [angleStep, setAngleStep] = useState(0);
+  const setAnglePoints = (points: Point[]) => { anglePointsRef.current = points; setAngleStep(points.length); };
   const [voltageStart, setVoltageStart] = useState<Point | null>(null);
   const voltageStartRef = useRef<Point | null>(null);
   const setFirstPoint = (point: Point | null) => {
@@ -467,6 +474,7 @@ export function useCanvasInteractions(
         setActiveLabel(null);
         setOverlay(blank);
         setWireDraft(null);
+        setAnglePoints([]);
         if (e.shiftKey) s.redo();
         else s.undo();
       } else if (mod && e.key.toLowerCase() === 'y') {
@@ -476,6 +484,7 @@ export function useCanvasInteractions(
         setActiveLabel(null);
         setOverlay(blank);
         setWireDraft(null);
+        setAnglePoints([]);
         s.redo();
       } else if (mod && e.key.toLowerCase() === 'd') {
         e.preventDefault();
@@ -498,7 +507,10 @@ export function useCanvasInteractions(
       } else if (e.key === 'Delete' || e.key === 'Backspace') {
         e.preventDefault();
         const draft = draftRef.current;
-        if (draft) {
+        if (s.tool === 'angle' && anglePointsRef.current.length) {
+          setAnglePoints(anglePointsRef.current.slice(0, -1));
+          setOverlay(blank);
+        } else if (draft) {
           if (draft.vertices.length)
             setWireDraft({ ...draft, vertices: draft.vertices.slice(0, -1) });
           else {
@@ -510,6 +522,7 @@ export function useCanvasInteractions(
       } else if (e.key === 'Escape') {
         s.setSplitWire(null);
         setFirstPoint(null);
+        setAnglePoints([]);
         s.cancelGesture();
         drag.current = null;
         setDragging(null);
@@ -641,6 +654,7 @@ export function useCanvasInteractions(
           setActiveLabel(null);
           setOverlay(blank);
           setFirstPoint(null);
+          setAnglePoints([]);
         }
       }),
     [setActiveLabel, drawingCandidate],
@@ -751,6 +765,22 @@ export function useCanvasInteractions(
           s.select([result.secondId]);
           s.setSplitWire(null);
         } else s.notify(t('Choose a point inside the wire, away from crossings and terminals.'));
+      }
+      return;
+    }
+    if (s.tool === 'angle') {
+      const point = s.snapEnabled && !e.altKey ? snapPoint(p) : p;
+      const points = anglePointsRef.current;
+      if (!points.length) setAnglePoints([point]);
+      else if (points.length === 1) {
+        if (distance(points[0], point) >= 8) setAnglePoints([...points, point]);
+      } else {
+        const object = createAngle(points[0], points[1], point);
+        s.add([object]);
+        setAnglePoints([]);
+        s.setTool('select');
+        s.select([object.id]);
+        setOverlay(blank);
       }
       return;
     }
@@ -941,7 +971,7 @@ export function useCanvasInteractions(
             kind: 'terminal',
             point: add(
               component,
-              rotatePoint({ x: terminal.localX, y: terminal.localY }, component.rotation),
+              rotatePoint({ x: terminal.localX*(component.scale ?? 1), y: terminal.localY*(component.scale ?? 1) }, component.rotation),
             ),
             endpoint: {
               kind: 'terminal',
@@ -1062,6 +1092,17 @@ export function useCanvasInteractions(
     mouseRef.current = p;
     screenPointerRef.current = { x: e.clientX, y: e.clientY };
     const d = drag.current;
+    if (s.tool === 'angle' && !d && !spaceDown.current) {
+      const point = s.snapEnabled && !e.altKey ? snapPoint(p) : p;
+      const [vertex, first] = anglePointsRef.current;
+      if (!vertex) setOverlay({ ...blank, target: point });
+      else {
+        const object = createAngle(vertex, first ?? point, first ? point : undefined);
+        if (!first) object.sweepAngle = 0.1;
+        setOverlay({ ...blank, target: point, arrow: { ...object, id: 'preview' } });
+      }
+      return;
+    }
     if (!d) {
       const hovered =
         s.tool === 'select'
@@ -1259,6 +1300,13 @@ export function useCanvasInteractions(
             : d.doc.objects.map((o) => {
                 if (!selected.has(o.id)) return o;
                 if (d.type === 'handle') {
+                  if (o.kind === 'angle' && d.handle?.startsWith('angle')) {
+                    return d.handle === 'angleVertex'
+                      ? { ...o, ...(s.snapEnabled && !e.altKey ? snapPoint(p) : p) }
+                      : resizeAngle(o, d.handle, p);
+                  }
+                  if (d.handle === 'shapeRotate' && o.kind === 'rectangle' && !o.frame)
+                    return { ...o, rotation: ((o.rotation ?? 0) + rotationGesture(shapeCenter(o), d.origin, p, e.shiftKey, o.rotation ?? 0) + 360) % 360 };
                   if (d.handle === 'rotate' && (o.kind === 'arrow' || o.kind === 'loop-arrow'))
                     return rotateArrow(
                       o,
@@ -1598,7 +1646,7 @@ export function useCanvasInteractions(
         d?.type === 'loop-arrow' ||
         d?.type === 'brace' ||
         d?.type === 'bracket') &&
-      overlay.arrow &&
+      overlay.arrow && overlay.arrow.kind !== 'angle' &&
       (overlay.arrow.kind === 'rectangle' || overlay.arrow.kind === 'circle'
         ? overlay.arrow.width >= 2 &&
           overlay.arrow.height >= 2 &&
@@ -1691,6 +1739,7 @@ export function useCanvasInteractions(
     viewport,
     hoveredArrow,
     voltageStart,
+    angleStep,
     surfaceSize,
     smart,
     paletteDragType,
@@ -1738,6 +1787,7 @@ export function useCanvasInteractions(
       setWireDraft(null);
       setOverlay(blank);
       setFirstPoint(null);
+      setAnglePoints([]);
       smart.reset();
     },
   };

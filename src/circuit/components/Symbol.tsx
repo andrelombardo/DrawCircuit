@@ -16,7 +16,7 @@ export function Symbol({
   rotation?: number;
 }) {
   return (
-    <g stroke={color} strokeWidth={width} fill="none" strokeLinecap="round" strokeLinejoin="round">
+    <g color={color} stroke={color} strokeWidth={width} fill="none" strokeLinecap="round" strokeLinejoin="round">
       {componentRegistry[type].shapes.map((shape, i) => {
         if (shape.kind === 'path')
           return (

@@ -1,4 +1,5 @@
 import { detachLineEndpoints } from '../utils/lines';
+import { frameSelection } from '../model/shapeAppearance';
 import { detachHighlight, highlightSpanHost } from '../annotations/highlight';
 import { detachElectrical } from '../annotations/electrical';
 import type { CircuitDocument, Endpoint, Wire } from '../model/types';
@@ -9,6 +10,7 @@ import { contentBounds, unionBounds } from '../utils/visualBounds';
  * internal connections may pass through unselected Junctions, never through
  * an unselected component or a coincident, unconnected wire crossing. */
 export function getExportSelection(doc: CircuitDocument, ids: readonly string[]): CircuitDocument {
+  ids = frameSelection(doc, ids);
   const objectsById = new Map(doc.objects.map((o) => [o.id, o]));
   const selected = new Set(ids.filter((id) => objectsById.has(id))),
     included = new Set(selected),
@@ -95,7 +97,7 @@ export function getExportSelection(doc: CircuitDocument, ids: readonly string[])
     )
       included.add(o.id);
   const endpoint = (ep: Endpoint): Endpoint =>
-    ep.kind === 'terminal' && !included.has(ep.componentId)
+    (ep.kind === 'terminal' && !included.has(ep.componentId)) || (ep.kind === 'shape' && !included.has(ep.shapeId))
       ? { kind: 'free', point: resolveEndpoint(ep, doc) }
       : ep;
   const objects = doc.objects

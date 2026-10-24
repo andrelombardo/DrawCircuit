@@ -1,4 +1,7 @@
+import { angleGeometry } from '../annotations/angle';
 import { highlightDrawing, highlightPaintGroups } from '../annotations/highlight';
+import { objectBorders, objectFills, paintVariants, parentFrame, shapeFills, shapeBorders } from '../model/shapeAppearance';
+import { shapeBorderWidth, shapeBounds, shapePath, shapeTransform } from '../utils/shapes';
 import { dashPattern } from '../utils/strokeStyle';
 import type { StrokeStyle } from '../model/types';
 import { drawingWireGaps, translucentCrossing } from '../utils/wireRendering';
@@ -6,7 +9,7 @@ import { braceGeometry } from '../annotations/brace';
 import { componentRegistry } from '../model/catalog';
 import { symbolText } from '../model/symbolGeometry';
 import { bridgePaths, wireCrossings } from '../utils/crossings';
-import type { CircuitDocument, Point, Rotation } from '../model/types';
+import type { CircuitDocument, CircuitObject, Point, Rotation } from '../model/types';
 import { canvasTextLayout, xmlText } from '../tikz/canvasText';
 import { isExportableObject } from '../tikz/validation';
 import { canvasArrowHead, canvasArrowHeadPath, lineArrowHeadPath } from '../tikz/arrowheads';
@@ -37,6 +40,11 @@ export function exportSVG(
   const boxes: Bounds[] = [],
     parts: string[] = [],
     labels: string[] = [];
+  const bodyById = new Map<string, string>(), labelById = new Map<string, string>(), bridgesById = new Map<string, string>();
+  const capture = (id: string, firstPart: number, firstLabel = labels.length) => {
+    if (parts.length > firstPart) bodyById.set(id, parts.splice(firstPart).join(''));
+    if (labels.length > firstLabel) labelById.set(id, labels.splice(firstLabel).join(''));
+  };
   const text = (
     value: string,
     p: Point,
@@ -93,37 +101,53 @@ export function exportSVG(
     fill = 'none',
   ) =>
     `<path d="${attr(d)}" fill="${fill}" stroke="${color}" stroke-width="${f(width)}" stroke-linecap="${cap}" stroke-linejoin="round"${dashPattern(style, width) ? ` stroke-dasharray="${dashPattern(style, width)!.map(f).join(' ')}"` : ''}/>`;
+  const paintMarkup = (o: CircuitObject, content: string): string => {
+    const variants = paintVariants(o), borders = [...objectBorders(o)].reverse().filter((p) => p.enabled);
+    const painted = variants === null ? `<g opacity="${f(o.opacity ?? 1)}">${content}</g>` : variants.map((variant, i) => {
+      const width = 'strokeWidth' in variant ? variant.strokeWidth : 'width' in variant ? variant.width : undefined;
+      let markup = content.replaceAll(o.color, variant.color);
+      if (width !== undefined) markup = markup.replace(/stroke-width="[^"]*"/g, `stroke-width="${f(width/(variant.kind === 'component' ? variant.scale ?? 1 : 1))}"`);
+      if (variant.kind === 'arrow' || variant.kind === 'loop-arrow') {
+        const weight = variant.kind === 'arrow' ? variant.width : variant.strokeWidth;
+        markup = path(variant.kind === 'arrow' ? arrowPath(variant) : loopPath(variant), variant.color, weight)+
+          path(canvasArrowHeadPath(variant), variant.color, weight, 'round', {}, variant.headFilled ? variant.color : 'none');
+        boxes.push(unionBounds(canvasArrowHead(variant).map((p) => ({ x: p.x-weight/2, y: p.y-weight/2, width: weight, height: weight }))));
+      } else if (variant.kind === 'line') {
+        const head = lineArrowHeadPath(variant, doc);
+        markup = path(linePath(variant, doc), variant.color, variant.width)+
+          (head ? path(head, variant.color, variant.width, 'round', {}, variant.arrowhead === 'filled' ? variant.color : 'none') : '');
+        boxes.push(visualBounds(variant, doc));
+      }
+      const border = borders[i];
+      if (border?.lineStyle !== undefined) markup = markup.replace(/ stroke-dasharray="[^"]*"/g, '');
+      const dash = border && dashPattern(border, border.width);
+      return `<g opacity="${f(variant.opacity ?? 1)}"${dash ? ` stroke-dasharray="${dash.map(f).join(' ')}"` : ''}>${markup}</g>`;
+    }).join('');
+    return `<g opacity="${f(o.styleOpacity ?? 1)}" style="mix-blend-mode:${o.blendMode ?? 'normal'}">${painted}</g>`;
+  };
   for (const group of highlightPaintGroups(doc)) {
-    const content = group
-      .map((object) => {
+    const first = group[0], paints = first.borders ? [...first.borders].reverse().filter((p) => p.enabled) : [{ id: 'stroke', color: first.color, width: first.width, opacity: first.opacity }];
+    const content = paints.map((paint) => `<g opacity="${f(paint.opacity)}">${group
+      .map((original) => {
+        const object = { ...original, color: paint.color, width: paint.width };
         boxes.push(visualBounds(object, doc));
         return highlightDrawing(object, doc)
           .map((stroke) => path(stroke.d, object.color, stroke.width))
           .join('');
       })
-      .join('');
-    if (content) parts.push(`<g opacity="${f(group[0].opacity)}">${content}</g>`);
+      .join('')}</g>`).join('');
+    if (content) bodyById.set(first.id, `<g opacity="${f(first.styleOpacity ?? 1)}" style="mix-blend-mode:${first.blendMode ?? 'normal'}">${content}</g>`);
   }
   for (const o of doc.objects) {
+    const firstPart = parts.length;
     if (o.kind === 'rectangle' || o.kind === 'circle') {
-      boxes.push({
-        x: o.x - o.strokeWidth / 2,
-        y: o.y - o.strokeWidth / 2,
-        width: o.width + o.strokeWidth,
-        height: o.height + o.strokeWidth,
-      });
-      const shape = o.kind === 'circle' ? 'circle' : 'rect';
-      const geometry =
-        o.kind === 'circle'
-          ? `cx="${f(o.x + o.width / 2)}" cy="${f(o.y + o.height / 2)}" r="${f(o.width / 2)}"`
-          : `x="${f(o.x)}" y="${f(o.y)}" width="${f(o.width)}" height="${f(o.height)}"`;
-      if (o.fill !== 'none')
-        parts.push(
-          `<${shape} ${geometry} fill="${o.fill}" fill-opacity="${f(o.fillOpacity ?? 1)}"/>`,
-        );
-      parts.push(
-        `<${shape} ${geometry} fill="none" stroke="${o.color}" stroke-width="${f(o.strokeWidth)}" opacity="${f(o.opacity ?? 1)}" stroke-linejoin="round"${dashPattern(o, o.strokeWidth) ? ` stroke-dasharray="${dashPattern(o, o.strokeWidth)!.map(f).join(' ')}"` : ''} stroke-linecap="round"/>`,
-      );
+      boxes.push(shapeBounds(o, true));
+      const fills = [...shapeFills(o)].reverse().filter((p) => p.enabled).map((p) =>
+        `<path d="${shapePath(o)}" fill="${p.color}" fill-opacity="${f(p.opacity)}"/>`).join('');
+      const borders = [...shapeBorders(o)].reverse().filter((p) => p.enabled).map((p) =>
+        `<path d="${shapePath(o, p)}" fill="none" stroke="${p.color}" stroke-width="${f(shapeBorderWidth(o, p))}" opacity="${f(p.opacity)}" stroke-linejoin="round" stroke-linecap="round"${dashPattern(p, p.width) ? ` stroke-dasharray="${dashPattern(p, p.width)!.map(f).join(' ')}"` : ''}/>`).join('');
+      const frame = o.kind === 'rectangle' && o.frame;
+      parts.push(`<g transform="${shapeTransform(o)}" opacity="${f(frame ? 1 : o.styleOpacity ?? 1)}" style="mix-blend-mode:${frame ? 'normal' : o.blendMode ?? 'normal'}">${fills}${borders}</g>`);
     } else if (o.kind === 'line') {
       const bounds = visualBounds(o, doc);
       boxes.push({
@@ -134,32 +158,37 @@ export function exportSVG(
       });
       const head = lineArrowHeadPath(o, doc);
       parts.push(
-        `<g opacity="${f(o.opacity ?? 1)}">${path(linePath(o, doc), o.color, o.width, 'round', o)}${head ? path(head, o.color, o.width, 'round', {}, o.arrowhead === 'filled' ? o.color : 'none') : ''}</g>`,
+        paintMarkup(o, path(linePath(o, doc), o.color, o.width, 'round', o)+(head ? path(head, o.color, o.width, 'round', {}, o.arrowhead === 'filled' ? o.color : 'none') : '')),
       );
     }
+    capture(o.id, firstPart);
   }
   const currentGaps = drawingWireGaps(doc, options.transparent);
   for (const o of doc.objects.filter((o) => o.kind === 'wire')) {
+    const firstPart = parts.length;
     try {
       const paths = wireDrawingPaths(wirePoints(o, doc), currentGaps.get(o.id));
       parts.push(
-        `<g opacity="${f(o.opacity ?? 1)}">${path(paths.map(pointsPath).join(' '), o.color, o.width, 'round', o)}</g>`,
+        paintMarkup(o, path(paths.map(pointsPath).join(' '), o.color, o.width, 'round', o)),
       );
       boxes.push(visualBounds(o, doc));
     } catch {
       /* Skip a dangling invalid wire like TikZ does. */
     }
+    capture(o.id, firstPart);
   }
   for (const c of wireCrossings(doc)) {
     const p = bridgePaths(c),
       w = Math.max(c.horizontal.width, c.vertical.width) + 4;
+    const addBridge = (...content: string[]) => bridgesById.set(p.overWire.id, (bridgesById.get(p.overWire.id) ?? '')+
+      `<g opacity="${f(p.overWire.styleOpacity ?? 1)}" style="mix-blend-mode:${p.overWire.blendMode ?? 'normal'}">${content.join('')}</g>`);
     if (options.transparent || translucentCrossing(c)) {
-      parts.push(
+      addBridge(
         `<g opacity="${f(p.overWire.opacity ?? 1)}">${path(p.arc, p.overWire.color, p.overWire.width, 'round', p.overWire)}</g>`,
       );
       continue;
     }
-    parts.push(
+    addBridge(
       path(p.gap, 'white', w),
       path(p.under, p.underWire.color, p.underWire.width, 'round', p.underWire),
       path(p.arc, 'white', w),
@@ -175,6 +204,7 @@ export function exportSVG(
       o.kind !== 'line',
   )) {
     const firstPart = parts.length;
+    const firstLabel = labels.length;
     if (o.kind !== 'text' && o.kind !== 'electrical') boxes.push(visualBounds(o, doc));
     if (o.kind === 'component') {
       const shapes = componentRegistry[o.type].shapes
@@ -190,7 +220,7 @@ export function exportSVG(
         })
         .join('');
       parts.push(
-        `<g transform="translate(${f(o.x)} ${f(o.y)}) rotate(${o.rotation})" stroke="${o.color}" stroke-width="${f(o.width)}" fill="none" stroke-linecap="round" stroke-linejoin="round">${shapes}</g>`,
+        `<g transform="translate(${f(o.x)} ${f(o.y)}) rotate(${o.rotation}) scale(${f(o.scale ?? 1)})" color="${o.color}" stroke="${o.color}" stroke-width="${f(o.width/(o.scale ?? 1))}" fill="none" stroke-linecap="round" stroke-linejoin="round">${shapes}</g>`,
       );
       labels.push(
         text(
@@ -204,7 +234,9 @@ export function exportSVG(
         ),
       );
     } else if (o.kind === 'junction') {
-      parts.push(`<circle cx="${f(o.x)}" cy="${f(o.y)}" r="4.5" fill="${o.color}"/>`);
+      const radius = o.radius ?? 4.5;
+      boxes.push({ x: o.x-radius, y: o.y-radius, width: radius*2, height: radius*2 });
+      parts.push(`<circle cx="${f(o.x)}" cy="${f(o.y)}" r="${f(o.radius ?? 4.5)}" fill="${o.color}"/>`);
       labels.push(
         text(
           o.label.text,
@@ -217,7 +249,7 @@ export function exportSVG(
         ),
       );
     } else if (o.kind === 'text')
-      labels.push(text(o.text, o, o.color, o.fontSize, o.rotation, o.align, o.opacity));
+      labels.push([...objectFills(o)].reverse().filter((paint) => paint.enabled).map((paint) => text(o.text, o, paint.color, o.fontSize, o.rotation, o.align, paint.opacity)).join(''));
     else if (o.kind === 'arrow' || o.kind === 'loop-arrow') {
       const width = o.kind === 'arrow' ? o.width : o.strokeWidth;
       boxes.push(
@@ -234,6 +266,10 @@ export function exportSVG(
         path(o.kind === 'arrow' ? arrowPath(o) : loopPath(o), o.color, width),
         path(canvasArrowHeadPath(o), o.color, width, 'round', {}, o.headFilled ? o.color : 'none'),
       );
+    } else if (o.kind === 'angle') {
+      const g = angleGeometry(o);
+      parts.push(path(g.d, o.color, o.width, 'round', o));
+      labels.push(text(o.label.text, g.labelPoint, o.label.color, o.label.fontSize, o.label.rotation, 'middle', o.label.opacity));
     } else if (o.kind === 'brace') {
       const g = braceGeometry(o);
       parts.push(path(g.d, o.color, o.width));
@@ -288,12 +324,15 @@ export function exportSVG(
         ),
       );
     }
-    if (parts.length > firstPart && o.opacity !== undefined)
+    if (parts.length > firstPart)
       parts.splice(
         firstPart,
         parts.length - firstPart,
-        `<g opacity="${f(o.opacity)}">${parts.slice(firstPart).join('')}</g>`,
+        paintMarkup(o, parts.slice(firstPart).join('')),
       );
+    if (labels.length > firstLabel) labels.splice(firstLabel, labels.length-firstLabel,
+      `<g opacity="${f(o.styleOpacity ?? 1)}" style="mix-blend-mode:${o.blendMode ?? 'normal'}">${labels.slice(firstLabel).join('')}</g>`);
+    capture(o.id, firstPart, firstLabel);
   }
 
   const bounds = unionBounds(boxes),
@@ -305,7 +344,21 @@ export function exportSVG(
   const background = options.transparent
     ? ''
     : `<rect x="${f(x)}" y="${f(y)}" width="${f(width)}" height="${f(height)}" fill="white"/>`;
-  const content = parts.join('') + labels.join('');
+  const renderScope = (scope?: string, depth = 0): string => {
+    if (depth > 32) return '';
+    const parent = scope && doc.objects.find((o) => o.id === scope);
+    const children = parent && parent.kind === 'rectangle' && parent.frame ? new Set(parent.frame.children) : null;
+    const objects = doc.objects.filter((o) => children ? children.has(o.id) : !parentFrame(doc, o.id));
+    const body = (o: typeof doc.objects[number]) => bodyById.get(o.id) ?? '';
+    return objects.filter((o) => o.kind === 'highlight').map(body).join('')+
+      objects.filter((o) => o.kind === 'rectangle' || o.kind === 'circle' || o.kind === 'line').map((o) =>
+        o.kind === 'rectangle' && o.frame ? `<g opacity="${f(o.styleOpacity ?? 1)}" style="mix-blend-mode:${o.blendMode ?? 'normal'}">${body(o)}${renderScope(o.id, depth+1)}</g>` : body(o)).join('')+
+      objects.filter((o) => o.kind === 'wire').map(body).join('')+
+      objects.map((o) => bridgesById.get(o.id) ?? '').join('')+
+      objects.filter((o) => !['highlight', 'rectangle', 'circle', 'line', 'wire'].includes(o.kind)).map(body).join('')+
+      objects.map((o) => labelById.get(o.id) ?? '').join('');
+  };
+  const content = renderScope();
   const fonts = content.includes('Comic Relief') ? EMBEDDED_CIRCUIT_FONTS : '';
   return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" viewBox="${f(x)} ${f(y)} ${f(width)} ${f(height)}" width="${f(width)}" height="${f(height)}"><title>${xmlText(doc.title)}</title>${fonts}${background}${content}</svg>`;
 }

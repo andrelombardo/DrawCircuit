@@ -3,12 +3,13 @@ import { translucentCrossing } from '../../utils/wireRendering';
 import { memo } from 'react';
 import type { CircuitDocument } from '../../model/types';
 import { bridgePaths, wireCrossings } from '../../utils/crossings';
-export const WireBridges = memo(function WireBridges({ doc }: { doc: CircuitDocument }) {
+export const WireBridges = memo(function WireBridges({ doc, wireIds }: { doc: CircuitDocument; wireIds?: string[] }) {
   return (
     <g data-layer="crossings" pointerEvents="none">
       {wireCrossings(doc).map((c) => {
         const p = bridgePaths(c),
           w = Math.max(c.horizontal.width, c.vertical.width) + 4;
+        if (wireIds && !wireIds.includes(p.overWire.id)) return null;
         return (
           <g
             key={`${c.x}:${c.y}`}
@@ -16,6 +17,8 @@ export const WireBridges = memo(function WireBridges({ doc }: { doc: CircuitDocu
             data-bridge-axis={c.bridgeAxis}
             data-over-wire={p.overWire.id}
             data-under-wire={p.underWire.id}
+            opacity={p.overWire.styleOpacity ?? 1}
+            style={{ mixBlendMode: p.overWire.blendMode ?? 'normal' }}
           >
             {!translucentCrossing(c) && (
               <>

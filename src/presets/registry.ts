@@ -1,3 +1,4 @@
+import { diagramPresets } from './diagrams';
 import { searchText } from '../i18n';
 import { GRID } from '../model/types';
 import type { ComponentType, Point, Rotation } from '../model/types';
@@ -301,6 +302,7 @@ const preset = (
 ): CircuitPreset => ({ id, name, shortName, category, keywords, ...layout });
 
 export const circuitPresets: CircuitPreset[] = [
+  ...diagramPresets,
   preset(
     'resistors-series-2',
     '2 resistors in series',

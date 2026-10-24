@@ -1,3 +1,4 @@
+import { angleGeometry } from '../annotations/angle';
 import { braceGeometry } from '../annotations/brace';
 import { componentRegistry } from '../model/catalog';
 import type { CircuitDocument, CircuitObject, Point } from '../model/types';
@@ -55,13 +56,13 @@ export function visualBounds(o: CircuitObject, doc: CircuitDocument): Bounds {
 /** Conservative fallback for positioning UI when SVG text cannot be measured. */
 export function contentBounds(o: CircuitObject, doc: CircuitDocument): Bounds {
   const b = visualBounds(o, doc);
-  if ((o.kind !== 'component' && o.kind !== 'junction' && o.kind !== 'brace') || !o.label.text)
+  if ((o.kind !== 'component' && o.kind !== 'junction' && o.kind !== 'brace' && o.kind !== 'angle') || !o.label.text)
     return b;
   const label = o.label,
     w = Math.max(label.fontSize, label.text.length * label.fontSize * 0.65),
     h = label.fontSize * Math.max(1.6, label.text.split('\n').length * 1.4);
   const center =
-    o.kind === 'brace'
+    o.kind === 'angle' ? angleGeometry(o).labelPoint : o.kind === 'brace'
       ? braceGeometry(o).labelPoint
       : { x: o.x + label.offset.x, y: o.y + label.offset.y };
   const corners = [

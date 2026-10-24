@@ -1,4 +1,6 @@
-import { t, useLanguage } from '../../i18n';
+import { angleGeometry } from '../../annotations/angle';
+import { t } from '../../i18n';
+import { shapeCenter, shapePoint, shapeTransform } from '../../utils/shapes';
 import {
   highlightPath,
   highlightPoints,
@@ -90,7 +92,6 @@ export function SelectionLayer({
   hoveredArrow?: string | null;
   zoom: number;
 }) {
-  useLanguage((state) => state.language);
   const selected = new Set(selection);
   const objects = doc.objects.filter((object) => selected.has(object.id));
   const single = objects.length === 1;
@@ -112,7 +113,7 @@ export function SelectionLayer({
             ? highlightPath(o, doc)
             : o.kind === 'line'
               ? linePath(o, doc)
-              : o.kind === 'brace'
+              : o.kind === 'angle' ? angleGeometry(o).d : o.kind === 'brace'
                 ? braceGeometry(o).d
                 : o.kind === 'wire'
                   ? pointsPath(wirePoints(o, doc))
@@ -127,7 +128,7 @@ export function SelectionLayer({
               <path
                 d={path}
                 fill="none"
-                stroke="#6695ed"
+                stroke="var(--ui-accent)"
                 opacity={0.2}
                 strokeWidth={7}
                 vectorEffect="non-scaling-stroke"
@@ -136,6 +137,12 @@ export function SelectionLayer({
             ) : null}
             {single && (
               <>
+                {o.kind === 'angle' && <>
+                  <Handle p={o} name="angleVertex" zoom={zoom} />
+                  <Handle p={angleGeometry(o).start} name="angleStart" zoom={zoom} />
+                  <Handle p={angleGeometry(o).end} name="angleEnd" zoom={zoom} />
+                  <Handle p={angleGeometry(o).middle} name="angleRadius" zoom={zoom} square />
+                </>}
                 {o.kind === 'highlight' &&
                   o.mode !== 'component' &&
                   (() => {
@@ -172,6 +179,7 @@ export function SelectionLayer({
                 {(o.kind === 'rectangle' || o.kind === 'circle') && (
                   <>
                     <rect
+                      transform={shapeTransform(o)}
                       x={o.x}
                       y={o.y}
                       width={o.width}
@@ -186,12 +194,13 @@ export function SelectionLayer({
                         name={`rect${corner}`}
                         zoom={zoom}
                         square
-                        p={{
+                        p={shapePoint(o, {
                           x: o.x + (corner.endsWith('E') ? o.width : 0),
                           y: o.y + (corner.startsWith('S') ? o.height : 0),
-                        }}
+                        })}
                       />
                     ))}
+                    {o.kind === 'rectangle' && !o.frame && <Handle p={shapePoint(o, { x: shapeCenter(o).x, y: o.y-28/zoom })} name="shapeRotate" zoom={zoom} />}
                   </>
                 )}
                 {(o.kind === 'arrow' || o.kind === 'brace') && (

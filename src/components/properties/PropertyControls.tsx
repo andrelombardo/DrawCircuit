@@ -15,6 +15,7 @@ function DraftInput({
   max = MAX_COORDINATE,
   unit,
   onCommit,
+  disabled,
 }: {
   value: string | number | undefined;
   label: string;
@@ -24,6 +25,7 @@ function DraftInput({
   max?: number;
   unit?: string;
   onCommit: (value: string) => void;
+  disabled?: boolean;
 }) {
   const [draft, setDraft] = useState(value === undefined ? '' : String(value));
   const cancelled = useRef(false);
@@ -56,6 +58,7 @@ function DraftInput({
       max={max}
       maxLength={numeric ? undefined : MAX_TEXT_LENGTH}
       value={draft}
+      disabled={disabled}
       aria-label={label}
       aria-valuetext={
         numeric ? (value === undefined ? t('Mixed values') : `${value}${unit ?? ''}`) : undefined
@@ -88,15 +91,17 @@ export function PropertyRow({
   secondary,
   htmlFor,
   secondaryCaption,
+  embedded = false,
 }: {
   caption: ReactNode;
   children: ReactNode;
   secondary?: ReactNode;
   htmlFor?: string;
   secondaryCaption?: ReactNode;
+  embedded?: boolean;
 }) {
   return (
-    <div className={`property-row${secondary ? ' property-row-secondary' : ''}`}>
+    <div className={`property-row${secondary ? ' property-row-secondary' : ''}${embedded ? ' property-row-embedded' : ''}`}>
       <label className="inspector-field-caption" htmlFor={htmlFor}>
         {caption}
       </label>
@@ -110,10 +115,11 @@ export function PropertyRow({
     </div>
   );
 }
-export function PropertyField(props: Parameters<typeof DraftInput>[0] & { caption?: ReactNode }) {
+export function PropertyField(props: Parameters<typeof DraftInput>[0] & { caption?: ReactNode; embedded?: boolean; icon?: ReactNode }) {
   const id = useId();
   const field = (
     <span className="inspector-input">
+      {props.icon && <span className="inspector-input-icon" aria-hidden="true">{props.icon}</span>}
       <DraftInput key={`${props.label}:${props.value}`} {...props} id={id} />
       {props.unit && (
         <span className="inspector-unit" aria-hidden="true">
@@ -126,7 +132,7 @@ export function PropertyField(props: Parameters<typeof DraftInput>[0] & { captio
   return props.caption === '' ? (
     field
   ) : (
-    <PropertyRow caption={props.caption ?? props.label} htmlFor={id}>
+    <PropertyRow caption={props.caption ?? props.label} htmlFor={id} embedded={props.embedded}>
       {field}
     </PropertyRow>
   );
@@ -138,6 +144,7 @@ export function PropertySelect({
   children,
   onChange,
   numeric,
+  embedded = false,
 }: {
   label: string;
   caption?: ReactNode;
@@ -145,6 +152,7 @@ export function PropertySelect({
   children: ReactNode;
   onChange: (value: string) => void;
   numeric?: NumericLimits;
+  embedded?: boolean;
 }) {
   const id = useId();
   const options = Children.toArray(children).flatMap((child) => {
@@ -168,7 +176,7 @@ export function PropertySelect({
   const description = selected?.label ?? t('Mixed values');
   if (numeric)
     return (
-      <PropertyRow caption={caption ?? label} htmlFor={id}>
+      <PropertyRow caption={caption ?? label} htmlFor={id} embedded={embedded}>
         <NumericCombobox
           id={id}
           label={label}
@@ -180,7 +188,7 @@ export function PropertySelect({
       </PropertyRow>
     );
   return (
-    <PropertyRow caption={caption ?? label} htmlFor={id}>
+    <PropertyRow caption={caption ?? label} htmlFor={id} embedded={embedded}>
       <ActionMenu
         triggerId={id}
         label={label}
@@ -206,10 +214,20 @@ export function PropertySelect({
     </PropertyRow>
   );
 }
-export function InspectorSection({ title, children }: { title: string; children: ReactNode }) {
+export function InspectorSection({
+  title,
+  children,
+  className = '',
+  actions,
+}: {
+  title: string;
+  children: ReactNode;
+  className?: string;
+  actions?: ReactNode;
+}) {
   return (
-    <section className="inspector-section" aria-label={title}>
-      <h3>{title}</h3>
+    <section className={`inspector-section${className ? ` ${className}` : ''}`} aria-label={title}>
+      <div className="inspector-section-heading"><h3>{title}</h3>{actions && <div className="inspector-section-actions">{actions}</div>}</div>
       {children}
     </section>
   );

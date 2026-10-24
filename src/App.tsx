@@ -1,4 +1,4 @@
-import { t, useLanguage } from './i18n';
+import { t } from './i18n';
 import { useCallback, useEffect, useState } from 'react';
 import { SelectionActions } from './components/properties/SelectionActions';
 import { X } from 'lucide-react';
@@ -9,13 +9,9 @@ import { HelpDialog } from './components/toolbar/HelpDialog';
 import { useEditorStore } from './store/editorStore';
 import { useInspectorPreferences } from './components/properties/useInspectorPreferences';
 export default function App() {
-  const language = useLanguage((state) => state.language);
-  useEffect(() => {
-    document.documentElement.lang = language;
-  }, [language]);
   const sidebar = useSidebarPreferences();
   const inspector = useInspectorPreferences();
-  const [compact, setCompact] = useState(() => window.matchMedia('(max-width: 600px)').matches);
+  const [compact, setCompact] = useState(() => window.matchMedia('(max-width: 800px)').matches);
   const [mobilePanel, setMobilePanel] = useState<'library' | 'inspector' | null>(null);
   const setInspectorPreferences = inspector.setPreferences;
   const toggleDesktopLibrary = sidebar.toggleSidebar;
@@ -34,7 +30,7 @@ export default function App() {
   const libraryVisible = compact ? mobilePanel === 'library' : sidebar.preferences.visible;
   const inspectorVisible = compact ? mobilePanel === 'inspector' : inspector.preferences.visible;
   useEffect(() => {
-    const media = window.matchMedia('(max-width: 600px)');
+    const media = window.matchMedia('(max-width: 800px)');
     const change = () => {
       setCompact(media.matches);
       setMobilePanel(null);

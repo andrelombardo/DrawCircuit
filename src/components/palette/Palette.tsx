@@ -23,27 +23,8 @@ export function Palette({ onHide }: { onHide: () => void }) {
   return (
     <aside className="palette" aria-label={t('Component library')}>
       <div className="palette-heading">
-        <span>{t('Components')}</span>
+        <h2>{t('Components')}</h2>
         <SidebarToggle side="left" visible onToggle={onHide} />
-      </div>
-      <div className="search-field">
-        <Search size={15} />
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={t('Search components…')}
-          aria-label={t('Search components')}
-          title={t('Search components and blocks')}
-        />
-        {search && (
-          <button
-            aria-label={t('Clear search')}
-            title={t('Clear search')}
-            onClick={() => setSearch('')}
-          >
-            <X size={14} />
-          </button>
-        )}
       </div>
       <div className="palette-scroll">
         <section className="preset-section" aria-label={t('Quick blocks')}>
@@ -166,6 +147,25 @@ export function Palette({ onHide }: { onHide: () => void }) {
           !personalBlocks.some((b) =>
             b.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()),
           ) && <p className="no-results">{t('No components or blocks found.')}</p>}
+      </div>
+      <div className="search-field">
+        <Search size={15} />
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={t('Search components…')}
+          aria-label={t('Search components')}
+          title={t('Search components and blocks')}
+        />
+        {search && (
+          <button
+            aria-label={t('Clear search')}
+            title={t('Clear search')}
+            onClick={() => setSearch('')}
+          >
+            <X size={14} />
+          </button>
+        )}
       </div>
     </aside>
   );

@@ -46,6 +46,9 @@ export function HelpDialog({ onClose }: { onClose: () => void }) {
           </p>
         </div>
         <p className="help-note">
+          {t('From Drawing and annotations, choose Diagrams for editable Cartesian axes or a Gauss plane. The Angle tool uses three clicks: vertex, first ray and radius, then second ray. Adjust degrees, radius and label in Properties. Decorative lines attach to the center or outline of circles and rectangles and follow them when moved.')}
+        </p>
+        <p className="help-note">
           {t(
             'Use Highlight eraser beside Highlighter to remove highlights only. Click to delete the topmost stroke or drag to erase part of every stroke you cross. Adjust its diameter in Properties; the outline shows the affected area in canvas units. Each drag is one undo step; Esc cancels an unfinished gesture and returns to Select.',
           )}

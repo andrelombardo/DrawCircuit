@@ -1,4 +1,6 @@
 import { t } from '../i18n';
+import { reconcileFrames } from '../utils/frames';
+import { mirrorShapes } from '../utils/shapes';
 import { DEFAULT_HIGHLIGHT, reconcileHighlights } from '../annotations/highlight';
 import type { HighlightSettings } from '../model/types';
 import { usePersonalBlocks, instantiatePersonalBlock } from '../personalBlocks/library';
@@ -89,7 +91,7 @@ interface EditorState {
   setActiveLabel: (id: string | null) => void;
   setArrowType: (type: ArrowAnnotation['type']) => void;
   toggleGrid: () => void;
-  commit: (doc: CircuitDocument) => boolean;
+  commit: (doc: CircuitDocument, options?: { preserveFrameChildren?: boolean }) => boolean;
   add: (objects: CircuitObject[]) => void;
   updateSelection: (fn: (o: CircuitObject) => CircuitObject) => void;
   updateObjects: (ids: readonly string[], fn: (o: CircuitObject) => CircuitObject) => void;
@@ -186,11 +188,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   setActiveLabel: (activeLabel) => set({ activeLabel }),
   setArrowType: (arrowType) => set({ arrowType }),
   toggleGrid: () => set((s) => ({ grid: !s.grid })),
-  commit: (document) => {
+  commit: (document, options) => {
     const s = get();
     const next = reconcileHighlights(
       s.gestureStart ?? s.document,
-      reconcileCurrentSegments(s.gestureStart ?? s.document, document),
+      reconcileCurrentSegments(s.gestureStart ?? s.document, reconcileFrames(s.document, document, options?.preserveFrameChildren)),
     );
     if (!canCommit(next)) {
       s.cancelGesture();
@@ -290,7 +292,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set((s) => ({
       document: reconcileHighlights(
         s.gestureStart ?? s.document,
-        reconcileCurrentSegments(s.gestureStart ?? s.document, document),
+        reconcileCurrentSegments(s.gestureStart ?? s.document, reconcileFrames(s.document, document)),
       ),
     })),
   endGesture: () => {
@@ -383,7 +385,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   },
   mirror: (axis) => {
     const s = get();
-    s.commit(mirrorArrows(s.document, s.selection, axis));
+    s.commit(mirrorShapes(mirrorArrows(s.document, s.selection, axis), s.selection, axis));
   },
   rotate: () => {
     const s = get();
@@ -402,7 +404,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   notify: (notice) => set({ notice }),
 }));
 let saveTimer: ReturnType<typeof setTimeout> | undefined;
-useEditorStore.subscribe((state, previous) => {
+const unsubscribePersistence = useEditorStore.subscribe((state, previous) => {
   // A preview may stay open indefinitely; keep saving the last committed document.
   if (
     (state.gestureStart ?? state.document) === (previous.gestureStart ?? previous.document) &&
@@ -443,3 +445,12 @@ if (typeof window !== 'undefined') {
   window.addEventListener('pagehide', saveOnExit);
   window.addEventListener('beforeunload', saveOnExit);
 }
+if (import.meta.hot) import.meta.hot.dispose(() => {
+  clearTimeout(saveTimer);
+  try { documentStorage.save(useEditorStore.getState().gestureStart ?? useEditorStore.getState().document); } catch { /* Preserve the previous saved document when storage is unavailable. */ }
+  unsubscribePersistence();
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('pagehide', saveOnExit);
+    window.removeEventListener('beforeunload', saveOnExit);
+  }
+});

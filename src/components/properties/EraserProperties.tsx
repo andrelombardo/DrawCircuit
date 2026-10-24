@@ -1,4 +1,3 @@
-import { Eraser } from 'lucide-react';
 import { t } from '../../i18n';
 import { useEditorStore } from '../../store/editorStore';
 import { InspectorSection } from './PropertyControls';
@@ -7,16 +6,8 @@ export function EraserProperties() {
   const size = useEditorStore((s) => s.eraserSize);
   return (
     <div className="inspector-properties">
-      <div className="inspector-selection">
-        <span className="inspector-object-icon">
-          <Eraser size={16} />
-        </span>
-        <div className="inspector-type">
-          <span>{t('Highlight eraser')}</span>
-          <small>{t('Only affects highlights')}</small>
-        </div>
-      </div>
-      <p className="inspector-geometry-note">
+      <p className="inspector-context-note">{t('Only affects highlights')}</p>
+      <p className="inspector-context-note">
         {t(
           'Click to delete a whole stroke. Drag to erase only the area you cross. Each gesture is one undo step.',
         )}

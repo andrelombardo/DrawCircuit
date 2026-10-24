@@ -1,3 +1,7 @@
+import { angleGeometry } from '../annotations/angle';
+import { shapePath } from '../utils/shapes';
+import { linePath } from '../utils/geometry';
+import { lineArrowHeadPath } from '../tikz/arrowheads';
 import { memo, useMemo } from 'react';
 import { Symbol } from '../circuit/components/Symbol';
 import { documentBounds, pointsPath, wirePoints } from '../utils/geometry';
@@ -39,7 +43,8 @@ export const PresetThumbnail = memo(function PresetThumbnail({
       },
       components: doc.objects.flatMap((o) => (o.kind === 'component' ? [o] : [])),
       paths: doc.objects.flatMap((o) =>
-        o.kind === 'wire' ? [pointsPath(wirePoints(o, doc))] : [],
+        o.kind === 'wire' ? [pointsPath(wirePoints(o, doc))] : o.kind === 'line' ? [linePath(o, doc), lineArrowHeadPath(o, doc)] :
+          o.kind === 'circle' || o.kind === 'rectangle' ? [shapePath(o)] : o.kind === 'angle' ? [angleGeometry(o).d] : [],
       ),
       nodes: doc.objects.flatMap((o) => (o.kind === 'junction' ? [o] : [])),
     };

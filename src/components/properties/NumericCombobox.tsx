@@ -215,6 +215,7 @@ export function NumericCombobox({
             role="listbox"
             aria-label={label}
             className="action-menu-panel action-menu-options numeric-combobox-options"
+            data-inspector
           >
             {choices.map((option, index) => (
               <div
@@ -228,10 +229,8 @@ export function NumericCombobox({
                 onPointerMove={() => setActive(index)}
                 onClick={() => choose(option.value)}
               >
+                <span className="action-menu-icon">{option.value === value && <Check size={13} aria-hidden="true" />}</span>
                 <span className="action-menu-label">{option.label}</span>
-                {option.value === value && (
-                  <Check size={14} className="action-menu-check" aria-hidden="true" />
-                )}
               </div>
             ))}
           </div>,

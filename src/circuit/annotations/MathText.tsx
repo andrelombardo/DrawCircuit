@@ -1,4 +1,4 @@
-import { t, useLanguage } from '../../i18n';
+import { t } from '../../i18n';
 import { memo, useLayoutEffect, useRef, useState } from 'react';
 import { CIRCUIT_FONT } from '../../model/fonts';
 import type { Rotation } from '../../model/types';
@@ -28,7 +28,6 @@ export const MathText = memo(function MathText({
   labelId?: string;
   selected?: boolean;
 }) {
-  useLanguage((state) => state.language);
   const result = renderLatex(text);
   const content = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 1, height: 1 });

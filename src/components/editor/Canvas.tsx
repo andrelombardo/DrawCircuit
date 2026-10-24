@@ -1,3 +1,4 @@
+import { AngleView } from '../../circuit/annotations/AngleView';
 import { linePreviewPath } from '../../utils/lines';
 import { t } from '../../i18n';
 import { GraphicView } from '../../circuit/annotations/GraphicView';
@@ -8,7 +9,8 @@ import { SelectionActions } from '../properties/SelectionActions';
 import { ActionMenu } from '../toolbar/ActionMenu';
 import { useEditActions } from '../toolbar/useEditActions';
 import { useEffect, useRef, useState } from 'react';
-import { CircleAlert, Grid2X2, HelpCircle, Magnet, Maximize, Minus, Plus } from 'lucide-react';
+import type { CSSProperties } from 'react';
+import { CircleAlert, Grid2X2, Magnet, Maximize, Minus, Plus } from 'lucide-react';
 import { useEditorStore } from '../../store/editorStore';
 import { catalog } from '../../model/catalog';
 import { componentTypes, GRID } from '../../model/types';
@@ -26,7 +28,7 @@ import { SidebarToggle } from '../toolbar/SidebarToggle';
 import { useCanvasInteractions } from './useCanvasInteractions';
 import { PropertiesInspector } from '../properties/PropertiesInspector';
 import { useInspectorPreferences } from '../properties/useInspectorPreferences';
-import { LanguageSwitcher } from '../toolbar/LanguageSwitcher';
+import { WorkspaceUtilities } from '../toolbar/WorkspaceUtilities';
 import { IconButton } from '../toolbar/IconButton';
 import logoUrl from '../../../assets/brand/drawcircuit-logo.svg?url';
 import { LoopArrowView } from '../../circuit/annotations/LoopArrowView';
@@ -101,6 +103,7 @@ function CanvasContent({
   const smart = interactions.smart;
   const terminalsNeeded =
     tool === 'wire' ||
+    tool === 'angle' ||
     tool === 'line' ||
     tool === 'junction' ||
     tool === 'voltage' ||
@@ -130,7 +133,10 @@ function CanvasContent({
       : pointsPath(wirePoints(wirePreview(draft, candidate, doc), doc));
   }
   const hint =
-    tool === 'highlight-eraser'
+    tool === 'angle'
+      ? t(interactions.angleStep === 0 ? 'Click the angle vertex · Esc cancels' : interactions.angleStep === 1
+        ? 'Click the first ray to set the radius · Alt bypasses snap' : 'Click the second ray · angles run counterclockwise · Alt bypasses snap')
+      : tool === 'highlight-eraser'
       ? t('Click a highlight to delete it · drag to erase part · Esc returns to Select')
       : tool === 'highlight'
         ? t('Drag to highlight all or part of wires and components · Esc returns to Select')
@@ -182,9 +188,12 @@ function CanvasContent({
                                       ? t('Drag to pan the view')
                                       : null;
   return (
-    <div className="editor-shell">
+    <div
+      className="editor-shell"
+      style={{ '--inspector-width': `${inspector.preferences.width}px` } as CSSProperties}
+    >
       <main className="editor" aria-label={t('Circuit editor')}>
-        <DrawingToolbar sidebarVisible={sidebarVisible} />
+        <DrawingToolbar sidebarVisible={sidebarVisible} inspectorVisible={inspector.preferences.visible} />
         {!sidebarVisible && (
           <SidebarToggle side="left" visible={false} onToggle={onToggleSidebar} />
         )}
@@ -262,7 +271,17 @@ function CanvasContent({
             terminalProximity.move(event);
             interactions.pointerMove(event);
           }}
-          onPointerUp={interactions.pointerUp}
+          onPointerUp={(event) => {
+            interactions.pointerUp(event);
+            if (
+              !inspector.preferences.visible &&
+              event.button === 0 &&
+              !interactions.space &&
+              useEditorStore.getState().tool === 'select' &&
+              useEditorStore.getState().selection.length &&
+              window.matchMedia('(min-width: 801px)').matches
+            ) onShowInspector();
+          }}
           onPointerCancel={interactions.cancel}
           onLostPointerCapture={interactions.lostCapture}
           onDoubleClick={interactions.doubleClick}
@@ -301,7 +320,7 @@ function CanvasContent({
               x={(v.x % gridSize) - gridSize / 2}
               y={(v.y % gridSize) - gridSize / 2}
             >
-              <circle cx={gridSize / 2} cy={gridSize / 2} r={0.7} fill="#dce2e8" />
+              <circle cx={gridSize / 2} cy={gridSize / 2} r={0.7} fill="#ceced2" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill={grid ? 'url(#grid)' : 'transparent'} />
@@ -358,9 +377,9 @@ function CanvasContent({
               {overlay.box && (
                 <rect
                   {...overlay.box}
-                  fill="#2463e8"
+                  fill="var(--ui-accent)"
                   fillOpacity={0.05}
-                  stroke="#2463e8"
+                  stroke="var(--ui-accent)"
                   strokeWidth={1 / v.zoom}
                 />
               )}
@@ -368,14 +387,14 @@ function CanvasContent({
                 <path
                   d={previewPath}
                   fill="none"
-                  stroke="#5681d0"
+                  stroke="var(--ui-accent)"
                   strokeWidth={2}
                   strokeDasharray="5 4"
                 />
               )}
               {draft &&
                 draft.vertices.map((p, i) => (
-                  <circle key={i} cx={p.x} cy={p.y} r={3} fill="#2463e8" />
+                  <circle key={i} cx={p.x} cy={p.y} r={3} fill="var(--ui-accent)" />
                 ))}
               {overlay.target && (
                 <>
@@ -389,7 +408,7 @@ function CanvasContent({
                     cx={overlay.target.x}
                     cy={overlay.target.y}
                     r={3 / v.zoom}
-                    fill="#2463e8"
+                    fill="var(--ui-accent)"
                   />
                 </>
               )}
@@ -398,6 +417,8 @@ function CanvasContent({
                 overlay.arrow.kind === 'circle' ||
                 overlay.arrow.kind === 'line' ? (
                   <GraphicView object={overlay.arrow} doc={doc} />
+                ) : overlay.arrow.kind === 'angle' ? (
+                  <AngleView object={overlay.arrow} zoom={v.zoom} />
                 ) : overlay.arrow.kind === 'brace' ? (
                   <BraceView object={overlay.arrow} zoom={v.zoom} />
                 ) : overlay.arrow.kind === 'electrical' ? (
@@ -420,6 +441,7 @@ function CanvasContent({
               doc={doc}
               componentId={overlay.componentTarget}
               wireId={overlay.wireTarget}
+              shapeId={overlay.connection?.kind === 'shape' && overlay.connection.endpoint.kind === 'shape' ? overlay.connection.endpoint.shapeId : null}
               firstPoint={tool === 'voltage' ? interactions.voltageStart : null}
               zoom={v.zoom}
             />
@@ -526,12 +548,9 @@ function CanvasContent({
             </div>
           )}
         </div>
-        <LanguageSwitcher />
-        <IconButton label={t('Help')} className="help-control floating-surface" onClick={onHelp}>
-          <HelpCircle size={18} />
-        </IconButton>
+        {!inspector.preferences.visible && <WorkspaceUtilities onHelp={onHelp} />}
       </main>
-      <PropertiesInspector {...inspector} />
+      <PropertiesInspector {...inspector} footer={<WorkspaceUtilities onHelp={onHelp} />} />
     </div>
   );
 }

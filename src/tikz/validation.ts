@@ -1,4 +1,5 @@
 import { componentRegistry } from '../model/catalog';
+import { validObjectAppearance, validShapeAppearance } from '../model/shapeAppearance';
 import { MAX_TEXT_LENGTH } from '../model/limits';
 import type { CircuitObject, Endpoint, Point } from '../model/types';
 import { isRotation } from '../model/types';
@@ -26,7 +27,7 @@ export function normalizeHex(color: string): string | null {
 }
 
 const endpoint = (e: Endpoint) =>
-  e?.kind === 'free'
+  e?.kind === 'shape' ? typeof e.shapeId === 'string' && finitePoint(e.anchor) && e.anchor.x>=0 && e.anchor.x<=1 && e.anchor.y>=0 && e.anchor.y<=1 : e?.kind === 'free'
     ? finitePoint(e.point) &&
       (e.connectionId === undefined ||
         (typeof e.connectionId === 'string' &&
@@ -38,6 +39,7 @@ const endpoint = (e: Endpoint) =>
 
 export function isExportableObject(o: CircuitObject): boolean {
   if (!o || typeof o.id !== 'string' || !o.id || !normalizeHex(o.color)) return false;
+  if (!validObjectAppearance(o as unknown as Record<string, unknown>)) return false;
   if (!opacity(o.opacity) || ('label' in o && o.label && !opacity(o.label.opacity))) return false;
   if (
     (o.kind === 'arrow' || o.kind === 'loop-arrow') &&
@@ -51,6 +53,7 @@ export function isExportableObject(o: CircuitObject): boolean {
         !Object.hasOwn(componentRegistry, o.type) ||
         !finitePoint(o) ||
         !rotation(o.rotation) ||
+        (o.scale !== undefined && (!positive(o.scale) || o.scale > 100)) ||
         !positive(o.width) ||
         (o.bodyText !== undefined && typeof o.bodyText !== 'string') ||
         !Array.isArray(o.terminals)
@@ -70,6 +73,11 @@ export function isExportableObject(o: CircuitObject): boolean {
         })
       );
     }
+    case 'angle':
+      return validStroke(o) && finitePoint(o) && positive(o.radius) && Number.isFinite(o.startAngle) && Number.isFinite(o.sweepAngle) &&
+        Math.abs(o.sweepAngle) <= 360 && o.sweepAngle !== 0 && typeof o.showRays === 'boolean' && positive(o.width) &&
+        !!o.label && typeof o.label.text === 'string' && finitePoint(o.label.offset) && !!normalizeHex(o.label.color) &&
+        positive(o.label.fontSize) && rotation(o.label.rotation);
     case 'brace':
       return (
         ['brace', 'bracket'].includes(o.type) &&
@@ -168,7 +176,7 @@ export function isExportableObject(o: CircuitObject): boolean {
               ))
       );
     case 'junction':
-      return finitePoint(o);
+      return finitePoint(o) && (o.radius === undefined || (positive(o.radius) && o.radius <= 1000));
     case 'text':
       return (
         finitePoint(o) &&
@@ -187,7 +195,7 @@ export function isExportableObject(o: CircuitObject): boolean {
         positive(o.strokeWidth) &&
         (o.fill === 'none' || !!normalizeHex(o.fill)) &&
         opacity(o.fillOpacity) &&
-        validStroke(o)
+        validStroke(o) && validShapeAppearance(o as unknown as Record<string, unknown>)
       );
     case 'line':
       return finitePoint(o.start) && finitePoint(o.end) && positive(o.width) && validStroke(o) &&

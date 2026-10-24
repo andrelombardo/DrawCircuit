@@ -1,5 +1,7 @@
 import { t } from '../../i18n';
 import {
+  DraftingCompass,
+  Axis3D,
   ArrowRight,
   CircleDot,
   Circle,
@@ -31,14 +33,14 @@ import {
   VoltageIcon,
 } from './DrawingIcons';
 
-export function DrawingToolbar({ sidebarVisible = true }: { sidebarVisible?: boolean }) {
+export function DrawingToolbar({ sidebarVisible = true, inspectorVisible = true }: { sidebarVisible?: boolean; inspectorVisible?: boolean }) {
   const {
     ref: toolbarRef,
     style,
     dragging,
     menuAbove,
     handle,
-  } = useFloatingToolbar(sidebarVisible);
+  } = useFloatingToolbar(sidebarVisible, inspectorVisible);
   const tool = useEditorStore((s) => s.tool),
     setTool = useEditorStore((s) => s.setTool),
     gestureStart = useEditorStore((s) => s.gestureStart),
@@ -53,6 +55,7 @@ export function DrawingToolbar({ sidebarVisible = true }: { sidebarVisible?: boo
     'rectangle',
     'circle',
     'line',
+    'angle',
     'junction',
     'arrow',
     'loop-arrow',
@@ -63,6 +66,11 @@ export function DrawingToolbar({ sidebarVisible = true }: { sidebarVisible?: boo
     'current',
   ];
   const items: MenuAction[] = [
+    { id: 'diagrams', label: t('Diagrams'), icon: <Axis3D size={18} />, children: [
+      { id: 'cartesian-axes', label: t('Cartesian axes'), onSelect: () => useEditorStore.getState().selectPreset('cartesian-axes') },
+      { id: 'gauss-plane', label: t('Gauss plane'), onSelect: () => useEditorStore.getState().selectPreset('gauss-plane') },
+    ] },
+    { id: 'angle', label: t('Angle'), icon: <DraftingCompass size={18} />, onSelect: () => setTool('angle') },
     {
       id: 'wire',
       label: t('Wire'),
@@ -170,56 +178,60 @@ export function DrawingToolbar({ sidebarVisible = true }: { sidebarVisible?: boo
       data-menu-above={menuAbove || undefined}
       onPointerDown={(event) => event.stopPropagation()}
     >
-      <button
-        type="button"
-        className="toolbar-grip"
-        aria-label={t('Move toolbar')}
-        title={t('Drag to move the tools')}
-        data-tooltip={t('Move toolbar')}
-        {...handle}
-      >
-        <GripVertical size={16} />
-      </button>
-      <IconButton
-        label={t('Select (V)')}
-        active={tool === 'select'}
-        onClick={() => setTool('select')}
-      >
-        <MousePointer2 size={18} />
-      </IconButton>
-      <IconButton label={t('Text')} active={tool === 'text'} onClick={() => setTool('text')}>
-        <Type size={19} />
-      </IconButton>
-      <ActionMenu
-        label={t('Drawing and annotations')}
-        icon={items.find((item) => item.id === tool)?.icon ?? <Pencil size={18} />}
-        items={items}
-        active={drawingTools.includes(tool)}
-        onEscape={() => setTool('select')}
-      />
-      <div className="toolbar-divider" />
-      <IconButton
-        label={`${t('Undo')} (${shortcut('Z')})`}
-        disabled={!past.length && !gestureStart}
-        onClick={undo}
-      >
-        <Undo2 size={18} />
-      </IconButton>
-      <IconButton
-        label={`${t('Redo')} (${shortcut('Z', true)})`}
-        disabled={!future.length}
-        onClick={redo}
-      >
-        <Redo2 size={18} />
-      </IconButton>
-      <div className="toolbar-divider" />
-      <IconButton
-        label={t('Pan view (H or Space)')}
-        active={tool === 'pan'}
-        onClick={() => setTool('pan')}
-      >
-        <Hand size={18} />
-      </IconButton>
+      <div className="tool-group">
+        <button
+          type="button"
+          className="toolbar-grip"
+          aria-label={t('Move toolbar')}
+          title={t('Drag to move the tools')}
+          data-tooltip={t('Move toolbar')}
+          {...handle}
+        >
+          <GripVertical size={16} />
+        </button>
+        <IconButton
+          label={t('Select (V)')}
+          active={tool === 'select'}
+          onClick={() => setTool('select')}
+        >
+          <MousePointer2 size={18} />
+        </IconButton>
+        <IconButton label={t('Text')} active={tool === 'text'} onClick={() => setTool('text')}>
+          <Type size={19} />
+        </IconButton>
+        <ActionMenu
+          label={t('Drawing and annotations')}
+          icon={items.find((item) => item.id === tool)?.icon ?? <Pencil size={18} />}
+          items={items}
+          active={drawingTools.includes(tool)}
+          onEscape={() => setTool('select')}
+        />
+      </div>
+      <div className="tool-group">
+        <IconButton
+          label={`${t('Undo')} (${shortcut('Z')})`}
+          disabled={!past.length && !gestureStart}
+          onClick={undo}
+        >
+          <Undo2 size={18} />
+        </IconButton>
+        <IconButton
+          label={`${t('Redo')} (${shortcut('Z', true)})`}
+          disabled={!future.length}
+          onClick={redo}
+        >
+          <Redo2 size={18} />
+        </IconButton>
+      </div>
+      <div className="tool-group">
+        <IconButton
+          label={t('Pan view (H or Space)')}
+          active={tool === 'pan'}
+          onClick={() => setTool('pan')}
+        >
+          <Hand size={18} />
+        </IconButton>
+      </div>
     </div>
   );
 }

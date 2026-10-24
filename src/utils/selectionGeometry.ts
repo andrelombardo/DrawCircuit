@@ -1,4 +1,5 @@
 import { t } from '../i18n';
+import { parentFrame } from '../model/shapeAppearance';
 import type { CircuitDocument, CircuitObject, Point } from '../model/types';
 import { measurementBounds } from './measurementGeometry';
 import { unionBounds } from './visualBounds';
@@ -16,9 +17,14 @@ export function objectCenter(o: CircuitObject, doc: CircuitDocument): Point {
  * in the same layout command would move a route/offset a second time. */
 export function layoutTargets(doc: CircuitDocument, ids: string[]) {
   const selected = new Set(ids);
+  const ancestorSelected = (id: string) => {
+    let parent = parentFrame(doc, id);
+    while (parent) { if (selected.has(parent.id)) return true; parent = parentFrame(doc, parent.id); }
+    return false;
+  };
   return doc.objects.filter(
     (o) =>
-      selected.has(o.id) &&
+      selected.has(o.id) && !ancestorSelected(o.id) &&
       !(
         o.kind === 'wire' &&
         (!isLooseEndpoint(o.startEndpoint, doc) || !isLooseEndpoint(o.endEndpoint, doc))

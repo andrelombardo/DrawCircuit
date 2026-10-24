@@ -40,7 +40,7 @@ const alignments = [
   ['y', 'end', 'Bottom', 'Align bottom', AlignVerticalJustifyEnd],
 ] as const;
 
-export function SelectionGeometry({ objects }: { objects: CircuitObject[] }) {
+export function SelectionGeometry({ objects, showAlignment = true }: { objects: CircuitObject[]; showAlignment?: boolean }) {
   const document = useEditorStore((s) => s.document);
   const [distribution, setDistribution] = useState<DistributionMode>('centers');
   const [spacingMode, setSpacingMode] = useState<DistributionMode>('centers');
@@ -82,7 +82,7 @@ export function SelectionGeometry({ objects }: { objects: CircuitObject[] }) {
               )}
         </p>
       )}
-      <div className="inspector-geometry-group" role="group" aria-label={t('Alignment')}>
+      {showAlignment && <div className="inspector-geometry-group" role="group" aria-label={t('Alignment')}>
         <h4>{t('Alignment')}</h4>
         {axes.map(({ axis, name }) => (
           <div className="inspector-axis-group" key={axis}>
@@ -110,7 +110,7 @@ export function SelectionGeometry({ objects }: { objects: CircuitObject[] }) {
             </div>
           </div>
         ))}
-      </div>
+      </div>}
       <div className="inspector-geometry-group" role="group" aria-label={t('Distribution')}>
         <h4>{t('Distribution')}</h4>
         <PropertySelect

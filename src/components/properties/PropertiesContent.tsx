@@ -5,52 +5,30 @@ import { HighlightProperties } from './HighlightProperties';
 import { commonValue } from './commonValue';
 import { fixedWireConnection, linePoints } from '../../utils/geometry';
 import { useShallow } from 'zustand/react/shallow';
-import {
-  RotateCw,
-  ArrowLeftRight,
-  FlipHorizontal,
-  FlipVertical,
-  Square,
-  Spline,
-  CircleDot,
-  Circle,
-  Type,
-  Layers,
-  ArrowRight,
-  Braces,
-} from 'lucide-react';
+import { RotateCw, ArrowLeftRight, FlipHorizontal, FlipVertical } from 'lucide-react';
+import { parentFrame } from '../../model/shapeAppearance';
+import { ObjectStyleSection } from './ObjectStyleSection';
+import { ShapeCorners } from './ShapeAppearance';
+import { ObjectPaintSection } from './PaintSections';
+import { FrameContents, FramePosition, FrameSettings, FrameSizing } from './FrameProperties';
+import { SelectionSizeFields } from './ScaleSelection';
 import { useEditorStore } from '../../store/editorStore';
 import { componentRegistry } from '../../model/catalog';
 import { ROTATIONS } from '../../model/types';
 import { MAX_COORDINATE } from '../../model/limits';
-import type { CircuitObject, Rotation, WireRouting, LineStyle } from '../../model/types';
+import type { CircuitObject, WireRouting, LineStyle } from '../../model/types';
 import { unionBounds } from '../../utils/visualBounds';
 import { measurementBounds } from '../../utils/measurementGeometry';
 import { objectCenter } from '../../utils/selectionGeometry';
 import type { Axis } from '../../utils/selectionGeometry';
 import { arrowOrientation, rotateArrow } from '../../utils/arrows';
 import { inlineTextTarget, replaceInlineText } from '../../utils/labels';
-import { SelectionStyle } from './SelectionStyle';
+import { LabelAppearance, SelectionStyle, SelectionTypography } from './SelectionStyle';
 import { rotateObjects } from '../../utils/operations';
-import { ElectricalProperties } from './ElectricalProperties';
+import { AnnotationReverseAction, ElectricalProperties } from './ElectricalProperties';
 import { SelectionGeometry } from './SelectionGeometry';
-import { ComponentPreview } from '../palette/ComponentPreview';
 import { reverseLoop } from '../../utils/loops';
-import { InspectorSection, PropertyField, PropertySelect, PropertyRow } from './PropertyControls';
-const names: Record<CircuitObject['kind'], string> = {
-  component: 'Component',
-  junction: 'Junction',
-  wire: 'Electrical wire',
-  text: 'Text',
-  arrow: 'Arrow',
-  'loop-arrow': 'Loop',
-  electrical: 'Electrical annotation',
-  brace: 'Brace / Bracket',
-  rectangle: 'Rectangle',
-  circle: 'Circle',
-  line: 'Decorative line',
-  highlight: 'Highlight',
-};
+import { InspectorDisclosure, InspectorSection, PropertyField, PropertySelect, PropertyRow } from './PropertyControls';
 export function PropertiesContent() {
   // Local input drafts live in the fields. Unrelated object edits preserve this selector's result.
   const objects = useEditorStore(
@@ -65,6 +43,11 @@ export function PropertiesContent() {
   const apply = (fn: (o: CircuitObject) => CircuitObject) => state().updateSelection(fn);
   const doc = state().document;
   const o = objects.length === 1 ? objects[0] : null;
+  const parent = o && !activeLabel ? parentFrame(doc, o.id) : undefined;
+  const shapes = objects.filter((o) => o.kind === 'rectangle' || o.kind === 'circle');
+  const shapeSelection = !!shapes.length && shapes.length === objects.length;
+  const fillSelection = objects.every((o) => ['rectangle', 'circle', 'text', 'junction'].includes(o.kind));
+  const strokeSelection = objects.every((o) => o.kind !== 'text' && o.kind !== 'junction');
   const bounds = unionBounds(objects.map((o) => measurementBounds(o, doc)));
   const labelTarget = activeLabel && o ? inlineTextTarget(o, doc) : null;
   const position = (axis: Axis) =>
@@ -77,7 +60,7 @@ export function PropertiesContent() {
         : bounds[axis];
   const rotatables = objects.filter(
     (o) =>
-      o.kind === 'component' || o.kind === 'text' || o.kind === 'arrow' || o.kind === 'loop-arrow',
+      o.kind === 'component' || o.kind === 'text' || o.kind === 'arrow' || o.kind === 'loop-arrow' || (o.kind === 'rectangle' && !o.frame),
   );
   const rotation =
     labelTarget && o && 'label' in o
@@ -95,7 +78,7 @@ export function PropertiesContent() {
   const selectedIds = new Set(objects.map((object) => object.id));
   const hasComponent = objects.some((object) => object.kind === 'component');
   const groupRotation =
-    objects.every(
+    !objects.some((object) => object.kind === 'rectangle' && object.frame) && objects.every(
       (item) =>
         [
           'component',
@@ -105,6 +88,7 @@ export function PropertiesContent() {
           'junction',
           'wire',
           'brace',
+          'angle',
           'rectangle',
           'circle',
           'line',
@@ -114,26 +98,28 @@ export function PropertiesContent() {
           [item.startEndpoint, item.endEndpoint].every((ep) =>
             ep.kind === 'free'
               ? !fixedWireConnection(ep, doc, selectedIds)
-              : selectedIds.has(ep.kind === 'terminal' ? ep.componentId : ep.junctionId),
+              : selectedIds.has(ep.kind === 'terminal' ? ep.componentId : ep.kind === 'shape' ? ep.shapeId : ep.junctionId),
           )),
     ) && objects.some((item) => !['wire', 'junction', 'circle'].includes(item.kind));
   const electricalOnly = o?.kind === 'electrical' && !labelTarget;
   const absoluteRotation = !!labelTarget || (!!o && independentRotation);
   const rectangles = objects.filter((o) => o.kind === 'rectangle');
-  const setRotation = (value: number) => {
+  const setRotation = (degrees: number) => {
+    const value = ((degrees % 360) + 360) % 360;
     if (!labelTarget && o?.kind === 'component') {
       if (value === o.rotation) return;
       // Share the keyboard operation's routing preservation when setting an
       // absolute component angle; a dropdown must not reroute distant branches.
       state().commit(
-        rotateObjects(state().document, [o.id], ((value - o.rotation + 360) % 360) as Rotation),
+        rotateObjects(state().document, [o.id], (value - o.rotation + 360) % 360),
       );
       return;
     }
     apply((o) => {
       if (labelTarget && 'label' in o)
-        return { ...o, label: { ...o.label, rotation: value as Rotation } };
-      if (o.kind === 'text') return { ...o, rotation: value as Rotation };
+        return { ...o, label: { ...o.label, rotation: value } };
+      if (o.kind === 'text') return { ...o, rotation: value };
+      if (o.kind === 'rectangle' && !o.frame) return { ...o, rotation: (value % 360 + 360) % 360 };
       if (o.kind === 'arrow' || o.kind === 'loop-arrow')
         return rotateArrow(
           o,
@@ -142,18 +128,13 @@ export function PropertiesContent() {
       return o;
     });
   };
-  const steppedRotation =
-    !!labelTarget || rotatables.some((o) => o.kind === 'component' || o.kind === 'text');
   const rotationControl = absoluteRotation && (
     <PropertySelect
       label={t('Rotation')}
-      caption={t('Rotation')}
+      caption={<RotateCw size={14} aria-hidden="true" />}
+      embedded
       value={rotation === undefined ? undefined : Number(rotation.toFixed(2))}
-      numeric={
-        steppedRotation
-          ? { min: 0, max: 315, step: 45, unit: '°' }
-          : { min: -MAX_COORDINATE, max: MAX_COORDINATE, unit: '°' }
-      }
+      numeric={{ min: -MAX_COORDINATE, max: MAX_COORDINATE, unit: '°' }}
       onChange={(v) => setRotation(Number(v))}
     >
       {ROTATIONS.map((r) => (
@@ -176,92 +157,8 @@ export function PropertiesContent() {
     );
   return (
     <div className="inspector-properties" key={objects.map((o) => o.id).join(',')}>
-      <div className="inspector-selection">
-        <span className="inspector-object-icon" aria-hidden="true">
-          {o?.kind === 'component' ? (
-            <ComponentPreview component={componentRegistry[o.type]} />
-          ) : o?.kind === 'rectangle' ? (
-            <Square size={16} />
-          ) : o?.kind === 'circle' ? (
-            <Circle size={16} />
-          ) : o?.kind === 'wire' || o?.kind === 'line' ? (
-            <Spline size={16} />
-          ) : o?.kind === 'junction' ? (
-            <CircleDot size={16} />
-          ) : o?.kind === 'text' ? (
-            <Type size={16} />
-          ) : o?.kind === 'brace' ? (
-            <Braces size={16} />
-          ) : o ? (
-            <ArrowRight size={16} />
-          ) : (
-            <Layers size={16} />
-          )}
-        </span>
-        <div className="inspector-type">
-          <span>
-            {o?.kind === 'component'
-              ? t(componentRegistry[o.type].name)
-              : o
-                ? t(names[o.kind])
-                : t('{count} selected elements', { count: objects.length })}
-          </span>
-          {activeLabel && <small>{t('Selected label')}</small>}
-          {!o && !objects.every((item) => item.kind === objects[0].kind) && (
-            <small>{t('Shared properties')}</small>
-          )}
-        </div>
-      </div>
-      {!electricalOnly &&
-        ((o && ('label' in o || o.kind === 'text')) ||
-          objects.every((o) => 'label' in o) ||
-          objects.every((o) => o.kind === 'text')) && (
-          <div className="inspector-general">
-            {o && ('label' in o || o.kind === 'text') && (
-              <PropertyField
-                label={
-                  o.kind === 'junction'
-                    ? t('Junction name')
-                    : o.kind === 'component'
-                      ? t('Component label')
-                      : o.kind === 'text'
-                        ? t('Text content')
-                        : t('Annotation label')
-                }
-                caption={o.kind === 'text' ? t('Content') : t('Label')}
-                value={o.kind === 'text' ? o.text : 'label' in o ? o.label.text : ''}
-                onCommit={(text) => apply((o) => replaceInlineText(o, text))}
-              />
-            )}
-            {objects.length > 1 && objects.every((o) => 'label' in o) && (
-              <PropertyField
-                label={t('Shared label')}
-                caption={t('Label')}
-                value={commonValue(objects.map((o) => ('label' in o ? o.label.text : '')))}
-                onCommit={(text) => apply((o) => replaceInlineText(o, text))}
-              />
-            )}
-            {objects.length > 1 && objects.every((o) => o.kind === 'text') && (
-              <PropertyField
-                label={t('Shared content')}
-                caption={t('Content')}
-                value={commonValue(objects.map((o) => (o.kind === 'text' ? o.text : '')))}
-                onCommit={(text) => apply((o) => replaceInlineText(o, text))}
-              />
-            )}
-            {o?.kind === 'component' && componentRegistry[o.type].internalText !== undefined && (
-              <PropertyField
-                label={t('Internal text')}
-                value={o.bodyText ?? '='}
-                onCommit={(bodyText) =>
-                  apply((o) => (o.kind === 'component' ? { ...o, bodyText } : o))
-                }
-              />
-            )}
-          </div>
-        )}
-      <InspectorSection title={t('Position')}>
-        <div className="inspector-pair">
+      <InspectorSection title={t('Position')} className="inspector-position">
+        {o && parent ? <FramePosition object={o} frame={parent} /> : <div className="inspector-pair inspector-position-fields">
           {(['x', 'y'] as const).map((axis) => (
             <PropertyField
               key={axis}
@@ -274,8 +171,43 @@ export function PropertiesContent() {
               onCommit={(v) => state().position(axis, Number(v))}
             />
           ))}
+          {rotationControl}
+        </div>}
+        <div className="inspector-transform-row">
+          {parent && rotationControl}
+          {groupRotation && !absoluteRotation && (
+            <button
+              className="inspector-property-action inspector-transform-action"
+              aria-label={t(objects.length > 1 ? 'Rotate group by {angle}°' : 'Rotate by {angle}°', {
+                angle: rotatables.some((object) => object.kind === 'component') ? 45 : 90,
+              }) + ' (R)'}
+              title={t('Rotate selection around its center (R)')}
+              onClick={() => state().rotate()}
+            >
+              <RotateCw size={16} />
+            </button>
+          )}
+          {objects.every((object) => object.kind === 'arrow' || object.kind === 'loop-arrow' || object.kind === 'circle' || (object.kind === 'rectangle' && !object.frame)) && (
+            <>
+              <button
+                className="inspector-property-action inspector-transform-action"
+                aria-label={t('Mirror horizontally')}
+                title={t('Mirror horizontally')}
+                onClick={() => state().mirror('horizontal')}
+              >
+                <FlipHorizontal size={16} />
+              </button>
+              <button
+                className="inspector-property-action inspector-transform-action"
+                aria-label={t('Mirror vertically')}
+                title={t('Mirror vertically')}
+                onClick={() => state().mirror('vertical')}
+              >
+                <FlipVertical size={16} />
+              </button>
+            </>
+          )}
         </div>
-        {rotationControl}
         {objects.length > 1 && (
           <p
             className="inspector-note"
@@ -287,14 +219,159 @@ export function PropertiesContent() {
           </p>
         )}
       </InspectorSection>
-      {!electricalOnly && (
-        <InspectorSection title={t('Appearance')}>
-          <SelectionStyle
+      {!labelTarget && (
+          <InspectorSection title={t('Layout')} className="inspector-layout">
+            {rectangles.length !== objects.length && o?.kind !== 'loop-arrow' && o?.kind !== 'angle' && <SelectionSizeFields objects={objects} />}
+            {o?.kind === 'angle' && <>
+              <div className="inspector-pair">
+                <PropertyField label={t('Radius')} caption="R" embedded value={Number(o.radius.toFixed(2))} numeric min={8} unit="u" onCommit={(v) => apply((item) => item.kind === 'angle' ? { ...item, radius: Number(v) } : item)} />
+                <PropertyField label={t('Start angle')} caption={<RotateCw size={14} />} embedded value={Number(o.startAngle.toFixed(2))} numeric unit="°" onCommit={(v) => apply((item) => item.kind === 'angle' ? { ...item, startAngle: ((Number(v)%360)+360)%360 } : item)} />
+              </div>
+              <PropertyField label={t('Angle amplitude')} value={Number(o.sweepAngle.toFixed(2))} numeric min={-360} max={360} unit="°" onCommit={(v) => { if (Number(v)) apply((item) => item.kind === 'angle' ? { ...item, sweepAngle: Number(v) } : item); }} />
+              <label className="inspector-check inspector-enable"><span>{t('Show rays')}</span><input type="checkbox" checked={o.showRays} onChange={(e) => apply((item) => item.kind === 'angle' ? { ...item, showRays: e.target.checked } : item)} /></label>
+            </>}
+            {objects.every((item) => item.kind === 'brace') && (
+              <PropertyRow caption={t('Side')}>
+                <button
+                  className="inspector-property-action"
+                  onClick={() =>
+                    apply((item) =>
+                      item.kind === 'brace' ? { ...item, side: item.side === 1 ? -1 : 1 } : item,
+                    )
+                  }
+                >
+                  <FlipHorizontal size={14} /> {t('Flip side')}{' '}
+                </button>
+              </PropertyRow>
+            )}
+            {objects.every((item) =>
+              item.kind === 'arrow' || item.kind === 'loop-arrow' ||
+              (item.kind === 'line' && item.arrowhead),
+            ) && (
+              <PropertyRow caption={t('Direction')}>
+                <button
+                  className="inspector-property-action"
+                  onClick={() =>
+                    apply((item) =>
+                      item.kind === 'arrow' || item.kind === 'electrical' || item.kind === 'line'
+                        ? { ...item, reversed: !item.reversed }
+                        : item.kind === 'loop-arrow'
+                          ? reverseLoop(item)
+                          : item,
+                    )
+                  }
+                >
+                  <ArrowLeftRight size={14} /> {t('Reverse arrow')}{' '}
+                </button>
+              </PropertyRow>
+            )}
+            {rectangles.length === objects.length && (
+              <div className="inspector-dimensions">
+                {(['width', 'height'] as const).map((dimension) => (
+                  <PropertyField
+                    key={dimension}
+                    label={dimension === 'width' ? t('Width') : t('Height')}
+                    caption={dimension === 'width' ? 'W' : 'H'}
+                    numeric
+                    min={1}
+                    max={1e7}
+                    value={commonValue(rectangles.map((o) => o[dimension]))}
+                    onCommit={(v) =>
+                      apply((o) => (o.kind === 'rectangle' ? { ...o, [dimension]: Number(v),
+                        ...(o.aspectLocked ? { [dimension === 'width' ? 'height' : 'width']: o[dimension === 'width' ? 'height' : 'width']*Number(v)/o[dimension] } : {}),
+                        ...(o.frame ? { frame: { ...o.frame, [dimension === 'width' ? 'widthSizing' : 'heightSizing']: 'fixed', ...(o.aspectLocked ? { widthSizing: 'fixed', heightSizing: 'fixed' } : {}) } } : {}),
+                      } : o))
+                    }
+                  />
+                ))}
+              </div>
+            )}
+            {o?.kind === 'rectangle' && o.frame && <>
+              <FrameSizing object={o} />
+              {o.frame.direction === 'free' && <FrameContents object={o} />}
+            </>}
+            {o?.kind === 'loop-arrow' && (
+              <div className="inspector-dimensions">
+                {(['width', 'height'] as const).map((dimension) => (
+                  <PropertyField
+                    key={dimension}
+                    label={dimension === 'width' ? t('Width') : t('Height')}
+                    caption={dimension === 'width' ? 'W' : 'H'}
+                    numeric
+                    min={1}
+                    max={1e7}
+                    value={o[dimension]}
+                    onCommit={(v) =>
+                      apply((o) => (o.kind === 'loop-arrow' ? { ...o, [dimension]: Number(v) } : o))
+                    }
+                  />
+                ))}
+              </div>
+            )}
+            {objects.every((o) => o.kind === 'wire' || o.kind === 'line') && (
+              <PropertySelect
+                label={t(objects.every((o) => o.kind === 'line') ? 'Line routing' : 'Wire routing')}
+                value={commonValue(
+                  objects.flatMap((o) => (o.kind === 'wire' || o.kind === 'line'
+                    ? [o.kind === 'line' && o.controlPoints ? 'curve' : o.routing ?? (o.kind === 'line' ? 'free' : 'orthogonal')] : [])),
+                )}
+                onChange={(v) =>
+                  apply((o) => o.kind === 'line' ? setLineRouting(o, v as WireRouting | 'curve', doc) : o.kind === 'wire' ? { ...o, routing: v as WireRouting } : o)
+                }
+              >
+                <option value="orthogonal">{t('Orthogonal')}</option>
+                <option value="45">45°</option>
+                <option value="free">{t('Free')}</option>
+                {objects.every((o) => o.kind === 'line') && <option value="curve">{t('Curved')}</option>}
+              </PropertySelect>
+            )}
+            {o?.kind === 'arrow' && (
+              <PropertySelect
+                label={t('Arrow type')}
+                caption={t('Shape')}
+                value={o.type}
+                onChange={(v) =>
+                  apply((o) =>
+                    o.kind === 'arrow' ? { ...o, type: v as 'straight' | 'curve' | 'arc' } : o,
+                  )
+                }
+              >
+                <option value="straight">{t('Straight')}</option>
+                <option value="curve">{t('Curved')}</option>
+                <option value="arc">{t('Loop')}</option>
+              </PropertySelect>
+            )}
+            {o?.kind === 'line' && <InspectorDisclosure title={t('Endpoints')}>
+              {(['start', 'end'] as const).map((end) => (
+                <div className="inspector-style-fields" key={end}>
+                  {(['x', 'y'] as const).map((axis) => (
+                    <PropertyField
+                      key={axis}
+                      label={`${end === 'start' ? t('Start') : t('End')} ${axis.toUpperCase()}`}
+                      numeric
+                      value={(end === 'start' ? linePoints(o, doc)[0] : linePoints(o, doc).at(-1)!)[axis]}
+                      onCommit={(v) =>
+                        apply((o) =>
+                          o.kind === 'line' ? routeEditedLine(moveLineEndpoint(o, end, { kind: 'free',
+                            point: { ...(end === 'start' ? linePoints(o, doc)[0] : linePoints(o, doc).at(-1)!), [axis]: Number(v) } }, doc), doc) : o,
+                        )
+                      }
+                    />
+                  ))}
+                </div>
+              ))}
+            </InspectorDisclosure>}
+          </InspectorSection>
+        )}
+      {!labelTarget && o?.kind === 'rectangle' && o.frame && <FrameSettings key={o.id} object={o} />}
+      {!labelTarget && (
+        <ObjectStyleSection objects={objects} apply={apply}>
+          {!fillSelection && !strokeSelection && <SelectionStyle
             objects={objects}
             apply={apply}
             labelOnly={!!labelTarget}
-            typography={objects.every((o) => 'label' in o || o.kind === 'text')}
-          />
+            labelAppearance={false}
+          />}
           {!labelTarget && arrows.length === objects.length && (
             <PropertySelect
               label={t('Arrowhead')}
@@ -329,7 +406,7 @@ export function PropertiesContent() {
               <option value="filled">{t('Filled arrowhead')}</option>
             </PropertySelect>
           )}
-          {!labelTarget && lineObjects.length === objects.length && (
+          {!strokeSelection && !shapeSelection && !labelTarget && lineObjects.length === objects.length && (
             <PropertySelect
               label={t('Line style')}
               value={commonValue(lineObjects.map((o) => o.lineStyle ?? 'solid'))}
@@ -349,7 +426,7 @@ export function PropertiesContent() {
               <option value="dotted">{t('Dotted')}</option>
             </PropertySelect>
           )}
-          {!labelTarget &&
+          {!strokeSelection && !shapeSelection && !labelTarget &&
             lineObjects.length === objects.length &&
             lineObjects.every((o) => o.lineStyle === 'dashed') && (
               <div className="inspector-style-fields">
@@ -403,204 +480,73 @@ export function PropertiesContent() {
                 />
               </div>
             )}
-        </InspectorSection>
+        </ObjectStyleSection>
       )}
-      {((groupRotation && !absoluteRotation) ||
-        objects.every((item) => item.kind === 'arrow' || item.kind === 'loop-arrow')) && (
-        <InspectorSection title={t('Transforms')}>
-          {groupRotation && !absoluteRotation && (
-            <div className="inspector-rotation">
-              <button
-                className="inspector-property-action"
-                aria-label={
-                  t(objects.length > 1 ? 'Rotate group by {angle}°' : 'Rotate by {angle}°', {
-                    angle: rotatables.some((o) => o.kind === 'component') ? 45 : 90,
-                  }) + ' (R)'
-                }
-                title={t('Rotate selection around its center (R)')}
-                onClick={() => state().rotate()}
-              >
-                <RotateCw size={14} />
-                {t(objects.length > 1 ? 'Rotate group by {angle}°' : 'Rotate by {angle}°', {
-                  angle: rotatables.some((o) => o.kind === 'component') ? 45 : 90,
-                })}
-              </button>
-            </div>
-          )}
-          {objects.every((item) => item.kind === 'arrow' || item.kind === 'loop-arrow') && (
-            <PropertyRow caption={t('Mirror')}>
-              <div className="inspector-segmented">
-                <button
-                  className="inspector-property-action"
-                  aria-label={t('Mirror horizontally')}
-                  title={t('Mirror horizontally')}
-                  onClick={() => state().mirror('horizontal')}
-                >
-                  <FlipHorizontal size={14} />
-                  {t('Horizontal')}{' '}
-                </button>
-                <button
-                  className="inspector-property-action"
-                  aria-label={t('Mirror vertically')}
-                  title={t('Mirror vertically')}
-                  onClick={() => state().mirror('vertical')}
-                >
-                  <FlipVertical size={14} />
-                  {t('Vertical')}{' '}
-                </button>
-              </div>
-            </PropertyRow>
-          )}
-        </InspectorSection>
-      )}
-      {!labelTarget &&
-        (objects.length > 1 ||
-          objects.some((o) =>
-            ['rectangle', 'circle', 'line', 'wire', 'arrow', 'loop-arrow', 'brace'].includes(
-              o.kind,
-            ),
-          )) && (
-          <InspectorSection title={t('Geometry')}>
-            {objects.every((item) => item.kind === 'brace') && (
-              <PropertyRow caption={t('Side')}>
-                <button
-                  className="inspector-property-action"
-                  onClick={() =>
-                    apply((item) =>
-                      item.kind === 'brace' ? { ...item, side: item.side === 1 ? -1 : 1 } : item,
-                    )
-                  }
-                >
-                  <FlipHorizontal size={14} /> {t('Flip side')}{' '}
-                </button>
-              </PropertyRow>
-            )}
-            {objects.every((item) =>
-              item.kind === 'arrow' || item.kind === 'loop-arrow' ||
-              (item.kind === 'line' && item.arrowhead),
-            ) && (
-              <PropertyRow caption={t('Direction')}>
-                <button
-                  className="inspector-property-action"
-                  onClick={() =>
-                    apply((item) =>
-                      item.kind === 'arrow' || item.kind === 'electrical' || item.kind === 'line'
-                        ? { ...item, reversed: !item.reversed }
-                        : item.kind === 'loop-arrow'
-                          ? reverseLoop(item)
-                          : item,
-                    )
-                  }
-                >
-                  <ArrowLeftRight size={14} /> {t('Reverse arrow')}{' '}
-                </button>
-              </PropertyRow>
-            )}
-            {objects.every((o) => o.kind === 'circle') && (
+      {shapeSelection && !labelTarget && <>
+        {rectangles.length === objects.length && <ShapeCorners objects={shapes} apply={apply} />}
+      </>}
+      {fillSelection && !labelTarget && <ObjectPaintSection objects={objects} apply={apply} />}
+      {strokeSelection && !labelTarget && <ObjectPaintSection objects={objects} apply={apply} border />}
+      {!electricalOnly &&
+        ((o && ('label' in o || o.kind === 'text')) ||
+          objects.every((o) => 'label' in o) ||
+          objects.every((o) => o.kind === 'text')) && (
+          <InspectorSection title={t(o?.kind === 'text' ? 'Text' : 'Label')} className="inspector-text">
+            <div className="inspector-text-content">
+            {o && ('label' in o || o.kind === 'text') && (
               <PropertyField
-                label={t('Diameter')}
-                numeric
-                min={1}
-                max={1e7}
-                value={commonValue(objects.map((o) => (o.kind === 'circle' ? o.width : 0)))}
-                onCommit={(v) =>
-                  apply((o) =>
-                    o.kind === 'circle' ? { ...o, width: Number(v), height: Number(v) } : o,
-                  )
+                label={
+                  o.kind === 'junction'
+                    ? t('Junction name')
+                    : o.kind === 'component'
+                      ? t('Component label')
+                      : o.kind === 'text'
+                        ? t('Text content')
+                        : t('Annotation label')
+                }
+                caption=""
+                value={o.kind === 'text' ? o.text : 'label' in o ? o.label.text : ''}
+                onCommit={(text) => apply((o) => replaceInlineText(o, text))}
+              />
+            )}
+            {objects.length > 1 && objects.every((o) => 'label' in o) && (
+              <PropertyField
+                label={t('Shared label')}
+                caption=""
+                value={commonValue(objects.map((o) => ('label' in o ? o.label.text : '')))}
+                onCommit={(text) => apply((o) => replaceInlineText(o, text))}
+              />
+            )}
+            {objects.length > 1 && objects.every((o) => o.kind === 'text') && (
+              <PropertyField
+                label={t('Shared content')}
+                caption=""
+                value={commonValue(objects.map((o) => (o.kind === 'text' ? o.text : '')))}
+                onCommit={(text) => apply((o) => replaceInlineText(o, text))}
+              />
+            )}
+              <div className="inspector-text-size"><SelectionTypography objects={objects} apply={apply} controls="size" /></div>
+            </div>
+            {o?.kind === 'component' && componentRegistry[o.type].internalText !== undefined && (
+              <PropertyField
+                label={t('Internal text')}
+                value={o.bodyText ?? '='}
+                onCommit={(bodyText) =>
+                  apply((o) => (o.kind === 'component' ? { ...o, bodyText } : o))
                 }
               />
             )}
-            {rectangles.length === objects.length && (
-              <div className="inspector-pair">
-                {(['width', 'height'] as const).map((dimension) => (
-                  <PropertyField
-                    key={dimension}
-                    label={dimension === 'width' ? t('Width') : t('Height')}
-                    caption={dimension === 'width' ? 'W' : 'H'}
-                    numeric
-                    min={1}
-                    max={1e7}
-                    value={commonValue(rectangles.map((o) => o[dimension]))}
-                    onCommit={(v) =>
-                      apply((o) => (o.kind === 'rectangle' ? { ...o, [dimension]: Number(v) } : o))
-                    }
-                  />
-                ))}
-              </div>
+            {objects.every((object) => 'label' in object) && (
+              <LabelAppearance objects={objects} apply={apply} caption={t('Color')} />
             )}
-            {o?.kind === 'loop-arrow' && (
-              <div className="inspector-pair">
-                {(['width', 'height'] as const).map((dimension) => (
-                  <PropertyField
-                    key={dimension}
-                    label={dimension === 'width' ? t('Width') : t('Height')}
-                    caption={dimension === 'width' ? 'W' : 'H'}
-                    numeric
-                    min={1}
-                    max={1e7}
-                    value={o[dimension]}
-                    onCommit={(v) =>
-                      apply((o) => (o.kind === 'loop-arrow' ? { ...o, [dimension]: Number(v) } : o))
-                    }
-                  />
-                ))}
-              </div>
-            )}
-            {objects.every((o) => o.kind === 'wire' || o.kind === 'line') && (
-              <PropertySelect
-                label={t(objects.every((o) => o.kind === 'line') ? 'Line routing' : 'Wire routing')}
-                value={commonValue(
-                  objects.flatMap((o) => (o.kind === 'wire' || o.kind === 'line'
-                    ? [o.kind === 'line' && o.controlPoints ? 'curve' : o.routing ?? (o.kind === 'line' ? 'free' : 'orthogonal')] : [])),
-                )}
-                onChange={(v) =>
-                  apply((o) => o.kind === 'line' ? setLineRouting(o, v as WireRouting | 'curve', doc) : o.kind === 'wire' ? { ...o, routing: v as WireRouting } : o)
-                }
-              >
-                <option value="orthogonal">{t('Orthogonal')}</option>
-                <option value="45">45°</option>
-                <option value="free">{t('Free')}</option>
-                {objects.every((o) => o.kind === 'line') && <option value="curve">{t('Curved')}</option>}
-              </PropertySelect>
-            )}
-            {o?.kind === 'arrow' && (
-              <PropertySelect
-                label={t('Arrow type')}
-                caption={t('Shape')}
-                value={o.type}
-                onChange={(v) =>
-                  apply((o) =>
-                    o.kind === 'arrow' ? { ...o, type: v as 'straight' | 'curve' | 'arc' } : o,
-                  )
-                }
-              >
-                <option value="straight">{t('Straight')}</option>
-                <option value="curve">{t('Curved')}</option>
-                <option value="arc">{t('Loop')}</option>
-              </PropertySelect>
-            )}
-            {o?.kind === 'line' &&
-              (['start', 'end'] as const).map((end) => (
-                <div className="inspector-style-fields" key={end}>
-                  {(['x', 'y'] as const).map((axis) => (
-                    <PropertyField
-                      key={axis}
-                      label={`${end === 'start' ? t('Start') : t('End')} ${axis.toUpperCase()}`}
-                      numeric
-                      value={(end === 'start' ? linePoints(o, doc)[0] : linePoints(o, doc).at(-1)!)[axis]}
-                      onCommit={(v) =>
-                        apply((o) =>
-                          o.kind === 'line' ? routeEditedLine(moveLineEndpoint(o, end, { kind: 'free',
-                            point: { ...(end === 'start' ? linePoints(o, doc)[0] : linePoints(o, doc).at(-1)!), [axis]: Number(v) } }, doc), doc) : o,
-                        )
-                      }
-                    />
-                  ))}
-                </div>
-              ))}
-            {objects.length > 1 && <SelectionGeometry objects={objects} />}
+            <SelectionTypography objects={objects} apply={apply} controls="alignment" />
           </InspectorSection>
         )}
+      {!labelTarget && objects.length > 1 && (
+        <InspectorSection title={t('Arrangement')} className="inspector-arrangement">
+          <SelectionGeometry objects={objects} showAlignment={false} />
+        </InspectorSection>
+      )}
       {!labelTarget && o && <ElectricalProperties object={o} />}
       {!labelTarget &&
         objects.length > 1 &&
@@ -611,21 +557,14 @@ export function PropertiesContent() {
             item.mode === objects[0].mode,
         ) && (
           <InspectorSection title={t('Electrical annotations')}>
-            <button
-              className="inspector-property-action"
+            <AnnotationReverseAction
+              mode={objects[0].kind === 'electrical' ? objects[0].mode : 'voltage'}
               onClick={() =>
                 apply((item) =>
                   item.kind === 'electrical' ? { ...item, reversed: !item.reversed } : item,
                 )
               }
-            >
-              <ArrowLeftRight size={14} />{' '}
-              {objects[0].kind === 'electrical' && objects[0].mode === 'polarity'
-                ? t('Reverse polarity')
-                : objects[0].kind === 'electrical' && objects[0].mode === 'current'
-                  ? t('Reverse current direction')
-                  : t('Reverse voltage arrow')}
-            </button>
+            />
           </InspectorSection>
         )}
     </div>

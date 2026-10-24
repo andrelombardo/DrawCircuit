@@ -1,4 +1,6 @@
 import { memo } from 'react';
+import { shapeFills, shapeBorders } from '../../model/shapeAppearance';
+import { shapeBorderWidth, shapePath, shapeTransform } from '../../utils/shapes';
 import type { CircuitDocument, LineAnnotation, ShapeAnnotation } from '../../model/types';
 import { dashPattern } from '../../utils/strokeStyle';
 import { linePath } from '../../utils/geometry';
@@ -11,13 +13,6 @@ export const GraphicView = memo(function GraphicView({
   doc?: CircuitDocument;
 }) {
   const width = o.kind === 'line' ? o.width : o.strokeWidth;
-  const Shape = o.kind === 'circle' ? 'circle' : 'rect';
-  const geometry =
-    o.kind === 'line'
-      ? {}
-      : o.kind === 'circle'
-        ? { cx: o.x + o.width / 2, cy: o.y + o.height / 2, r: o.width / 2 }
-        : { x: o.x, y: o.y, width: o.width, height: o.height };
   const stroke = {
     fill: 'none',
     stroke: o.color,
@@ -27,21 +22,33 @@ export const GraphicView = memo(function GraphicView({
     strokeLinejoin: 'round' as const,
   };
   return (
-    <g data-object={o.id} className="circuit-object">
+    <g data-object={o.id} className="circuit-object" opacity={o.kind === 'line' ? o.styleOpacity : undefined} style={o.kind === 'line' ? { mixBlendMode: o.blendMode ?? 'normal' } : undefined}>
       {o.kind !== 'line' ? (
         <>
-          {o.fill !== 'none' && (
-            <Shape {...geometry} fill={o.fill} fillOpacity={o.fillOpacity ?? 1} stroke="none" />
-          )}
-          <Shape
-            {...geometry}
+          <g transform={shapeTransform(o)} opacity={o.styleOpacity ?? 1} style={{ mixBlendMode: o.blendMode ?? 'normal' }}>
+            {[...shapeFills(o)].reverse().filter((p) => p.enabled).map((paint) => (
+              <path key={paint.id} d={shapePath(o)} fill={paint.color} fillOpacity={paint.opacity} stroke="none" />
+            ))}
+            {[...shapeBorders(o)].reverse().filter((p) => p.enabled).map((paint) => (
+              <path key={paint.id} d={shapePath(o, paint)} fill="none" stroke={paint.color}
+                strokeWidth={shapeBorderWidth(o, paint)} opacity={paint.opacity} strokeDasharray={dashPattern(paint, paint.width)?.join(' ')}
+                strokeLinejoin="round" strokeLinecap="round" pointerEvents="none" />
+            ))}
+          </g>
+          <path
+            d={shapePath(o)} transform={shapeTransform(o)}
             fill="none"
             stroke="transparent"
             strokeWidth={14}
             vectorEffect="non-scaling-stroke"
-            pointerEvents="stroke"
+            pointerEvents={shapeFills(o).some((p) => p.enabled) ? 'all' : 'stroke'}
+            className="object-hit"
           />
-          <Shape {...geometry} {...stroke} opacity={o.opacity} pointerEvents="none" />
+          {o.kind === 'rectangle' && o.frame && (
+            <text x={o.x} y={o.y-10} className="frame-canvas-name" fill="var(--ui-accent)" fontSize={12}>
+              {o.frame.name}
+            </text>
+          )}
         </>
       ) : (
         <>

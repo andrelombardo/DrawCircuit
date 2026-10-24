@@ -1,4 +1,7 @@
+import { angleGeometry } from '../annotations/angle';
 import { t } from '../i18n';
+import { shapeBounds } from './shapes';
+import { shapeAnchorPoint } from './shapeAnchors';
 import { lineArrowHead } from '../tikz/arrowheads';
 import { highlightBounds, mapHighlight } from '../annotations/highlight';
 import { braceGeometry } from '../annotations/brace';
@@ -49,7 +52,7 @@ export function rotatePoint(p: Point, rotation: number): Point {
   }
 }
 export function localToWorld(component: CircuitComponent, p: Point): Point {
-  const r = rotatePoint(p, component.rotation);
+  const r = rotatePoint({ x: p.x*(component.scale ?? 1), y: p.y*(component.scale ?? 1) }, component.rotation);
   return { x: component.x + r.x, y: component.y + r.y };
 }
 const indices = new WeakMap<CircuitDocument, Map<string, CircuitObject>>();
@@ -88,6 +91,11 @@ export function fixedWireConnection(endpoint: Endpoint, doc: CircuitDocument, mo
 }
 export function resolveEndpoint(endpoint: Endpoint, doc: CircuitDocument): Point {
   if (endpoint.kind === 'free') return endpoint.point;
+  if (endpoint.kind === 'shape') {
+    const shape = objectIndex(doc).get(endpoint.shapeId);
+    if (shape?.kind === 'circle' || shape?.kind === 'rectangle') return shapeAnchorPoint(shape, endpoint.anchor);
+    throw new Error(t('Connection refers to an unknown shape.'));
+  }
   if (endpoint.kind === 'junction') {
     const j = objectIndex(doc).get(endpoint.junctionId);
     if (j?.kind === 'junction') return { x: j.x, y: j.y };
@@ -593,6 +601,7 @@ export function nearestWire(
 export function moveObject(o: CircuitObject, delta: Point, moved: Set<string>): CircuitObject {
   if (
     o.kind === 'component' ||
+    o.kind === 'angle' ||
     o.kind === 'junction' ||
     o.kind === 'text' ||
     o.kind === 'loop-arrow' ||
@@ -628,7 +637,7 @@ export function moveObject(o: CircuitObject, delta: Point, moved: Set<string>): 
       ? moved.has(ep.componentId)
       : ep.kind === 'junction'
         ? moved.has(ep.junctionId)
-        : false;
+        : ep.kind === 'shape' ? moved.has(ep.shapeId) : false;
   // Connected endpoints remain references. Moving a selected wire changes its route only.
   return {
     ...o,
@@ -697,7 +706,11 @@ export function objectBounds(
 ): { x: number; y: number; width: number; height: number } {
   let points: Point[];
   if (o.kind === 'highlight') return highlightBounds(o, doc);
-  if (o.kind === 'brace') {
+  if (o.kind === 'angle') {
+    points = angleGeometry(o).points.flatMap((p) => [
+      { x: p.x-o.width/2, y: p.y-o.width/2 }, { x: p.x+o.width/2, y: p.y+o.width/2 },
+    ]);
+  } else if (o.kind === 'brace') {
     const g = braceGeometry(o);
     points = g.points.flatMap((p) => [
       { x: p.x - o.width / 2, y: p.y - o.width / 2 },
@@ -715,7 +728,7 @@ export function objectBounds(
     ];
     if (drawing) points.push(...drawing.head);
   } else if (o.kind === 'rectangle' || o.kind === 'circle')
-    return { x: o.x, y: o.y, width: o.width, height: o.height };
+    return shapeBounds(o);
   else if (o.kind === 'line') points = [...linePoints(o, doc), ...lineArrowHead(o, doc)];
   else if (o.kind === 'wire') points = wirePoints(o, doc);
   else if (o.kind === 'loop-arrow') {
@@ -747,8 +760,8 @@ export function objectBounds(
     ].map((p) => localToWorld(o, p));
   } else if (o.kind === 'junction')
     points = [
-      { x: o.x - 8, y: o.y - 8 },
-      { x: o.x + 8, y: o.y + 8 },
+      { x: o.x - Math.max(8, o.radius ?? 4.5), y: o.y - Math.max(8, o.radius ?? 4.5) },
+      { x: o.x + Math.max(8, o.radius ?? 4.5), y: o.y + Math.max(8, o.radius ?? 4.5) },
     ];
   else {
     const w = Math.max(30, o.text.length * o.fontSize * 0.55),

@@ -1,6 +1,6 @@
-import type { ComponentType, Point, Rotation } from '../model/types';
+import type { CircuitObject, ComponentType, Point, Rotation } from '../model/types';
 
-export const presetCategories = ['Resistors', 'Basic circuits', 'RLC', 'Networks'] as const;
+export const presetCategories = ['Diagrams', 'Resistors', 'Basic circuits', 'RLC', 'Networks'] as const;
 export type PresetCategory = (typeof presetCategories)[number];
 export interface PresetComponent extends Point {
   key: string;
@@ -38,4 +38,6 @@ export interface CircuitPreset {
   wires: PresetWire[];
   annotations?: { x: number; y: number; text: string }[];
   thumbnail?: PresetThumbnail;
+  /** Fresh native drawing objects, already positioned and rotated for insertion. */
+  graphics?: (origin: Point, rotation: Rotation) => CircuitObject[];
 }

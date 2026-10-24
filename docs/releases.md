@@ -12,7 +12,7 @@ DrawCircuit is a static web application. Its only deployment target is [GitHub P
 
 Pull requests run the same checks without publishing. The pipeline does not use platform routing, automatic versioning, release tags, or repository-content write permissions. Deployments are serialized.
 
-Before publishing, use `npm run preview` locally and also check the `/drawcircuit/` prefix with `npm run preview -- --base /drawcircuit/`. Verify drawing, editing, local saving, image copying, and both interface languages in the browser. `npm test` covers highlight erasure, geometry, history, and persistence compatibility. Build assets, manifest, and icons use relative paths. Never include generated builds, `.env` files, or private keys in commits.
+Before publishing, use `npm run preview` locally and also check the `/drawcircuit/` prefix with `npm run preview -- --base /drawcircuit/`. Verify drawing, editing, local saving, image copying, and the Italian interface in the browser. `npm test` covers highlight erasure, geometry, history, and persistence compatibility. Build assets, manifest, and icons use relative paths. Never include generated builds, `.env` files, or private keys in commits.
 
 To verify publication, confirm that the Actions run and Pages deployment match the commit being tested. Open the public URL in the browser and, when needed, compare its HTML asset hashes with the run’s build artifact. The public site does not include unpublished local changes. No app version file is generated.
 

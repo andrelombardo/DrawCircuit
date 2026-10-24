@@ -1,3 +1,4 @@
+import { AngleView } from '../../circuit/annotations/AngleView';
 import { highlightPaintGroups } from '../../annotations/highlight';
 import { HighlightView } from '../../circuit/annotations/HighlightView';
 import type { Highlight } from '../../model/types';
@@ -7,8 +8,9 @@ import { BraceView } from '../../circuit/annotations/BraceView';
 import { WireBridges } from '../../circuit/wires/WireBridges';
 import { ElectricalView } from '../../circuit/annotations/ElectricalView';
 import { wireDrawingPaths } from '../../annotations/electrical';
-import { memo, useMemo } from 'react';
-import type { CircuitDocument } from '../../model/types';
+import { cloneElement, isValidElement, memo, useMemo } from 'react';
+import type { ReactNode } from 'react';
+import type { CircuitDocument, CircuitObject } from '../../model/types';
 import { isLooseEndpoint, wirePoints } from '../../utils/geometry';
 import { ComponentView } from '../../circuit/components/ComponentView';
 import { WireView } from '../../circuit/wires/WireView';
@@ -18,6 +20,28 @@ import { LoopArrowView } from '../../circuit/annotations/LoopArrowView';
 import { MathText } from '../../circuit/annotations/MathText';
 import { inlineTextTarget } from '../../utils/labels';
 import { SelectionLayer } from './SelectionLayer';
+import { objectBorders, paintVariants, parentFrame } from '../../model/shapeAppearance';
+import { dashPattern } from '../../utils/strokeStyle';
+function Appearance({ object, children }: { object: CircuitObject; children: ReactNode }) {
+  const renderer = isValidElement<{ object: CircuitObject }>(children) && children.props.object ? children : null;
+  const normalized = renderer ? cloneElement(renderer, { object: { ...object, styleOpacity: 1, blendMode: 'normal' } }) : children;
+  const variants = renderer ? paintVariants(object) : null;
+  const borders = [...objectBorders(object)].reverse().filter((p) => p.enabled);
+  return <g opacity={object.styleOpacity ?? 1} style={{ mixBlendMode: object.blendMode ?? 'normal' }} data-appearance={object.id}>
+    {variants && renderer ? <>
+      <g opacity={0}>{normalized}</g>
+      {variants.map((variant, i) => <g key={i} pointerEvents="none" aria-hidden="true" strokeDasharray={borders[i] && dashPattern(borders[i], borders[i].width)?.join(' ')}>
+        {cloneElement(renderer, { object: variant })}
+      </g>)}
+    </> : normalized}
+  </g>;
+}
+function TextView({ object, selected }: { object: Extract<CircuitObject, { kind: 'text' }>; selected: boolean }) {
+  return <g data-object={object.id} className={`circuit-object${selected ? ' selected-symbol' : ''}`}>
+    <MathText text={object.text} x={object.x} y={object.y} color={object.color} opacity={object.opacity}
+      fontSize={object.fontSize} align={object.align} rotation={object.rotation} />
+  </g>;
+}
 export const CircuitLayer = memo(function CircuitLayer({
   doc,
   selection,
@@ -29,6 +53,7 @@ export const CircuitLayer = memo(function CircuitLayer({
   editingLabelId,
   hoveredArrow,
   highlightDraft,
+  scope,
 }: {
   doc: CircuitDocument;
   highlightDraft?: Highlight | null;
@@ -40,128 +65,119 @@ export const CircuitLayer = memo(function CircuitLayer({
   editingTextId?: string;
   editingLabelId?: string;
   hoveredArrow?: string | null;
+  scope?: string;
 }) {
+  const objects = useMemo(() => {
+    const frame = scope && doc.objects.find((o) => o.id === scope);
+    const ids = frame && frame.kind === 'rectangle' && frame.frame ? new Set(frame.frame.children) : null;
+    return doc.objects.filter((o) => ids ? ids.has(o.id) : !parentFrame(doc, o.id));
+  }, [doc, scope]);
   const selected = useMemo(() => new Set(selection), [selection]);
   const nearby = useMemo(() => new Set(nearbyComponents), [nearbyComponents]);
   const currentGaps = useMemo(() => drawingWireGaps(doc), [doc]);
   const wires = useMemo(
     () =>
-      doc.objects.flatMap((o) =>
+      objects.flatMap((o) =>
         o.kind === 'wire' ? [{ object: o, points: wirePoints(o, doc) }] : [],
       ),
-    [doc],
+    [doc, objects],
   );
   return (
     <>
       <g data-layer="highlights">
-        {highlightPaintGroups(doc).map((group) => (
-          <g key={group[0].id} opacity={group[0].opacity}>
-            {group.map((object) => (
-              <HighlightView key={object.id} object={object} doc={doc} grouped />
-            ))}
-          </g>
-        ))}
-        {highlightDraft && (
+        {highlightPaintGroups({ ...doc, objects }).map((group) => {
+          const first = group[0], paints = first.borders ? [...first.borders].reverse().filter((p) => p.enabled) : [{ id: 'stroke', color: first.color, opacity: first.opacity, width: first.width }];
+          return <g key={first.id} opacity={first.styleOpacity ?? 1} style={{ mixBlendMode: first.blendMode ?? 'normal' }}>
+            {paints.map((paint) => <g key={paint.id} opacity={paint.opacity}>
+              {group.map((object) => <HighlightView key={object.id} object={{ ...object, color: paint.color, width: paint.width }} doc={doc} grouped />)}
+            </g>)}
+          </g>;
+        })}
+        {!scope && highlightDraft && (
           <g pointerEvents="none">
             <HighlightView object={highlightDraft} doc={doc} interactive={false} />
           </g>
         )}
       </g>
       <g data-layer="graphics">
-        {doc.objects.map((o) =>
+        {objects.map((o) =>
           o.kind === 'rectangle' || o.kind === 'circle' || o.kind === 'line' ? (
-            <GraphicView key={o.id} object={o} doc={doc} />
+            o.kind === 'rectangle' && o.frame ? <Appearance key={o.id} object={o}>
+              <GraphicView object={{ ...o, styleOpacity: 1, blendMode: 'normal' }} doc={doc} />
+              <CircuitLayer doc={doc} scope={o.id} selection={selection} terminals={terminals} nearbyComponents={nearbyComponents}
+                zoom={zoom} activeLabel={activeLabel} editingTextId={editingTextId} editingLabelId={editingLabelId} hoveredArrow={hoveredArrow} />
+            </Appearance> : o.kind === 'line' ? <Appearance key={o.id} object={o}><GraphicView object={o} doc={doc} /></Appearance> : <GraphicView key={o.id} object={o} doc={doc} />
           ) : null,
         )}
       </g>
       <g data-layer="wires">
         {wires.map(({ object, points }) => (
-          <WireView
-            key={object.id}
+          <Appearance key={object.id} object={object}><WireView
             object={object}
             points={points}
             looseStart={isLooseEndpoint(object.startEndpoint, doc)}
             looseEnd={isLooseEndpoint(object.endEndpoint, doc)}
             paths={wireDrawingPaths(points, currentGaps.get(object.id))}
-          />
+          /></Appearance>
         ))}
       </g>
-      <WireBridges doc={doc} />
+      <WireBridges doc={doc} wireIds={wires.map(({ object }) => object.id)} />
       <g data-layer="components">
-        {doc.objects.map((o) =>
+        {objects.map((o) =>
           o.kind === 'component' ? (
-            <ComponentView
-              key={o.id}
+            <Appearance key={o.id} object={o}><ComponentView
               object={o}
               selected={selected.has(o.id) && activeLabel !== o.id}
               terminals={
                 terminals || (selection.length === 1 && selected.has(o.id)) || nearby.has(o.id)
               }
-            />
+            /></Appearance>
           ) : null,
         )}
       </g>
       <g data-layer="junctions">
-        {doc.objects.map((o) =>
+        {objects.map((o) =>
           o.kind === 'junction' ? (
-            <JunctionView
-              key={o.id}
+            <Appearance key={o.id} object={o}><JunctionView
               object={o}
               selected={selected.has(o.id) && activeLabel !== o.id}
-            />
+            /></Appearance>
           ) : null,
         )}
       </g>
       <g data-layer="annotations">
-        {doc.objects.map((o) =>
-          o.kind === 'brace' ? (
-            <BraceView
-              key={o.id}
+        {objects.map((o) =>
+          o.kind === 'angle' ? <Appearance key={o.id} object={o}><AngleView object={o} zoom={zoom} hideLabel /></Appearance> : o.kind === 'brace' ? (
+            <Appearance key={o.id} object={o}><BraceView
               object={o}
               zoom={zoom}
               labelSelected={selected.has(o.id) && activeLabel === o.id}
               hideLabel
-            />
+            /></Appearance>
           ) : o.kind === 'electrical' ? (
-            <ElectricalView
-              key={o.id}
+            <Appearance key={o.id} object={o}><ElectricalView
               object={o}
               doc={doc}
               selected={selected.has(o.id) && activeLabel !== o.id}
               labelSelected={selected.has(o.id) && activeLabel === o.id}
               hideLabel
               zoom={zoom}
-            />
+            /></Appearance>
           ) : o.kind === 'arrow' ? (
-            <ArrowView key={o.id} object={o} zoom={zoom} />
+            <Appearance key={o.id} object={o}><ArrowView object={o} zoom={zoom} /></Appearance>
           ) : o.kind === 'loop-arrow' ? (
-            <LoopArrowView key={o.id} object={o} zoom={zoom} />
+            <Appearance key={o.id} object={o}><LoopArrowView object={o} zoom={zoom} /></Appearance>
           ) : o.kind === 'text' && o.id !== editingTextId ? (
-            <g
-              key={o.id}
-              data-object={o.id}
-              className={`circuit-object${selected.has(o.id) ? ' selected-symbol' : ''}`}
-            >
-              <MathText
-                text={o.text}
-                x={o.x}
-                y={o.y}
-                color={o.color}
-                opacity={o.opacity}
-                fontSize={o.fontSize}
-                align={o.align}
-                rotation={o.rotation}
-              />
-            </g>
+            <Appearance key={o.id} object={o}><TextView object={o} selected={selected.has(o.id)} /></Appearance>
           ) : null,
         )}
       </g>
       <g data-layer="labels">
-        {doc.objects.map((o) => {
+        {objects.map((o) => {
           if (!('label' in o) || o.id === editingLabelId) return null;
           const target = inlineTextTarget(o, doc)!;
           return (
-            <g key={o.id} data-object={o.id}>
+            <g key={o.id} data-object={o.id} opacity={o.styleOpacity ?? 1} style={{ mixBlendMode: o.blendMode ?? 'normal' }}>
               <MathText
                 text={target.text}
                 x={target.point.x}
@@ -177,12 +193,12 @@ export const CircuitLayer = memo(function CircuitLayer({
           );
         })}
       </g>
-      <SelectionLayer
+      {!scope && <SelectionLayer
         doc={doc}
         hoveredArrow={hoveredArrow}
         selection={selection.filter((id) => id !== activeLabel)}
         zoom={zoom}
-      />
+      />}
     </>
   );
 });

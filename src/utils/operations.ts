@@ -1,3 +1,4 @@
+import { normalizeAngle } from '../annotations/angle';
 import {
   detachHighlight,
   highlightPoints,
@@ -5,6 +6,7 @@ import {
   mapHighlight,
 } from '../annotations/highlight';
 import { detachElectrical } from '../annotations/electrical';
+import { frameSelection } from '../model/shapeAppearance';
 import { rotateArrow } from './arrows';
 import { makeId } from '../model/catalog';
 import {
@@ -23,10 +25,11 @@ import type { CircuitDocument, CircuitObject, Endpoint, Point, Rotation } from '
 import { healWireConnections } from './wires';
 import { detachLineEndpoints, normalizeLine } from './lines';
 export function extractSelection(doc: CircuitDocument, ids: string[]): CircuitDocument {
-  const selected = new Set(ids);
+  const selected = new Set(frameSelection(doc, ids));
   const ep = (e: Endpoint): Endpoint =>
     (e.kind === 'terminal' && !selected.has(e.componentId)) ||
-    (e.kind === 'junction' && !selected.has(e.junctionId))
+    (e.kind === 'junction' && !selected.has(e.junctionId)) ||
+    (e.kind === 'shape' && !selected.has(e.shapeId))
       ? { kind: 'free', point: resolveEndpoint(e, doc) }
       : e;
   return {
@@ -61,6 +64,7 @@ export function cloneObjects(
   const remap = (e: Endpoint): Endpoint => {
     if (e.kind === 'terminal') return { ...e, componentId: ids.get(e.componentId)! };
     if (e.kind === 'junction') return { ...e, junctionId: ids.get(e.junctionId)! };
+    if (e.kind === 'shape') return { ...e, shapeId: ids.get(e.shapeId)! };
     if (!e.connectionId) return e;
     const id = connections.get(e.connectionId) ?? makeId();
     connections.set(e.connectionId, id);
@@ -72,6 +76,10 @@ export function cloneObjects(
   return doc.objects.map((o) => {
     const copy = structuredClone(o);
     copy.id = ids.get(o.id)!;
+    if (copy.kind === 'rectangle' && copy.frame) copy.frame = { ...copy.frame,
+      children: copy.frame.children.flatMap((id) => ids.has(id) ? [ids.get(id)!] : []),
+      constraints: Object.fromEntries(Object.entries(copy.frame.constraints).flatMap(([id, pin]) => ids.has(id) ? [[ids.get(id)!, pin]] : [])),
+    };
     if (copy.kind === 'highlight' && copy.paintGroup) {
       const group = paintGroups.get(copy.paintGroup) ?? makeId();
       paintGroups.set(copy.paintGroup, group);
@@ -110,7 +118,7 @@ export function cloneObjects(
   });
 }
 export function removeObjects(doc: CircuitDocument, ids: string[]): CircuitDocument {
-  const removed = new Set(ids);
+  const removed = new Set(frameSelection(doc, ids));
   const connections = new Set<string>();
   const detached = new Map<string, Endpoint>();
   for (const o of doc.objects) {
@@ -119,7 +127,7 @@ export function removeObjects(doc: CircuitDocument, ids: string[]): CircuitDocum
       if (endpoint.kind === 'free' && endpoint.connectionId) connections.add(endpoint.connectionId);
   }
   const detach = (endpoint: Endpoint): Endpoint => {
-    const key = endpoint.kind === 'terminal'
+    const key = endpoint.kind === 'shape' ? JSON.stringify(['shape',endpoint.shapeId,endpoint.anchor]) : endpoint.kind === 'terminal'
       ? JSON.stringify(['terminal', endpoint.componentId, endpoint.terminalId])
       : endpoint.kind === 'junction' ? JSON.stringify(['junction', endpoint.junctionId]) : '';
     let replacement = detached.get(key);
@@ -133,7 +141,8 @@ export function removeObjects(doc: CircuitDocument, ids: string[]): CircuitDocum
   };
   const ep = (e: Endpoint): Endpoint =>
     (e.kind === 'terminal' && removed.has(e.componentId)) ||
-    (e.kind === 'junction' && removed.has(e.junctionId))
+    (e.kind === 'junction' && removed.has(e.junctionId)) ||
+    (e.kind === 'shape' && removed.has(e.shapeId))
       ? detach(e)
       : e;
   return healWireConnections({
@@ -198,6 +207,7 @@ function transformLineRoutes(doc: CircuitDocument, transform: (doc: CircuitDocum
 }
 /** Shared geometric move used by pointer dragging and keyboard nudging. */
 export function moveSelection(doc: CircuitDocument, ids: string[], delta: Point): CircuitDocument {
+  ids = frameSelection(doc, ids);
   if (doc.objects.some((o) => o.kind === 'line'))
     return transformLineRoutes(doc, (adapted) => moveSelection(adapted, ids, delta));
   const selected = new Set(ids);
@@ -276,6 +286,7 @@ export function rotateObjects(
   const selected = new Set(ids),
     objects = doc.objects.filter((o) => selected.has(o.id));
   if (!objects.length || increment === 0) return doc;
+  if (objects.some((o) => o.kind === 'rectangle' && o.frame)) return doc;
   if (objects.length === 1 && objects[0].kind === 'circle') return doc;
   const angle: Rotation = increment ?? (objects.some((o) => o.kind === 'component') ? 45 : 90);
   const boxes = objects.map((o) => objectBounds(o, doc));
@@ -297,7 +308,7 @@ export function rotateObjects(
     return midpoint(o.start, o.end);
   });
   const center =
-    objects.length === 1 && objects[0].kind === 'component'
+    objects.length === 1 && (objects[0].kind === 'component' || objects[0].kind === 'angle')
       ? { x: objects[0].x, y: objects[0].y }
       : objects.length === 1 && objects[0].kind === 'brace'
         ? midpoint(objects[0].start, objects[0].end)
@@ -349,6 +360,8 @@ export function rotateObjects(
           rotation: next(o.rotation),
           label: { ...o.label, offset: rotatePoint(o.label.offset, angle) },
         };
+      if (o.kind === 'angle') return { ...o, ...rp(o), startAngle: normalizeAngle(o.startAngle-angle),
+        label: { ...o.label, offset: rotatePoint(o.label.offset, angle) } };
       if (o.kind === 'junction') return { ...o, ...rp(o) };
       if (o.kind === 'text') return { ...o, ...rp(o), rotation: next(o.rotation) };
       if (o.kind === 'loop-arrow') return rotateArrow(o, angle, center);
@@ -382,11 +395,9 @@ export function rotateObjects(
         };
       }
       if (o.kind === 'rectangle' || o.kind === 'circle') {
-        // Rectangles stay axis aligned; quarter turns exchange dimensions.
         const c = rp({ x: o.x + o.width / 2, y: o.y + o.height / 2 });
-        const width = angle === 90 ? o.height : o.width,
-          height = angle === 90 ? o.width : o.height;
-        return { ...o, x: c.x - width / 2, y: c.y - height / 2, width, height };
+        return { ...o, x: c.x - o.width / 2, y: c.y - o.height / 2,
+          ...(o.kind === 'rectangle' ? { rotation: ((o.rotation ?? 0) + angle) % 360 } : {}) };
       }
       if (o.kind === 'line') return { ...o, start: rp(o.start), end: rp(o.end) };
       if (o.kind === 'arrow') return rotateArrow(o, angle, center);

@@ -1,5 +1,5 @@
 import { t } from '../../i18n';
-import { Highlighter, Unlink } from 'lucide-react';
+import { Blend, Unlink } from 'lucide-react';
 import type { Highlight, HighlightStyle } from '../../model/types';
 import {
   detachHighlight,
@@ -13,6 +13,8 @@ import { commonValue } from './commonValue';
 import { InspectorSection, PropertyField, PropertySelect } from './PropertyControls';
 import { ColorControl } from './SelectionStyle';
 import { SelectionGeometry } from './SelectionGeometry';
+import { ObjectStyleSection } from './ObjectStyleSection';
+import { ObjectPaintSection } from './PaintSections';
 
 /** Reuse the inspector's standard color, opacity and numeric controls. */
 export function HighlightProperties({ objects = [] }: { objects?: Highlight[] }) {
@@ -32,6 +34,7 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
   const color = commonValue(values.map((o) => o.color));
   const opacity = commonValue(values.map((o) => Math.round(o.opacity * 100)));
   const width = commonValue(values.map((o) => o.width));
+  const AppearanceSection = editing ? ObjectStyleSection : InspectorSection;
   const detachButton = (
     <button
       className="inspector-property-action"
@@ -50,17 +53,7 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
   );
   return (
     <div className="inspector-properties">
-      <div className="inspector-selection">
-        <span className="inspector-object-icon">
-          <Highlighter size={16} />
-        </span>
-        <div className="inspector-type">
-          <span>
-            {objects.length > 1
-              ? t('{count} highlights', { count: objects.length })
-              : t('Highlighter')}
-          </span>
-          <small>
+      <p className="inspector-context-note">
             {!editing
               ? t('Settings for the next stroke')
               : single?.mode === 'smart'
@@ -70,9 +63,7 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
                   : single
                     ? t('Freehand stroke')
                     : t('Shared properties')}
-          </small>
-        </div>
-      </div>
+      </p>
       {!editing && (
         <div className="inspector-general">
           <PropertySelect
@@ -97,8 +88,8 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
           </p>
         </div>
       )}
-      <InspectorSection title={t('Appearance')}>
-        <div className="inspector-style">
+      <AppearanceSection title={t('Appearance')} objects={objects} apply={(fn) => state().updateSelection(fn)}>
+        {!editing && <div className="inspector-style">
           <ColorControl
             label={t('Color')}
             value={color}
@@ -109,6 +100,7 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
             <PropertyField
               label={t('Highlighter opacity')}
               caption=""
+              icon={<Blend size={12} />}
               numeric
               unit="%"
               min={0}
@@ -127,8 +119,9 @@ export function HighlightProperties({ objects = [] }: { objects?: Highlight[] })
             value={width}
             onCommit={(v) => apply({ width: Number(v) })}
           />
-        </div>
-      </InspectorSection>
+        </div>}
+      </AppearanceSection>
+      {editing && <ObjectPaintSection objects={objects} apply={(fn) => state().updateSelection(fn)} border />}
       {single && (
         <InspectorSection title={t('Geometry')}>
           {single.mode === 'smart' ? (

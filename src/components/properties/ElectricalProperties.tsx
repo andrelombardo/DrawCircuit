@@ -15,6 +15,15 @@ import {
 } from './PropertyControls';
 import { SelectionStyle } from './SelectionStyle';
 
+export function AnnotationReverseAction({ mode, onClick }: {
+  mode: ElectricalAnnotation['mode']; onClick: () => void;
+}) {
+  const label = t(mode === 'polarity' ? 'Reverse polarity' : mode === 'current' ? 'Reverse current direction' : 'Reverse voltage arrow');
+  return <button className="inspector-inline-action inspector-reverse-action" aria-label={label} title={label} onClick={onClick}>
+    <ArrowLeftRight size={18} aria-hidden="true" />
+  </button>;
+}
+
 function AnnotationFields({ annotation }: { annotation: ElectricalAnnotation }) {
   const state = () => useEditorStore.getState();
   const apply = (fn: (o: CircuitObject) => CircuitObject) =>
@@ -33,17 +42,10 @@ function AnnotationFields({ annotation }: { annotation: ElectricalAnnotation }) 
           value={annotation.label.text}
           onCommit={(text) => update((o) => ({ ...o, label: { ...o.label, text } }))}
         />
-        <button
-          className="inspector-inline-action"
+        <AnnotationReverseAction
+          mode={annotation.mode}
           onClick={() => update((o) => ({ ...o, reversed: !o.reversed }))}
-        >
-          <ArrowLeftRight size={14} />{' '}
-          {annotation.mode === 'polarity'
-            ? t('Reverse polarity')
-            : current
-              ? t('Reverse current direction')
-              : t('Reverse voltage arrow')}
-        </button>
+        />
       </div>
       {current && segments > 0 && (
         <>
@@ -96,6 +98,7 @@ function AnnotationFields({ annotation }: { annotation: ElectricalAnnotation }) 
           />
         </>
       )}
+      <InspectorDisclosure title={t('Position')}>
       {(!current || !annotation.wireId) && (
         <div className="inspector-offsets" role="group" aria-label={t('Annotation position')}>
           <h4 title={t('Offset from the component or reference geometry, in canvas units.')}>
@@ -147,6 +150,7 @@ function AnnotationFields({ annotation }: { annotation: ElectricalAnnotation }) 
           ))}
         </div>
       </div>
+      </InspectorDisclosure>
       <InspectorDisclosure
         title={t('Annotation style')}
         preview={

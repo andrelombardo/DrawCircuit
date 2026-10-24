@@ -1,3 +1,4 @@
+import { angleGeometry } from '../annotations/angle';
 import { braceGeometry } from '../annotations/brace';
 import { electricalDrawingGeometry } from '../annotations/electrical';
 import type { CircuitDocument, CircuitObject, Label, Point, Rotation } from '../model/types';
@@ -42,7 +43,9 @@ export function inlineTextTarget(
   const point =
     object.kind === 'electrical'
       ? electrical!.labelPoint
-      : object.kind === 'brace'
+      : object.kind === 'angle'
+        ? angleGeometry(object).labelPoint
+        : object.kind === 'brace'
         ? braceGeometry(object).labelPoint
         : add(object, object.label.offset);
   return {

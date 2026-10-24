@@ -1,3 +1,4 @@
+import { parentFrame } from '../model/shapeAppearance';
 import type {
   CircuitComponent,
   CircuitDocument,
@@ -436,7 +437,7 @@ export function highlightPaintGroups(doc: CircuitDocument): Highlight[][] {
   const groups = new Map<string, Highlight[]>();
   for (const object of doc.objects) {
     if (object.kind !== 'highlight') continue;
-    const key = `${object.paintGroup ?? object.id}:${object.color}:${object.opacity}`;
+    const key = `${object.paintGroup ?? object.id}:${object.color}:${object.opacity}:${object.styleOpacity ?? 1}:${object.blendMode ?? 'normal'}:${parentFrame(doc, object.id)?.id ?? ''}:${JSON.stringify(object.borders)}`;
     const group = groups.get(key);
     if (group) group.push(object);
     else groups.set(key, [object]);

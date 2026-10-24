@@ -1,3 +1,4 @@
+import { normalizeAngle } from '../annotations/angle';
 import { mapHighlight } from '../annotations/highlight';
 import { t } from '../i18n';
 import { create } from 'zustand';
@@ -68,6 +69,9 @@ export function instantiatePersonalBlock(
   rotation: Rotation,
   existing: CircuitDocument,
 ) {
+  // Frames use canvas-aligned constraints. Preserve their hierarchy and layout
+  // when inserting a block rather than rotating its children out of the frame.
+  if (block.document.objects.some((o) => o.kind === 'rectangle' && o.frame)) rotation = 0;
   const rp = (p: Point) => rotatePoint(p, rotation);
   const next = (r: Rotation) => ((r + rotation) % 360) as Rotation;
   const ep = (e: Endpoint): Endpoint => (e.kind === 'free' ? { ...e, point: rp(e.point) } : e);
@@ -87,17 +91,19 @@ export function instantiatePersonalBlock(
           ...rp(o),
           label: { ...o.label, offset: rp(o.label.offset) },
         };
+      if (o.kind === 'angle') return { ...o, ...rp(o), startAngle: normalizeAngle(o.startAngle-rotation),
+        label: { ...o.label, offset: rp(o.label.offset) } };
       if (o.kind === 'text') return { ...o, ...rp(o), rotation: next(o.rotation) };
       if (o.kind === 'rectangle' || o.kind === 'circle') {
         const center = rp({ x: o.x + o.width / 2, y: o.y + o.height / 2 });
-        const width = rotation % 180 === 90 ? o.height : o.width,
-          height = rotation % 180 === 90 ? o.width : o.height;
+        const width = o.width, height = o.height;
         return {
           ...o,
           x: center.x - width / 2,
           y: center.y - height / 2,
           width,
           height,
+          ...(o.kind === 'rectangle' && !o.frame ? { rotation: ((o.rotation ?? 0) + rotation) % 360 } : {}),
         };
       }
       if (o.kind === 'highlight') return mapHighlight(o, rp);

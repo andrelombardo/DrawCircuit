@@ -16,7 +16,7 @@ const key = (p: Point) => `${quantize(p.x)},${quantize(p.y)}`;
 const endpointKey = (ep: Endpoint): string | null =>
   ep.kind === 'terminal' ? `t:${ep.componentId}:${ep.terminalId}` :
     ep.kind === 'junction' ? `j:${ep.junctionId}` :
-      ep.connectionId ? `w:${ep.connectionId}` : null;
+      ep.kind === 'free' && ep.connectionId ? `w:${ep.connectionId}` : null;
 function sharedConnectionAt(a: Wire, b: Wire, point: Point, doc: CircuitDocument) {
   return [a.startEndpoint, a.endEndpoint].some((ep) => {
     const id = endpointKey(ep);

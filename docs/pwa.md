@@ -2,7 +2,7 @@
 
 DrawCircuit loads from the network and stores circuits, personal blocks, and preferences in the browser. It does not register service workers, precache resources, or implement an update system. Opening the app loads the site normally. The host controls ordinary HTTP caching; this is separate from an app-managed offline cache. An already open editor may continue working with resources in memory, but offline startup is not guaranteed.
 
-`public/manifest.webmanifest` preserves the name, icons, colors, and standalone launch. The canonical public path is case-sensitive `/drawcircuit/`; the visible app name remains DrawCircuit. Relative `start_url` and `scope` work under this path. Local data belongs to the unchanged origin `https://andrelombardo.github.io`. An app installed from the old address may need to be installed again from the new URL. The manifest defaults to English; the in-app language selector remembers English or Italian independently of circuit data.
+`public/manifest.webmanifest` preserves the name, icons, colors, and standalone launch. The canonical public path is case-sensitive `/drawcircuit/`; the visible app name remains DrawCircuit. Relative `start_url` and `scope` work under this path. Local data belongs to the unchanged origin `https://andrelombardo.github.io`. An app installed from the old address may need to be installed again from the new URL. The manifest and interface use Italian. Circuit text and saved personal data retain their original content.
 
 ## Browsers
 
