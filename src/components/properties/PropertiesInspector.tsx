@@ -15,7 +15,6 @@ import {
 export function PropertiesInspector({
   preferences,
   setPreferences,
-  toggle,
   footer,
 }: ReturnType<typeof useInspectorPreferences> & { footer?: ReactNode }) {
   const drag = useRef<{ x: number; width: number; pointer: number } | null>(null);
@@ -36,7 +35,7 @@ export function PropertiesInspector({
       hidden={!preferences.visible}
       style={{ '--inspector-width': `${preferences.width}px` } as CSSProperties}
     >
-      <InspectorHeader onHide={toggle} />
+      <InspectorHeader />
       {preferences.visible && (
         <div ref={scroll} className="inspector-scroll">
           <PropertiesContent />

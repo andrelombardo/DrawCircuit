@@ -1,7 +1,8 @@
 import { t } from '../../i18n';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { SidebarIcon } from './SidebarIcon';
 
-/** Both workspace panels share the same control, including their floating reopen buttons. */
+/** The properties panel uses an edge tab; the component library keeps its floating control. */
 export function SidebarToggle({
   side,
   visible,
@@ -26,7 +27,7 @@ export function SidebarToggle({
   return (
     <button
       type="button"
-      className={`icon-button sidebar-toggle${visible || !floating ? '' : ` sidebar-reopen floating-surface${side === 'right' ? ' inspector-reopen' : ''}`}`}
+      className={`icon-button sidebar-toggle${side === 'right' ? ' inspector-edge-toggle' : visible || !floating ? '' : ' sidebar-reopen floating-surface'}`}
       aria-label={label}
       title={title}
       data-tooltip={title}
@@ -34,7 +35,9 @@ export function SidebarToggle({
       aria-controls={side === 'left' ? 'component-library' : 'properties-inspector'}
       onClick={onToggle}
     >
-      <SidebarIcon side={side} />
+      {side === 'right'
+        ? visible ? <ChevronRight size={18} aria-hidden="true" /> : <ChevronLeft size={18} aria-hidden="true" />
+        : <SidebarIcon side={side} />}
     </button>
   );
 }

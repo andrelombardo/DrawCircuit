@@ -203,9 +203,6 @@ function CanvasContent({
             {t('Local saving is unavailable. Keep this page open and use “Copy as image”.')}{' '}
           </div>
         )}
-        {!inspector.preferences.visible && (
-          <SidebarToggle side="right" visible={false} onToggle={inspector.toggle} />
-        )}
         {(tool === 'wire' || tool === 'line') && (
           <div className="arrow-tool-options" role="group" aria-label={t(tool === 'line' ? 'Line routing' : 'Wire routing')}>
             {(['orthogonal', '45', 'free'] as const).map((routing, i) => (
@@ -550,6 +547,7 @@ function CanvasContent({
         </div>
         {!inspector.preferences.visible && <WorkspaceUtilities onHelp={onHelp} />}
       </main>
+      <SidebarToggle side="right" visible={inspector.preferences.visible} onToggle={inspector.toggle} />
       <PropertiesInspector {...inspector} footer={<WorkspaceUtilities onHelp={onHelp} />} />
     </div>
   );

@@ -131,7 +131,7 @@ export function PropertiesContent() {
   const rotationControl = absoluteRotation && (
     <PropertySelect
       label={t('Rotation')}
-      caption={<RotateCw size={14} aria-hidden="true" />}
+      caption={<><RotateCw size={16} aria-hidden="true" /><span>{t('Rotation')}</span></>}
       embedded
       value={rotation === undefined ? undefined : Number(rotation.toFixed(2))}
       numeric={{ min: -MAX_COORDINATE, max: MAX_COORDINATE, unit: '°' }}
@@ -171,10 +171,9 @@ export function PropertiesContent() {
               onCommit={(v) => state().position(axis, Number(v))}
             />
           ))}
-          {rotationControl}
         </div>}
         <div className="inspector-transform-row">
-          {parent && rotationControl}
+          {rotationControl}
           {groupRotation && !absoluteRotation && (
             <button
               className="inspector-property-action inspector-transform-action"
@@ -364,6 +363,61 @@ export function PropertiesContent() {
           </InspectorSection>
         )}
       {!labelTarget && o?.kind === 'rectangle' && o.frame && <FrameSettings key={o.id} object={o} />}
+      {!electricalOnly &&
+        ((o && ('label' in o || o.kind === 'text')) ||
+          objects.every((o) => 'label' in o) ||
+          objects.every((o) => o.kind === 'text')) && (
+          <InspectorSection title={t(o?.kind === 'text' ? 'Text' : 'Label')} className="inspector-text">
+            <div className="inspector-text-content">
+            {o && ('label' in o || o.kind === 'text') && (
+              <PropertyField
+                label={
+                  o.kind === 'junction'
+                    ? t('Junction name')
+                    : o.kind === 'component'
+                      ? t('Component label')
+                      : o.kind === 'text'
+                        ? t('Text content')
+                        : t('Annotation label')
+                }
+                caption=""
+                value={o.kind === 'text' ? o.text : 'label' in o ? o.label.text : ''}
+                onCommit={(text) => apply((o) => replaceInlineText(o, text))}
+              />
+            )}
+            {objects.length > 1 && objects.every((o) => 'label' in o) && (
+              <PropertyField
+                label={t('Shared label')}
+                caption=""
+                value={commonValue(objects.map((o) => ('label' in o ? o.label.text : '')))}
+                onCommit={(text) => apply((o) => replaceInlineText(o, text))}
+              />
+            )}
+            {objects.length > 1 && objects.every((o) => o.kind === 'text') && (
+              <PropertyField
+                label={t('Shared content')}
+                caption=""
+                value={commonValue(objects.map((o) => (o.kind === 'text' ? o.text : '')))}
+                onCommit={(text) => apply((o) => replaceInlineText(o, text))}
+              />
+            )}
+              <div className="inspector-text-size"><SelectionTypography objects={objects} apply={apply} controls="size" /></div>
+            </div>
+            {o?.kind === 'component' && componentRegistry[o.type].internalText !== undefined && (
+              <PropertyField
+                label={t('Internal text')}
+                value={o.bodyText ?? '='}
+                onCommit={(bodyText) =>
+                  apply((o) => (o.kind === 'component' ? { ...o, bodyText } : o))
+                }
+              />
+            )}
+            {objects.every((object) => 'label' in object) && (
+              <LabelAppearance objects={objects} apply={apply} caption={t('Color')} />
+            )}
+            <SelectionTypography objects={objects} apply={apply} controls="alignment" />
+          </InspectorSection>
+        )}
       {!labelTarget && (
         <ObjectStyleSection objects={objects} apply={apply}>
           {!fillSelection && !strokeSelection && <SelectionStyle
@@ -487,61 +541,6 @@ export function PropertiesContent() {
       </>}
       {fillSelection && !labelTarget && <ObjectPaintSection objects={objects} apply={apply} />}
       {strokeSelection && !labelTarget && <ObjectPaintSection objects={objects} apply={apply} border />}
-      {!electricalOnly &&
-        ((o && ('label' in o || o.kind === 'text')) ||
-          objects.every((o) => 'label' in o) ||
-          objects.every((o) => o.kind === 'text')) && (
-          <InspectorSection title={t(o?.kind === 'text' ? 'Text' : 'Label')} className="inspector-text">
-            <div className="inspector-text-content">
-            {o && ('label' in o || o.kind === 'text') && (
-              <PropertyField
-                label={
-                  o.kind === 'junction'
-                    ? t('Junction name')
-                    : o.kind === 'component'
-                      ? t('Component label')
-                      : o.kind === 'text'
-                        ? t('Text content')
-                        : t('Annotation label')
-                }
-                caption=""
-                value={o.kind === 'text' ? o.text : 'label' in o ? o.label.text : ''}
-                onCommit={(text) => apply((o) => replaceInlineText(o, text))}
-              />
-            )}
-            {objects.length > 1 && objects.every((o) => 'label' in o) && (
-              <PropertyField
-                label={t('Shared label')}
-                caption=""
-                value={commonValue(objects.map((o) => ('label' in o ? o.label.text : '')))}
-                onCommit={(text) => apply((o) => replaceInlineText(o, text))}
-              />
-            )}
-            {objects.length > 1 && objects.every((o) => o.kind === 'text') && (
-              <PropertyField
-                label={t('Shared content')}
-                caption=""
-                value={commonValue(objects.map((o) => (o.kind === 'text' ? o.text : '')))}
-                onCommit={(text) => apply((o) => replaceInlineText(o, text))}
-              />
-            )}
-              <div className="inspector-text-size"><SelectionTypography objects={objects} apply={apply} controls="size" /></div>
-            </div>
-            {o?.kind === 'component' && componentRegistry[o.type].internalText !== undefined && (
-              <PropertyField
-                label={t('Internal text')}
-                value={o.bodyText ?? '='}
-                onCommit={(bodyText) =>
-                  apply((o) => (o.kind === 'component' ? { ...o, bodyText } : o))
-                }
-              />
-            )}
-            {objects.every((object) => 'label' in object) && (
-              <LabelAppearance objects={objects} apply={apply} caption={t('Color')} />
-            )}
-            <SelectionTypography objects={objects} apply={apply} controls="alignment" />
-          </InspectorSection>
-        )}
       {!labelTarget && objects.length > 1 && (
         <InspectorSection title={t('Arrangement')} className="inspector-arrangement">
           <SelectionGeometry objects={objects} showAlignment={false} />

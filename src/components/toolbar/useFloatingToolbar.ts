@@ -44,6 +44,7 @@ export function useFloatingToolbar(sidebarVisible: boolean, inspectorVisible: bo
     toolbarWidth: 0,
     toolbarHeight: 0,
     titleArea: null as TitleArea | null,
+    inspectorToggle: null as { left: number; right: number; top: number; bottom: number } | null,
   });
   const point = useRef<Position>({ x: 0, y: 0 });
   const drag = useRef<{
@@ -72,13 +73,14 @@ export function useFloatingToolbar(sidebarVisible: boolean, inspectorVisible: bo
         if (b.travelX >= 44) position.x = 58;
         else position.y = Math.min(reopenBottom, MARGIN + b.travelY);
       }
-      // Both panel buttons share the top row. Keep tools clear of the right
-      // button too, moving them below that row when the screen is narrow.
-      if (!inspectorVisible && position.y < reopenBottom && position.x + b.toolbarWidth > b.width - 58) {
+      // Keep the inspector's edge tab reachable in both panel states.
+      const toggle = b.inspectorToggle;
+      if (toggle && position.y < toggle.bottom + 8 && position.y + b.toolbarHeight > toggle.top - 8 &&
+        position.x < toggle.right + 8 && position.x + b.toolbarWidth > toggle.left - 8) {
         const left = sidebarVisible ? MARGIN : 58;
-        if (b.toolbarWidth <= b.width - 58 - left)
-          position.x = Math.max(left, b.width - 58 - b.toolbarWidth);
-        else position.y = Math.min(reopenBottom, MARGIN + b.travelY);
+        if (b.toolbarWidth <= toggle.left - 8 - left)
+          position.x = Math.max(left, toggle.left - 8 - b.toolbarWidth);
+        else position.y = Math.min(toggle.bottom + 8, MARGIN + b.travelY);
       }
       // The canvas reaches the top edge in installed apps. Keep a toolbar dragged
       // into that area inside the space between the browser's window buttons.
@@ -97,7 +99,7 @@ export function useFloatingToolbar(sidebarVisible: boolean, inspectorVisible: bo
       });
       return position;
     },
-    [sidebarVisible, inspectorVisible],
+    [sidebarVisible],
   );
   const save = () => {
     const b = bounds.current;
@@ -130,6 +132,7 @@ export function useFloatingToolbar(sidebarVisible: boolean, inspectorVisible: bo
           ? edge - surface.left
           : surface.width;
       const title = overlay?.visible ? overlay.getTitlebarAreaRect() : null;
+      const toggle = editor.parentElement?.querySelector('.inspector-edge-toggle')?.getBoundingClientRect();
       bounds.current = {
         width,
         height: surface.height,
@@ -138,6 +141,12 @@ export function useFloatingToolbar(sidebarVisible: boolean, inspectorVisible: bo
         travelY: Math.max(0, surface.height - size.height - MARGIN - 64),
         toolbarWidth: size.width,
         toolbarHeight: size.height,
+        inspectorToggle: toggle ? {
+          left: toggle.left - surface.left,
+          right: toggle.right - surface.left,
+          top: toggle.top - surface.top,
+          bottom: toggle.bottom - surface.top,
+        } : null,
         titleArea: title
           ? {
               left: title.x - surface.left,
@@ -165,7 +174,7 @@ export function useFloatingToolbar(sidebarVisible: boolean, inspectorVisible: bo
       window.removeEventListener('resize', measure);
       overlay?.removeEventListener('geometrychange', measure);
     };
-  }, [place]);
+  }, [place, inspectorVisible]);
 
   const finish = (event: ReactPointerEvent<HTMLButtonElement>, cancelled = false) => {
     if (!drag.current || drag.current.pointerId !== event.pointerId) return;

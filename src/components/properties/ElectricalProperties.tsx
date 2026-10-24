@@ -177,23 +177,28 @@ export function ElectricalProperties({ object }: { object: CircuitObject }) {
   );
   const hosted = object.kind !== 'electrical';
   if (hosted && object.kind !== 'wire' && !supportsPolarity(object)) return null;
-  const title = object.kind === 'wire' ? t('Current') : t('Polarity and voltage');
   return (
-    <InspectorSection title={t('Electrical annotations')}>
-      {!annotations.length && (
-        <label className="inspector-check inspector-enable">
-          <span>{title}</span>
+    <InspectorSection
+      title={t('Electrical annotations')}
+      actions={hosted && (
+        <label className="inspector-enable">
           <input
             type="checkbox"
-            checked={false}
-            onChange={() => {
+            role="switch"
+            aria-label={t('Electrical annotations')}
+            checked={annotations.length > 0}
+            onChange={(event) => {
               const s = useEditorStore.getState();
-              const doc = withHostAnnotation(object, s.document);
+              const ids = new Set(annotationsForHost(object, s.document).map((annotation) => annotation.id));
+              const doc = event.target.checked
+                ? withHostAnnotation(object, s.document)
+                : { ...s.document, objects: s.document.objects.filter((item) => !ids.has(item.id)) };
               if (doc !== s.document) s.commit(doc);
             }}
           />
         </label>
       )}
+    >
       {annotations.map((annotation, index) => (
         <div
           className="inspector-annotation"
@@ -201,25 +206,7 @@ export function ElectricalProperties({ object }: { object: CircuitObject }) {
           aria-label={`${annotation.mode === 'current' ? t('Current') : t('Polarity and voltage')}${annotations.length > 1 ? ` ${index + 1}` : ''}`}
           key={annotation.id}
         >
-          {hosted ? (
-            <label className="inspector-check inspector-enable">
-              <span>
-                {title}
-                {annotations.length > 1 ? ` ${index + 1}` : ''}
-              </span>
-              <input
-                type="checkbox"
-                checked
-                onChange={() => {
-                  const s = useEditorStore.getState();
-                  s.commit({
-                    ...s.document,
-                    objects: s.document.objects.filter((o) => o.id !== annotation.id),
-                  });
-                }}
-              />
-            </label>
-          ) : (
+          {!hosted && (
             <PropertyRow caption={t('Type')}>
               <span>
                 {annotation.mode === 'polarity'

@@ -6,7 +6,6 @@ import { componentRegistry } from '../../model/catalog';
 import type { CircuitObject } from '../../model/types';
 import { objectTypeName } from './objectName';
 import { useEditorStore } from '../../store/editorStore';
-import { SidebarToggle } from '../toolbar/SidebarToggle';
 import { ComponentPreview } from '../palette/ComponentPreview';
 
 const objectIcons: Record<CircuitObject['kind'], LucideIcon> = {
@@ -15,7 +14,7 @@ const objectIcons: Record<CircuitObject['kind'], LucideIcon> = {
   rectangle: RectangleHorizontal, circle: Circle, line: Minus, highlight: Highlighter,
 };
 
-export function InspectorHeader({ onHide }: { onHide: () => void }) {
+export function InspectorHeader() {
   const objects = useEditorStore(
     useShallow((s) => {
       const ids = new Set(s.selection);
@@ -38,15 +37,19 @@ export function InspectorHeader({ onHide }: { onHide: () => void }) {
   const Icon = tool === 'highlight-eraser' ? Eraser : tool === 'highlight' ? Highlighter : activeLabel ? Type :
     object?.kind === 'rectangle' && object.frame ? Frame : object ? objectIcons[object.kind] : Layers2;
   const component = object?.kind === 'component' && !activeLabel && tool !== 'highlight' && tool !== 'highlight-eraser' ? object : null;
+  const definition = component ? componentRegistry[component.type] : null;
+  const componentCategory = definition?.name.match(/^(AC|DC)\b/)?.[1] ?? (definition ? t(definition.group) : '');
   return (
-    <div className="inspector-header" data-contextual={contextual || undefined}>
+    <div className="inspector-header" data-contextual={contextual || undefined} data-component={component ? true : undefined}>
       <div className="inspector-header-title">
-        {contextual && <span className="inspector-object-icon" aria-hidden="true">
-          {component ? <ComponentPreview component={componentRegistry[component.type]} /> : <Icon size={22} />}
+        {contextual && <span className="inspector-object-icon" data-component={component ? true : undefined} aria-hidden="true">
+          {definition ? <ComponentPreview component={definition} /> : <Icon size={22} />}
         </span>}
-        <h2>{title}</h2>
+        {component ? <div className="inspector-component-details">
+          <h2>{title}</h2>
+          <p>{t('Component')} · {componentCategory}</p>
+        </div> : <h2>{title}</h2>}
       </div>
-      <SidebarToggle side="right" visible onToggle={onHide} />
     </div>
   );
 }
